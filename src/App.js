@@ -14,7 +14,7 @@ const STRIPE_PRICE_ID = "price_YOUR_PRICE_ID_HERE";
 const STRIPE_CONFIGURED = false; // ← set to true once you add real keys
 
 const FREE_USES_LIMIT = 3;
-const API_URL = "https://api.anthropic.com/v1/messages";
+const API_URL = "/api/analyze";
 
 const SYSTEM_PROMPT = `You are an expert IELTS examiner with 20+ years of experience. You evaluate IELTS Academic and General Training Writing Task 2 essays with precision and fairness.
 
@@ -421,4 +421,5 @@ export default function IELTSBot() {
     </div>
   );
 }
+
 
