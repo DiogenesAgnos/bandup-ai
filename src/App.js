@@ -656,10 +656,7 @@ export default function IELTSBot(){
         <div style={{marginTop:12,display:"inline-flex",background:proUser?T.greenBg:usesLeft<=0?T.redBg:T.goldLight,border:`1px solid ${proUser?T.greenBorder:usesLeft<=0?T.redBorder:T.goldBorder}`,borderRadius:100,padding:"4px 16px",fontSize:13,fontFamily:"system-ui",color:proUser?T.green:usesLeft<=0?T.red:T.gold,fontWeight:600}}>
           {proUser?"✓ Pro — Unlimited Access":usesLeft>0?`${usesLeft} free ${usesLeft===1?"analysis":"analyses"} remaining`:"Free limit reached — upgrade to continue"}
         </div>
-        <div style={{marginTop:10,display:"flex",gap:8,justifyContent:"center"}}>
-          <button onClick={()=>switchLang("en")} style={{background:lang==="en"?T.gold:"white",border:`1px solid ${lang==="en"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="en"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇬🇧 English</button>
-          <button onClick={()=>switchLang("ar")} style={{background:lang==="ar"?T.gold:"white",border:`1px solid ${lang==="ar"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="ar"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇸🇦 عربي</button>
-        </div>
+
       </div>
 
       <div style={{maxWidth:860,margin:"0 auto",padding:"24px 16px 0"}}>
@@ -675,7 +672,8 @@ export default function IELTSBot(){
         {mainView==="analyze"&&(
           <div>
             <div style={{marginBottom:20}}>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10,fontFamily:"system-ui",fontWeight:600}}>Select Task Type</label>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"system-ui",fontWeight:600}}>Select Task Type</label>
+              <p style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
                   <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); }}
@@ -709,7 +707,7 @@ export default function IELTSBot(){
               </div>
               <div>
                 <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"system-ui",fontWeight:600}}>
-                  Student's Response
+                  Student's Response <span style={{fontSize:11,color:T.textMuted,fontWeight:400,textTransform:"none",letterSpacing:0}}>(minimum {minWords} words required for Task {taskType==="task2"?"2":"1"})</span>
                   <span style={{color:wordCount>=minWords?T.green:wordCount>=(minWords*0.6)?T.amber:T.red,marginLeft:10,fontWeight:500,fontFamily:"system-ui"}}>
                     {wordCount} words {wordCount>=minWords?"✓":`(min. ${minWords} required${wordCount>10&&wordCount<minWords?" — penalty applies":""})`}
                   </span>
@@ -731,6 +729,31 @@ export default function IELTSBot(){
                 style={{background:loading?"#e2e8f0":T.gold,border:"none",borderRadius:10,color:loading?T.textMuted:"white",fontSize:15,fontWeight:800,padding:"15px 28px",cursor:loading?"not-allowed":"pointer",fontFamily:"system-ui",boxShadow:loading?"none":T.shadowMd,transition:"all 0.2s"}}>
                 {loading?"⏳ Examining...":!proUser&&usesLeft<=0?"🔓 Upgrade to Continue":`🎓 Analyze ${TASK_TYPES[taskType].label}`}
               </button>
+
+              {/* Language Selector */}
+              <Card style={{background:T.bg3,border:`1px solid ${T.border}`,marginTop:4}}>
+                <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
+                <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?T.goldLight:"white",border:`1px solid ${lang==="en"?T.goldBorder:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
+                    <div style={{fontSize:22,flexShrink:0}}>🇬🇧</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?T.gold:T.text,fontFamily:"system-ui",marginBottom:2}}>English — Feedback in English</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui"}}>All scores, corrections and tips will appear in English.</div>
+                      {lang==="en"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"system-ui",marginTop:4}}>⚠️ Switching language will re-run the analysis.</div>}
+                    </div>
+                    {lang==="en"&&<span style={{background:T.gold,color:"white",borderRadius:20,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"system-ui",flexShrink:0}}>✓ Active</span>}
+                  </div>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="ar"?T.goldLight:"white",border:`1px solid ${lang==="ar"?T.goldBorder:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s",direction:"ltr"}} onClick={()=>switchLang("ar")}>
+                    <div style={{fontSize:22,flexShrink:0}}>🇸🇦</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?T.gold:T.text,fontFamily:"system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui",direction:"rtl",textAlign:"right"}}>ستظهر جميع الدرجات والتصحيحات والنصائح باللغة العربية.</div>
+                      {lang==="ar"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"system-ui",marginTop:4,direction:"rtl",textAlign:"right"}}>⚠️ تغيير اللغة سيُعيد تحليل المقال من جديد.</div>}
+                    </div>
+                    {lang==="ar"&&<span style={{background:T.gold,color:"white",borderRadius:20,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"system-ui",flexShrink:0}}>✓ نشط</span>}
+                  </div>
+                </div>
+              </Card>
             </div>
 
             {result&&(
@@ -755,9 +778,12 @@ export default function IELTSBot(){
 
                 {result.mistakes?.length>0&&(
                   <Card style={{marginBottom:16,background:T.bg3}}>
-                    <div style={{fontSize:12,color:T.textMid,fontFamily:"system-ui",marginBottom:6,fontWeight:600}}>Click any underlined word in the essay to see its correction:</div>
+                    <div style={{marginBottom:8}}>
+                      <div style={{fontSize:13,color:T.text,fontFamily:"system-ui",marginBottom:2,fontWeight:700}}>👆 Click any underlined word to see its correction and explanation.</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui",direction:"rtl",textAlign:"right",marginBottom:8}}>اضغط على أي كلمة تحتها خط لرؤية التصحيح والشرح.</div>
+                    </div>
                     <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-                      {[["major",T.red,"Major"],["moderate",T.amber,"Moderate"],["minor",T.blue,"Minor"]].map(([s,c,l])=>(
+                      {[["major",T.red,"Major — خطأ كبير"],["moderate",T.amber,"Moderate — خطأ متوسط"],["minor",T.blue,"Minor — خطأ بسيط"]].map(([s,c,l])=>(
                         <span key={s} style={{fontSize:12,fontFamily:"system-ui",display:"flex",alignItems:"center",gap:4}}>
                           <span style={{display:"inline-block",width:20,height:2,background:c,borderRadius:1}}/><span style={{color:c,fontWeight:600}}>{l}</span>
                         </span>
@@ -779,7 +805,7 @@ export default function IELTSBot(){
                 {activeTab==="annotated"&&(
                   <Card>
                     <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                      <span>📝 Your Essay — Click underlined words for corrections</span>
+                      <span>📝 Your Essay — 👆 Click underlined words for corrections / اضغط على الكلمات لرؤية التصحيح</span>
                       <span style={{color:T.red,fontWeight:600}}>{result.mistakes?.length} mistakes found</span>
                     </div>
                     <AnnotatedEssay essay={essay} mistakes={result.mistakes}/>
