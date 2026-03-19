@@ -539,6 +539,7 @@ const PracticeMode = ({ isPro, onUpgrade, setJokerMessage, setJokerMood }) => {
 
   const fetchLiveFeedback = useCallback(async (text) => {
     if (text.trim().split(/\s+/).length < 25) return;
+    if (!isPro && getStoredUses() >= FREE_USES_LIMIT) { onUpgrade(); return; }
     setLoadingFeedback(true);
     try {
       const res = await fetch(API_URL, {
@@ -549,6 +550,7 @@ const PracticeMode = ({ isPro, onUpgrade, setJokerMessage, setJokerMood }) => {
       const raw = data.content?.map(b => b.text||"").join("") || "";
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
       setLiveFeedback(parsed);
+if (!isPro) { const n = getStoredUses() + 1; saveUses(n); }
       if (parsed.spotError) { setJokerMessage(getJokerLine("mistake_grammar")); }
       else if (parsed.estimatedBand >= 7) { setJokerMessage(getJokerLine("scoreHigh")); }
       else { setJokerMessage(getJokerLine("typing")); }
