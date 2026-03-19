@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react"; 
 
 // ── Config ─────────────────────────────────
 const STRIPE_CONFIGURED = false;
