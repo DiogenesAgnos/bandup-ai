@@ -607,6 +607,12 @@ export default function IELTSBot(){
   const [proUser,setProUser]=useState(getStoredPro);
   const [lang,setLang]=useState("en");
   const fileRef=useRef();
+  const analyzeRef=useRef(null);
+
+  const switchLang=(newLang)=>{
+    setLang(newLang);
+    if(result){ setTimeout(()=>analyzeRef.current?.click(),150); }
+  };
 
   const usesLeft=FREE_USES_LIMIT-uses;
   const minWords=TASK_TYPES[taskType].minWords;
@@ -651,8 +657,8 @@ export default function IELTSBot(){
           {proUser?"✓ Pro — Unlimited Access":usesLeft>0?`${usesLeft} free ${usesLeft===1?"analysis":"analyses"} remaining`:"Free limit reached — upgrade to continue"}
         </div>
         <div style={{marginTop:10,display:"flex",gap:8,justifyContent:"center"}}>
-          <button onClick={()=>setLang("en")} style={{background:lang==="en"?T.gold:"white",border:`1px solid ${lang==="en"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="en"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇬🇧 English</button>
-          <button onClick={()=>setLang("ar")} style={{background:lang==="ar"?T.gold:"white",border:`1px solid ${lang==="ar"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="ar"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇸🇦 عربي</button>
+          <button onClick={()=>switchLang("en")} style={{background:lang==="en"?T.gold:"white",border:`1px solid ${lang==="en"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="en"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇬🇧 English</button>
+          <button onClick={()=>switchLang("ar")} style={{background:lang==="ar"?T.gold:"white",border:`1px solid ${lang==="ar"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="ar"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇸🇦 عربي</button>
         </div>
       </div>
 
@@ -721,7 +727,7 @@ export default function IELTSBot(){
                   <span style={{color:T.amber,fontSize:13,fontFamily:"system-ui"}}> for unlimited access.</span>
                 </Card>
               )}
-              <button onClick={analyze} disabled={loading}
+              <button ref={analyzeRef} onClick={analyze} disabled={loading}
                 style={{background:loading?"#e2e8f0":T.gold,border:"none",borderRadius:10,color:loading?T.textMuted:"white",fontSize:15,fontWeight:800,padding:"15px 28px",cursor:loading?"not-allowed":"pointer",fontFamily:"system-ui",boxShadow:loading?"none":T.shadowMd,transition:"all 0.2s"}}>
                 {loading?"⏳ Examining...":!proUser&&usesLeft<=0?"🔓 Upgrade to Continue":`🎓 Analyze ${TASK_TYPES[taskType].label}`}
               </button>
