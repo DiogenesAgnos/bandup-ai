@@ -1,10 +1,40 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
-// ── Config ────────────────────────────────────
+// ── Config ─────────────────────────────────
 const STRIPE_CONFIGURED = false;
 const FREE_USES_LIMIT = 2;
 const STORAGE_KEY = "bandup_uses";
 const API_URL = "/api/analyze";
+
+// ── Theme ───────────────────────────────────
+const T = {
+  bg: "#f8f9fc",
+  bg2: "#ffffff",
+  bg3: "#f0f2f7",
+  border: "#e2e8f0",
+  borderStrong: "#cbd5e1",
+  gold: "#b8860b",
+  goldLight: "#fef3c7",
+  goldBorder: "#fcd34d",
+  text: "#1e293b",
+  textMid: "#475569",
+  textMuted: "#94a3b8",
+  green: "#059669",
+  greenBg: "#ecfdf5",
+  greenBorder: "#6ee7b7",
+  blue: "#0284c7",
+  blueBg: "#e0f2fe",
+  blueBorder: "#7dd3fc",
+  red: "#dc2626",
+  redBg: "#fef2f2",
+  redBorder: "#fca5a5",
+  amber: "#d97706",
+  amberBg: "#fffbeb",
+  amberBorder: "#fcd34d",
+  shadow: "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)",
+  shadowMd: "0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05)",
+  shadowLg: "0 10px 25px rgba(0,0,0,0.1)"
+};
 
 const TASK_TYPES = {
   task2: { label: "Task 2 — Essay", description: "Academic & General Training", minWords: 250, icon: "✍️" },
@@ -12,81 +42,84 @@ const TASK_TYPES = {
   task1general: { label: "Task 1 — General", description: "Formal / Informal Letter", minWords: 150, icon: "✉️" }
 };
 
-// ── Persistent storage ────────────────────────
-const getStoredUses = () => {
-  try { return parseInt(localStorage.getItem(STORAGE_KEY) || "0"); } catch { return 0; }
-};
-const saveUses = (n) => {
-  try { localStorage.setItem(STORAGE_KEY, String(n)); } catch {}
-};
-const getStoredPro = () => {
-  try { return localStorage.getItem("bandup_pro") === "true"; } catch { return false; }
-};
-const savePro = () => {
-  try { localStorage.setItem("bandup_pro", "true"); } catch {}
-};
+// ── Helpers ─────────────────────────────────
+const bandColor = (b) => b >= 8 ? T.green : b >= 7 ? T.blue : b >= 6 ? T.amber : b >= 5 ? "#ea580c" : T.red;
+const bandBg = (b) => b >= 8 ? T.greenBg : b >= 7 ? T.blueBg : b >= 6 ? T.amberBg : b >= 5 ? "#fff7ed" : T.redBg;
+const bandLabel = (b) => b >= 8.5 ? "Expert" : b >= 7.5 ? "Very Good" : b >= 6.5 ? "Competent" : b >= 5.5 ? "Modest" : "Limited";
+const severityColor = (s) => s === "major" ? T.red : s === "moderate" ? T.amber : T.blue;
+const severityBg = (s) => s === "major" ? T.redBg : s === "moderate" ? T.amberBg : T.blueBg;
 
-// ── Joker lines ───────────────────────────────
+// ── Persistent storage ───────────────────────
+const getStoredUses = () => { try { return parseInt(localStorage.getItem(STORAGE_KEY) || "0"); } catch { return 0; } };
+const saveUses = (n) => { try { localStorage.setItem(STORAGE_KEY, String(n)); } catch {} };
+const getStoredPro = () => { try { return localStorage.getItem("bandup_pro") === "true"; } catch { return false; } };
+const savePro = () => { try { localStorage.setItem("bandup_pro", "true"); } catch {} };
+
+// ── Joker Lines ──────────────────────────────
 const JOKER_LINES = {
   idle: [
-    "Why so serious? Start writing already! 🃏",
-    "An empty essay box... how delightfully tragic.",
-    "I've seen better writing on the walls of Arkham. But no pressure.",
-    "The cursor blinks. Your future blinks. Coincidence? 🃏",
-    "Waiting for you to type something... anything... please."
+    "Why so serious? Start writing! 🃏",
+    "An empty page... how delightfully tragic.",
+    "The cursor blinks. Your future blinks. Coincidence?",
+    "I've seen better writing on Arkham's walls. But no pressure. 🃏",
+    "Tick tock. The examiner's patience isn't infinite. Neither is mine."
   ],
   typing: [
-    "Ooh you're actually trying. How adorably ambitious. 🃏",
-    "Keep going... I'm watching every word. EVERY. WORD.",
-    "Not bad. For someone who clearly didn't study. 😄",
-    "I see some potential here. Don't ruin it.",
-    "You know what's funny? Your sentence structure. 🃏"
+    "Ooh, you're actually trying. How adorably ambitious. 🃏",
+    "Keep going... I'm watching. EVERY. WORD.",
+    "Not bad. For someone who clearly skipped class.",
+    "I see potential. Don't ruin it. 🃏",
+    "You know what's funny? Your sentence structure. Ha. HA. HAHA!"
   ],
   mistake_grammar: [
     "Subject-verb agreement? Never heard of her? 🃏",
-    "Ah yes, the classic grammatical disaster. My favourite.",
-    "I've seen this error so many times it's become... beautiful. In a horrible way.",
-    "Your grammar called. It's in tears. 🃏",
-    "You know what this grammatical error needs? A good PENCIL. Through it."
+    "Oh, a grammatical disaster. My FAVOURITE kind.",
+    "Your grammar called. It's sobbing. 🃏",
+    "I used to have a grammar error like that once. I burned it.",
+    "The examiner's face reading this... 🃏 *chef's kiss of horror*"
   ],
   mistake_spelling: [
-    "That's not how you spell that. Or is it? No. No it's not. 🃏",
-    "Spell-check exists for a reason. Just saying.",
-    "I used to have a spelling mistake like that once. I burned it.",
-    "The examiner's face when they see this spelling... 🃏 chef's kiss.",
-    "Autocorrect tried to help you. You rejected it. Tragic."
+    "That's... not how you spell that. At all. 🃏",
+    "Spell-check exists for a REASON, darling.",
+    "Autocorrect tried to help you. You rejected it. Tragic. 🃏",
+    "I've seen this spelling error so many times it haunts my dreams."
   ],
   wordCount: [
-    "Under 250 words? The examiner will LOVE this. Oh wait, no they won't. 🃏",
-    "Quantity AND quality, darling. This isn't a tweet.",
-    "Short essays are like short jokes. They usually don't land.",
-    "You stopped writing? We were just getting started! 🃏"
+    "Under 250 words? The examiner will LOVE this. Oh wait. 🃏",
+    "This isn't a tweet, sweetheart. Keep. Writing.",
+    "Short essay. Short band score. Short future. 🃏",
+    "You stopped? We were just getting started!"
+  ],
+  wordGood: [
+    "Over 250 words! I'm almost proud. Almost. 🃏",
+    "Good length! Now let's hope the quality matches. 🃏",
+    "Word count achieved! Half the battle won. The easier half."
   ],
   analyzing: [
     "Calculating the damage... 🃏",
-    "Reading this carefully so the examiner doesn't have to suffer alone...",
-    "Processing... preparing my most disappointed face...",
-    "Almost done. Brace yourself. 🃏"
+    "Reading this so the examiner doesn't suffer alone...",
+    "Preparing my most disappointed face... almost ready... 🃏",
+    "Processing... brace yourself."
   ],
   scoreHigh: [
-    "Well well well... turns out you CAN write. I'm almost disappointed. 🃏",
-    "Band 7+? I was NOT expecting that. Genuinely impressed. Don't tell anyone.",
-    "Hm. This is actually good. I had a whole speech prepared. 🃏"
+    "Well well well... you CAN write. I'm almost disappointed. 🃏",
+    "Band 7+?! I had a whole speech prepared. Ruined. 🃏",
+    "Hm. Actually good. Don't tell anyone I said that."
   ],
   scoreMid: [
-    "Band 6. The Switzerland of IELTS scores. Neutral. Inoffensive. Forgettable. 🃏",
-    "Could be worse. Could also be much, much better. Just saying.",
-    "Band 6 is like a participation trophy. Nice, but not what you came for. 🃏"
+    "Band 6. The Switzerland of IELTS. Safe. Neutral. Forgettable. 🃏",
+    "Could be worse. Could also be MUCH better. Just saying.",
+    "Band 6 is like a participation trophy. Nice, but not why you're here. 🃏"
   ],
   scoreLow: [
-    "Band 5. You know what that stands for? Needs work. Significant work. 🃏",
-    "I've seen worse. Okay, I haven't. But I'm being KIND.",
-    "The good news: there's nowhere to go but up! The bad news: you have a LOT of going up to do. 🃏"
+    "Band 5. You know what that means? More practice. Lots more. 🃏",
+    "I've seen worse. Okay I haven't. But I'm being KIND.",
+    "Good news: nowhere to go but up! Bad news: you have A LOT of going up to do. 🃏"
   ],
   practice: [
-    "Practice mode! Let's see what you can do when no one's judging you. Oh wait, I am. 🃏",
-    "Write freely! I'll interrupt with sarcastic feedback every few seconds!",
-    "Time to practice! Remember: the only bad essay is the one you didn't write. And yours. Sometimes. 🃏"
+    "Practice mode! Let's see what you've got. I'll be watching. 🃏",
+    "Write freely! I'll interrupt with sarcastic wisdom every few seconds!",
+    "Time to practice! Remember: I judge everything. Everything. 🃏"
   ]
 };
 
@@ -95,7 +128,7 @@ const getJokerLine = (type) => {
   return lines[Math.floor(Math.random() * lines.length)];
 };
 
-// ── Practice questions by topic ───────────────
+// ── Practice Questions ───────────────────────
 const PRACTICE_QUESTIONS = {
   "Education": [
     "Some people believe that universities should focus on providing students with the practical skills needed in the workplace. Others argue that universities should prioritise academic knowledge. Discuss both views and give your opinion.",
@@ -124,12 +157,12 @@ const PRACTICE_QUESTIONS = {
   ]
 };
 
-// ── System prompts ────────────────────────────
+// ── System Prompts ───────────────────────────
 const getSystemPrompt = (taskType) => `You are an expert IELTS examiner with 20+ years of experience.
 
-${taskType === "task2" ? "Evaluating IELTS Task 2. Under 250 words = Task Achievement MAX Band 5.0." : taskType === "task1academic" ? "Evaluating IELTS Task 1 Academic. Check: overview? key trends? data accuracy? no opinion?" : "Evaluating IELTS Task 1 General letter. Check: bullet points addressed? correct register?"}
+${taskType === "task2" ? "Evaluating IELTS Task 2. Under 250 words = Task Achievement MAX Band 5.0." : taskType === "task1academic" ? "Evaluating IELTS Task 1 Academic. Check: overview? key trends? data accuracy? no personal opinion?" : "Evaluating IELTS Task 1 General letter. Check: all bullet points? correct register?"}
 
-SCORING: Band 9=flawless, Band 8=very good minor errors, Band 7=good some errors, Band 6=competent noticeable errors, Band 5=frequent errors. Task 1 with clear overview+accurate data+comparisons = 7.5-8.0 minimum. Do NOT undermark.
+SCORING: Band 9=flawless, Band 8=very good minor errors only, Band 7=good some errors rarely impede, Band 6=competent noticeable errors, Band 5=frequent errors limited vocab. Task 1 with clear overview+accurate data+good comparisons = 7.5-8.0 minimum. Do NOT undermark.
 
 Respond ONLY with valid JSON (no markdown, no backticks):
 {
@@ -141,164 +174,130 @@ Respond ONLY with valid JSON (no markdown, no backticks):
     "lexicalResource": { "band": 7.0, "feedback": "..." },
     "grammaticalRange": { "band": 7.5, "feedback": "..." }
   },
-  "mistakes": [{ "original": "exact phrase", "correction": "corrected version", "explanation": "why this is wrong", "category": "Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register", "severity": "minor|moderate|major" }],
-  "vocabularyUpgrades": [{ "weak": "exact weak phrase from essay", "advanced": "better alternative", "reason": "why" }],
+  "mistakes": [{ "original": "exact phrase from text", "correction": "corrected version", "explanation": "clear explanation", "category": "Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register", "severity": "minor|moderate|major" }],
+  "vocabularyUpgrades": [{ "weak": "exact weak phrase", "advanced": "better alternative", "reason": "why this helps" }],
   "bandBooster": { "currentBand": 7.0, "targetBand": 7.5, "specificActions": ["action 1", "action 2", "action 3"] },
-  "examinerTips": ["tip 1 specific to this essay", "tip 2", "tip 3"],
+  "examinerTips": ["insider tip 1 specific to this essay", "tip 2", "tip 3"],
   "strengths": ["strength 1", "strength 2"],
   "improvements": ["improvement 1", "improvement 2"],
-  "sampleEssay": "Full Band 8+ response minimum 270 words Task 2 / 185 words Task 1",
+  "sampleEssay": "Full Band 8+ response. MINIMUM 270 words Task 2 / 185 words Task 1. Count carefully.",
   "sampleEssayExplanation": { "introduction": "...", "bodyParagraphs": "...", "conclusion": "...", "vocabularyHighlights": ["word 1", "word 2"], "whyHighScore": "..." }
 }
-Find ALL mistakes — no limit. Vocabulary upgrades: 5-8 from essay. Sample: MINIMUM 270 Task 2 / 185 Task 1.`;
+Find ALL mistakes — spelling, grammar, punctuation, sentence structure, word choice, register. No limit.
+Vocabulary: 5-8 weak words from essay with Band 7-8 alternatives.`;
 
-const PRACTICE_SYSTEM = `You are a friendly but sarcastic IELTS writing coach reviewing an essay in progress.
-Give SHORT, specific, actionable feedback. Be a little funny and direct.
+const PRACTICE_SYSTEM = `You are a sharp, witty IELTS writing coach reviewing a student essay in progress. Be sarcastic but helpful. Keep it SHORT.
 Respond ONLY with valid JSON (no markdown):
 {
-  "tips": ["specific tip 1 with example", "specific tip 2", "specific tip 3"],
-  "quickFix": "The single most important thing to fix RIGHT NOW in one sentence",
+  "tips": ["specific actionable tip 1", "tip 2"],
+  "quickFix": "The single most important fix right now — be specific and direct",
   "encouragement": "One short sarcastic-but-kind comment",
   "estimatedBand": 6.0,
-  "spotError": "Quote one actual error from the text and correct it, or null if none found"
+  "spotError": "Quote one real error from the text and correct it — format: 'X' should be 'Y' — or null"
 }`;
 
-// ── Toolkit Data ──────────────────────────────
+// ── Toolkit Data ─────────────────────────────
 const TOOLKIT = {
   linkingWords: [
-    { category: "Adding Information", color: "#4fc3f7", words: ["Furthermore", "Moreover", "In addition", "Additionally", "What is more", "Besides this"] },
-    { category: "Contrasting", color: "#ffb74d", words: ["However", "Nevertheless", "Nonetheless", "On the other hand", "In contrast", "Conversely", "Although", "Whereas"] },
-    { category: "Cause & Effect", color: "#00c9a7", words: ["Therefore", "Consequently", "As a result", "Hence", "Thus", "For this reason", "This leads to"] },
-    { category: "Examples", color: "#c9a84c", words: ["For instance", "For example", "To illustrate", "Such as", "A case in point is", "This is exemplified by"] },
-    { category: "Conclusion", color: "#ff8a65", words: ["In conclusion", "To conclude", "In summary", "Overall", "All things considered", "Taking everything into account"] },
-    { category: "Task 1 Sequencing", color: "#80cbc4", words: ["Initially", "Subsequently", "Following this", "Meanwhile", "Over the period shown", "By contrast"] }
+    { category: "Adding Information", color: "#0284c7", words: ["Furthermore", "Moreover", "In addition", "Additionally", "What is more", "Besides this"] },
+    { category: "Contrasting", color: "#d97706", words: ["However", "Nevertheless", "Nonetheless", "On the other hand", "In contrast", "Conversely", "Although", "Whereas"] },
+    { category: "Cause & Effect", color: "#059669", words: ["Therefore", "Consequently", "As a result", "Hence", "Thus", "For this reason", "This leads to"] },
+    { category: "Examples", color: "#b8860b", words: ["For instance", "For example", "To illustrate", "Such as", "A case in point is", "This is exemplified by"] },
+    { category: "Conclusion", color: "#7c3aed", words: ["In conclusion", "To conclude", "In summary", "Overall", "All things considered", "Taking everything into account"] },
+    { category: "Task 1 Sequencing", color: "#0891b2", words: ["Initially", "Subsequently", "Following this", "Meanwhile", "Over the period shown", "By contrast"] }
   ],
   vocabulary: [
     { topic: "Education", words: [["learn", "acquire knowledge"], ["school", "educational institution"], ["important", "crucial / paramount"], ["students", "learners / pupils"], ["helpful", "beneficial / advantageous"]] },
     { topic: "Crime", words: [["crime", "criminal activity / antisocial behaviour"], ["punish", "penalise / impose sanctions"], ["prison", "incarceration"], ["reduce", "curb / alleviate / diminish"], ["rise", "surge / escalate / proliferate"]] },
     { topic: "Technology", words: [["use", "utilise / harness / leverage"], ["change", "transform / revolutionise"], ["new", "cutting-edge / innovative"], ["problem", "drawback / pitfall"], ["spread", "proliferate / permeate"]] },
-    { topic: "Graph Language", words: [["went up", "rose / increased / surged / climbed"], ["went down", "fell / declined / dropped / plummeted"], ["same", "remained stable / plateaued / levelled off"], ["big", "dramatic / sharp / significant / marked"], ["small", "slight / marginal / modest"]] }
+    { topic: "Graph Language", words: [["went up", "rose / increased / surged / climbed"], ["went down", "fell / declined / dropped / plummeted"], ["same", "remained stable / plateaued / levelled off"], ["big change", "dramatic / sharp / significant increase"], ["highest", "peaked at / reached a peak of"]] }
   ],
   grammarRules: [
     { rule: "Subject-Verb Agreement", tip: "Collective nouns = singular: 'The government IS...' Uncountable = singular: 'Information IS...'" },
-    { rule: "Article Usage", tip: "Use 'the' for specific things. Use 'a/an' for first mention. Omit with general plurals: 'Children need education' not 'The children need the education'." },
-    { rule: "Avoid Contractions", tip: "NEVER: don't → do not, can't → cannot, it's → it is. Contractions instantly lower your Lexical Resource score." },
-    { rule: "Passive Voice", tip: "'It is widely believed...' / 'It has been argued...' / 'This can be attributed to...' Use passive for academic formality." },
+    { rule: "Article Usage (a/an/the)", tip: "Use 'the' for specific things. Use 'a/an' for first mention. Omit with general plurals: 'Children need education' NOT 'The children need the education'." },
+    { rule: "Avoid Contractions", tip: "NEVER: don't → do not, can't → cannot, it's → it is. Contractions instantly lower Lexical Resource score." },
+    { rule: "Passive Voice for Formality", tip: "'It is widely believed...' / 'It has been argued...' / 'This can be attributed to...' Use for academic formality." },
     { rule: "Uncountable Nouns", tip: "Never add 's' to: advice, information, knowledge, research, evidence, equipment, furniture, traffic, behaviour, progress." }
   ],
   petPeeves: [
     { peeve: "Starting with 'Nowadays'", fix: "Examiners see this in 80% of essays. Use: 'In contemporary society...' / 'In the modern era...' / 'Over recent decades...'" },
-    { peeve: "'In my opinion, I think...'", fix: "Redundant. Use: 'I firmly contend that...' / 'It is my view that...' / 'I am convinced that...'" },
-    { peeve: "Vague examples", fix: "Name the country/data: 'Finland's education system...' / 'Norway's recidivism rate of 20%...' Specific = higher Task Achievement." },
+    { peeve: "'In my opinion, I think...'", fix: "Redundant. Use ONE: 'I firmly contend that...' / 'It is my view that...' / 'I am convinced that...'" },
+    { peeve: "Vague examples: 'in some countries'", fix: "Name the country: 'Finland's education system...' / 'Norway's recidivism rate of 20%...' Specific = higher Task Achievement." },
     { peeve: "One-sentence paragraphs", fix: "Minimum 3 sentences per body paragraph: Topic sentence → Explanation → Example/Result." },
-    { peeve: "Copying words from the question", fix: "Paraphrase the introduction. If the question says 'reduce crime', write 'address criminal activity'." }
+    { peeve: "Copying words from the question", fix: "Paraphrase the introduction. 'reduce crime' → 'address criminal activity'. Direct copying is penalised." }
   ],
   templates: [
     { type: "Task 2 Introduction", template: "In contemporary society, [topic] has become an increasingly [debated/contentious] issue. While some argue that [view 1], others contend that [view 2]. This essay will examine both perspectives before arguing that [your position]." },
     { type: "Body Paragraph", template: "[Topic sentence]. This is because [explanation]. For instance, [specific example with data/country]. Consequently, [result/implication]." },
     { type: "Concession + Rebuttal", template: "Admittedly, [opposing view]. However, [counter-argument]. While [opponent's point] may hold some merit, the evidence overwhelmingly suggests that [your point]." },
     { type: "Task 2 Conclusion", template: "In conclusion, while [opposing view] has some validity, I firmly maintain that [your position] is the more effective approach. Governments and individuals must [action] in order to [outcome]." },
-    { type: "Task 1 Overview", template: "Overall, it is clear that [main trend 1], while [main trend 2]. [Category] experienced the most significant [increase/decrease], whereas [other] remained comparatively [stable/low]." }
+    { type: "Task 1 Overview", template: "Overall, it is clear that [main trend 1], while [main trend 2]. [Category] experienced the most significant [change], whereas [other] remained comparatively [stable/low]." }
   ]
 };
 
-// ── Components ────────────────────────────────
-const CriteriaCard = ({ label, data }) => (
-  <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:12, padding:"16px 20px", display:"flex", flexDirection:"column", gap:8 }}>
-    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-      <span style={{ color:"#b0b8c8", fontSize:13, fontWeight:600, letterSpacing:"0.04em", textTransform:"uppercase", fontFamily:"system-ui" }}>{label}</span>
-      <span style={{ background:bandColor(data.band), color:"#000", fontWeight:800, fontSize:14, borderRadius:8, padding:"3px 10px" }}>{data.band}</span>
-    </div>
-    <p style={{ color:"#cdd5e0", fontSize:14, lineHeight:1.65, margin:0, fontFamily:"system-ui" }}>{data.feedback}</p>
-  </div>
-);
-
-const MistakeCard = ({ mistake, i }) => (
-  <div style={{ background:"rgba(239,83,80,0.06)", borderLeft:`3px solid ${severityColor(mistake.severity)}`, borderRadius:12, padding:"14px 18px", display:"flex", flexDirection:"column", gap:8 }}>
-    <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
-      <span style={{ background:`${severityColor(mistake.severity)}20`, border:`1px solid ${severityColor(mistake.severity)}50`, borderRadius:20, padding:"2px 8px", fontSize:11, color:severityColor(mistake.severity), fontFamily:"system-ui", fontWeight:600 }}>{mistake.severity}</span>
-      <span style={{ background:"rgba(79,195,247,0.1)", borderRadius:20, padding:"2px 8px", fontSize:11, color:"#4fc3f7", fontFamily:"system-ui" }}>{mistake.category}</span>
-    </div>
-    <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-      <div style={{ flex:1, minWidth:140 }}>
-        <div style={{ fontSize:10, color:"#888", marginBottom:3, fontFamily:"system-ui" }}>ORIGINAL</div>
-        <div style={{ background:"rgba(239,83,80,0.15)", borderRadius:6, padding:"5px 10px", color:"#ffcdd2", fontSize:13, fontStyle:"italic" }}>"{mistake.original}"</div>
-      </div>
-      <div style={{ fontSize:16, color:"#555", alignSelf:"center" }}>→</div>
-      <div style={{ flex:1, minWidth:140 }}>
-        <div style={{ fontSize:10, color:"#888", marginBottom:3, fontFamily:"system-ui" }}>CORRECTION</div>
-        <div style={{ background:"rgba(0,201,167,0.12)", borderRadius:6, padding:"5px 10px", color:"#80cbc4", fontSize:13 }}>"{mistake.correction}"</div>
-      </div>
-    </div>
-    <p style={{ color:"#aaa", fontSize:13, margin:0, lineHeight:1.6, fontFamily:"system-ui" }}>💡 {mistake.explanation}</p>
-  </div>
-);
-
-const TabBtn = ({ label, active, onClick, badge }) => (
-  <button onClick={onClick} style={{ background:active?"rgba(79,195,247,0.15)":"transparent", border:active?"1px solid rgba(79,195,247,0.4)":"1px solid transparent", color:active?"#4fc3f7":"#667", borderRadius:8, padding:"7px 14px", cursor:"pointer", fontSize:12, fontWeight:600, fontFamily:"system-ui", display:"flex", alignItems:"center", gap:5, whiteSpace:"nowrap" }}>
-  {label}{badge && <span style={{ background:"#ef5350", color:"#fff", borderRadius:20, padding:"1px 6px", fontSize:10, fontWeight:700 }}>{badge}</span>}
-  </button>
-);
-
-const MainTab = ({ label, active, onClick }) => (
-  <button onClick={onClick} style={{ flex:1, background:active?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:active?"1px solid rgba(201,168,76,0.4)":"1px solid rgba(255,255,255,0.08)", color:active?"#c9a84c":"#667", borderRadius:10, padding:"12px 8px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"system-ui", transition:"all 0.2s" }}>
-    {label}
-  </button>
-);
-
-// ── THE JOKER ─────────────────────────────────
+// ── THE JOKER SVG ────────────────────────────
 const Joker = ({ message, mood }) => {
   const [visible, setVisible] = useState(true);
-  const [laugh, setLaugh] = useState(false);
+  const [wiggle, setWiggle] = useState(false);
 
   useEffect(() => {
-    setLaugh(true);
-    const t = setTimeout(() => setLaugh(false), 500);
+    setWiggle(true);
+    const t = setTimeout(() => setWiggle(false), 400);
     return () => clearTimeout(t);
   }, [message]);
 
-  const moodEyes = {
-    idle: "😐", happy: "😄", thinking: "🤔", concerned: "😒", excited: "🤩", analyzing: "👁️"
-  };
-
   return (
-    <div style={{ position:"fixed", top:80, left:16, zIndex:400, display:"flex", flexDirection:"column", alignItems:"flex-start", gap:8, maxWidth:220 }}>
-      {/* Joker face */}
-      <div onClick={() => setVisible(v => !v)}
-        style={{ cursor:"pointer", transition:"transform 0.3s", transform:laugh?"scale(1.1)":"scale(1)" }}>
-        <svg width="72" height="80" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg">
-          {/* Green hair */}
-          <ellipse cx="36" cy="12" rx="28" ry="14" fill="#2d7a2d"/>
-          <rect x="8" y="8" width="8" height="20" rx="4" fill="#2d7a2d"/>
-          <rect x="56" y="8" width="8" height="20" rx="4" fill="#2d7a2d"/>
-          <rect x="20" y="4" width="6" height="18" rx="3" fill="#3a9a3a"/>
-          <rect x="46" y="4" width="6" height="18" rx="3" fill="#3a9a3a"/>
-          <rect x="33" y="2" width="6" height="16" rx="3" fill="#2d7a2d"/>
+    <div style={{ position:"fixed", top:70, left:12, zIndex:500, display:"flex", flexDirection:"column", alignItems:"flex-start", gap:6, maxWidth:200 }}>
+      {/* Joker SVG */}
+      <div onClick={() => setVisible(v => !v)} style={{ cursor:"pointer", transform:wiggle?"rotate(-8deg)":"rotate(0deg)", transition:"transform 0.2s ease", filter:"drop-shadow(2px 4px 8px rgba(0,0,0,0.25))" }}>
+        <svg width="80" height="110" viewBox="0 0 80 110" xmlns="http://www.w3.org/2000/svg">
+          {/* Purple top hat */}
+          <rect x="12" y="4" width="56" height="5" rx="2" fill="#4a0080"/>
+          <rect x="18" y="8" width="44" height="26" rx="4" fill="#5c0099"/>
+          <rect x="14" y="33" width="52" height="4" rx="2" fill="#4a0080"/>
+          {/* Hat band */}
+          <rect x="18" y="30" width="44" height="5" rx="1" fill="#2d004d"/>
+          {/* Green hair sides */}
+          <ellipse cx="15" cy="50" rx="8" ry="14" fill="#1a7a1a"/>
+          <ellipse cx="65" cy="50" rx="8" ry="14" fill="#1a7a1a"/>
+          <rect x="10" y="38" width="12" height="20" rx="6" fill="#228b22"/>
+          <rect x="58" y="38" width="12" height="20" rx="6" fill="#228b22"/>
           {/* White face */}
-          <ellipse cx="36" cy="48" rx="26" ry="30" fill="#f0f0e8"/>
-          {/* Purple suit collar */}
-          <path d="M10 72 Q36 65 62 72 L62 80 L10 80 Z" fill="#4a148c"/>
-          <path d="M28 72 L36 78 L44 72 L36 65 Z" fill="#6a1ab0"/>
+          <ellipse cx="40" cy="68" rx="28" ry="34" fill="#f5f0e0"/>
+          {/* Face shadow/depth */}
+          <ellipse cx="40" cy="70" rx="26" ry="30" fill="#ede8d5" opacity="0.3"/>
+          {/* Dark eye makeup */}
+          <ellipse cx="28" cy="60" rx="10" ry="7" fill="#1a0a2e" opacity="0.8"/>
+          <ellipse cx="52" cy="60" rx="10" ry="7" fill="#1a0a2e" opacity="0.8"/>
           {/* Eyes */}
-          <ellipse cx="24" cy="44" rx="7" ry="8" fill="white"/>
-          <ellipse cx="48" cy="44" rx="7" ry="8" fill="white"/>
-          <ellipse cx="24" cy="45" rx="4" ry="5" fill="#1a1a2e"/>
-          <ellipse cx="48" cy="45" rx="4" ry="5" fill="#1a1a2e"/>
-          <ellipse cx="25" cy="43" rx="1.5" ry="1.5" fill="white"/>
-          <ellipse cx="49" cy="43" rx="1.5" ry="1.5" fill="white"/>
-          {/* Scar lines */}
-          <path d="M10 52 Q15 48 18 52" stroke="#cc0000" strokeWidth="1.5" fill="none"/>
-          <path d="M54 52 Q57 48 62 52" stroke="#cc0000" strokeWidth="1.5" fill="none"/>
-          {/* Big red smile */}
-          <path d="M14 60 Q24 72 36 74 Q48 72 58 60" stroke="#cc0000" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          <path d="M14 60 Q24 70 36 72 Q48 70 58 60 Q48 64 36 65 Q24 64 14 60 Z" fill="#cc0000" opacity="0.3"/>
+          <ellipse cx="28" cy="60" rx="7" ry="6" fill="white"/>
+          <ellipse cx="52" cy="60" rx="7" ry="6" fill="white"/>
+          <ellipse cx="29" cy="61" rx="4" ry="4" fill="#1a0a2e"/>
+          <ellipse cx="53" cy="61" rx="4" ry="4" fill="#1a0a2e"/>
+          <ellipse cx="30" cy="59" rx="1.5" ry="1.5" fill="white"/>
+          <ellipse cx="54" cy="59" rx="1.5" ry="1.5" fill="white"/>
+          {/* Arched menacing eyebrows */}
+          <path d="M18 52 Q28 46 36 52" stroke="#2d5a1b" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+          <path d="M44 52 Q52 46 62 52" stroke="#2d5a1b" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+          {/* Scar lines on cheeks */}
+          <path d="M12 64 Q16 60 18 65" stroke="#cc2200" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+          <path d="M62 64 Q66 60 68 65" stroke="#cc2200" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+          {/* Red triangles on cheeks (classic Joker face paint) */}
+          <polygon points="14,70 20,65 20,75" fill="#cc0000" opacity="0.7"/>
+          <polygon points="66,70 60,65 60,75" fill="#cc0000" opacity="0.7"/>
+          {/* Red nose */}
+          <ellipse cx="40" cy="72" rx="3" ry="2.5" fill="#cc0000"/>
+          {/* Big red Glasgow grin */}
+          <path d="M16 80 Q28 100 40 102 Q52 100 64 80" stroke="#cc0000" strokeWidth="3" fill="none" strokeLinecap="round"/>
+          {/* Mouth fill */}
+          <path d="M16 80 Q28 96 40 98 Q52 96 64 80 Q52 86 40 88 Q28 86 16 80 Z" fill="#8b0000" opacity="0.6"/>
           {/* Teeth */}
-          <path d="M22 64 Q36 70 50 64 Q36 68 22 64 Z" fill="white"/>
-          {/* Eyebrows — arched menacingly */}
-          <path d="M17 36 Q24 32 31 36" stroke="#2d7a2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          <path d="M41 36 Q48 32 55 36" stroke="#2d7a2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          {/* Purple hat hint */}
-          <rect x="16" y="18" width="40" height="6" rx="2" fill="#4a148c" opacity="0.6"/>
+          <path d="M24 82 Q40 90 56 82 Q40 87 24 82 Z" fill="white" opacity="0.9"/>
+          {/* Purple collar */}
+          <path d="M12 100 Q24 95 40 97 Q56 95 68 100 L68 110 L12 110 Z" fill="#4a0080"/>
+          <path d="M32 97 L40 106 L48 97 L40 102 Z" fill="#6600b3"/>
+          {/* Bow tie */}
+          <polygon points="34,98 40,103 46,98 40,96" fill="#cc0000"/>
         </svg>
       </div>
 
@@ -306,52 +305,102 @@ const Joker = ({ message, mood }) => {
       {visible && message && (
         <div style={{
           background:"#1a0a2e",
-          border:"1px solid rgba(106,26,176,0.6)",
+          border:"1px solid #6600b3",
           borderRadius:12,
           padding:"10px 14px",
           position:"relative",
-          boxShadow:"0 4px 20px rgba(106,26,176,0.3)",
-          animation:"slideIn 0.3s ease"
+          boxShadow:"0 4px 16px rgba(102,0,179,0.3)",
+          maxWidth:190,
+          animation:"jokerPop 0.3s cubic-bezier(0.34,1.56,0.64,1)"
         }}>
-          <div style={{ position:"absolute", top:10, left:-8, width:0, height:0, borderTop:"6px solid transparent", borderBottom:"6px solid transparent", borderRight:"8px solid #1a0a2e" }} />
-          <p style={{ color:"#e8d5ff", fontSize:12, margin:0, lineHeight:1.5, fontFamily:"system-ui", fontStyle:"italic" }}>
-            {message}
-          </p>
+          <div style={{ position:"absolute", top:10, left:-7, width:0, height:0, borderTop:"6px solid transparent", borderBottom:"6px solid transparent", borderRight:"7px solid #1a0a2e" }}/>
+          <p style={{ color:"#e8d5ff", fontSize:11.5, margin:0, lineHeight:1.5, fontFamily:"system-ui", fontStyle:"italic" }}>{message}</p>
         </div>
       )}
     </div>
   );
 };
 
+// ── Components ────────────────────────────────
+const Card = ({ children, style }) => (
+  <div style={{ background:T.bg2, border:`1px solid ${T.border}`, borderRadius:12, padding:"16px 20px", boxShadow:T.shadow, ...style }}>
+    {children}
+  </div>
+);
+
+const CriteriaCard = ({ label, data }) => (
+  <Card>
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+      <span style={{ color:T.textMid, fontSize:12, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", fontFamily:"system-ui" }}>{label}</span>
+      <span style={{ background:bandBg(data.band), color:bandColor(data.band), fontWeight:800, fontSize:14, borderRadius:8, padding:"3px 12px", border:`1px solid ${bandColor(data.band)}40` }}>{data.band}</span>
+    </div>
+    <p style={{ color:T.textMid, fontSize:14, lineHeight:1.65, margin:0, fontFamily:"system-ui" }}>{data.feedback}</p>
+  </Card>
+);
+
+const MistakeCard = ({ mistake, i }) => (
+  <div style={{ background:severityBg(mistake.severity), border:`1px solid ${severityColor(mistake.severity)}40`, borderLeft:`3px solid ${severityColor(mistake.severity)}`, borderRadius:10, padding:"12px 16px", display:"flex", flexDirection:"column", gap:8 }}>
+    <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
+      <span style={{ fontSize:11, fontWeight:700, color:T.textMuted, fontFamily:"system-ui" }}>#{i+1}</span>
+      <span style={{ background:"white", border:`1px solid ${severityColor(mistake.severity)}60`, borderRadius:20, padding:"1px 8px", fontSize:11, color:severityColor(mistake.severity), fontFamily:"system-ui", fontWeight:700 }}>{mistake.severity}</span>
+      <span style={{ background:"white", border:`1px solid ${T.blueBorder}`, borderRadius:20, padding:"1px 8px", fontSize:11, color:T.blue, fontFamily:"system-ui" }}>{mistake.category}</span>
+    </div>
+    <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+      <div style={{ flex:1, minWidth:130 }}>
+        <div style={{ fontSize:10, color:T.textMuted, marginBottom:3, fontFamily:"system-ui", fontWeight:600 }}>ORIGINAL</div>
+        <div style={{ background:"#fee2e2", borderRadius:6, padding:"5px 10px", color:"#991b1b", fontSize:13, fontStyle:"italic" }}>"{mistake.original}"</div>
+      </div>
+      <div style={{ fontSize:16, color:T.textMuted, alignSelf:"center" }}>→</div>
+      <div style={{ flex:1, minWidth:130 }}>
+        <div style={{ fontSize:10, color:T.textMuted, marginBottom:3, fontFamily:"system-ui", fontWeight:600 }}>CORRECTION</div>
+        <div style={{ background:"#dcfce7", borderRadius:6, padding:"5px 10px", color:"#166534", fontSize:13 }}>"{mistake.correction}"</div>
+      </div>
+    </div>
+    <p style={{ color:T.textMid, fontSize:13, margin:0, lineHeight:1.6, fontFamily:"system-ui" }}>💡 {mistake.explanation}</p>
+  </div>
+);
+
+const TabBtn = ({ label, active, onClick, badge }) => (
+  <button onClick={onClick} style={{ background:active?"#eff6ff":"transparent", border:active?`1px solid ${T.blueBorder}`:"1px solid transparent", color:active?T.blue:T.textMuted, borderRadius:8, padding:"7px 14px", cursor:"pointer", fontSize:12, fontWeight:600, fontFamily:"system-ui", display:"flex", alignItems:"center", gap:5, whiteSpace:"nowrap", transition:"all 0.15s" }}>
+    {label}{badge > 0 && <span style={{ background:T.red, color:"white", borderRadius:20, padding:"1px 6px", fontSize:10, fontWeight:700 }}>{badge}</span>}
+  </button>
+);
+
+const MainTab = ({ label, active, onClick }) => (
+  <button onClick={onClick} style={{ flex:1, background:active?T.gold:"transparent", border:active?`1px solid ${T.gold}`:`1px solid ${T.border}`, color:active?"white":T.textMid, borderRadius:10, padding:"11px 8px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"system-ui", transition:"all 0.2s", boxShadow:active?T.shadowMd:"none" }}>
+    {label}
+  </button>
+);
+
 // ── Paywall ───────────────────────────────────
 const PaywallModal = ({ onClose, onSuccess }) => (
-  <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.88)", backdropFilter:"blur(10px)", zIndex:999, display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-    <div style={{ background:"#13151a", border:"1px solid rgba(201,168,76,0.35)", borderRadius:20, padding:"40px 32px", maxWidth:440, width:"100%", position:"relative" }}>
-      <button onClick={onClose} style={{ position:"absolute", top:16, right:20, background:"none", border:"none", color:"#555", fontSize:22, cursor:"pointer" }}>✕</button>
-      <div style={{ textAlign:"center", marginBottom:20 }}>
-        <div style={{ fontSize:32, marginBottom:8 }}>🃏</div>
-        <div style={{ display:"inline-block", background:"rgba(201,168,76,0.1)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:100, padding:"6px 16px", fontSize:11, color:"#c9a84c", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14, fontFamily:"system-ui" }}>Free analyses used up</div>
-        <h2 style={{ fontFamily:"Georgia,serif", color:"#f5f0e8", fontSize:24, marginBottom:8 }}>Unlock Unlimited Access</h2>
-        <p style={{ color:"#6b6760", fontSize:14, lineHeight:1.6, fontFamily:"system-ui" }}>Full IELTS Writing coverage — Task 1 & 2, Academic & General Training.</p>
+  <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", zIndex:999, display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
+    <div style={{ background:T.bg2, border:`1px solid ${T.border}`, borderRadius:20, padding:"40px 32px", maxWidth:440, width:"100%", position:"relative", boxShadow:T.shadowLg }}>
+      <button onClick={onClose} style={{ position:"absolute", top:16, right:20, background:"none", border:"none", color:T.textMuted, fontSize:22, cursor:"pointer" }}>✕</button>
+      <div style={{ textAlign:"center", marginBottom:24 }}>
+        <div style={{ fontSize:36, marginBottom:8 }}>🃏</div>
+        <div style={{ display:"inline-block", background:T.goldLight, border:`1px solid ${T.goldBorder}`, borderRadius:100, padding:"5px 16px", fontSize:11, color:T.gold, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14, fontFamily:"system-ui" }}>Free analyses used up</div>
+        <h2 style={{ fontFamily:"Georgia,serif", color:T.text, fontSize:24, marginBottom:8 }}>Unlock Unlimited Access</h2>
+        <p style={{ color:T.textMid, fontSize:14, lineHeight:1.6, fontFamily:"system-ui" }}>Full IELTS Writing coverage — Task 1 & 2, Academic & General Training.</p>
       </div>
-      <div style={{ background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:12, padding:"16px", marginBottom:18, textAlign:"center" }}>
-        <div style={{ fontFamily:"Georgia,serif", fontSize:48, fontWeight:900, color:"#f5f0e8", lineHeight:1 }}>
-          <sup style={{ fontSize:20, verticalAlign:"super" }}>$</sup>19<sub style={{ fontSize:14, color:"#6b6760" }}>/month</sub>
+      <div style={{ background:T.goldLight, border:`1px solid ${T.goldBorder}`, borderRadius:12, padding:"16px", marginBottom:20, textAlign:"center" }}>
+        <div style={{ fontFamily:"Georgia,serif", fontSize:48, fontWeight:900, color:T.text, lineHeight:1 }}>
+          <sup style={{ fontSize:20, verticalAlign:"super" }}>$</sup>19<sub style={{ fontSize:14, color:T.textMuted }}>/month</sub>
         </div>
-        <div style={{ color:"#6b6760", fontSize:12, marginTop:4, fontFamily:"system-ui" }}>Cancel anytime · No hidden fees</div>
+        <div style={{ color:T.textMuted, fontSize:12, marginTop:4, fontFamily:"system-ui" }}>Cancel anytime · No hidden fees</div>
       </div>
       <ul style={{ listStyle:"none", padding:0, display:"flex", flexDirection:"column", gap:8, marginBottom:22 }}>
-        {["Unlimited essay analyses","Complete mistake detection","Band Booster + Vocabulary upgrades","Full IELTS Toolkit (Grammar, Templates, Pet Peeves)","Practice Mode with live AI feedback","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i) => (
-          <li key={i} style={{ display:"flex", gap:10, fontSize:13, color:"#d4cfc6", fontFamily:"system-ui" }}>
-            <span style={{ color:"#00c9a7", fontWeight:700, flexShrink:0 }}>✓</span>{f}
+        {["Unlimited analyses — Task 1 & 2, Academic & General","Complete mistake detection (all categories & severities)","Band Booster + Vocabulary upgrades from YOUR essay","Full IELTS Toolkit (Grammar Rules, Templates, Pet Peeves)","Practice Mode with live AI coaching feedback","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i) => (
+          <li key={i} style={{ display:"flex", gap:10, fontSize:13, color:T.textMid, fontFamily:"system-ui" }}>
+            <span style={{ color:T.green, fontWeight:700, flexShrink:0 }}>✓</span>{f}
           </li>
         ))}
       </ul>
       <button onClick={() => { savePro(); onSuccess(); }}
-        style={{ width:"100%", background:"linear-gradient(135deg,#c9a84c,#a87c30)", color:"#000", fontWeight:800, fontSize:15, padding:"15px", borderRadius:10, border:"none", cursor:"pointer", fontFamily:"system-ui", boxShadow:"0 8px 24px rgba(201,168,76,0.3)" }}>
+        style={{ width:"100%", background:T.gold, color:"white", fontWeight:800, fontSize:15, padding:"15px", borderRadius:10, border:"none", cursor:"pointer", fontFamily:"system-ui", boxShadow:T.shadowMd }}>
         🔓 {STRIPE_CONFIGURED ? "Start Pro — $19/month" : "Unlock Pro (Test Mode)"}
       </button>
-      {!STRIPE_CONFIGURED && <p style={{ textAlign:"center", color:"#555", fontSize:11, marginTop:10, fontFamily:"system-ui", fontStyle:"italic" }}>Add Stripe keys to enable real payments.</p>}
+      {!STRIPE_CONFIGURED && <p style={{ textAlign:"center", color:T.textMuted, fontSize:11, marginTop:10, fontFamily:"system-ui" }}>Add Stripe keys to enable real payments.</p>}
     </div>
   </div>
 );
@@ -360,31 +409,29 @@ const PaywallModal = ({ onClose, onSuccess }) => (
 const ToolkitContent = ({ isPro, onUpgrade }) => {
   const [section, setSection] = useState("linking");
   const sections = [
-    { key:"linking", label:"🔗 Linking Words", free: true },
-    { key:"vocab", label:"📚 Vocabulary", free: false },
-    { key:"grammar", label:"📐 Grammar Rules", free: false },
-    { key:"peeves", label:"⚠️ Pet Peeves", free: false },
-    { key:"templates", label:"📝 Templates", free: false }
+    { key:"linking", label:"🔗 Linking Words", free:true },
+    { key:"vocab", label:"📚 Vocabulary", free:false },
+    { key:"grammar", label:"📐 Grammar", free:false },
+    { key:"peeves", label:"⚠️ Pet Peeves", free:false },
+    { key:"templates", label:"📝 Templates", free:false }
   ];
 
-  const LockedOverlay = () => (
+  const LockedSection = () => (
     <div style={{ position:"relative" }}>
-      <div style={{ filter:"blur(4px)", pointerEvents:"none", userSelect:"none", opacity:0.4 }}>
-        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 18px", marginBottom:10 }}>
-          <div style={{ fontSize:13, fontWeight:700, color:"#c9a84c", marginBottom:6, fontFamily:"system-ui" }}>Example content...</div>
-          <p style={{ color:"#cdd5e0", fontSize:13, margin:0, fontFamily:"system-ui" }}>This valuable content is locked. Upgrade to Pro to access all grammar rules, vocabulary upgrades, examiner pet peeves and essay templates.</p>
-        </div>
-        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 18px" }}>
-          <div style={{ fontSize:13, fontWeight:700, color:"#4fc3f7", marginBottom:6, fontFamily:"system-ui" }}>More locked content...</div>
-          <p style={{ color:"#cdd5e0", fontSize:13, margin:0, fontFamily:"system-ui" }}>Unlock all sections including band 7-8 vocabulary lists, grammar rules with examples, and ready-to-use essay templates.</p>
-        </div>
+      <div style={{ filter:"blur(3px)", pointerEvents:"none", userSelect:"none" }}>
+        {[1,2,3].map(i => (
+          <Card key={i} style={{ marginBottom:8 }}>
+            <div style={{ height:16, background:T.bg3, borderRadius:4, marginBottom:8, width:"60%" }}/>
+            <div style={{ height:12, background:T.bg3, borderRadius:4, width:"90%" }}/>
+          </Card>
+        ))}
       </div>
-      <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16 }}>
-        <div style={{ fontSize:40 }}>🔒</div>
+      <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:12 }}>
+        <div style={{ fontSize:36 }}>🔒</div>
         <div style={{ textAlign:"center" }}>
-          <div style={{ color:"#f5f0e8", fontWeight:700, fontSize:16, fontFamily:"system-ui", marginBottom:6 }}>Pro Feature</div>
-          <div style={{ color:"#6b6760", fontSize:13, fontFamily:"system-ui", marginBottom:16 }}>Unlock Grammar Rules, Vocabulary, Pet Peeves & Templates</div>
-          <button onClick={onUpgrade} style={{ background:"linear-gradient(135deg,#c9a84c,#a87c30)", color:"#000", fontWeight:800, fontSize:14, padding:"10px 24px", borderRadius:8, border:"none", cursor:"pointer", fontFamily:"system-ui" }}>
+          <div style={{ color:T.text, fontWeight:700, fontSize:15, fontFamily:"system-ui", marginBottom:4 }}>Pro Feature</div>
+          <div style={{ color:T.textMid, fontSize:13, fontFamily:"system-ui", marginBottom:14 }}>Upgrade to unlock this section</div>
+          <button onClick={onUpgrade} style={{ background:T.gold, color:"white", fontWeight:700, fontSize:13, padding:"9px 20px", borderRadius:8, border:"none", cursor:"pointer", fontFamily:"system-ui" }}>
             Upgrade to Pro — $19/mo
           </button>
         </div>
@@ -394,91 +441,91 @@ const ToolkitContent = ({ isPro, onUpgrade }) => {
 
   return (
     <div>
-      <div style={{ background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:12, padding:"12px 16px", marginBottom:16 }}>
-        <p style={{ color:"#c9a84c", fontSize:13, margin:0, fontFamily:"system-ui" }}>🎓 Your personal IELTS reference guide — use these in every essay to boost your band score. {!isPro && <span style={{ color:"#667" }}>Linking Words are free. Upgrade for full access.</span>}</p>
-      </div>
+      <Card style={{ marginBottom:16, background:T.goldLight, border:`1px solid ${T.goldBorder}` }}>
+        <p style={{ color:T.gold, fontSize:13, margin:0, fontFamily:"system-ui" }}>🎓 Your personal IELTS reference guide — use these in every essay to boost your band score. {!isPro && <span style={{ color:T.textMid }}>Linking Words are free. Upgrade for full access.</span>}</p>
+      </Card>
       <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:16 }}>
         {sections.map(s => (
           <button key={s.key} onClick={() => setSection(s.key)}
-            style={{ background:section===s.key?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.03)", border:section===s.key?"1px solid rgba(201,168,76,0.4)":"1px solid rgba(255,255,255,0.08)", color:section===s.key?"#c9a84c":"#667", borderRadius:8, padding:"6px 12px", cursor:"pointer", fontSize:12, fontWeight:600, fontFamily:"system-ui", display:"flex", alignItems:"center", gap:6 }}>
-            {s.label} {!s.free && !isPro && <span style={{ fontSize:10 }}>🔒</span>}
+            style={{ background:section===s.key?T.gold:"white", border:section===s.key?`1px solid ${T.gold}`:`1px solid ${T.border}`, color:section===s.key?"white":T.textMid, borderRadius:8, padding:"7px 14px", cursor:"pointer", fontSize:12, fontWeight:600, fontFamily:"system-ui", display:"flex", alignItems:"center", gap:5 }}>
+            {s.label}{!s.free && !isPro && <span style={{ fontSize:10 }}>🔒</span>}
           </button>
         ))}
       </div>
 
       {section === "linking" && (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {TOOLKIT.linkingWords.map((cat, i) => (
-            <div key={i} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 18px" }}>
-              <div style={{ fontSize:12, fontWeight:700, color:cat.color, marginBottom:10, fontFamily:"system-ui", textTransform:"uppercase", letterSpacing:"0.06em" }}>{cat.category}</div>
-              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+            <Card key={i}>
+              <div style={{ fontSize:11, fontWeight:700, color:cat.color, marginBottom:10, fontFamily:"system-ui", textTransform:"uppercase", letterSpacing:"0.06em" }}>{cat.category}</div>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                 {cat.words.map((w, j) => (
-                  <span key={j} style={{ background:`${cat.color}15`, border:`1px solid ${cat.color}30`, borderRadius:8, padding:"4px 12px", fontSize:13, color:cat.color, fontFamily:"system-ui" }}>{w}</span>
+                  <span key={j} style={{ background:`${cat.color}12`, border:`1px solid ${cat.color}40`, borderRadius:8, padding:"4px 12px", fontSize:13, color:cat.color, fontFamily:"system-ui" }}>{w}</span>
                 ))}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
 
       {section === "vocab" && (isPro ? (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {TOOLKIT.vocabulary.map((topic, i) => (
-            <div key={i} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 18px" }}>
-              <div style={{ fontSize:12, fontWeight:700, color:"#c9a84c", marginBottom:10, fontFamily:"system-ui", textTransform:"uppercase" }}>{topic.topic}</div>
+            <Card key={i}>
+              <div style={{ fontSize:11, fontWeight:700, color:T.gold, marginBottom:10, fontFamily:"system-ui", textTransform:"uppercase" }}>{topic.topic}</div>
               <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                 {topic.words.map((pair, j) => (
                   <div key={j} style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap" }}>
-                    <span style={{ background:"rgba(239,83,80,0.1)", borderRadius:6, padding:"3px 10px", fontSize:13, color:"#ffcdd2", fontFamily:"system-ui" }}>✗ {pair[0]}</span>
-                    <span style={{ color:"#555" }}>→</span>
-                    <span style={{ background:"rgba(0,201,167,0.1)", borderRadius:6, padding:"3px 10px", fontSize:13, color:"#80cbc4", fontFamily:"system-ui" }}>✓ {pair[1]}</span>
+                    <span style={{ background:"#fee2e2", borderRadius:6, padding:"3px 10px", fontSize:13, color:"#991b1b", fontFamily:"system-ui" }}>✗ {pair[0]}</span>
+                    <span style={{ color:T.textMuted }}>→</span>
+                    <span style={{ background:"#dcfce7", borderRadius:6, padding:"3px 10px", fontSize:13, color:"#166534", fontFamily:"system-ui" }}>✓ {pair[1]}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
-      ) : <LockedOverlay />)}
+      ) : <LockedSection />)}
 
       {section === "grammar" && (isPro ? (
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {TOOLKIT.grammarRules.map((item, i) => (
-            <div key={i} style={{ background:"rgba(79,195,247,0.05)", border:"1px solid rgba(79,195,247,0.15)", borderRadius:12, padding:"14px 18px" }}>
-              <div style={{ fontSize:13, fontWeight:700, color:"#4fc3f7", marginBottom:6, fontFamily:"system-ui" }}>📐 {item.rule}</div>
-              <p style={{ color:"#cdd5e0", fontSize:13, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{item.tip}</p>
-            </div>
+            <Card key={i} style={{ border:`1px solid ${T.blueBorder}`, background:T.blueBg }}>
+              <div style={{ fontSize:13, fontWeight:700, color:T.blue, marginBottom:6, fontFamily:"system-ui" }}>📐 {item.rule}</div>
+              <p style={{ color:T.textMid, fontSize:13, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{item.tip}</p>
+            </Card>
           ))}
         </div>
-      ) : <LockedOverlay />)}
+      ) : <LockedSection />)}
 
       {section === "peeves" && (isPro ? (
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {TOOLKIT.petPeeves.map((item, i) => (
-            <div key={i} style={{ background:"rgba(239,83,80,0.05)", border:"1px solid rgba(239,83,80,0.15)", borderRadius:12, padding:"14px 18px" }}>
-              <div style={{ fontSize:13, fontWeight:700, color:"#ef9a9a", marginBottom:6, fontFamily:"system-ui" }}>⚠️ {item.peeve}</div>
-              <p style={{ color:"#cdd5e0", fontSize:13, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>✅ {item.fix}</p>
-            </div>
+            <Card key={i} style={{ border:`1px solid ${T.redBorder}`, background:T.redBg }}>
+              <div style={{ fontSize:13, fontWeight:700, color:T.red, marginBottom:6, fontFamily:"system-ui" }}>⚠️ {item.peeve}</div>
+              <p style={{ color:T.textMid, fontSize:13, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>✅ {item.fix}</p>
+            </Card>
           ))}
         </div>
-      ) : <LockedOverlay />)}
+      ) : <LockedSection />)}
 
       {section === "templates" && (isPro ? (
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {TOOLKIT.templates.map((item, i) => (
-            <div key={i} style={{ background:"rgba(201,168,76,0.05)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:12, padding:"16px 18px" }}>
-              <div style={{ fontSize:12, fontWeight:700, color:"#c9a84c", marginBottom:8, fontFamily:"system-ui", textTransform:"uppercase" }}>📝 {item.type}</div>
-              <p style={{ color:"#dde5f0", fontSize:13, lineHeight:1.8, margin:0, fontFamily:"Georgia,serif", fontStyle:"italic", background:"rgba(255,255,255,0.03)", padding:"10px 14px", borderRadius:8, whiteSpace:"pre-wrap" }}>{item.template}</p>
-            </div>
+            <Card key={i} style={{ border:`1px solid ${T.amberBorder}`, background:T.amberBg }}>
+              <div style={{ fontSize:11, fontWeight:700, color:T.amber, marginBottom:8, fontFamily:"system-ui", textTransform:"uppercase" }}>📝 {item.type}</div>
+              <p style={{ color:T.text, fontSize:13, lineHeight:1.8, margin:0, fontFamily:"Georgia,serif", fontStyle:"italic", background:"white", padding:"10px 14px", borderRadius:8, whiteSpace:"pre-wrap", border:`1px solid ${T.amberBorder}` }}>{item.template}</p>
+            </Card>
           ))}
         </div>
-      ) : <LockedOverlay />)}
+      ) : <LockedSection />)}
     </div>
   );
 };
 
 // ── Practice Mode ─────────────────────────────
 const PracticeMode = ({ isPro, onUpgrade, setJokerMessage, setJokerMood }) => {
-  const [questionMode, setQuestionMode] = useState("choose"); // choose | custom
+  const [questionMode, setQuestionMode] = useState("choose");
   const [selectedTopic, setSelectedTopic] = useState("Education");
   const [selectedQuestion, setSelectedQuestion] = useState("");
   const [customQuestion, setCustomQuestion] = useState("");
@@ -488,80 +535,60 @@ const PracticeMode = ({ isPro, onUpgrade, setJokerMessage, setJokerMood }) => {
   const [started, setStarted] = useState(false);
   const timerRef = useRef(null);
   const wordCount = practiceEssay.trim().split(/\s+/).filter(Boolean).length;
+  const question = selectedQuestion || customQuestion;
 
   const fetchLiveFeedback = useCallback(async (text) => {
-    if (text.trim().split(/\s+/).length < 30) return;
+    if (text.trim().split(/\s+/).length < 25) return;
     setLoadingFeedback(true);
     try {
       const res = await fetch(API_URL, {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-          model:"claude-sonnet-4-20250514", max_tokens:800,
-          system: PRACTICE_SYSTEM,
-          messages:[{ role:"user", content:`Question: "${selectedQuestion || customQuestion}"\n\nEssay so far:\n${text}\n\nGive quick coaching feedback.` }]
-        })
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:600, system:PRACTICE_SYSTEM, messages:[{ role:"user", content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive quick sarcastic coaching feedback as JSON.` }] })
       });
       const data = await res.json();
       const raw = data.content?.map(b => b.text||"").join("") || "";
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
       setLiveFeedback(parsed);
-      if (parsed.spotError) {
-        setJokerMessage(getJokerLine("mistake_grammar"));
-        setJokerMood("concerned");
-      } else if (parsed.estimatedBand >= 7) {
-        setJokerMessage(getJokerLine("scoreHigh"));
-        setJokerMood("happy");
-      } else {
-        setJokerMessage(getJokerLine("typing"));
-        setJokerMood("thinking");
-      }
+      if (parsed.spotError) { setJokerMessage(getJokerLine("mistake_grammar")); }
+      else if (parsed.estimatedBand >= 7) { setJokerMessage(getJokerLine("scoreHigh")); }
+      else { setJokerMessage(getJokerLine("typing")); }
     } catch(e) { console.error(e); }
     finally { setLoadingFeedback(false); }
-  }, [selectedQuestion, customQuestion, setJokerMessage, setJokerMood]);
+  }, [question, setJokerMessage]);
 
   const handleEssayChange = (e) => {
     const val = e.target.value;
     setPracticeEssay(val);
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => fetchLiveFeedback(val), 3000);
+    timerRef.current = setTimeout(() => fetchLiveFeedback(val), 1500);
   };
-
-  const question = selectedQuestion || customQuestion;
 
   return (
     <div>
-      <div style={{ background:"rgba(79,195,247,0.06)", border:"1px solid rgba(79,195,247,0.2)", borderRadius:12, padding:"14px 18px", marginBottom:20 }}>
-        <p style={{ color:"#4fc3f7", fontSize:13, margin:0, fontFamily:"system-ui" }}>🎯 <strong>Practice Mode</strong> — Write freely and get live AI coaching every few seconds as you type. No final score — just real-time improvement tips.</p>
-      </div>
+      <Card style={{ marginBottom:20, background:T.blueBg, border:`1px solid ${T.blueBorder}` }}>
+        <p style={{ color:T.blue, fontSize:13, margin:0, fontFamily:"system-ui" }}>🎯 <strong>Practice Mode</strong> — Write freely and get live AI coaching every ~1.5 seconds as you pause. No final score — just real-time improvement tips from your friendly neighbourhood Joker. 🃏</p>
+      </Card>
 
       {!started ? (
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          {/* Question source */}
           <div style={{ display:"flex", gap:8 }}>
-            <button onClick={()=>setQuestionMode("choose")} style={{ flex:1, background:questionMode==="choose"?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:questionMode==="choose"?"1px solid rgba(201,168,76,0.4)":"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:"10px", cursor:"pointer", color:questionMode==="choose"?"#c9a84c":"#667", fontSize:13, fontWeight:600, fontFamily:"system-ui" }}>
-              📋 Choose a Question
-            </button>
-            <button onClick={()=>setQuestionMode("custom")} style={{ flex:1, background:questionMode==="custom"?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:questionMode==="custom"?"1px solid rgba(201,168,76,0.4)":"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:"10px", cursor:"pointer", color:questionMode==="custom"?"#c9a84c":"#667", fontSize:13, fontWeight:600, fontFamily:"system-ui" }}>
-              ✏️ Write My Own
-            </button>
+            {[["choose","📋 Choose a Question"],["custom","✏️ Write My Own"]].map(([mode, label]) => (
+              <button key={mode} onClick={()=>setQuestionMode(mode)} style={{ flex:1, background:questionMode===mode?T.gold:"white", border:questionMode===mode?`1px solid ${T.gold}`:`1px solid ${T.border}`, borderRadius:10, padding:"10px", cursor:"pointer", color:questionMode===mode?"white":T.textMid, fontSize:13, fontWeight:600, fontFamily:"system-ui" }}>{label}</button>
+            ))}
           </div>
 
           {questionMode === "choose" && (
             <div>
-              <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, fontFamily:"monospace" }}>Choose Topic</label>
-              <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:16 }}>
+              <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:12 }}>
                 {Object.keys(PRACTICE_QUESTIONS).map(topic => (
                   <button key={topic} onClick={()=>{ setSelectedTopic(topic); setSelectedQuestion(""); }}
-                    style={{ background:selectedTopic===topic?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.03)", border:selectedTopic===topic?"1px solid rgba(201,168,76,0.4)":"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"6px 14px", cursor:"pointer", color:selectedTopic===topic?"#c9a84c":"#667", fontSize:12, fontWeight:600, fontFamily:"system-ui" }}>
-                    {topic}
-                  </button>
+                    style={{ background:selectedTopic===topic?T.gold:"white", border:selectedTopic===topic?`1px solid ${T.gold}`:`1px solid ${T.border}`, borderRadius:8, padding:"6px 14px", cursor:"pointer", color:selectedTopic===topic?"white":T.textMid, fontSize:12, fontWeight:600, fontFamily:"system-ui" }}>{topic}</button>
                 ))}
               </div>
-              <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, fontFamily:"monospace" }}>Choose Question</label>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {PRACTICE_QUESTIONS[selectedTopic].map((q, i) => (
                   <div key={i} onClick={()=>setSelectedQuestion(q)}
-                    style={{ background:selectedQuestion===q?"rgba(79,195,247,0.1)":"rgba(255,255,255,0.03)", border:selectedQuestion===q?"1px solid rgba(79,195,247,0.4)":"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"12px 16px", cursor:"pointer", color:selectedQuestion===q?"#4fc3f7":"#b0b8c8", fontSize:13, fontFamily:"system-ui", lineHeight:1.6, transition:"all 0.2s" }}>
+                    style={{ background:selectedQuestion===q?T.blueBg:"white", border:selectedQuestion===q?`1px solid ${T.blueBorder}`:`1px solid ${T.border}`, borderRadius:10, padding:"12px 16px", cursor:"pointer", color:selectedQuestion===q?T.blue:T.textMid, fontSize:13, fontFamily:"system-ui", lineHeight:1.6, transition:"all 0.15s", boxShadow:selectedQuestion===q?T.shadowMd:T.shadow }}>
                     {i+1}. {q}
                   </div>
                 ))}
@@ -571,109 +598,97 @@ const PracticeMode = ({ isPro, onUpgrade, setJokerMessage, setJokerMood }) => {
 
           {questionMode === "custom" && (
             <div>
-              <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8, fontFamily:"monospace" }}>Your Question</label>
+              <label style={{ display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8, fontFamily:"system-ui", fontWeight:600 }}>Your Question</label>
               <textarea value={customQuestion} onChange={e=>setCustomQuestion(e.target.value)} rows={3}
                 placeholder="Paste or type your own IELTS question here..."
-                style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10, color:"#e0e6f0", fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.6, outline:"none", boxSizing:"border-box" }}
+                style={{ width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.6, outline:"none", boxSizing:"border-box", boxShadow:T.shadow }}
               />
             </div>
           )}
 
-          <button
-            onClick={() => { if (question) { setStarted(true); setJokerMessage(getJokerLine("practice")); setJokerMood("excited"); } }}
+          <button onClick={() => { if (question) { setStarted(true); setJokerMessage(getJokerLine("practice")); } }}
             disabled={!question}
-            style={{ background:question?"linear-gradient(135deg,#4fc3f7,#0288d1)":"rgba(255,255,255,0.05)", border:"none", borderRadius:10, color:question?"#000":"#555", fontSize:15, fontWeight:800, padding:"15px", cursor:question?"pointer":"not-allowed", fontFamily:"system-ui" }}>
+            style={{ background:question?T.gold:"#e2e8f0", border:"none", borderRadius:10, color:question?"white":T.textMuted, fontSize:15, fontWeight:800, padding:"15px", cursor:question?"pointer":"not-allowed", fontFamily:"system-ui", boxShadow:question?T.shadowMd:"none" }}>
             {question ? "🖊️ Start Practice Session" : "Select a question to begin"}
           </button>
         </div>
       ) : (
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          {/* Question display */}
-          <div style={{ background:"rgba(79,195,247,0.06)", border:"1px solid rgba(79,195,247,0.2)", borderRadius:12, padding:"14px 18px" }}>
-            <div style={{ fontSize:11, color:"#4fc3f7", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6, fontFamily:"system-ui" }}>Your Question</div>
-            <p style={{ color:"#e0e6f0", fontSize:14, margin:0, lineHeight:1.6, fontFamily:"system-ui" }}>{question}</p>
-          </div>
+          <Card style={{ background:T.blueBg, border:`1px solid ${T.blueBorder}` }}>
+            <div style={{ fontSize:11, color:T.blue, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6, fontFamily:"system-ui" }}>Your Question</div>
+            <p style={{ color:T.text, fontSize:14, margin:0, lineHeight:1.6, fontFamily:"system-ui" }}>{question}</p>
+          </Card>
 
           <div style={{ display:"flex", gap:16, alignItems:"flex-start", flexWrap:"wrap" }}>
-            {/* Essay textarea */}
-            <div style={{ flex:2, minWidth:300 }}>
-              <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:7, fontFamily:"monospace" }}>
+            <div style={{ flex:2, minWidth:280 }}>
+              <label style={{ display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:7, fontFamily:"system-ui", fontWeight:600 }}>
                 Your Essay
-                <span style={{ color:wordCount>=250?"#00c9a7":wordCount>=150?"#ffb74d":"#ef5350", marginLeft:10, fontWeight:400 }}>
-                  {wordCount} words {wordCount>=250?"✓":wordCount>=150?"(keep going)":"(too short)"}
+                <span style={{ color:wordCount>=250?T.green:wordCount>=150?T.amber:T.red, marginLeft:10, fontWeight:400 }}>
+                  {wordCount} words {wordCount>=250?"✓":wordCount>=150?"(keep going!)":"(too short)"}
                 </span>
               </label>
               <textarea value={practiceEssay} onChange={handleEssayChange} rows={14}
-                placeholder="Start writing your essay here... I'll give you live feedback every few seconds!"
-                style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, color:"#e0e6f0", fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.8, outline:"none", boxSizing:"border-box" }}
+                placeholder="Start writing here... I'll give you live feedback every second or so!"
+                style={{ width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.8, outline:"none", boxSizing:"border-box", boxShadow:T.shadow }}
               />
               <button onClick={() => { setStarted(false); setPracticeEssay(""); setLiveFeedback(null); setSelectedQuestion(""); setCustomQuestion(""); }}
-                style={{ marginTop:8, background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"#667", fontSize:12, padding:"6px 14px", cursor:"pointer", fontFamily:"system-ui" }}>
+                style={{ marginTop:8, background:"transparent", border:`1px solid ${T.border}`, borderRadius:8, color:T.textMid, fontSize:12, padding:"6px 14px", cursor:"pointer", fontFamily:"system-ui" }}>
                 ← Change Question
               </button>
             </div>
 
-            {/* Live feedback panel */}
-            <div style={{ flex:1, minWidth:240 }}>
-              <div style={{ fontSize:11, color:"#4fc3f7", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10, fontFamily:"system-ui" }}>
-                {loadingFeedback ? "🔍 Analysing..." : "💬 Live Feedback"}
+            {/* Live feedback */}
+            <div style={{ flex:1, minWidth:220, display:"flex", flexDirection:"column", gap:10 }}>
+              <div style={{ fontSize:11, color:T.textMid, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"system-ui" }}>
+                {loadingFeedback ? "🔍 Analysing..." : "💬 Live Coaching"}
               </div>
 
               {loadingFeedback && (
-                <div style={{ background:"rgba(79,195,247,0.05)", border:"1px solid rgba(79,195,247,0.15)", borderRadius:10, padding:"14px", textAlign:"center" }}>
-                  <div style={{ color:"#4fc3f7", fontSize:13, fontFamily:"system-ui" }}>Reading your essay... 🎓</div>
-                </div>
+                <Card style={{ textAlign:"center", background:T.blueBg, border:`1px solid ${T.blueBorder}` }}>
+                  <div style={{ color:T.blue, fontSize:13, fontFamily:"system-ui" }}>Reading your essay... 🎓</div>
+                </Card>
               )}
 
               {liveFeedback && !loadingFeedback && (
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  {/* Estimated band */}
-                  <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:"12px 14px", display:"flex", alignItems:"center", gap:12 }}>
-                    <div style={{ fontSize:32, fontWeight:900, color:bandColor(liveFeedback.estimatedBand), fontFamily:"Georgia,serif", lineHeight:1 }}>{liveFeedback.estimatedBand}</div>
+                <>
+                  <Card style={{ display:"flex", alignItems:"center", gap:12 }}>
+                    <div style={{ fontSize:36, fontWeight:900, color:bandColor(liveFeedback.estimatedBand), fontFamily:"Georgia,serif", lineHeight:1 }}>{liveFeedback.estimatedBand}</div>
                     <div>
-                      <div style={{ fontSize:11, color:"#667", fontFamily:"monospace", textTransform:"uppercase" }}>Estimated So Far</div>
-                      <div style={{ fontSize:12, color:bandColor(liveFeedback.estimatedBand), fontFamily:"system-ui", fontWeight:600 }}>{bandLabel(liveFeedback.estimatedBand)}</div>
+                      <div style={{ fontSize:10, color:T.textMuted, fontFamily:"system-ui", textTransform:"uppercase", letterSpacing:"0.08em" }}>Estimated Band</div>
+                      <div style={{ fontSize:13, color:bandColor(liveFeedback.estimatedBand), fontFamily:"system-ui", fontWeight:700 }}>{bandLabel(liveFeedback.estimatedBand)}</div>
                     </div>
-                  </div>
-
-                  {/* Quick fix */}
+                  </Card>
                   {liveFeedback.quickFix && (
-                    <div style={{ background:"rgba(239,83,80,0.08)", border:"1px solid rgba(239,83,80,0.2)", borderRadius:10, padding:"12px 14px" }}>
-                      <div style={{ fontSize:11, color:"#ef9a9a", fontWeight:700, marginBottom:4, fontFamily:"system-ui" }}>🚨 QUICK FIX</div>
-                      <p style={{ color:"#ffcdd2", fontSize:13, margin:0, lineHeight:1.5, fontFamily:"system-ui" }}>{liveFeedback.quickFix}</p>
-                    </div>
+                    <Card style={{ background:T.redBg, border:`1px solid ${T.redBorder}` }}>
+                      <div style={{ fontSize:11, color:T.red, fontWeight:700, marginBottom:4, fontFamily:"system-ui" }}>🚨 QUICK FIX</div>
+                      <p style={{ color:"#991b1b", fontSize:13, margin:0, lineHeight:1.5, fontFamily:"system-ui" }}>{liveFeedback.quickFix}</p>
+                    </Card>
                   )}
-
-                  {/* Spot error */}
                   {liveFeedback.spotError && (
-                    <div style={{ background:"rgba(255,183,77,0.08)", border:"1px solid rgba(255,183,77,0.2)", borderRadius:10, padding:"12px 14px" }}>
-                      <div style={{ fontSize:11, color:"#ffb74d", fontWeight:700, marginBottom:4, fontFamily:"system-ui" }}>✏️ SPOT ERROR</div>
-                      <p style={{ color:"#ffe082", fontSize:13, margin:0, lineHeight:1.5, fontFamily:"system-ui" }}>{liveFeedback.spotError}</p>
-                    </div>
+                    <Card style={{ background:T.amberBg, border:`1px solid ${T.amberBorder}` }}>
+                      <div style={{ fontSize:11, color:T.amber, fontWeight:700, marginBottom:4, fontFamily:"system-ui" }}>✏️ SPOT ERROR</div>
+                      <p style={{ color:"#92400e", fontSize:13, margin:0, lineHeight:1.5, fontFamily:"system-ui" }}>{liveFeedback.spotError}</p>
+                    </Card>
                   )}
-
-                  {/* Tips */}
-                  <div style={{ background:"rgba(79,195,247,0.05)", border:"1px solid rgba(79,195,247,0.15)", borderRadius:10, padding:"12px 14px" }}>
-                    <div style={{ fontSize:11, color:"#4fc3f7", fontWeight:700, marginBottom:8, fontFamily:"system-ui" }}>💡 TIPS</div>
+                  <Card style={{ background:T.blueBg, border:`1px solid ${T.blueBorder}` }}>
+                    <div style={{ fontSize:11, color:T.blue, fontWeight:700, marginBottom:8, fontFamily:"system-ui" }}>💡 TIPS</div>
                     {liveFeedback.tips?.map((tip, i) => (
-                      <div key={i} style={{ color:"#cdd5e0", fontSize:13, lineHeight:1.5, marginBottom:6, fontFamily:"system-ui" }}>• {tip}</div>
+                      <div key={i} style={{ color:T.textMid, fontSize:13, lineHeight:1.5, marginBottom:5, fontFamily:"system-ui" }}>• {tip}</div>
                     ))}
-                  </div>
-
-                  {/* Encouragement */}
+                  </Card>
                   {liveFeedback.encouragement && (
-                    <div style={{ background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.15)", borderRadius:10, padding:"10px 14px" }}>
-                      <p style={{ color:"#c9a84c", fontSize:12, margin:0, fontStyle:"italic", fontFamily:"system-ui" }}>🃏 {liveFeedback.encouragement}</p>
-                    </div>
+                    <Card style={{ background:T.goldLight, border:`1px solid ${T.goldBorder}` }}>
+                      <p style={{ color:T.gold, fontSize:12, margin:0, fontStyle:"italic", fontFamily:"system-ui" }}>🃏 {liveFeedback.encouragement}</p>
+                    </Card>
                   )}
-                </div>
+                </>
               )}
 
               {!liveFeedback && !loadingFeedback && (
-                <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"16px", textAlign:"center" }}>
-                  <div style={{ fontSize:24, marginBottom:8 }}>🖊️</div>
-                  <p style={{ color:"#555", fontSize:13, margin:0, fontFamily:"system-ui" }}>Start writing — feedback appears after a few seconds of typing!</p>
-                </div>
+                <Card style={{ textAlign:"center", padding:"24px 16px" }}>
+                  <div style={{ fontSize:28, marginBottom:8 }}>🖊️</div>
+                  <p style={{ color:T.textMuted, fontSize:13, margin:0, fontFamily:"system-ui" }}>Start writing — feedback appears after a short pause!</p>
+                </Card>
               )}
             </div>
           </div>
@@ -683,7 +698,7 @@ const PracticeMode = ({ isPro, onUpgrade, setJokerMessage, setJokerMood }) => {
   );
 };
 
-// ── Main App ──────────────────────────────────
+// ── MAIN APP ──────────────────────────────────
 export default function IELTSBot() {
   const [mainView, setMainView] = useState("analyze");
   const [taskType, setTaskType] = useState("task2");
@@ -707,25 +722,12 @@ export default function IELTSBot() {
   const wordCount = essay.trim().split(/\s+/).filter(Boolean).length;
   const sampleWordCount = result?.sampleEssay ? result.sampleEssay.trim().split(/\s+/).filter(Boolean).length : 0;
 
-  // Joker reacts to typing
   useEffect(() => {
-    if (!essay) return;
-    if (wordCount < minWords && wordCount > 10) {
-      setJokerMessage(getJokerLine("wordCount"));
-      setJokerMood("concerned");
-    } else if (wordCount >= minWords) {
-      setJokerMessage(getJokerLine("wordGood") || getJokerLine("typing"));
-      setJokerMood("happy");
-    }
-  }, [wordCount]);
+    if (wordCount > 20 && wordCount < minWords) { setJokerMessage(getJokerLine("wordCount")); }
+    else if (wordCount >= minWords) { setJokerMessage(getJokerLine("wordGood")); }
+  }, [wordCount, minWords]);
 
-  const handleProSuccess = () => {
-    savePro();
-    setProUser(true);
-    setShowPaywall(false);
-    setJokerMessage("Well, well, well... a paying customer. I'm almost impressed. 🃏 Unlimited access unlocked!");
-    setJokerMood("excited");
-  };
+  const handleProSuccess = () => { savePro(); setProUser(true); setShowPaywall(false); setJokerMessage("A paying customer! I'm... almost impressed. 🃏 Unlimited access unlocked!"); };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -740,10 +742,8 @@ export default function IELTSBot() {
     if (wordCount < 30) { setError("Response too short."); return; }
     if (taskType === "task1academic" && !image) { setError("Please upload the graph/chart image for Academic Task 1."); return; }
     if (!proUser && uses >= FREE_USES_LIMIT) { setShowPaywall(true); return; }
-
     setError(""); setLoading(true); setResult(null);
     setJokerMessage(getJokerLine("analyzing"));
-    setJokerMood("analyzing");
 
     try {
       const messageContent = taskType === "task1academic" && image
@@ -758,26 +758,12 @@ export default function IELTSBot() {
       const text = data.content.map(b => b.text||"").join("");
       const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
 
-      if (!proUser) {
-        const newUses = uses + 1;
-        setUses(newUses);
-        saveUses(newUses);
-      }
+      if (!proUser) { const n = uses+1; setUses(n); saveUses(n); }
+      setResult(parsed); setActiveTab("scores");
 
-      setResult(parsed);
-      setActiveTab("scores");
-
-      // Joker reacts to score
-      if (parsed.overallBand >= 7.5) {
-        setJokerMessage(getJokerLine("scoreHigh"));
-        setJokerMood("happy");
-      } else if (parsed.overallBand >= 6) {
-        setJokerMessage(getJokerLine("scoreMid"));
-        setJokerMood("idle");
-      } else {
-        setJokerMessage(getJokerLine("scoreLow"));
-        setJokerMood("concerned");
-      }
+      if (parsed.overallBand >= 7.5) { setJokerMessage(getJokerLine("scoreHigh")); }
+      else if (parsed.overallBand >= 6) { setJokerMessage(getJokerLine("scoreMid")); }
+      else { setJokerMessage(getJokerLine("scoreLow")); }
     } catch(e) {
       setError("Something went wrong. Please try again.");
       setJokerMessage("Something broke. Even I'm surprised. 🃏");
@@ -785,48 +771,45 @@ export default function IELTSBot() {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0d1117", color:"#e0e6f0", paddingBottom:60 }}>
+    <div style={{ minHeight:"100vh", background:T.bg, color:T.text, paddingBottom:60 }}>
       {showPaywall && <PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess} />}
-
-      {/* Joker */}
       <Joker message={jokerMessage} mood={jokerMood} />
 
       {/* Header */}
-      <div style={{ background:"linear-gradient(135deg,#0d1117,#161b27)", borderBottom:"1px solid rgba(201,168,76,0.15)", padding:"28px 24px", textAlign:"center" }}>
-        <div style={{ fontSize:11, letterSpacing:"0.3em", color:"#c9a84c", fontFamily:"monospace", marginBottom:10, textTransform:"uppercase" }}>AI-Powered</div>
-        <h1 style={{ margin:0, fontSize:"clamp(24px,5vw,44px)", fontWeight:900, fontFamily:"Georgia,serif", background:"linear-gradient(90deg,#c9a84c,#00c9a7)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-          BandUp AI
+      <div style={{ background:T.bg2, borderBottom:`1px solid ${T.border}`, padding:"24px 24px 20px", textAlign:"center", boxShadow:T.shadow }}>
+        <div style={{ fontSize:10, letterSpacing:"0.3em", color:T.gold, fontFamily:"monospace", marginBottom:8, textTransform:"uppercase", fontWeight:700 }}>AI-Powered · IELTS Writing</div>
+        <h1 style={{ margin:0, fontSize:"clamp(24px,5vw,40px)", fontWeight:900, fontFamily:"Georgia,serif", color:T.text }}>
+          BandUp <span style={{ color:T.gold }}>AI</span>
         </h1>
-        <p style={{ color:"#667", fontSize:13, fontFamily:"system-ui", margin:"8px auto 0", maxWidth:560 }}>
-          IELTS Writing Examiner · Task 1 & 2 · Practice Mode · Live Feedback · Full Toolkit
+        <p style={{ color:T.textMuted, fontSize:13, fontFamily:"system-ui", margin:"6px auto 0", maxWidth:500 }}>
+          Task 1 & 2 · Complete mistake detection · Practice Mode · Live Feedback · IELTS Toolkit
         </p>
-        <div style={{ marginTop:14, display:"inline-flex", background:proUser?"rgba(0,201,167,0.1)":usesLeft<=0?"rgba(239,83,80,0.1)":"rgba(201,168,76,0.08)", border:`1px solid ${proUser?"rgba(0,201,167,0.3)":usesLeft<=0?"rgba(239,83,80,0.3)":"rgba(201,168,76,0.2)"}`, borderRadius:100, padding:"5px 16px", fontSize:13, fontFamily:"system-ui", color:proUser?"#00c9a7":usesLeft<=0?"#ef9a9a":"#c9a84c", fontWeight:600 }}>
+        <div style={{ marginTop:12, display:"inline-flex", background:proUser?T.greenBg:usesLeft<=0?T.redBg:T.goldLight, border:`1px solid ${proUser?T.greenBorder:usesLeft<=0?T.redBorder:T.goldBorder}`, borderRadius:100, padding:"4px 16px", fontSize:13, fontFamily:"system-ui", color:proUser?T.green:usesLeft<=0?T.red:T.gold, fontWeight:600 }}>
           {proUser ? "✓ Pro — Unlimited Access" : usesLeft > 0 ? `${usesLeft} free ${usesLeft===1?"analysis":"analyses"} remaining` : "Free limit reached — upgrade to continue"}
         </div>
       </div>
 
-      <div style={{ maxWidth:860, margin:"0 auto", padding:"24px 16px 0", paddingLeft:100 }}>
-
-        {/* Main Navigation */}
+      <div style={{ maxWidth:880, margin:"0 auto", padding:"24px 16px 0", paddingLeft:110 }}>
+        {/* Main Nav */}
         <div style={{ display:"flex", gap:8, marginBottom:24 }}>
           <MainTab label="🎓 Analyze Essay" active={mainView==="analyze"} onClick={()=>setMainView("analyze")} />
-          <MainTab label="🖊️ Practice Mode" active={mainView==="practice"} onClick={()=>{ setMainView("practice"); setJokerMessage(getJokerLine("practice")); setJokerMood("excited"); }} />
+          <MainTab label="🖊️ Practice Mode" active={mainView==="practice"} onClick={()=>{ setMainView("practice"); setJokerMessage(getJokerLine("practice")); }} />
           <MainTab label="📚 IELTS Toolkit" active={mainView==="toolkit"} onClick={()=>setMainView("toolkit")} />
         </div>
 
-        {/* ── ANALYZE VIEW ── */}
+        {/* ── ANALYZE ── */}
         {mainView === "analyze" && (
           <div>
-            {/* Task Type */}
+            {/* Task selector */}
             <div style={{ marginBottom:20 }}>
-              <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, fontFamily:"monospace" }}>Select Task Type</label>
+              <label style={{ display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10, fontFamily:"system-ui", fontWeight:600 }}>Select Task Type</label>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
                 {Object.entries(TASK_TYPES).map(([key, task]) => (
                   <button key={key} onClick={() => { setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); }}
-                    style={{ background:taskType===key?"rgba(201,168,76,0.12)":"rgba(255,255,255,0.03)", border:taskType===key?"1px solid rgba(201,168,76,0.4)":"1px solid rgba(255,255,255,0.08)", borderRadius:12, padding:"14px 10px", cursor:"pointer", textAlign:"center" }}>
+                    style={{ background:taskType===key?T.goldLight:"white", border:taskType===key?`1px solid ${T.gold}`:`1px solid ${T.border}`, borderRadius:12, padding:"14px 10px", cursor:"pointer", textAlign:"center", boxShadow:taskType===key?T.shadowMd:T.shadow, transition:"all 0.15s" }}>
                     <div style={{ fontSize:22, marginBottom:6 }}>{task.icon}</div>
-                    <div style={{ fontSize:12, fontWeight:700, color:taskType===key?"#c9a84c":"#cdd5e0", fontFamily:"system-ui", marginBottom:2 }}>{task.label}</div>
-                    <div style={{ fontSize:11, color:"#555", fontFamily:"system-ui" }}>{task.description}</div>
+                    <div style={{ fontSize:12, fontWeight:700, color:taskType===key?T.gold:T.text, fontFamily:"system-ui", marginBottom:2 }}>{task.label}</div>
+                    <div style={{ fontSize:11, color:T.textMuted, fontFamily:"system-ui" }}>{task.description}</div>
                   </button>
                 ))}
               </div>
@@ -835,13 +818,13 @@ export default function IELTSBot() {
             {/* Image upload */}
             {taskType === "task1academic" && (
               <div style={{ marginBottom:16 }}>
-                <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8, fontFamily:"monospace" }}>Upload Graph / Chart Image *</label>
+                <label style={{ display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8, fontFamily:"system-ui", fontWeight:600 }}>Upload Graph / Chart Image *</label>
                 <div onClick={() => fileRef.current.click()}
-                  style={{ border:`2px dashed ${imagePreview?"rgba(0,201,167,0.4)":"rgba(201,168,76,0.3)"}`, borderRadius:12, padding:"20px", textAlign:"center", cursor:"pointer", background:"rgba(255,255,255,0.02)" }}>
+                  style={{ border:`2px dashed ${imagePreview?T.greenBorder:T.goldBorder}`, borderRadius:12, padding:"20px", textAlign:"center", cursor:"pointer", background:"white", boxShadow:T.shadow }}>
                   {imagePreview ? (
-                    <div><img src={imagePreview} alt="graph" style={{ maxHeight:180, maxWidth:"100%", borderRadius:8, marginBottom:8 }} /><div style={{ fontSize:12, color:"#00c9a7", fontFamily:"system-ui" }}>✓ Uploaded — click to change</div></div>
+                    <div><img src={imagePreview} alt="graph" style={{ maxHeight:180, maxWidth:"100%", borderRadius:8, marginBottom:8 }} /><div style={{ fontSize:12, color:T.green, fontFamily:"system-ui" }}>✓ Uploaded — click to change</div></div>
                   ) : (
-                    <div><div style={{ fontSize:32, marginBottom:8 }}>📊</div><div style={{ fontSize:14, color:"#c9a84c", fontFamily:"system-ui", marginBottom:4 }}>Click to upload graph/chart image</div><div style={{ fontSize:12, color:"#555", fontFamily:"system-ui" }}>JPG, PNG — AI will read and evaluate the graph</div></div>
+                    <div><div style={{ fontSize:32, marginBottom:8 }}>📊</div><div style={{ fontSize:14, color:T.gold, fontFamily:"system-ui", marginBottom:4 }}>Click to upload graph/chart image</div><div style={{ fontSize:12, color:T.textMuted, fontFamily:"system-ui" }}>JPG, PNG — AI reads and evaluates the graph</div></div>
                   )}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display:"none" }} />
@@ -850,65 +833,70 @@ export default function IELTSBot() {
 
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               <div>
-                <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:7, fontFamily:"monospace" }}>
+                <label style={{ display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:7, fontFamily:"system-ui", fontWeight:600 }}>
                   {taskType==="task1general"?"Letter Task Instructions":taskType==="task1academic"?"Task Description":"Essay Question / Topic"}
                 </label>
                 <textarea value={topic} onChange={e=>setTopic(e.target.value)} rows={3}
-                  placeholder={taskType==="task2"?"e.g. Some people think universities should focus on job skills. Others believe universities should provide knowledge for its own sake. Discuss both views and give your opinion.":taskType==="task1academic"?"e.g. The graph below shows changes in energy consumption in the US between 1980 and 2020. Summarise the information by selecting and reporting the main features.":"e.g. You recently bought a laptop online but it arrived damaged. Write a letter to the manager. Explain what happened and what you want them to do."}
-                  style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:10, color:"#e0e6f0", fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.6, outline:"none", boxSizing:"border-box" }}
+                  placeholder={taskType==="task2"?"e.g. Some people think universities should focus on job skills. Others believe universities should provide knowledge for its own sake. Discuss both views and give your opinion.":taskType==="task1academic"?"e.g. The graph below shows changes in energy consumption in the US between 1980 and 2020. Summarise the information by selecting and reporting the main features.":"e.g. You recently bought a laptop online but it arrived damaged. Write a letter to the manager explaining what happened and what you want them to do."}
+                  style={{ width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.6, outline:"none", boxSizing:"border-box", boxShadow:T.shadow }}
                 />
               </div>
 
               <div>
-                <label style={{ display:"block", fontSize:11, color:"#c9a84c", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:7, fontFamily:"monospace" }}>
+                <label style={{ display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:7, fontFamily:"system-ui", fontWeight:600 }}>
                   Student's Response
-                  <span style={{ color:wordCount>=minWords?"#00c9a7":wordCount>=(minWords*0.6)?"#ffb74d":"#ef5350", marginLeft:10, fontWeight:400, fontFamily:"system-ui" }}>
-                    {wordCount} words {wordCount>=minWords?"✓":`(min. ${minWords}${wordCount<minWords?" — penalty applies":""})`}
+                  <span style={{ color:wordCount>=minWords?T.green:wordCount>=(minWords*0.6)?T.amber:T.red, marginLeft:10, fontWeight:500 }}>
+                    {wordCount} words {wordCount>=minWords?"✓":`(min. ${minWords} required${wordCount<minWords&&wordCount>10?" — penalty applies":""})`}
                   </span>
                 </label>
-                <textarea value={essay} onChange={e=>{ setEssay(e.target.value); if(e.target.value.length>20) { setJokerMessage(getJokerLine("typing")); setJokerMood("thinking"); } }}
+                <textarea value={essay}
+                  onChange={e=>{ setEssay(e.target.value); if(e.target.value.length>20) setJokerMessage(getJokerLine("typing")); }}
                   placeholder={taskType==="task1general"?"Dear Sir/Madam,\n\nI am writing to...":taskType==="task1academic"?"The graph illustrates...":"Paste the student's essay here..."}
                   rows={10}
-                  style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, color:"#e0e6f0", fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.8, outline:"none", boxSizing:"border-box" }}
+                  style={{ width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", resize:"vertical", fontFamily:"system-ui", lineHeight:1.8, outline:"none", boxSizing:"border-box", boxShadow:T.shadow }}
                 />
               </div>
 
-              {error && <div style={{ background:"rgba(239,83,80,0.1)", border:"1px solid rgba(239,83,80,0.3)", borderRadius:8, padding:"11px 14px", color:"#ef9a9a", fontSize:14, fontFamily:"system-ui" }}>{error}</div>}
+              {error && <Card style={{ background:T.redBg, border:`1px solid ${T.redBorder}` }}><p style={{ color:T.red, fontSize:14, margin:0, fontFamily:"system-ui" }}>{error}</p></Card>}
 
               {!proUser && usesLeft===1 && (
-                <div style={{ background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.2)", borderRadius:8, padding:"11px 14px", fontSize:13, color:"#c9a84c", fontFamily:"system-ui", textAlign:"center" }}>
-                  ⚠️ Last free analysis!{" "}<button onClick={()=>setShowPaywall(true)} style={{ background:"none", border:"none", color:"#e8c97a", fontWeight:700, cursor:"pointer", textDecoration:"underline", fontSize:13, fontFamily:"system-ui" }}>Upgrade to Pro</button>{" "}for unlimited access.
-                </div>
+                <Card style={{ background:T.amberBg, border:`1px solid ${T.amberBorder}`, textAlign:"center" }}>
+                  <span style={{ color:T.amber, fontSize:13, fontFamily:"system-ui" }}>⚠️ Last free analysis! </span>
+                  <button onClick={()=>setShowPaywall(true)} style={{ background:"none", border:"none", color:T.gold, fontWeight:700, cursor:"pointer", textDecoration:"underline", fontSize:13, fontFamily:"system-ui" }}>Upgrade to Pro</button>
+                  <span style={{ color:T.amber, fontSize:13, fontFamily:"system-ui" }}> for unlimited access.</span>
+                </Card>
               )}
 
               <button onClick={analyze} disabled={loading}
-                style={{ background:loading?"rgba(201,168,76,0.1)":"linear-gradient(135deg,#c9a84c,#a87c30)", border:"none", borderRadius:10, color:loading?"#c9a84c":"#000", fontSize:15, fontWeight:800, padding:"15px 28px", cursor:loading?"not-allowed":"pointer", fontFamily:"system-ui", boxShadow:loading?"none":"0 6px 24px rgba(201,168,76,0.25)", transition:"all 0.2s" }}>
+                style={{ background:loading?"#e2e8f0":T.gold, border:"none", borderRadius:10, color:loading?T.textMuted:"white", fontSize:15, fontWeight:800, padding:"15px 28px", cursor:loading?"not-allowed":"pointer", fontFamily:"system-ui", boxShadow:loading?"none":T.shadowMd, transition:"all 0.2s" }}>
                 {loading?"⏳ Examining...":!proUser&&usesLeft<=0?"🔓 Upgrade to Continue":`🎓 Analyze ${TASK_TYPES[taskType].label}`}
               </button>
             </div>
 
             {/* Results */}
             {result && (
-              <div style={{ marginTop:36 }}>
-                <div style={{ background:"linear-gradient(135deg,rgba(201,168,76,0.1),rgba(0,201,167,0.1))", border:"1px solid rgba(201,168,76,0.25)", borderRadius:14, padding:"24px 28px", display:"flex", alignItems:"center", gap:24, marginBottom:20, flexWrap:"wrap" }}>
+              <div style={{ marginTop:32 }}>
+                {/* Score banner */}
+                <Card style={{ display:"flex", alignItems:"center", gap:24, marginBottom:20, flexWrap:"wrap", background:bandBg(result.overallBand), border:`1px solid ${bandColor(result.overallBand)}30` }}>
                   <div style={{ textAlign:"center" }}>
                     <div style={{ fontSize:60, fontWeight:900, color:bandColor(result.overallBand), lineHeight:1, fontFamily:"Georgia,serif" }}>{result.overallBand}</div>
-                    <div style={{ fontSize:11, color:"#667", fontFamily:"monospace", letterSpacing:"0.1em", textTransform:"uppercase", marginTop:3 }}>Overall Band</div>
+                    <div style={{ fontSize:10, color:T.textMuted, fontFamily:"monospace", letterSpacing:"0.1em", textTransform:"uppercase", marginTop:2 }}>Overall Band</div>
                   </div>
                   <div style={{ flex:1, minWidth:180 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8, flexWrap:"wrap" }}>
                       <div style={{ fontSize:20, fontWeight:700, color:bandColor(result.overallBand), fontFamily:"Georgia,serif" }}>{bandLabel(result.overallBand)} User</div>
-                      <span style={{ background:result.wordCount>=minWords?"rgba(0,201,167,0.15)":"rgba(239,83,80,0.15)", border:`1px solid ${result.wordCount>=minWords?"rgba(0,201,167,0.3)":"rgba(239,83,80,0.3)"}`, borderRadius:20, padding:"2px 10px", fontSize:12, color:result.wordCount>=minWords?"#00c9a7":"#ef9a9a", fontFamily:"system-ui" }}>
+                      <span style={{ background:"white", border:`1px solid ${result.wordCount>=minWords?T.greenBorder:T.redBorder}`, borderRadius:20, padding:"2px 10px", fontSize:12, color:result.wordCount>=minWords?T.green:T.red, fontFamily:"system-ui", fontWeight:600 }}>
                         {result.wordCount} words {result.wordCount>=minWords?"✓":"⚠ below minimum"}
                       </span>
                     </div>
                     <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                      {result.strengths?.map((s,i) => <span key={i} style={{ background:"rgba(0,201,167,0.12)", border:"1px solid rgba(0,201,167,0.25)", borderRadius:20, padding:"2px 10px", fontSize:12, color:"#80cbc4", fontFamily:"system-ui" }}>✓ {s}</span>)}
+                      {result.strengths?.map((s,i) => <span key={i} style={{ background:"white", border:`1px solid ${T.greenBorder}`, borderRadius:20, padding:"2px 10px", fontSize:12, color:T.green, fontFamily:"system-ui" }}>✓ {s}</span>)}
                     </div>
                   </div>
-                </div>
+                </Card>
 
-                <div style={{ display:"flex", gap:6, marginBottom:16, flexWrap:"wrap" }}>
+                {/* Result tabs */}
+                <div style={{ display:"flex", gap:6, marginBottom:16, flexWrap:"wrap", background:"white", padding:6, borderRadius:12, border:`1px solid ${T.border}`, boxShadow:T.shadow }}>
                   <TabBtn label="📊 Scores" active={activeTab==="scores"} onClick={()=>setActiveTab("scores")} />
                   <TabBtn label="🔍 Mistakes" active={activeTab==="mistakes"} onClick={()=>setActiveTab("mistakes")} badge={result.mistakes?.length} />
                   <TabBtn label="📈 Band Booster" active={activeTab==="booster"} onClick={()=>setActiveTab("booster")} />
@@ -924,10 +912,10 @@ export default function IELTSBot() {
                     <CriteriaCard label="Lexical Resource" data={result.criteria.lexicalResource} />
                     <CriteriaCard label="Grammatical Range & Accuracy" data={result.criteria.grammaticalRange} />
                     {result.improvements?.length>0 && (
-                      <div style={{ background:"rgba(255,183,77,0.07)", border:"1px solid rgba(255,183,77,0.2)", borderRadius:10, padding:"14px 18px" }}>
-                        <div style={{ fontSize:11, color:"#ffb74d", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8, fontFamily:"system-ui" }}>Key Improvements Needed</div>
-                        {result.improvements.map((imp,i)=><div key={i} style={{ color:"#cdd5e0", fontSize:14, lineHeight:1.6, marginBottom:4, fontFamily:"system-ui" }}>→ {imp}</div>)}
-                      </div>
+                      <Card style={{ background:T.amberBg, border:`1px solid ${T.amberBorder}` }}>
+                        <div style={{ fontSize:11, color:T.amber, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8, fontFamily:"system-ui" }}>Key Improvements Needed</div>
+                        {result.improvements.map((imp,i)=><div key={i} style={{ color:T.textMid, fontSize:14, lineHeight:1.6, marginBottom:4, fontFamily:"system-ui" }}>→ {imp}</div>)}
+                      </Card>
                     )}
                   </div>
                 )}
@@ -935,88 +923,92 @@ export default function IELTSBot() {
                 {activeTab==="mistakes" && (
                   <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                     <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:4 }}>
-                      {[["major","#ef5350"],["moderate","#ffb74d"],["minor","#4fc3f7"]].map(([s,c])=>(
-                        <span key={s} style={{ background:`${c}15`, border:`1px solid ${c}40`, borderRadius:20, padding:"3px 10px", fontSize:11, color:c, fontFamily:"system-ui", fontWeight:600 }}>● {s}</span>
+                      {[["major",T.red],["moderate",T.amber],["minor",T.blue]].map(([s,c])=>(
+                        <span key={s} style={{ background:"white", border:`1px solid ${c}60`, borderRadius:20, padding:"3px 10px", fontSize:11, color:c, fontFamily:"system-ui", fontWeight:600 }}>● {s}</span>
                       ))}
-                      <span style={{ color:"#555", fontSize:12, fontFamily:"system-ui", alignSelf:"center" }}>— {result.mistakes?.length} found</span>
+                      <span style={{ color:T.textMuted, fontSize:12, fontFamily:"system-ui", alignSelf:"center" }}>— {result.mistakes?.length} total found</span>
                     </div>
-                    {result.mistakes?.length===0 ? <div style={{ color:"#00c9a7", textAlign:"center", padding:36, fontFamily:"system-ui" }}>No mistakes — excellent!</div>
-                    : result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i} />)}
+                    {result.mistakes?.length===0
+                      ? <Card style={{ textAlign:"center", color:T.green, padding:36, fontFamily:"system-ui" }}>No mistakes found — excellent work!</Card>
+                      : result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i} />)
+                    }
                   </div>
                 )}
 
                 {activeTab==="booster" && result.bandBooster && (
-                  <div style={{ background:"linear-gradient(135deg,rgba(201,168,76,0.1),rgba(0,201,167,0.05))", border:"1px solid rgba(201,168,76,0.25)", borderRadius:14, padding:"20px 24px" }}>
+                  <Card style={{ background:T.goldLight, border:`1px solid ${T.goldBorder}` }}>
                     <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:20, flexWrap:"wrap" }}>
-                      <div style={{ textAlign:"center" }}><div style={{ fontSize:36, fontWeight:900, color:bandColor(result.bandBooster.currentBand), fontFamily:"Georgia,serif" }}>{result.bandBooster.currentBand}</div><div style={{ fontSize:10, color:"#667", fontFamily:"monospace", textTransform:"uppercase" }}>Current</div></div>
-                      <div style={{ fontSize:24, color:"#c9a84c" }}>→</div>
-                      <div style={{ textAlign:"center" }}><div style={{ fontSize:36, fontWeight:900, color:bandColor(result.bandBooster.targetBand), fontFamily:"Georgia,serif" }}>{result.bandBooster.targetBand}</div><div style={{ fontSize:10, color:"#667", fontFamily:"monospace", textTransform:"uppercase" }}>Target</div></div>
-                      <div style={{ flex:1 }}><div style={{ fontSize:14, color:"#c9a84c", fontWeight:700, fontFamily:"system-ui" }}>What to do:</div></div>
+                      <div style={{ textAlign:"center" }}><div style={{ fontSize:36, fontWeight:900, color:bandColor(result.bandBooster.currentBand), fontFamily:"Georgia,serif" }}>{result.bandBooster.currentBand}</div><div style={{ fontSize:10, color:T.textMuted, fontFamily:"monospace", textTransform:"uppercase" }}>Current</div></div>
+                      <div style={{ fontSize:24, color:T.gold }}>→</div>
+                      <div style={{ textAlign:"center" }}><div style={{ fontSize:36, fontWeight:900, color:bandColor(result.bandBooster.targetBand), fontFamily:"Georgia,serif" }}>{result.bandBooster.targetBand}</div><div style={{ fontSize:10, color:T.textMuted, fontFamily:"monospace", textTransform:"uppercase" }}>Target</div></div>
+                      <div style={{ flex:1 }}><div style={{ fontSize:14, color:T.gold, fontWeight:700, fontFamily:"system-ui" }}>Exactly what to do:</div></div>
                     </div>
                     {result.bandBooster.specificActions?.map((a,i)=>(
                       <div key={i} style={{ display:"flex", gap:12, alignItems:"flex-start", marginBottom:10 }}>
-                        <span style={{ background:"rgba(201,168,76,0.2)", border:"1px solid rgba(201,168,76,0.4)", borderRadius:"50%", width:26, height:26, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:"#c9a84c", fontWeight:700, flexShrink:0, fontFamily:"system-ui" }}>{i+1}</span>
-                        <p style={{ color:"#cdd5e0", fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{a}</p>
+                        <span style={{ background:T.gold, borderRadius:"50%", width:24, height:24, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:"white", fontWeight:700, flexShrink:0, fontFamily:"system-ui" }}>{i+1}</span>
+                        <p style={{ color:T.textMid, fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{a}</p>
                       </div>
                     ))}
-                  </div>
+                  </Card>
                 )}
 
                 {activeTab==="vocab" && (
                   <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                     {result.vocabularyUpgrades?.map((v,i)=>(
-                      <div key={i} style={{ background:"rgba(79,195,247,0.05)", border:"1px solid rgba(79,195,247,0.15)", borderRadius:12, padding:"14px 18px", display:"flex", flexDirection:"column", gap:8 }}>
-                        <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap" }}>
-                          <div style={{ background:"rgba(239,83,80,0.15)", borderRadius:6, padding:"4px 12px", color:"#ffcdd2", fontSize:14, fontStyle:"italic" }}>"{v.weak}"</div>
-                          <div style={{ fontSize:16, color:"#555" }}>→</div>
-                          <div style={{ background:"rgba(79,195,247,0.15)", borderRadius:6, padding:"4px 12px", color:"#4fc3f7", fontSize:14, fontWeight:600 }}>"{v.advanced}"</div>
+                      <Card key={i} style={{ border:`1px solid ${T.blueBorder}`, background:T.blueBg }}>
+                        <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap", marginBottom:8 }}>
+                          <div style={{ background:"#fee2e2", borderRadius:6, padding:"4px 12px", color:"#991b1b", fontSize:14, fontStyle:"italic" }}>"{v.weak}"</div>
+                          <div style={{ fontSize:16, color:T.textMuted }}>→</div>
+                          <div style={{ background:"#dcfce7", borderRadius:6, padding:"4px 12px", color:"#166534", fontSize:14, fontWeight:600 }}>"{v.advanced}"</div>
                         </div>
-                        <p style={{ color:"#aaa", fontSize:13, margin:0, lineHeight:1.6, fontFamily:"system-ui" }}>💡 {v.reason}</p>
-                      </div>
+                        <p style={{ color:T.textMid, fontSize:13, margin:0, lineHeight:1.6, fontFamily:"system-ui" }}>💡 {v.reason}</p>
+                      </Card>
                     ))}
                   </div>
                 )}
 
                 {activeTab==="tips" && (
-                  <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                     {result.examinerTips?.map((tip,i)=>(
-                      <div key={i} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:12, padding:"16px 20px", display:"flex", gap:14, alignItems:"flex-start" }}>
-                        <span style={{ background:"rgba(201,168,76,0.15)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:"50%", width:28, height:28, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:"#c9a84c", fontWeight:700, flexShrink:0, fontFamily:"system-ui" }}>{i+1}</span>
-                        <p style={{ color:"#cdd5e0", fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{tip}</p>
-                      </div>
+                      <Card key={i} style={{ display:"flex", gap:14, alignItems:"flex-start" }}>
+                        <span style={{ background:T.goldLight, border:`1px solid ${T.goldBorder}`, borderRadius:"50%", width:28, height:28, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:T.gold, fontWeight:700, flexShrink:0, fontFamily:"system-ui" }}>{i+1}</span>
+                        <p style={{ color:T.textMid, fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{tip}</p>
+                      </Card>
                     ))}
                   </div>
                 )}
 
                 {activeTab==="sample" && result.sampleEssay && (
                   <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                    <div style={{ background:"rgba(0,201,167,0.06)", border:"1px solid rgba(0,201,167,0.2)", borderRadius:12, padding:"18px 22px" }}>
+                    <Card style={{ background:T.greenBg, border:`1px solid ${T.greenBorder}` }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14, flexWrap:"wrap", gap:8 }}>
-                        <div style={{ fontSize:11, color:"#00c9a7", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", fontFamily:"system-ui" }}>Band 8+ Model Response</div>
-                        <div style={{ fontSize:12, fontFamily:"system-ui", fontWeight:600, color:sampleWordCount>=minWords?"#00c9a7":"#ef5350" }}>{sampleWordCount} words {sampleWordCount>=minWords?"✓":"⚠ below minimum"}</div>
+                        <div style={{ fontSize:11, color:T.green, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", fontFamily:"system-ui" }}>Band 8+ Model Response</div>
+                        <div style={{ fontSize:12, fontFamily:"system-ui", fontWeight:600, color:sampleWordCount>=minWords?T.green:T.red }}>
+                          {sampleWordCount} words {sampleWordCount>=minWords?"✓":"⚠ below minimum"}
+                        </div>
                       </div>
-                      <p style={{ color:"#dde5f0", fontSize:15, lineHeight:1.9, whiteSpace:"pre-wrap", margin:0, fontFamily:"Georgia,serif" }}>{result.sampleEssay}</p>
-                    </div>
+                      <p style={{ color:T.text, fontSize:15, lineHeight:1.9, whiteSpace:"pre-wrap", margin:0, fontFamily:"Georgia,serif" }}>{result.sampleEssay}</p>
+                    </Card>
                     {result.sampleEssayExplanation && (
-                      <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"18px 22px" }}>
-                        <div style={{ fontSize:11, color:"#4fc3f7", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14, fontFamily:"system-ui" }}>Why This Scores High</div>
+                      <Card>
+                        <div style={{ fontSize:11, color:T.blue, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14, fontFamily:"system-ui" }}>Why This Response Scores High</div>
                         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                           {[["Introduction",result.sampleEssayExplanation.introduction],["Body Paragraphs",result.sampleEssayExplanation.bodyParagraphs],["Conclusion",result.sampleEssayExplanation.conclusion]].map(([lbl,txt])=>(
-                            <div key={lbl}><div style={{ fontSize:11, color:"#ffb74d", fontWeight:700, marginBottom:4, fontFamily:"system-ui" }}>{lbl}</div><p style={{ color:"#b0b8c8", fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{txt}</p></div>
+                            <div key={lbl}><div style={{ fontSize:11, color:T.amber, fontWeight:700, marginBottom:4, fontFamily:"system-ui" }}>{lbl}</div><p style={{ color:T.textMid, fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>{txt}</p></div>
                           ))}
                           {result.sampleEssayExplanation.vocabularyHighlights?.length>0 && (
                             <div>
-                              <div style={{ fontSize:11, color:"#ffb74d", fontWeight:700, marginBottom:6, fontFamily:"system-ui" }}>Advanced Vocabulary</div>
+                              <div style={{ fontSize:11, color:T.amber, fontWeight:700, marginBottom:6, fontFamily:"system-ui" }}>Advanced Vocabulary Used</div>
                               <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                                {result.sampleEssayExplanation.vocabularyHighlights.map((v,i)=><span key={i} style={{ background:"rgba(79,195,247,0.1)", border:"1px solid rgba(79,195,247,0.25)", borderRadius:6, padding:"2px 9px", fontSize:12, color:"#4fc3f7", fontFamily:"system-ui" }}>{v}</span>)}
+                                {result.sampleEssayExplanation.vocabularyHighlights.map((v,i)=><span key={i} style={{ background:T.blueBg, border:`1px solid ${T.blueBorder}`, borderRadius:6, padding:"2px 9px", fontSize:12, color:T.blue, fontFamily:"system-ui" }}>{v}</span>)}
                               </div>
                             </div>
                           )}
-                          <div style={{ background:"rgba(0,201,167,0.08)", borderRadius:8, padding:"10px 14px" }}>
-                            <p style={{ color:"#80cbc4", fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>🏆 {result.sampleEssayExplanation.whyHighScore}</p>
-                          </div>
+                          <Card style={{ background:T.greenBg, border:`1px solid ${T.greenBorder}` }}>
+                            <p style={{ color:T.green, fontSize:14, lineHeight:1.7, margin:0, fontFamily:"system-ui" }}>🏆 {result.sampleEssayExplanation.whyHighScore}</p>
+                          </Card>
                         </div>
-                      </div>
+                      </Card>
                     )}
                   </div>
                 )}
@@ -1025,20 +1017,15 @@ export default function IELTSBot() {
           </div>
         )}
 
-        {/* ── PRACTICE VIEW ── */}
-        {mainView === "practice" && (
-          <PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)} setJokerMessage={setJokerMessage} setJokerMood={setJokerMood} />
-        )}
-
-        {/* ── TOOLKIT VIEW ── */}
-        {mainView === "toolkit" && (
-          <ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)} />
-        )}
+        {mainView === "practice" && <PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)} setJokerMessage={setJokerMessage} setJokerMood={setJokerMood} />}
+        {mainView === "toolkit" && <ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)} />}
       </div>
 
       <style>{`
-        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes jokerPop {
+          from { opacity:0; transform:scale(0.8) translateX(-10px); }
+          to { opacity:1; transform:scale(1) translateX(0); }
+        }
       `}</style>
     </div>
   );
