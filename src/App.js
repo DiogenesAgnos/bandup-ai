@@ -59,24 +59,67 @@ const PRACTICE_QUESTIONS = {
   "Health":["In many countries, obesity is becoming a serious problem. What are the causes and what measures could be taken to address it?","Healthcare should be funded entirely by governments. To what extent do you agree or disagree?"]
 };
 
-const getSystemPrompt = (taskType) => `You are an expert IELTS examiner with 20+ years of experience.
-${taskType==="task2"?"Evaluating IELTS Task 2. Under 250 words = Task Achievement MAX Band 5.0.":taskType==="task1academic"?"Evaluating IELTS Task 1 Academic. Check: overview? key trends? data accuracy? no personal opinion?":"Evaluating IELTS Task 1 General letter. Check: all bullet points? correct register?"}
-SCORING: Band 9=flawless, Band 8=very good minor errors, Band 7=good some errors, Band 6=competent noticeable errors, Band 5=frequent errors. Do NOT undermark. Task 1 with clear overview+accurate data = 7.5-8.0 minimum.
-WORD COUNT: Count by splitting on spaces. Report exact count in wordCount.
-Respond ONLY with valid JSON (no markdown):
+const getSystemPrompt = (taskType, lang="en") => `You are an expert IELTS examiner with 20+ years of experience. You apply the official IELTS band descriptors with precision.
+
+${taskType==="task2"?"Evaluating IELTS Task 2. Under 250 words = Task Achievement MAX Band 5.0.":taskType==="task1academic"?"Evaluating IELTS Task 1 Academic. Check: overview present? key trends identified? data accurately referenced? no personal opinion given?":"Evaluating IELTS Task 1 General letter. Check: all three bullet points addressed? correct register (formal/informal)? appropriate opening and closing?"}
+
+OFFICIAL IELTS BAND DESCRIPTORS — apply these precisely:
+
+TASK ACHIEVEMENT / TASK RESPONSE:
+- Band 9: Fully addresses all parts of the task. Position is clear and fully developed. Ideas are relevant, fully extended and well supported.
+- Band 8: Sufficiently addresses all parts. Position is clear and well developed. Ideas are relevant, well extended and supported.
+- Band 7: Addresses all parts of the task. A clear position is presented throughout. Main ideas are extended and supported but there may be a tendency to over-generalise.
+- Band 6: Addresses all parts though some may be more fully covered. A relevant position is presented. Main ideas are relevant but some may be inadequately developed or unclear.
+- Band 5: Addresses the task only partially. The format may be inappropriate in places. A position is presented but not always maintained. Some main ideas are put forward but they are limited and not sufficiently developed.
+
+COHERENCE & COHESION:
+- Band 9: Uses cohesion in a skilful way. Paragraphing is used appropriately throughout.
+- Band 8: Sequences information and ideas logically. Manages all aspects of cohesion well. Uses paragraphing sufficiently and appropriately.
+- Band 7: Logically organises information and ideas with clear progression. Uses a range of cohesive devices appropriately. Presents a clear central topic within each paragraph.
+- Band 6: Arranges information and ideas coherently. Uses cohesive devices effectively but cohesion within and/or between sentences may be faulty or mechanical.
+- Band 5: Presents information with some organisation but there may be a lack of overall progression. Makes inadequate, inaccurate or overuse of cohesive devices. May be repetitive.
+
+LEXICAL RESOURCE:
+- Band 9: Uses a wide range of vocabulary with very natural and sophisticated control of lexical features. Rare minor errors occur only as slips.
+- Band 8: Uses a wide range of vocabulary fluently and flexibly to convey precise meanings. Skilfully uses uncommon lexical items. Occasional errors in word choice, spelling and/or word formation.
+- Band 7: Uses sufficient range of vocabulary to allow flexibility and precision. Uses less common lexical items with some awareness of style and collocation. May produce occasional errors in word choice, spelling and/or word formation.
+- Band 6: Uses an adequate range of vocabulary for the task. Attempts to use less common vocabulary but with some inaccuracy. Makes some errors in spelling and/or word formation but these do not impede communication.
+- Band 5: Uses a limited range of vocabulary but this is minimally adequate for the task. May make noticeable errors in spelling and/or word formation that may cause some difficulty for the reader.
+
+GRAMMATICAL RANGE & ACCURACY:
+- Band 9: Uses a wide range of structures with full flexibility and accuracy. Rare minor errors occur only as slips.
+- Band 8: Uses a wide range of structures. The majority of sentences are error-free. Occasional inappropriate sentences or non-systematic errors.
+- Band 7: Uses a variety of complex structures. Produces frequent error-free sentences. Has good control of grammar and punctuation but may make a few errors.
+- Band 6: Uses a mix of simple and complex sentence forms. Makes some errors in grammar and punctuation but these rarely reduce communication.
+- Band 5: Uses only a limited range of structures. Attempts complex sentences but these tend to be less accurate than simple sentences. May make frequent grammatical errors and punctuation may be faulty.
+
+CRITICAL SCORING RULES:
+- The overall band is the mean of the four criteria bands, rounded to the nearest 0.5
+- Under 250 words (Task 2) = Task Achievement MAX Band 5.0. Under 150 words (Task 1) = Task Achievement MAX Band 5.0
+- Task 1 Academic with clear overview + accurate data coverage + good comparisons + no major errors = minimum Band 7.0 overall
+- Never undermark — if writing demonstrates Band 7 features, score it Band 7
+- Never overmark — errors that impede communication must reduce the score
+- Punctuation errors (missing commas, wrong apostrophes, run-on sentences) count under Grammatical Range & Accuracy
+
+WORD COUNT: Count by splitting on spaces. Report exact count in wordCount field.
+
+Respond ONLY with valid JSON (no markdown, no backticks):
 {
   "wordCount":201,"overallBand":7.5,
   "criteria":{"taskAchievement":{"band":7.0,"feedback":"..."},"coherenceCohesion":{"band":7.5,"feedback":"..."},"lexicalResource":{"band":7.0,"feedback":"..."},"grammaticalRange":{"band":7.5,"feedback":"..."}},
-  "mistakes":[{"original":"exact phrase","correction":"corrected","explanation":"why","category":"Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register","severity":"minor|moderate|major"}],
-  "vocabularyUpgrades":[{"weak":"exact weak phrase","advanced":"better alternative","reason":"why"}],
-  "bandBooster":{"currentBand":7.0,"targetBand":7.5,"specificActions":["action 1","action 2","action 3"]},
-  "examinerTips":["tip 1","tip 2","tip 3"],
+  "mistakes":[{"original":"exact phrase from text","correction":"corrected version","explanation":"clear explanation","category":"Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register","severity":"minor|moderate|major"}],
+  "vocabularyUpgrades":[{"weak":"exact weak phrase from essay","advanced":"better IELTS alternative","reason":"why this upgrade helps"}],
+  "bandBooster":{"currentBand":7.0,"targetBand":7.5,"specificActions":["specific action 1","action 2","action 3"]},
+  "examinerTips":["insider tip 1 specific to this essay","tip 2","tip 3"],
   "strengths":["strength 1","strength 2"],
   "improvements":["improvement 1","improvement 2"],
-  "sampleEssay":"Full Band 8+ response MINIMUM 270 words Task 2 / 185 Task 1",
+  "sampleEssay":"Full Band 8+ response — MINIMUM 270 words Task 2 / 185 words Task 1. Count carefully.",
   "sampleEssayExplanation":{"introduction":"...","bodyParagraphs":"...","conclusion":"...","vocabularyHighlights":["word 1","word 2"],"whyHighScore":"..."}
 }
-Find ALL mistakes — spelling, grammar, punctuation, sentence structure, word choice, register. No limit. The "original" must match EXACTLY.`;
+
+Find ALL mistakes — spelling, grammar, punctuation, sentence structure, word choice, register. No limit. The "original" field must match the essay text EXACTLY character for character.
+${lang==="ar"?"\n\nمهم جداً: قدّم جميع التعليقات والشرح باللغة العربية. هذا يشمل: حقل feedback لكل معيار، وحقل explanation لكل خطأ، وحقل reason لكل ترقية مفردات، وحقل specificActions في Band Booster، وحقل examinerTips، وحقل strengths، وحقل improvements، وحقل sampleEssayExplanation بالكامل. أبقِ درجات الباند (أرقام) والمقال النموذجي sampleEssay باللغة الإنجليزية. جميع التعليقات الأخرى يجب أن تكون باللغة العربية الفصحى الواضحة.":""}
+`;
 
 const PRACTICE_SYSTEM = `You are a direct IELTS writing coach reviewing an essay in progress. Be concise and specific.
 Respond ONLY with valid JSON (no markdown):
@@ -409,7 +452,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
     if(!isPro&&getStoredUses()>=FREE_USES_LIMIT){ onUpgrade(); return; }
     setLoadingFeedback(true);
     try{
-      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:PRACTICE_SYSTEM,messages:[{role:"user",content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive coaching feedback with spotted errors as JSON.`}]})});
+      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:800,system:PRACTICE_SYSTEM,messages:[{role:"user",content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive coaching feedback with spotted errors as JSON.`}]})});
       const data=await res.json();
       const raw=data.content?.map(b=>b.text||"").join("")||"";
       const parsed=JSON.parse(raw.replace(/```json|```/g,"").trim());
@@ -562,6 +605,7 @@ export default function IELTSBot(){
   const [showPaywall,setShowPaywall]=useState(false);
   const [uses,setUses]=useState(getStoredUses);
   const [proUser,setProUser]=useState(getStoredPro);
+  const [lang,setLang]=useState("en");
   const fileRef=useRef();
 
   const usesLeft=FREE_USES_LIMIT-uses;
@@ -582,7 +626,7 @@ export default function IELTSBot(){
       const messageContent=taskType==="task1academic"&&image
         ?[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:image}},{type:"text",text:`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`}]
         :`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`;
-      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:4000,system:getSystemPrompt(taskType),messages:[{role:"user",content:messageContent}]})});
+      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:4000,system:getSystemPrompt(taskType,lang),messages:[{role:"user",content:messageContent}]})});
       const data=await res.json();
       const text=data.content.map(b=>b.text||"").join("");
       const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
@@ -605,6 +649,10 @@ export default function IELTSBot(){
         <p style={{color:T.textMuted,fontSize:13,fontFamily:"system-ui",margin:"6px auto 0",maxWidth:500}}>Task 1 & 2 · Inline corrections · Progress tracker · Practice Mode · IELTS Toolkit</p>
         <div style={{marginTop:12,display:"inline-flex",background:proUser?T.greenBg:usesLeft<=0?T.redBg:T.goldLight,border:`1px solid ${proUser?T.greenBorder:usesLeft<=0?T.redBorder:T.goldBorder}`,borderRadius:100,padding:"4px 16px",fontSize:13,fontFamily:"system-ui",color:proUser?T.green:usesLeft<=0?T.red:T.gold,fontWeight:600}}>
           {proUser?"✓ Pro — Unlimited Access":usesLeft>0?`${usesLeft} free ${usesLeft===1?"analysis":"analyses"} remaining`:"Free limit reached — upgrade to continue"}
+        </div>
+        <div style={{marginTop:10,display:"flex",gap:8,justifyContent:"center"}}>
+          <button onClick={()=>setLang("en")} style={{background:lang==="en"?T.gold:"white",border:`1px solid ${lang==="en"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="en"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇬🇧 English</button>
+          <button onClick={()=>setLang("ar")} style={{background:lang==="ar"?T.gold:"white",border:`1px solid ${lang==="ar"?T.gold:T.border}`,borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:lang==="ar"?"white":T.textMid,cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇸🇦 عربي</button>
         </div>
       </div>
 
