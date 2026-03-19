@@ -79,7 +79,7 @@ BAND BOOSTER: Give the single most impactful set of actions to jump exactly 0.5 
 
 EXAMINER TIPS: Share 3 insider tips specific to THIS essay that most students never hear from teachers.
 
-The sample essay must be 260-280 words minimum and demonstrate Band 8+ writing.`;
+The sample essay MUST be a minimum of 270 words — count carefully before finishing. If it is under 270 words, continue writing until it reaches 270 words minimum. A model essay under 250 words is completely unacceptable and contradicts the Band 8+ label. Count every word before submitting.`;
 
 const bandColor = (b) => b >= 8 ? "#00c9a7" : b >= 7 ? "#4fc3f7" : b >= 6 ? "#ffb74d" : b >= 5 ? "#ff8a65" : "#ef5350";
 const bandLabel = (b) => b >= 8.5 ? "Expert" : b >= 7.5 ? "Very Good" : b >= 6.5 ? "Competent" : b >= 5.5 ? "Modest" : "Limited";
