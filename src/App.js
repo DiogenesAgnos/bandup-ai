@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 const STRIPE_CONFIGURED = false;
 const FREE_USES_LIMIT = 2;
-const STORAGE_KEY = "bandup_uses";
+const STORAGE_KEY = "banfdup_uses";
 const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
 
@@ -137,6 +137,8 @@ Respond ONLY with valid JSON (no markdown, no backticks):
 }
 
 Find ALL mistakes — spelling, grammar, punctuation, sentence structure, word choice, register. No limit. The "original" field must match the essay text EXACTLY character for character.
+CRITICAL SCORING RULE: You must determine and lock in all band scores (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammatical Range & Accuracy, and Overall Band) before considering the feedback language. Scores must be identical whether feedback is in English or Arabic. The language of feedback must never influence the numerical scores.
+
 ${lang==="ar"?"\n\nمهم جداً: قدّم جميع التعليقات والشرح باللغة العربية. هذا يشمل: حقل feedback لكل معيار، وحقل explanation لكل خطأ، وحقل reason لكل ترقية مفردات، وحقل specificActions في Band Booster، وحقل examinerTips، وحقل strengths، وحقل improvements، وحقل sampleEssayExplanation بالكامل. أبقِ درجات الباند (أرقام) والمقال النموذجي sampleEssay باللغة الإنجليزية. جميع التعليقات الأخرى يجب أن تكون باللغة العربية الفصحى الواضحة.":""}
 `;
 
