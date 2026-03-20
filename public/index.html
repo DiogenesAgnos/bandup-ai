@@ -3,7 +3,58 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="BandUp AI — AI-powered IELTS Writing Examiner. Instant band scores, mistake detection, Band 8+ model essays." />
     <title>BandUp AI — IELTS Writing Examiner</title>
+
+    <!-- ═══════════════════════════════════════════════════
+         GOOGLE ANALYTICS 4
+         1. Go to analytics.google.com
+         2. Admin → Create Property → Web
+         3. Copy your Measurement ID (G-XXXXXXXXXX)
+         4. Replace BOTH instances of G-XXXXXXXXXX below
+         
+         To get weekly email reports:
+         analytics.google.com → Reports → Scheduled emails
+         You can also see: country, age, device, sessions
+         ═══════════════════════════════════════════════════ -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX', {
+        send_page_view: true
+      });
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════
+         EMAILJS (for Contact Form)
+         1. Go to emailjs.com → Sign up free
+         2. Add Email Service → Connect your Gmail
+         3. Create Email Template with these variables:
+            {{from_name}}, {{from_email}}, {{country}},
+            {{age_group}}, {{message}}, {{to_email}}
+         4. Go to Account → Public Key → copy it
+         5. Replace YOUR_PUBLIC_KEY below
+         ═══════════════════════════════════════════════════ -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+      (function(){
+        // Replace with your EmailJS public key
+        emailjs.init({ publicKey: "YOUR_PUBLIC_KEY" });
+      })();
+    </script>
+
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+      /* Smooth scrolling */
+      html { scroll-behavior: smooth; }
+      /* Custom scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #f0f2f7; }
+      ::-webkit-scrollbar-thumb { background: #003865; border-radius: 3px; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
