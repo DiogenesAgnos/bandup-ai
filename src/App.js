@@ -337,7 +337,7 @@ const MainTab=({label,active,onClick})=>(
 // ── Paywall ───────────────────────────────────
 const PaywallModal=({onClose,onSuccess})=>(
   <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-    <div style={{background:T.cream,border:`1px solid ${T.border}`,borderRadius:20,padding:"40px 32px",maxWidth:440,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
+    <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,padding:"40px 32px",maxWidth:440,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
       <button onClick={onClose} style={{position:"absolute",top:16,right:20,background:"none",border:"none",color:T.textMuted,fontSize:22,cursor:"pointer"}}>✕</button>
       <div style={{textAlign:"center",marginBottom:24}}>
         <div style={{fontSize:36,marginBottom:8}}>🎓</div>
@@ -478,7 +478,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
   const LockedSection=()=>(
     <div style={{position:"relative"}}>
       <div style={{filter:"blur(3px)",pointerEvents:"none",userSelect:"none"}}>
-        {[1,2,3].map(i=><Card key={i} style={{marginBottom:8}}><div style={{height:16,background:T.bg3,borderRadius:4,marginBottom:8,width:"60%"}}/><div style={{height:12,background:T.bg3,borderRadius:4,width:"90%"}}/></Card>)}
+        {[1,2,3].map(i=><div key={i} style={{background:'#fefdf8',border:`1px solid ${T.border}`,borderRadius:10,padding:'16px 20px',marginBottom:8}}><div style={{height:16,background:T.bg3,borderRadius:4,marginBottom:8,width:'60%'}}/><div style={{height:12,background:T.bg3,borderRadius:4,width:'90%'}}/></div>)}
       </div>
       <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}>
         <div style={{fontSize:36}}>🔒</div>
@@ -564,7 +564,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
           <div style={{display:"flex",gap:8}}>
             {[["choose","📋 Choose a Question"],["custom","✏️ Write My Own"]].map(([mode,label])=>(
-              <button key={mode} onClick={()=>setQuestionMode(mode)} style={{flex:1,background:questionMode===mode?T.gold:"white",border:questionMode===mode?`1px solid ${T.gold}`:`1px solid ${T.border}`,borderRadius:10,padding:"10px",cursor:"pointer",color:questionMode===mode?"white":T.textMid,fontSize:13,fontWeight:600,fontFamily:"system-ui"}}>{label}</button>
+              <button key={mode} onClick={()=>setQuestionMode(mode)} style={{flex:1,background:questionMode===mode?T.red:T.bg3,border:`2px solid ${questionMode===mode?T.red:T.border}`,borderRadius:10,padding:"10px",cursor:"pointer",color:questionMode===mode?"white":T.textMid,fontSize:13,fontWeight:700,fontFamily:"'Mulish', system-ui",boxShadow:questionMode===mode?`0 4px 12px ${T.redGlow}`:'none',transition:'all 0.2s'}}>{label}</button>
             ))}
           </div>
           {questionMode==="choose"&&(
@@ -572,13 +572,13 @@ const PracticeMode=({isPro,onUpgrade})=>{
               <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
                 {Object.keys(PRACTICE_QUESTIONS).map(topic=>(
                   <button key={topic} onClick={()=>{ setSelectedTopic(topic); setSelectedQuestion(""); }}
-                    style={{background:selectedTopic===topic?T.red:"white",border:selectedTopic===topic?`1px solid ${T.red}`:`1px solid ${T.border}`,borderRadius:8,padding:"6px 14px",cursor:"pointer",color:selectedTopic===topic?"white":T.textMid,fontSize:12,fontWeight:600,fontFamily:"system-ui"}}>{topic}</button>
+                    style={{background:selectedTopic===topic?T.red:T.bg3,border:`1px solid ${selectedTopic===topic?T.red:T.border}`,borderRadius:20,padding:"6px 16px",cursor:"pointer",color:selectedTopic===topic?"white":T.textMid,fontSize:12,fontWeight:700,fontFamily:"'Mulish', system-ui",boxShadow:selectedTopic===topic?`0 3px 10px ${T.redGlow}`:'none',transition:'all 0.18s'}}>{topic}</button>
                 ))}
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 {PRACTICE_QUESTIONS[selectedTopic].map((q,i)=>(
                   <div key={i} onClick={()=>setSelectedQuestion(q)}
-                    style={{background:selectedQuestion===q?"#fff0f0":"white",border:selectedQuestion===q?`2px solid ${T.red}`:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",color:selectedQuestion===q?T.red:T.textMid,fontSize:13,fontFamily:"system-ui",lineHeight:1.6,transition:"all 0.15s",boxShadow:T.shadow}}>
+                    style={{background:selectedQuestion===q?"#fff5f5":T.bg3,border:selectedQuestion===q?`2px solid ${T.red}`:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",color:selectedQuestion===q?T.red:T.textMid,fontSize:13,fontFamily:"system-ui",lineHeight:1.6,transition:"all 0.15s",boxShadow:T.shadow}}>
                     {i+1}. {q}
                   </div>
                 ))}
@@ -861,7 +861,7 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh", background:T.bg, fontFamily:"'Mulish', system-ui"}}>
+    <div style={{minHeight:"100vh", background:'#0d1020', fontFamily:"'Mulish', system-ui"}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
       {/* ══════════════════════════════════════
@@ -1004,7 +1004,7 @@ export default function IELTSBot(){
 
         {/* Content glass card */}
         <div style={{
-          background:T.cream,
+          background:"#fefdf8",
           borderRadius:16,
           boxShadow:"0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)",
           padding:"32px 32px 40px",
