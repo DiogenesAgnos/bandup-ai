@@ -298,12 +298,12 @@ const MainTab=({label,active,onClick})=>(
     border: "none",
     borderBottom: active ? `3px solid ${T.primary}` : "3px solid transparent",
     color: active ? T.primary : T.textMuted,
-    padding: "0 20px",
-    height: 56,
+    padding: "0 14px",
+    height: 64,
     cursor: "pointer",
     fontSize: 14,
     fontWeight: active ? 700 : 400,
-    fontFamily: "'Source Sans Pro', 'Inter', system-ui",
+    fontFamily: "'Source Sans Pro','Inter',system-ui",
     transition: "color 0.15s, border-color 0.15s",
     whiteSpace: "nowrap",
     flexShrink: 0,
@@ -416,7 +416,7 @@ const ProgressTracker=({onUpgrade,isPro})=>{
             return (
               <div key={key} style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
                 <div style={{width:160,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>{label}</div>
-                <div style={{flex:1,background:T.bg3,borderRadius:6,height:8,position:"relative"}}>
+                <div style={{flex:1,background:T.bgGray,borderRadius:6,height:8,position:"relative"}}>
                   <div style={{position:"absolute",left:0,top:0,height:"100%",width:`${(curr/9)*100}%`,background:bandColor(curr),borderRadius:6,transition:"width 0.5s"}}/>
                 </div>
                 <div style={{fontSize:13,fontWeight:700,color:bandColor(curr),fontFamily:"'Source Sans Pro','Inter',system-ui",width:32}}>{curr}</div>
@@ -456,7 +456,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
   const LockedSection=()=>(
     <div style={{position:"relative"}}>
       <div style={{filter:"blur(3px)",pointerEvents:"none",userSelect:"none"}}>
-        {[1,2,3].map(i=><div key={i} style={{background:'#fefdf8',border:`1px solid ${T.border}`,borderRadius:10,padding:'16px 20px',marginBottom:8}}><div style={{height:16,background:T.bg3,borderRadius:4,marginBottom:8,width:'60%'}}/><div style={{height:12,background:T.bg3,borderRadius:4,width:'90%'}}/></div>)}
+        {[1,2,3].map(i=><div key={i} style={{background:'#fefdf8',border:`1px solid ${T.border}`,borderRadius:10,padding:'16px 20px',marginBottom:8}}><div style={{height:16,background:T.bgGray,borderRadius:4,marginBottom:8,width:'60%'}}/><div style={{height:12,background:T.bgGray,borderRadius:4,width:'90%'}}/></div>)}
       </div>
       <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}>
         <div style={{fontSize:36}}>🔒</div>
@@ -568,7 +568,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
               <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>Your Question</label>
               <textarea value={customQuestion} onChange={e=>setCustomQuestion(e.target.value)} rows={3}
                 placeholder="Paste your own IELTS question here..."
-                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
             </div>
           )}
           <button onClick={()=>{ if(question) setStarted(true); }} disabled={!question}
@@ -592,7 +592,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
               </label>
               <textarea value={practiceEssay} onChange={handleEssayChange} rows={12}
                 placeholder="Start writing here — live feedback and inline corrections appear as you pause!"
-                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
 
               {/* Annotated preview */}
               {showAnnotated&&liveFeedback&&practiceAnnotations.length>0&&(
@@ -839,150 +839,146 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh", background:T.bgMuted, fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif", color:T.text}}>
+    <div style={{minHeight:"100vh", background:"#f9f9f9", fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif", color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
-      {/* ══════════════════════════════════════
-          STICKY NAV — exact Coursera layout
-      ══════════════════════════════════════ */}
-      <div style={{
-        position:"sticky", top:0, zIndex:200,
-        background:T.bg,
-        borderBottom:`1px solid ${T.border}`,
-        boxShadow:T.shadowNav,
-      }}>
+      {/* ══ NAV BAR 1 — black top bar like Coursera ══ */}
+      <div style={{background:"#1c1d1f", padding:"0 24px"}}>
+        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", alignItems:"center", height:40, gap:24}}>
+          {["For Students","For Schools","For Teachers"].map(item=>(
+            <span key={item} style={{color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:400, cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui", transition:"color 0.15s"}}
+              onMouseEnter={e=>e.target.style.color="#fff"}
+              onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.7)"}
+            >{item}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* ══ NAV BAR 2 — white logo + tabs like Coursera ══ */}
+      <div style={{position:"sticky", top:0, zIndex:200, background:T.bg, borderBottom:`1px solid ${T.border}`, boxShadow:T.shadowNav}}>
         <div style={{maxWidth:1200, margin:"0 auto", padding:"0 24px", display:"flex", alignItems:"center", justifyContent:"space-between", height:64}}>
           {/* Logo */}
-          <div style={{display:"flex", alignItems:"center", gap:10}}>
-            <span style={{
-              color:T.primary, fontWeight:800, fontSize:22,
-              fontFamily:"'Source Sans Pro','Inter',system-ui",
-              letterSpacing:"-0.5px"
-            }}>BandUp AI</span>
-            <span style={{
-              background:T.primaryLight, color:T.primary,
-              fontSize:11, fontWeight:700, padding:"2px 8px",
-              borderRadius:4, letterSpacing:"0.05em", textTransform:"uppercase"
-            }}>IELTS</span>
-          </div>
-          {/* Right controls */}
-          <div style={{display:"flex", alignItems:"center", gap:12}}>
-            <div style={{
-              fontSize:13, fontWeight:600, color:T.textMuted,
-              fontFamily:"'Source Sans Pro','Inter',system-ui"
-            }}>
-              {proUser
-                ? <span style={{color:T.green}}>✓ Pro — Unlimited</span>
-                : usesLeft>0
-                  ? `${usesLeft} free ${usesLeft===1?"analysis":"analyses"} left`
-                  : <span style={{color:T.red}}>Upgrade to continue</span>
-              }
+          <div style={{display:"flex", alignItems:"center", gap:24}}>
+            <span style={{color:T.primary, fontWeight:800, fontSize:26, fontFamily:"'Source Sans Pro','Inter',system-ui", letterSpacing:"-0.8px", lineHeight:1}}>BandUp AI</span>
+            <div style={{display:"flex", gap:4}}>
+              <MainTab label="🎓 Analyze" active={mainView==="analyze"} onClick={()=>{setMainView("analyze"); trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{setMainView("practice"); trackEvent("nav_click",{page:"practice"});}}/>
+              <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{setMainView("progress"); trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{setMainView("toolkit"); trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{setMainView("contact"); trackEvent("nav_click",{page:"contact"});}}/>
             </div>
+          </div>
+          {/* Right side */}
+          <div style={{display:"flex", alignItems:"center", gap:12}}>
+            <span style={{fontSize:13, color:proUser?T.green:usesLeft<=0?T.red:T.textMuted, fontWeight:600, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+              {proUser?"✓ Pro — Unlimited":usesLeft>0?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"Free limit reached"}
+            </span>
             <div style={{width:1, height:20, background:T.border}}/>
             {["en","ar"].map(l=>(
               <button key={l} onClick={()=>switchLang(l)} style={{
-                background: lang===l ? T.primaryLight : "transparent",
-                border: `1px solid ${lang===l ? T.primaryBorder : T.border}`,
-                borderRadius:4, padding:"5px 12px",
-                fontSize:13, fontWeight:lang===l?700:400,
-                color: lang===l ? T.primary : T.textMuted,
-                cursor:"pointer",
-                fontFamily:"'Source Sans Pro','Inter',system-ui",
+                background:lang===l?T.primaryLight:"transparent",
+                border:`1px solid ${lang===l?T.primaryBorder:T.border}`,
+                borderRadius:4, padding:"5px 12px", fontSize:13,
+                fontWeight:lang===l?700:400,
+                color:lang===l?T.primary:T.textMuted,
+                cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui",
                 transition:"all 0.15s"
               }}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
             ))}
+            {!proUser&&(
+              <button onClick={()=>setShowPaywall(true)} style={{
+                background:T.primary, color:"white",
+                border:"none", borderRadius:4, padding:"8px 18px",
+                fontSize:13, fontWeight:700, cursor:"pointer",
+                fontFamily:"'Source Sans Pro','Inter',system-ui",
+                transition:"background 0.15s"
+              }}>Upgrade to Pro →</button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════
-          HERO — Coursera style dark blue banner
-      ══════════════════════════════════════ */}
-      <div style={{background:"#1c1d1f", padding:"40px 24px 44px"}}>
-        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", gap:32, flexWrap:"wrap"}}>
-          <div style={{flex:1, minWidth:300}}>
+      {/* ══ HERO — Coursera style warm + image ══ */}
+      <div style={{background:"#f0f4ff", overflow:"hidden", position:"relative"}}>
+        <div style={{maxWidth:1200, margin:"0 auto", padding:"0 24px", display:"flex", alignItems:"stretch", minHeight:340}}>
+          {/* Left text */}
+          <div style={{flex:"0 0 55%", padding:"48px 40px 48px 0", display:"flex", flexDirection:"column", justifyContent:"center", zIndex:2}}>
             <div style={{
               display:"inline-flex", alignItems:"center", gap:8,
-              background:"rgba(255,255,255,0.1)", borderRadius:4,
-              padding:"4px 12px", marginBottom:16
+              background:"rgba(0,86,210,0.1)", border:"1px solid rgba(0,86,210,0.2)",
+              borderRadius:4, padding:"4px 12px", marginBottom:18, alignSelf:"flex-start"
             }}>
-              <span style={{color:"rgba(255,255,255,0.85)", fontSize:12, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-Powered · IELTS Writing</span>
+              <span style={{color:T.primary, fontSize:12, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-Powered · IELTS Writing Examiner</span>
             </div>
             <h1 style={{
-              margin:"0 0 12px",
-              fontSize:"clamp(26px,3.5vw,40px)",
+              margin:"0 0 14px",
+              fontSize:"clamp(26px,3.2vw,42px)",
               fontWeight:700,
               fontFamily:"'Source Sans Pro','Inter',system-ui",
-              color:"#fff",
+              color:"#1c1d1f",
               lineHeight:1.2,
               letterSpacing:"-0.3px"
             }}>
-              The smarter way to prepare<br/>
-              for IELTS Writing
+              Write better.<br/>Score higher.<br/>
+              <span style={{color:T.primary}}>Get the IELTS band you deserve.</span>
             </h1>
             <p style={{
-              color:"rgba(255,255,255,0.7)",
-              fontSize:16, lineHeight:1.6,
+              color:T.textMuted, fontSize:16, lineHeight:1.6,
               fontFamily:"'Source Sans Pro','Inter',system-ui",
-              margin:"0 0 24px", maxWidth:520
+              margin:"0 0 24px", maxWidth:460
             }}>
-              Instant AI band scores · Complete mistake detection ·<br/>Band 8+ model essays · Practice Mode
+              Instant AI band scores · Complete mistake detection · Band 8+ model essays · Practice Mode with live coaching
             </p>
-            <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
-              {["✍️ Task 2 Essay","📊 Task 1 Academic","✉️ Task 1 General"].map(label=>(
-                <div key={label} style={{
-                  background:"rgba(255,255,255,0.1)",
-                  border:"1px solid rgba(255,255,255,0.2)",
-                  borderRadius:4, padding:"6px 14px",
-                  color:"rgba(255,255,255,0.85)",
-                  fontSize:13, fontFamily:"'Source Sans Pro','Inter',system-ui", fontWeight:500
-                }}>{label}</div>
-              ))}
+            <div style={{display:"flex", gap:12, flexWrap:"wrap"}}>
+              <button onClick={()=>setMainView("analyze")} style={{
+                background:T.primary, color:"white", border:"none",
+                borderRadius:4, padding:"13px 24px", fontSize:15,
+                fontWeight:700, cursor:"pointer",
+                fontFamily:"'Source Sans Pro','Inter',system-ui",
+                boxShadow:"0 2px 8px rgba(0,86,210,0.3)"
+              }}>Start Analyzing →</button>
+              <button onClick={()=>setMainView("practice")} style={{
+                background:"transparent", color:T.primary,
+                border:`2px solid ${T.primary}`,
+                borderRadius:4, padding:"11px 24px", fontSize:15,
+                fontWeight:700, cursor:"pointer",
+                fontFamily:"'Source Sans Pro','Inter',system-ui"
+              }}>Try Practice Mode</button>
             </div>
           </div>
-          {/* Stats */}
-          <div style={{display:"flex", gap:32, flexWrap:"wrap"}}>
-            {[["9", "Band Levels"], ["4", "Criteria Assessed"], ["100%", "AI Powered"]].map(([num, label])=>(
-              <div key={label} style={{textAlign:"center"}}>
-                <div style={{fontSize:32, fontWeight:700, color:"#fff", fontFamily:"'Source Sans Pro','Inter',system-ui", lineHeight:1}}>{num}</div>
-                <div style={{fontSize:13, color:"rgba(255,255,255,0.6)", fontFamily:"'Source Sans Pro','Inter',system-ui", marginTop:4}}>{label}</div>
-              </div>
-            ))}
+          {/* Right image */}
+          <div style={{flex:"0 0 45%", position:"relative", overflow:"hidden", minHeight:320}}>
+            <img
+              src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=85&auto=format&fit=crop"
+              alt="Student studying for IELTS"
+              style={{
+                position:"absolute", inset:0,
+                width:"100%", height:"100%",
+                objectFit:"cover",
+                objectPosition:"center top"
+              }}
+            />
+            {/* Gradient fade left edge */}
+            <div style={{position:"absolute", inset:0, background:"linear-gradient(90deg, #f0f4ff 0%, transparent 30%)"}}/>
           </div>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════
-          MAIN CONTENT WRAPPER
-      ══════════════════════════════════════ */}
-      <div style={{maxWidth:1200, margin:"0 auto", padding:"0 24px 80px"}}>
-
-        {/* Tab navigation — Coursera style horizontal underline */}
-        <div style={{
-          background:T.bg,
-          borderBottom:`1px solid ${T.border}`,
-          display:"flex", overflowX:"auto",
-          marginBottom:0,
-          position:"sticky", top:64, zIndex:100,
-          boxShadow:T.shadowNav
-        }}>
-          <MainTab label="🎓 Analyze Essay"  active={mainView==="analyze"}  onClick={()=>{setMainView("analyze"); trackEvent("nav_click",{page:"analyze"});}}/>
-          <MainTab label="🖊️ Practice Mode"  active={mainView==="practice"} onClick={()=>{setMainView("practice"); trackEvent("nav_click",{page:"practice"});}}/>
-          <MainTab label="📈 My Progress"    active={mainView==="progress"} onClick={()=>{setMainView("progress"); trackEvent("nav_click",{page:"progress"});}}/>
-          <MainTab label="📚 IELTS Toolkit"  active={mainView==="toolkit"}  onClick={()=>{setMainView("toolkit"); trackEvent("nav_click",{page:"toolkit"});}}/>
-          <MainTab label="✉️ Contact"        active={mainView==="contact"}  onClick={()=>{setMainView("contact"); trackEvent("nav_click",{page:"contact"});}}/>
+      {/* ══ QUICK STATS BAR ══ */}
+      <div style={{background:T.bg, borderBottom:`1px solid ${T.border}`, padding:"16px 24px"}}>
+        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", gap:32, alignItems:"center", flexWrap:"wrap"}}>
+          {[["9","Band levels covered"],["4","IELTS criteria scored"],["100%","AI-powered analysis"],["Task 1 & 2","Academic + General Training"]].map(([num,label])=>(
+            <div key={label} style={{display:"flex", alignItems:"center", gap:10}}>
+              <span style={{color:T.primary, fontWeight:700, fontSize:18, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{num}</span>
+              <span style={{color:T.textMuted, fontSize:13, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</span>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Content card */}
-        <div style={{
-          background:T.bg,
-          border:`1px solid ${T.border}`,
-          borderTop:"none",
-          borderRadius:"0 0 8px 8px",
-          padding:"32px 32px 40px",
-          boxShadow:T.shadow,
-          minHeight:400
-        }}>
+      {/* ══ CONTENT AREA ══ */}
+      <div style={{maxWidth:1200, margin:"24px auto 80px", padding:"0 24px"}}>
+        <div style={{background:T.bg, border:`1px solid ${T.border}`, borderRadius:8, padding:"32px", boxShadow:T.shadow}}>
 
         {/* ── ANALYZE ── */}
         {mainView==="analyze"&&(
@@ -994,15 +990,14 @@ export default function IELTSBot(){
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
                   <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); }}
                     style={{
-                      background: taskType===key ? T.primaryLight : T.bgGray,
+                      background: taskType===key ? T.primaryLight : "#f9f9f9",
                       border: `2px solid ${taskType===key ? T.primary : T.border}`,
-                      borderRadius: 10,
-                      padding: "18px 12px",
+                      borderRadius: 8,
+                      padding: "20px 14px",
                       cursor: "pointer",
                       textAlign: "center",
-                      boxShadow: taskType===key ? T.shadowMd : T.shadow,
-                      transform: taskType===key ? "translateY(-2px)" : "none",
-                      transition: "all 0.2s"
+                      boxShadow: taskType===key ? `0 0 0 2px ${T.primaryBorder}` : T.shadow,
+                      transition: "all 0.18s"
                     }}>
                     <div style={{fontSize:22,marginBottom:6}}>{task.icon}</div>
                     <div style={{fontSize:12,fontWeight:700,color:taskType===key?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4,fontWeight:600,fontSize:13}}>{task.label}</div>
@@ -1029,7 +1024,7 @@ export default function IELTSBot(){
                 </label>
                 <textarea value={topic} onChange={e=>setTopic(e.target.value)} rows={3}
                   placeholder={taskType==="task2"?"e.g. Some people think universities should focus on job skills. Discuss both views and give your opinion.":taskType==="task1academic"?"e.g. The graph below shows changes in energy consumption. Summarise the information and make comparisons.":"e.g. You recently bought a laptop online but it arrived damaged. Write a letter to the manager."}
-                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                  style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               <div>
                 <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
@@ -1041,7 +1036,7 @@ export default function IELTSBot(){
                 <textarea value={essay} onChange={e=>setEssay(e.target.value)}
                   placeholder={taskType==="task1general"?"Dear Sir/Madam,\n\nI am writing to...":taskType==="task1academic"?"The graph illustrates...":"Paste the student's essay here..."}
                   rows={10}
-                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                  style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</p></Card>}
               {!proUser&&usesLeft===1&&(
@@ -1074,7 +1069,7 @@ export default function IELTSBot(){
               </button>
 
               {/* Language Selector */}
-              <Card style={{background:T.bg3,border:`1px solid ${T.border}`,marginTop:4}}>
+              <Card style={{background:T.bgGray,border:`1px solid ${T.border}`,marginTop:4}}>
                 <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
                   <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?T.red:"white",border:`1px solid ${lang==="en"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
@@ -1102,7 +1097,7 @@ export default function IELTSBot(){
             {result&&(
               <div style={{marginTop:32}}>
                 <div style={{
-                  background:`linear-gradient(135deg, #1c1d1f 0%, #2d3748 100%)`,
+                  background:`linear-gradient(135deg, ${T.primary} 0%, #003a99 100%)`,
                   borderRadius:12,
                   padding:"28px 32px",
                   marginBottom:24,
@@ -1120,18 +1115,18 @@ export default function IELTSBot(){
                   <div style={{flex:1,minWidth:180}}>
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
                       <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand)}}>User</span></div>
-                      <span style={{background:"white",border:`1px solid ${result.wordCount>=minWords?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.2)"}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
+                      <span style={{background:"white",border:`1px solid ${result.wordCount>=minWords?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.2)"}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:"rgba(255,255,255,0.9)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
                         {result.wordCount} words {result.wordCount>=minWords?"✓":"⚠ below minimum"}
                       </span>
                     </div>
                     <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                      {result.strengths?.map((s,i)=><span key={i} style={{background:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"3px 12px",fontSize:12,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>✓ {s}</span>)}
+                      {result.strengths?.map((s,i)=><span key={i} style={{background:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"3px 12px",fontSize:12,color:"rgba(255,255,255,0.9)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>✓ {s}</span>)}
                     </div>
                   </div>
                 </div>
 
                 {result.mistakes?.length>0&&(
-                  <Card style={{marginBottom:16,background:T.bg3}}>
+                  <Card style={{marginBottom:16,background:T.bgGray}}>
                     <div style={{marginBottom:8}}>
                       <div style={{fontSize:13,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2,fontWeight:700}}>👆 Click any underlined word to see its correction and explanation.</div>
                       <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",direction:"rtl",textAlign:"right",marginBottom:8}}>اضغط على أي كلمة تحتها خط لرؤية التصحيح والشرح.</div>
@@ -1276,9 +1271,9 @@ export default function IELTSBot(){
         </div>{/* end page content card */}
       </div>{/* end maxWidth */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
         * { box-sizing: border-box; }
-        body { font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif; margin: 0; }
+        body { font-family: 'Source Sans 3', 'Inter', system-ui, sans-serif; margin: 0; }
         textarea, input, select, button { font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #F3F4F6; }
