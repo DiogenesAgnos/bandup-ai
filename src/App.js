@@ -7,16 +7,20 @@ const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
 
 const T = {
-  bg:"#f8f9fc", bg2:"#ffffff", bg3:"#f0f2f7",
-  border:"#e2e8f0", borderStrong:"#cbd5e1",
+  bg:"#f4f6f9", bg2:"#ffffff", bg3:"#eef1f6",
+  border:"#dce3ed", borderStrong:"#b8c6d9",
+  // Primary: British Council navy + Cambridge teal
+  navy:"#003865", navyLight:"#e8eef5", navyBorder:"#b3c6d9",
+  teal:"#009cde", tealLight:"#e0f4fc", tealBorder:"#7dd3f0",
+  // Keep gold for branding accents
   gold:"#b8860b", goldLight:"#fef3c7", goldBorder:"#fcd34d",
-  text:"#1e293b", textMid:"#475569", textMuted:"#94a3b8",
-  green:"#059669", greenBg:"#ecfdf5", greenBorder:"#6ee7b7",
-  blue:"#0284c7", blueBg:"#e0f2fe", blueBorder:"#7dd3fc",
-  red:"#dc2626", redBg:"#fef2f2", redBorder:"#fca5a5",
-  amber:"#d97706", amberBg:"#fffbeb", amberBorder:"#fcd34d",
-  purple:"#7c3aed", purpleBg:"#f5f3ff", purpleBorder:"#c4b5fd",
-  shadow:"0 1px 3px rgba(0,0,0,0.1)", shadowMd:"0 4px 6px rgba(0,0,0,0.07)", shadowLg:"0 10px 25px rgba(0,0,0,0.1)"
+  text:"#1a2332", textMid:"#3d5166", textMuted:"#7a90a8",
+  green:"#007a5e", greenBg:"#e6f6f2", greenBorder:"#5cc8ad",
+  blue:"#003865", blueBg:"#e8eef5", blueBorder:"#b3c6d9",
+  red:"#c0392b", redBg:"#fdf2f1", redBorder:"#f0a099",
+  amber:"#c47a00", amberBg:"#fff8e6", amberBorder:"#fcd77a",
+  purple:"#5b3fa0", purpleBg:"#f0ecfa", purpleBorder:"#c4aff0",
+  shadow:"0 1px 4px rgba(0,56,101,0.08)", shadowMd:"0 4px 12px rgba(0,56,101,0.1)", shadowLg:"0 10px 32px rgba(0,56,101,0.15)"
 };
 
 const TASK_TYPES = {
@@ -239,12 +243,12 @@ const MistakeCard=({mistake,i})=>(
   </div>
 );
 const TabBtn=({label,active,onClick,badge})=>(
-  <button onClick={onClick} style={{background:active?"#eff6ff":"transparent",border:active?`1px solid ${T.blueBorder}`:"1px solid transparent",color:active?T.blue:T.textMuted,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"system-ui",display:"flex",alignItems:"center",gap:5,whiteSpace:"nowrap",transition:"all 0.15s"}}>
+  <button onClick={onClick} style={{background:active?T.tealLight:"transparent",border:active?`1px solid ${T.teal}`:"1px solid transparent",color:active?T.navy:T.textMuted,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"system-ui",display:"flex",alignItems:"center",gap:5,whiteSpace:"nowrap",transition:"all 0.15s"}}>
     {label}{badge>0&&<span style={{background:T.red,color:"white",borderRadius:20,padding:"1px 6px",fontSize:10,fontWeight:700}}>{badge}</span>}
   </button>
 );
 const MainTab=({label,active,onClick})=>(
-  <button onClick={onClick} style={{flex:1,background:active?T.gold:"transparent",border:active?`1px solid ${T.gold}`:`1px solid ${T.border}`,color:active?"white":T.textMid,borderRadius:10,padding:"11px 8px",cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"system-ui",transition:"all 0.2s",boxShadow:active?T.shadowMd:"none"}}>
+  <button onClick={onClick} style={{flex:1,background:active?T.navy:"transparent",border:active?`1px solid ${T.navy}`:`1px solid ${T.border}`,color:active?"white":T.textMid,borderRadius:10,padding:"11px 8px",cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"system-ui",transition:"all 0.2s",boxShadow:active?T.shadowMd:"none"}}>
     {label}
   </button>
 );
@@ -269,7 +273,7 @@ const PaywallModal=({onClose,onSuccess})=>(
           <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
         ))}
       </ul>
-      <button onClick={()=>{savePro();onSuccess();}} style={{width:"100%",background:T.gold,color:"white",fontWeight:800,fontSize:15,padding:"15px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:"system-ui",boxShadow:T.shadowMd}}>
+      <button onClick={()=>{savePro();onSuccess();}} style={{width:"100%",background:T.navy,color:"white",fontWeight:800,fontSize:15,padding:"15px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:"system-ui",boxShadow:T.shadowMd}}>
         🔓 {STRIPE_CONFIGURED?"Start Pro — $19/month":"Unlock Pro (Test Mode)"}
       </button>
       {!STRIPE_CONFIGURED&&<p style={{textAlign:"center",color:T.textMuted,fontSize:11,marginTop:10,fontFamily:"system-ui"}}>Add Stripe keys to enable real payments.</p>}
@@ -412,7 +416,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>
         {sections.map(s=>(
           <button key={s.key} onClick={()=>setSection(s.key)}
-            style={{background:section===s.key?T.gold:"white",border:section===s.key?`1px solid ${T.gold}`:`1px solid ${T.border}`,color:section===s.key?"white":T.textMid,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"system-ui",display:"flex",alignItems:"center",gap:5}}>
+            style={{background:section===s.key?T.navy:"white",border:section===s.key?`1px solid ${T.navy}`:`1px solid ${T.border}`,color:section===s.key?"white":T.textMid,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"system-ui",display:"flex",alignItems:"center",gap:5}}>
             {s.label}{!s.free&&!isPro&&<span style={{fontSize:10}}>🔒</span>}
           </button>
         ))}
@@ -509,7 +513,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
             </div>
           )}
           <button onClick={()=>{ if(question) setStarted(true); }} disabled={!question}
-            style={{background:question?T.gold:"#e2e8f0",border:"none",borderRadius:10,color:question?"white":T.textMuted,fontSize:15,fontWeight:800,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"system-ui",boxShadow:question?T.shadowMd:"none"}}>
+            style={{background:question?T.navy:"#e2e8f0",border:"none",borderRadius:10,color:question?"white":T.textMuted,fontSize:15,fontWeight:800,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"system-ui",boxShadow:question?T.shadowMd:"none"}}>
             {question?"🖊️ Start Practice Session":"Select a question to begin"}
           </button>
         </div>
@@ -590,9 +594,144 @@ const PracticeMode=({isPro,onUpgrade})=>{
   );
 };
 
+
+// ── Analytics Helper ─────────────────────────
+// Replace GA_MEASUREMENT_ID with your Google Analytics 4 ID (e.g. G-XXXXXXXXXX)
+// Get it free at analytics.google.com → Admin → Create Property
+const GA_ID = "G-XXXXXXXXXX"; // ← Replace this with your GA4 ID
+
+const trackEvent = (eventName, params={}) => {
+  try {
+    if(window.gtag) window.gtag("event", eventName, params);
+  } catch(e) {}
+};
+
+// ── Contact Page ─────────────────────────────
+// Uses EmailJS to send emails to your Gmail (free)
+// Setup: go to emailjs.com → create account → create service → create template
+// Then replace the three placeholders below
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";    // ← from emailjs.com
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";  // ← from emailjs.com
+const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";     // ← from emailjs.com
+
+const ContactPage = () => {
+  const [form, setForm] = useState({ name:"", country:"", age:"", email:"", message:"" });
+  const [status, setStatus] = useState(null); // null | "sending" | "success" | "error"
+
+  const COUNTRIES = ["Afghanistan","Albania","Algeria","Argentina","Australia","Austria","Bahrain","Bangladesh","Belgium","Brazil","Canada","Chile","China","Colombia","Croatia","Czech Republic","Denmark","Egypt","Ethiopia","Finland","France","Germany","Ghana","Greece","Hungary","India","Indonesia","Iran","Iraq","Ireland","Italy","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Lebanon","Libya","Malaysia","Mexico","Morocco","Netherlands","New Zealand","Nigeria","Norway","Oman","Pakistan","Palestine","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Saudi Arabia","Singapore","South Africa","South Korea","Spain","Sri Lanka","Sudan","Sweden","Switzerland","Syria","Thailand","Tunisia","Turkey","UAE","UK","USA","Ukraine","Vietnam","Yemen","Other"];
+
+  const AGE_GROUPS = ["Under 18","18–24","25–34","35–44","45–54","55+"];
+
+  const handleSubmit = async () => {
+    if(!form.name||!form.email||!form.message){ setStatus("error"); return; }
+    setStatus("sending");
+    trackEvent("contact_form_submit", { country: form.country, age_group: form.age });
+    try {
+      if(EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
+        // Demo mode — EmailJS not configured yet
+        await new Promise(r => setTimeout(r, 1500));
+        setStatus("success");
+        setForm({ name:"", country:"", age:"", email:"", message:"" });
+        return;
+      }
+      await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        from_name: form.name,
+        from_email: form.email,
+        country: form.country,
+        age_group: form.age,
+        message: form.message,
+        to_email: "diogenes.agnos@gmail.com"
+      }, EMAILJS_PUBLIC_KEY);
+      setStatus("success");
+      setForm({ name:"", country:"", age:"", email:"", message:"" });
+    } catch(e) {
+      setStatus("error");
+    }
+  };
+
+  const inputStyle = { width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", fontFamily:"system-ui", outline:"none", boxSizing:"border-box", boxShadow:T.shadow, transition:"border-color 0.2s" };
+  const labelStyle = { display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6, fontFamily:"system-ui", fontWeight:600 };
+
+  return (
+    <div style={{maxWidth:600,margin:"0 auto",padding:"24px 16px 0"}}>
+      {/* Page header */}
+      <div style={{textAlign:"center",marginBottom:32}}>
+        <div style={{fontSize:48,marginBottom:12}}>✉️</div>
+        <h2 style={{fontFamily:"Georgia,serif",color:T.navy,fontSize:28,margin:"0 0 8px 0"}}>Contact Us</h2>
+        <p style={{color:T.textMid,fontSize:15,fontFamily:"system-ui",margin:0,lineHeight:1.6}}>Have a question, feedback or need support? We'd love to hear from you.</p>
+        <p style={{color:T.textMuted,fontSize:13,fontFamily:"system-ui",marginTop:4,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور.</p>
+      </div>
+
+      <Card style={{border:`2px solid ${T.navyBorder}`}}>
+        <div style={{display:"flex",flexDirection:"column",gap:16}}>
+          {/* Name + Country row */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+            <div>
+              <label style={labelStyle}>Full Name *</label>
+              <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Your name" style={inputStyle}/>
+            </div>
+            <div>
+              <label style={labelStyle}>Country</label>
+              <select value={form.country} onChange={e=>setForm({...form,country:e.target.value})} style={{...inputStyle,background:"white"}}>
+                <option value="">Select country...</option>
+                {COUNTRIES.map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Age + Email row */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+            <div>
+              <label style={labelStyle}>Age Group</label>
+              <select value={form.age} onChange={e=>setForm({...form,age:e.target.value})} style={{...inputStyle,background:"white"}}>
+                <option value="">Select age group...</option>
+                {AGE_GROUPS.map(a=><option key={a} value={a}>{a}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Email Address *</label>
+              <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="your@email.com" style={inputStyle}/>
+            </div>
+          </div>
+
+          {/* Message */}
+          <div>
+            <label style={labelStyle}>Message *</label>
+            <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Write your message here... / اكتب رسالتك هنا..." rows={5} style={{...inputStyle,resize:"vertical",lineHeight:1.6}}/>
+          </div>
+
+          {/* Status messages */}
+          {status==="error"&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:13,margin:0,fontFamily:"system-ui"}}>⚠️ Please fill in all required fields (Name, Email, Message).</p></Card>}
+          {status==="success"&&<Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:13,margin:0,fontFamily:"system-ui"}}>✅ Message sent successfully! We'll get back to you soon. / تم إرسال رسالتك بنجاح!</p></Card>}
+
+          {/* Submit button */}
+          <button onClick={handleSubmit} disabled={status==="sending"}
+            style={{background:status==="sending"?"#e2e8f0":T.navy,border:"none",borderRadius:10,color:status==="sending"?T.textMuted:"white",fontSize:15,fontWeight:800,padding:"15px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"system-ui",boxShadow:status==="sending"?"none":T.shadowMd}}>
+            {status==="sending"?"⏳ Sending...":"📨 Send Message"}
+          </button>
+
+          {/* EmailJS setup note */}
+          {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(
+            <p style={{textAlign:"center",color:T.textMuted,fontSize:11,fontFamily:"system-ui",fontStyle:"italic",margin:0}}>
+              📧 EmailJS not configured yet — messages won't be delivered until you add your EmailJS keys in the code.
+            </p>
+          )}
+        </div>
+      </Card>
+
+      {/* Contact info */}
+      <Card style={{marginTop:16,background:T.navyLight,border:`1px solid ${T.navyBorder}`,textAlign:"center"}}>
+        <p style={{color:T.navy,fontSize:13,fontFamily:"system-ui",margin:0}}>
+          📧 You can also reach us directly at <strong>diogenes.agnos@gmail.com</strong>
+        </p>
+      </Card>
+    </div>
+  );
+};
+
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
-  const [mainView,setMainView]=useState("analyze");
+  const [mainView,setMainView]=useState("analyze"); // analyze | practice | progress | toolkit | contact
   const [taskType,setTaskType]=useState("task2");
   const [topic,setTopic]=useState("");
   const [essay,setEssay]=useState("");
@@ -619,14 +758,14 @@ export default function IELTSBot(){
   const wordCount=countWords(essay);
   const sampleWordCount=result?.sampleEssay?countWords(result.sampleEssay):0;
 
-  const handleProSuccess=()=>{ savePro(); setProUser(true); setShowPaywall(false); };
+  const handleProSuccess=()=>{ savePro(); setProUser(true); setShowPaywall(false); trackEvent('upgrade_to_pro'); };
   const handleImageUpload=(e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=(ev)=>{ setImage(ev.target.result.split(",")[1]); setImagePreview(ev.target.result); }; reader.readAsDataURL(file); };
 
   const analyze=async()=>{
     if(!topic.trim()||!essay.trim()){ setError("Please provide both the task question and your response."); return; }
     if(wordCount<30){ setError("Response too short."); return; }
     if(taskType==="task1academic"&&!image){ setError("Please upload the graph/chart image for Academic Task 1."); return; }
-    if(!proUser&&uses>=FREE_USES_LIMIT){ setShowPaywall(true); return; }
+    if(!proUser&&uses>=FREE_USES_LIMIT){ setShowPaywall(true); trackEvent('paywall_shown',{task_type:taskType}); return; }
     setError(""); setLoading(true); setResult(null);
     try{
       const messageContent=taskType==="task1academic"&&image
@@ -640,6 +779,7 @@ export default function IELTSBot(){
       // Save to history
       addToHistory({ band:parsed.overallBand, taskType, wordCount:parsed.wordCount||wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } });
       setResult(parsed); setActiveTab("annotated");
+      trackEvent("essay_analyzed", { task_type: taskType, band_score: parsed.overallBand, language: lang, is_pro: proUser });
     }catch(e){ setError("Something went wrong. Please try again."); }
     finally{ setLoading(false); }
   };
@@ -649,11 +789,11 @@ export default function IELTSBot(){
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
       {/* Header */}
-      <div style={{background:T.bg2,borderBottom:`1px solid ${T.border}`,padding:"24px 24px 20px",textAlign:"center",boxShadow:T.shadow}}>
-        <div style={{fontSize:10,letterSpacing:"0.3em",color:T.gold,fontFamily:"monospace",marginBottom:8,textTransform:"uppercase",fontWeight:700}}>AI-Powered · IELTS Writing</div>
-        <h1 style={{margin:0,fontSize:"clamp(24px,5vw,40px)",fontWeight:900,fontFamily:"Georgia,serif",color:T.text}}>BandUp <span style={{color:T.gold}}>AI</span></h1>
-        <p style={{color:T.textMuted,fontSize:13,fontFamily:"system-ui",margin:"6px auto 0",maxWidth:500}}>Task 1 & 2 · Inline corrections · Progress tracker · Practice Mode · IELTS Toolkit</p>
-        <div style={{marginTop:12,display:"inline-flex",background:proUser?T.greenBg:usesLeft<=0?T.redBg:T.goldLight,border:`1px solid ${proUser?T.greenBorder:usesLeft<=0?T.redBorder:T.goldBorder}`,borderRadius:100,padding:"4px 16px",fontSize:13,fontFamily:"system-ui",color:proUser?T.green:usesLeft<=0?T.red:T.gold,fontWeight:600}}>
+      <div style={{background:`linear-gradient(135deg, ${T.navy} 0%, #005b99 100%)`,borderBottom:`1px solid ${T.navyBorder}`,padding:"24px 24px 20px",textAlign:"center",boxShadow:T.shadowMd}}>
+        <div style={{fontSize:10,letterSpacing:"0.3em",color:"#7dd3f0",fontFamily:"monospace",marginBottom:8,textTransform:"uppercase",fontWeight:700}}>AI-Powered · IELTS Writing</div>
+        <h1 style={{margin:0,fontSize:"clamp(24px,5vw,40px)",fontWeight:900,fontFamily:"Georgia,serif",color:"white"}}>BandUp <span style={{color:T.teal}}>AI</span></h1>
+        <p style={{color:"rgba(255,255,255,0.7)",fontSize:13,fontFamily:"system-ui",margin:"6px auto 0",maxWidth:500}}>Task 1 & 2 · Inline corrections · Progress tracker · Practice Mode · IELTS Toolkit</p>
+        <div style={{marginTop:12,display:"inline-flex",background:proUser?"rgba(0,201,139,0.2)":usesLeft<=0?"rgba(192,57,43,0.25)":"rgba(255,255,255,0.15)",border:`1px solid ${proUser?"rgba(0,201,139,0.5)":usesLeft<=0?"rgba(192,57,43,0.5)":"rgba(255,255,255,0.35)"}`,borderRadius:100,padding:"4px 16px",fontSize:13,fontFamily:"system-ui",color:proUser?"#5eefc8":usesLeft<=0?"#ffaaaa":"white",fontWeight:600}}>
           {proUser?"✓ Pro — Unlimited Access":usesLeft>0?`${usesLeft} free ${usesLeft===1?"analysis":"analyses"} remaining`:"Free limit reached — upgrade to continue"}
         </div>
 
@@ -661,11 +801,12 @@ export default function IELTSBot(){
 
       <div style={{maxWidth:860,margin:"0 auto",padding:"24px 16px 0"}}>
         {/* Main Nav */}
-        <div style={{display:"flex",gap:8,marginBottom:24}}>
-          <MainTab label="🎓 Analyze Essay" active={mainView==="analyze"} onClick={()=>setMainView("analyze")}/>
-          <MainTab label="🖊️ Practice Mode" active={mainView==="practice"} onClick={()=>setMainView("practice")}/>
-          <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>setMainView("progress")}/>
-          <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>setMainView("toolkit")}/>
+        <div style={{display:"flex",gap:6,marginBottom:24,flexWrap:"wrap"}}>
+          <MainTab label="🎓 Analyze" active={mainView==="analyze"} onClick={()=>{ setMainView("analyze"); trackEvent("nav_click",{page:"analyze"}); }}/>
+          <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{ setMainView("practice"); trackEvent("nav_click",{page:"practice"}); }}/>
+          <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{ setMainView("progress"); trackEvent("nav_click",{page:"progress"}); }}/>
+          <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{ setMainView("toolkit"); trackEvent("nav_click",{page:"toolkit"}); }}/>
+          <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{ setMainView("contact"); trackEvent("nav_click",{page:"contact"}); }}/>
         </div>
 
         {/* ── ANALYZE ── */}
@@ -726,7 +867,7 @@ export default function IELTSBot(){
                 </Card>
               )}
               <button ref={analyzeRef} onClick={analyze} disabled={loading}
-                style={{background:loading?"#e2e8f0":T.gold,border:"none",borderRadius:10,color:loading?T.textMuted:"white",fontSize:15,fontWeight:800,padding:"15px 28px",cursor:loading?"not-allowed":"pointer",fontFamily:"system-ui",boxShadow:loading?"none":T.shadowMd,transition:"all 0.2s"}}>
+                style={{background:loading?"#e2e8f0":T.navy,border:"none",borderRadius:10,color:loading?T.textMuted:"white",fontSize:15,fontWeight:800,padding:"15px 28px",cursor:loading?"not-allowed":"pointer",fontFamily:"system-ui",boxShadow:loading?"none":`0 4px 14px rgba(0,56,101,0.3)`,transition:"all 0.2s"}}>
                 {loading?"⏳ Examining...":!proUser&&usesLeft<=0?"🔓 Upgrade to Continue":`🎓 Analyze ${TASK_TYPES[taskType].label}`}
               </button>
 
@@ -918,6 +1059,7 @@ export default function IELTSBot(){
         {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="contact"&&<ContactPage/>}
       </div>
     </div>
   );
