@@ -2,36 +2,30 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 const STRIPE_CONFIGURED = false;
 const FREE_USES_LIMIT = 2;
-const STORAGE_KEY = "banfdup_uses";
+const STORAGE_KEY = "bandup_uses";
 const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
 
 const T = {
-  // ── Coursera exact design system ──────────────────────────────
-  // Brand: #0056d2 blue family
   primary:      "#0056d2",
   primaryHover: "#0041a8",
   primaryLight: "#e8f0fc",
   primaryBorder:"#b3ccf5",
-  // Backgrounds
-  bg:           "#ffffff",   // page white
-  bgMuted:      "#f9f9f9",   // section alternate
-  bgGray:       "#f3f3f3",   // card muted
-  // Text - Coursera neutral scale
-  text:         "#1f1f1f",   // primary text
-  textMid:      "#3c3c3c",   // secondary
-  textMuted:    "#636363",   // muted / labels
-  textLight:    "#8c8c8c",   // placeholder
-  // Borders - very subtle
+  bg:           "#ffffff",
+  bgMuted:      "#f9f9f9",
+  bgGray:       "#f3f3f3",
+  text:         "#1f1f1f",
+  textMid:      "#3c3c3c",
+  textMuted:    "#636363",
+  textLight:    "#8c8c8c",
   border:       "#e0e0e0",
   borderMid:    "#c7c7c7",
-  // Status colors
   green:        "#00785a", greenBg:"#e6f4f1",  greenBorder:"#99d6c8",
   red:          "#c0392b", redBg:"#fdf2f2",    redBorder:"#f0a09a",
   amber:        "#b45309", amberBg:"#fef9ec",  amberBorder:"#fcd97a",
   blue:         "#0056d2", blueBg:"#e8f0fc",   blueBorder:"#b3ccf5",
   purple:       "#6554af", purpleBg:"#f2f0ff", purpleBorder:"#c2b8ff",
-  // Shadows — very subtle like Coursera
+  gold:         "#b45309",
   shadow:    "0 2px 4px rgba(0,0,0,0.08)",
   shadowMd:  "0 4px 12px rgba(0,0,0,0.1)",
   shadowLg:  "0 8px 32px rgba(0,0,0,0.12)",
@@ -67,7 +61,7 @@ const saveHistory = (h) => { try{ localStorage.setItem(HISTORY_KEY,JSON.stringif
 const addToHistory = (entry) => {
   const h = getHistory();
   h.unshift({ ...entry, date: new Date().toISOString(), id: Date.now() });
-  saveHistory(h.slice(0,20)); // keep last 20
+  saveHistory(h.slice(0,20));
 };
 
 const PRACTICE_QUESTIONS = {
@@ -137,6 +131,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
 }
 
 Find ALL mistakes — spelling, grammar, punctuation, sentence structure, word choice, register. No limit. The "original" field must match the essay text EXACTLY character for character.
+
 CRITICAL SCORING RULE: You must determine and lock in all band scores (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammatical Range & Accuracy, and Overall Band) before considering the feedback language. Scores must be identical whether feedback is in English or Arabic. The language of feedback must never influence the numerical scores.
 
 ${lang==="ar"?"\n\nمهم جداً: قدّم جميع التعليقات والشرح باللغة العربية. هذا يشمل: حقل feedback لكل معيار، وحقل explanation لكل خطأ، وحقل reason لكل ترقية مفردات، وحقل specificActions في Band Booster، وحقل examinerTips، وحقل strengths، وحقل improvements، وحقل sampleEssayExplanation بالكامل. أبقِ درجات الباند (أرقام) والمقال النموذجي sampleEssay باللغة الإنجليزية. جميع التعليقات الأخرى يجب أن تكون باللغة العربية الفصحى الواضحة.":""}
@@ -239,6 +234,7 @@ const Card=({children,style})=>(
     {children}
   </div>
 );
+
 const CriteriaCard=({label,data})=>(
   <div style={{
     background: T.bg, border: `1px solid ${T.border}`,
@@ -252,10 +248,12 @@ const CriteriaCard=({label,data})=>(
     <p style={{color:T.textMid,fontSize:15,lineHeight:1.65,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{data.feedback}</p>
   </div>
 );
+
 const MistakeCard=({mistake,i})=>(
   <div style={{background:severityBg(mistake.severity),border:`1px solid ${severityColor(mistake.severity)}40`,borderLeft:`3px solid ${severityColor(mistake.severity)}`,borderRadius:10,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8}}>
     <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
-      <span style={{fontSize:11,fontWeight:700,color:taskType===key?T.primary:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",fontSize:11,opacity:taskType===key?0.8:1}}>#{i+1}</span>
+      {/* FIX 3: removed broken taskType===key reference */}
+      <span style={{fontSize:11,fontWeight:700,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>#{i+1}</span>
       <span style={{background:"white",border:`1px solid ${severityColor(mistake.severity)}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:severityColor(mistake.severity),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>{mistake.severity}</span>
       <span style={{background:"white",border:`1px solid ${categoryColor(mistake.category)}50`,borderRadius:20,padding:"1px 8px",fontSize:11,color:categoryColor(mistake.category),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>{mistake.category}</span>
     </div>
@@ -267,6 +265,7 @@ const MistakeCard=({mistake,i})=>(
     <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 {mistake.explanation}</p>
   </div>
 );
+
 const TabBtn=({label,active,onClick,badge})=>(
   <button onClick={onClick} style={{
     background: "transparent",
@@ -294,6 +293,7 @@ const TabBtn=({label,active,onClick,badge})=>(
     )}
   </button>
 );
+
 const MainTab=({label,active,onClick})=>(
   <button onClick={onClick} style={{
     background: "transparent",
@@ -364,7 +364,6 @@ const ProgressTracker=({onUpgrade,isPro})=>{
   const mistakeDiff=previous?(latest.mistakeCount-previous.mistakeCount):null;
   return (
     <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      {/* Summary cards */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Card style={{textAlign:"center",background:bandBg(latest.band),border:`1px solid ${bandColor(latest.band)}30`}}>
           <div style={{fontSize:42,fontWeight:900,color:bandColor(latest.band),fontFamily:"Georgia,serif",lineHeight:1}}>{latest.band}</div>
@@ -387,8 +386,6 @@ const ProgressTracker=({onUpgrade,isPro})=>{
           </Card>
         )}
       </div>
-
-      {/* Band score history visual */}
       {history.length>=2&&(
         <Card>
           <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📊 Band Score History</div>
@@ -406,8 +403,6 @@ const ProgressTracker=({onUpgrade,isPro})=>{
           </div>
         </Card>
       )}
-
-      {/* Criteria breakdown comparison */}
       {previous&&(
         <Card>
           <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📋 Criteria Comparison — Latest vs Previous</div>
@@ -430,13 +425,11 @@ const ProgressTracker=({onUpgrade,isPro})=>{
           })}
         </Card>
       )}
-
-      {/* Essay history list */}
       <Card>
         <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📝 Essay History</div>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {history.map((h,i)=>(
-            <div key={h.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:i===0?bandBg(h.band):T.bg3,borderRadius:10,border:i===0?`1px solid ${bandColor(h.band)}30`:`1px solid ${T.border}`}}>
+            <div key={h.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:i===0?bandBg(h.band):T.bg,borderRadius:10,border:i===0?`1px solid ${bandColor(h.band)}30`:`1px solid ${T.border}`}}>
               <div style={{fontSize:24,fontWeight:900,color:bandColor(h.band),fontFamily:"Georgia,serif",lineHeight:1,width:40}}>{h.band}</div>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,marginBottom:2}}>{h.taskType==="task2"?"Task 2 Essay":h.taskType==="task1academic"?"Task 1 Academic":"Task 1 General"} {i===0&&<span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:20,padding:"1px 8px",fontSize:10,color:T.gold,fontWeight:700}}>Latest</span>}</div>
@@ -506,7 +499,6 @@ const PracticeMode=({isPro,onUpgrade})=>{
   const wordCount=countWords(practiceEssay);
   const question=selectedQuestion||customQuestion;
 
-  // Convert spotErrors to mistake format for AnnotatedEssay
   const practiceAnnotations=liveFeedback?.spotErrors?.map(e=>({
     original:e.original, correction:e.correction, explanation:e.explanation,
     category:e.category||"Grammar", severity:"moderate"
@@ -584,9 +576,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
             <div style={{fontSize:11,color:T.blue,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Question</div>
             <p style={{color:T.text,fontSize:14,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{question}</p>
           </Card>
-
           <div style={{display:"flex",gap:16,alignItems:"flex-start",flexWrap:"wrap"}}>
-            {/* Writing area */}
             <div style={{flex:2,minWidth:280,display:"flex",flexDirection:"column",gap:10}}>
               <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
                 Your Essay
@@ -595,8 +585,6 @@ const PracticeMode=({isPro,onUpgrade})=>{
               <textarea value={practiceEssay} onChange={handleEssayChange} rows={12}
                 placeholder="Start writing here — live feedback and inline corrections appear as you pause!"
                 style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
-
-              {/* Annotated preview */}
               {showAnnotated&&liveFeedback&&practiceAnnotations.length>0&&(
                 <Card style={{border:`1px solid ${T.amberBorder}`}}>
                   <div style={{fontSize:11,color:T.amber,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between"}}>
@@ -606,12 +594,9 @@ const PracticeMode=({isPro,onUpgrade})=>{
                   <AnnotatedEssay essay={practiceEssay} mistakes={practiceAnnotations}/>
                 </Card>
               )}
-
               <button onClick={()=>{ setStarted(false); setPracticeEssay(""); setLiveFeedback(null); setShowAnnotated(false); setSelectedQuestion(""); setCustomQuestion(""); }}
                 style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,color:T.textMid,fontSize:12,padding:"6px 14px",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",alignSelf:"flex-start"}}>← Change Question</button>
             </div>
-
-            {/* Live feedback panel */}
             <div style={{flex:1,minWidth:220,display:"flex",flexDirection:"column",gap:10}}>
               <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
                 {loadingFeedback?"🔍 Analysing...":"💬 Live Coaching"}
@@ -655,274 +640,130 @@ const PracticeMode=({isPro,onUpgrade})=>{
   );
 };
 
-
 // ── Analytics Helper ─────────────────────────
-// Replace GA_MEASUREMENT_ID with your Google Analytics 4 ID (e.g. G-XXXXXXXXXX)
-// Get it free at analytics.google.com → Admin → Create Property
-const GA_ID = "G-XXXXXXXXXX"; // ← Replace this with your GA4 ID
-
+const GA_ID = "G-XXXXXXXXXX";
 const trackEvent = (eventName, params={}) => {
-  try {
-    if(window.gtag) window.gtag("event", eventName, params);
-  } catch(e) {}
+  try { if(window.gtag) window.gtag("event", eventName, params); } catch(e) {}
 };
 
 // ── Contact Page ─────────────────────────────
-// Uses EmailJS to send emails to your Gmail (free)
-// Setup: go to emailjs.com → create account → create service → create template
-// Then replace the three placeholders below
-const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";    // ← from emailjs.com
-const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";  // ← from emailjs.com
-const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";     // ← from emailjs.com
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
 
 const ContactPage = () => {
   const [form, setForm] = useState({ name:"", country:"", age:"", email:"", message:"" });
-  const [status, setStatus] = useState(null); // null | "sending" | "success" | "error"
-
+  const [status, setStatus] = useState(null);
   const COUNTRIES = ["Afghanistan","Albania","Algeria","Argentina","Australia","Austria","Bahrain","Bangladesh","Belgium","Brazil","Canada","Chile","China","Colombia","Croatia","Czech Republic","Denmark","Egypt","Ethiopia","Finland","France","Germany","Ghana","Greece","Hungary","India","Indonesia","Iran","Iraq","Ireland","Italy","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Lebanon","Libya","Malaysia","Mexico","Morocco","Netherlands","New Zealand","Nigeria","Norway","Oman","Pakistan","Palestine","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Saudi Arabia","Singapore","South Africa","South Korea","Spain","Sri Lanka","Sudan","Sweden","Switzerland","Syria","Thailand","Tunisia","Turkey","UAE","UK","USA","Ukraine","Vietnam","Yemen","Other"];
-
   const AGE_GROUPS = ["Under 18","18–24","25–34","35–44","45–54","55+"];
-
   const handleSubmit = async () => {
     if(!form.name||!form.email||!form.message){ setStatus("error"); return; }
     setStatus("sending");
     trackEvent("contact_form_submit", { country: form.country, age_group: form.age });
     try {
       if(EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-        // Demo mode — EmailJS not configured yet
         await new Promise(r => setTimeout(r, 1500));
         setStatus("success");
         setForm({ name:"", country:"", age:"", email:"", message:"" });
         return;
       }
       await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        from_name: form.name,
-        from_email: form.email,
-        country: form.country,
-        age_group: form.age,
-        message: form.message,
-        to_email: "diogenes.agnos@gmail.com"
+        from_name: form.name, from_email: form.email, country: form.country,
+        age_group: form.age, message: form.message, to_email: "diogenes.agnos@gmail.com"
       }, EMAILJS_PUBLIC_KEY);
       setStatus("success");
       setForm({ name:"", country:"", age:"", email:"", message:"" });
-    } catch(e) {
-      setStatus("error");
-    }
+    } catch(e) { setStatus("error"); }
   };
-
   const inputStyle = { width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", fontFamily:"'Source Sans Pro','Inter',system-ui", outline:"none", boxSizing:"border-box", boxShadow:T.shadow, transition:"border-color 0.2s" };
   const labelStyle = { display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6, fontFamily:"'Source Sans Pro','Inter',system-ui", fontWeight:600 };
-
   return (
     <div style={{maxWidth:600,margin:"0 auto",padding:"24px 16px 0"}}>
-      {/* Page header */}
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{fontSize:48,marginBottom:12}}>✉️</div>
         <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900}}>Contact Us</h2>
         <p style={{color:T.textMid,fontSize:15,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0,lineHeight:1.6}}>Have a question, feedback or need support? We'd love to hear from you.</p>
         <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور.</p>
       </div>
-
       <Card style={{border:"2px solid #e0e0e0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
-          {/* Name + Country row */}
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-            <div>
-              <label style={labelStyle}>Full Name *</label>
-              <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Your name" style={inputStyle}/>
-            </div>
-            <div>
-              <label style={labelStyle}>Country</label>
-              <select value={form.country} onChange={e=>setForm({...form,country:e.target.value})} style={{...inputStyle,background:"white"}}>
-                <option value="">Select country...</option>
-                {COUNTRIES.map(c=><option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
+            <div><label style={labelStyle}>Full Name *</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Your name" style={inputStyle}/></div>
+            <div><label style={labelStyle}>Country</label><select value={form.country} onChange={e=>setForm({...form,country:e.target.value})} style={{...inputStyle,background:"white"}}><option value="">Select country...</option>{COUNTRIES.map(c=><option key={c} value={c}>{c}</option>)}</select></div>
           </div>
-
-          {/* Age + Email row */}
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-            <div>
-              <label style={labelStyle}>Age Group</label>
-              <select value={form.age} onChange={e=>setForm({...form,age:e.target.value})} style={{...inputStyle,background:"white"}}>
-                <option value="">Select age group...</option>
-                {AGE_GROUPS.map(a=><option key={a} value={a}>{a}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={labelStyle}>Email Address *</label>
-              <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="your@email.com" style={inputStyle}/>
-            </div>
+            <div><label style={labelStyle}>Age Group</label><select value={form.age} onChange={e=>setForm({...form,age:e.target.value})} style={{...inputStyle,background:"white"}}><option value="">Select age group...</option>{AGE_GROUPS.map(a=><option key={a} value={a}>{a}</option>)}</select></div>
+            <div><label style={labelStyle}>Email Address *</label><input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="your@email.com" style={inputStyle}/></div>
           </div>
-
-          {/* Message */}
-          <div>
-            <label style={labelStyle}>Message *</label>
-            <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Write your message here... / اكتب رسالتك هنا..." rows={5} style={{...inputStyle,resize:"vertical",lineHeight:1.6}}/>
-          </div>
-
-          {/* Status messages */}
+          <div><label style={labelStyle}>Message *</label><textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Write your message here... / اكتب رسالتك هنا..." rows={5} style={{...inputStyle,resize:"vertical",lineHeight:1.6}}/></div>
           {status==="error"&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Please fill in all required fields (Name, Email, Message).</p></Card>}
-          {status==="success"&&<Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✅ Message sent successfully! We'll get back to you soon. / تم إرسال رسالتك بنجاح!</p></Card>}
-
-          {/* Submit button */}
-          <button onClick={handleSubmit} disabled={status==="sending"}
-            style={{background:status==="sending"?T.bgGray:T.primary,border:"none",borderRadius:4,color:status==="sending"?T.textMuted:"white",fontSize:14,fontWeight:600,padding:"14px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadow}}>
+          {status==="success"&&<Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✅ Message sent successfully! We'll get back to you soon.</p></Card>}
+          <button onClick={handleSubmit} disabled={status==="sending"} style={{background:status==="sending"?T.bgGray:T.primary,border:"none",borderRadius:4,color:status==="sending"?T.textMuted:"white",fontSize:14,fontWeight:600,padding:"14px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadow}}>
             {status==="sending"?"⏳ Sending...":"Send Message →"}
           </button>
-
-          {/* EmailJS setup note */}
-          {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(
-            <p style={{textAlign:"center",color:T.textMuted,fontSize:11,fontFamily:"'Source Sans Pro','Inter',system-ui",fontStyle:"italic",margin:0}}>
-              📧 EmailJS not configured yet — messages won't be delivered until you add your EmailJS keys in the code.
-            </p>
-          )}
+          {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(<p style={{textAlign:"center",color:T.textMuted,fontSize:11,fontFamily:"'Source Sans Pro','Inter',system-ui",fontStyle:"italic",margin:0}}>📧 EmailJS not configured yet.</p>)}
         </div>
       </Card>
-
-
     </div>
   );
 };
 
-
-// ── POLICY PAGES ─────────────────────────────────────────────────────────────
+// ── POLICY PAGES ─────────────────────────────
 const PolicyPage = ({ title, children, onBack }) => (
   <div style={{maxWidth:800, margin:"0 auto", padding:"0 24px 80px"}}>
-    <button onClick={onBack} style={{
-      background:"none", border:"none", color:T.primary,
-      fontSize:14, fontWeight:600, cursor:"pointer",
-      fontFamily:"'Source Sans Pro','Inter',system-ui",
-      padding:"24px 0 16px", display:"flex", alignItems:"center", gap:6
-    }}>← Back to BandUp AI</button>
-    <div style={{background:T.bg, border:`1px solid ${T.border}`, borderRadius:8, padding:"40px 48px", boxShadow:T.shadow}}>
-      <h1 style={{fontFamily:"'Source Sans Pro','Inter',system-ui", fontSize:28, fontWeight:700, color:T.text, marginBottom:8, marginTop:0}}>{title}</h1>
-      <p style={{color:T.textMuted, fontSize:13, fontFamily:"'Source Sans Pro','Inter',system-ui", marginBottom:32}}>Last updated: {new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}</p>
-      <div style={{color:T.textMid, fontSize:15, lineHeight:1.8, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-        {children}
-      </div>
+    <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"24px 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to BandUp AI</button>
+    <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"40px 48px",boxShadow:T.shadow}}>
+      <h1 style={{fontFamily:"'Source Sans Pro','Inter',system-ui",fontSize:28,fontWeight:700,color:T.text,marginBottom:8,marginTop:0}}>{title}</h1>
+      <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:32}}>Last updated: {new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}</p>
+      <div style={{color:T.textMid,fontSize:15,lineHeight:1.8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{children}</div>
     </div>
   </div>
 );
-
 const Section = ({title, children}) => (
   <div style={{marginBottom:28}}>
-    <h2 style={{fontSize:17, fontWeight:700, color:"#1c1d1f", marginBottom:10, marginTop:0, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{title}</h2>
+    <h2 style={{fontSize:17,fontWeight:700,color:"#1c1d1f",marginBottom:10,marginTop:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{title}</h2>
     {children}
   </div>
 );
-
 const TermsPage = ({onBack}) => (
   <PolicyPage title="Terms of Service" onBack={onBack}>
-    <Section title="1. Acceptance of Terms">
-      <p style={{margin:"0 0 12px"}}>By accessing or using BandUp AI ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. BandUp AI is operated by Ahmad Sartawi ("we", "us", "our").</p>
-    </Section>
-    <Section title="2. Description of Service">
-      <p style={{margin:"0 0 12px"}}>BandUp AI is an AI-powered IELTS Writing examination tool that provides automated band score assessment, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p>
-    </Section>
-    <Section title="3. User Accounts and Subscriptions">
-      <p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $19 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p>
-      <p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings. Cancellation takes effect at the end of the current billing period.</p>
-    </Section>
-    <Section title="4. Acceptable Use">
-      <p style={{margin:"0 0 12px"}}>You agree to use BandUp AI only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy the AI systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p>
-    </Section>
-    <Section title="5. AI Accuracy Disclaimer">
-      <p style={{margin:"0 0 12px"}}>BandUp AI uses artificial intelligence to provide IELTS writing feedback. While we strive for accuracy, AI-generated scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p>
-    </Section>
-    <Section title="6. Intellectual Property">
-      <p style={{margin:"0 0 12px"}}>All content, design, software, and materials on BandUp AI are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p>
-    </Section>
-    <Section title="7. Limitation of Liability">
-      <p style={{margin:"0 0 12px"}}>To the maximum extent permitted by law, BandUp AI shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability to you shall not exceed the amount paid by you in the 12 months preceding the claim.</p>
-    </Section>
-    <Section title="8. Modifications to Terms">
-      <p style={{margin:"0 0 12px"}}>We reserve the right to modify these Terms at any time. We will notify users of material changes via email or prominent notice on the Service. Continued use after changes constitutes acceptance of the new Terms.</p>
-    </Section>
-    <Section title="9. Governing Law">
-      <p style={{margin:"0 0 12px"}}>These Terms shall be governed by the laws of the Hashemite Kingdom of Jordan. Any disputes shall be resolved in the courts of Amman, Jordan.</p>
-    </Section>
-    <Section title="10. Contact">
-      <p style={{margin:"0 0 12px"}}>For any questions regarding these Terms, please contact us at: <strong>diogenes.agnos@gmail.com</strong></p>
-    </Section>
+    <Section title="1. Acceptance of Terms"><p style={{margin:"0 0 12px"}}>By accessing or using BandUp AI ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. BandUp AI is operated by Ahmad Sartawi ("we", "us", "our").</p></Section>
+    <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>BandUp AI is an AI-powered IELTS Writing examination tool that provides automated band score assessment, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
+    <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $19 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p><p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings. Cancellation takes effect at the end of the current billing period.</p></Section>
+    <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use BandUp AI only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy the AI systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
+    <Section title="5. AI Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>BandUp AI uses artificial intelligence to provide IELTS writing feedback. While we strive for accuracy, AI-generated scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
+    <Section title="6. Intellectual Property"><p style={{margin:"0 0 12px"}}>All content, design, software, and materials on BandUp AI are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p></Section>
+    <Section title="7. Limitation of Liability"><p style={{margin:"0 0 12px"}}>To the maximum extent permitted by law, BandUp AI shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability to you shall not exceed the amount paid by you in the 12 months preceding the claim.</p></Section>
+    <Section title="8. Modifications to Terms"><p style={{margin:"0 0 12px"}}>We reserve the right to modify these Terms at any time. We will notify users of material changes via email or prominent notice on the Service. Continued use after changes constitutes acceptance of the new Terms.</p></Section>
+    <Section title="9. Governing Law"><p style={{margin:"0 0 12px"}}>These Terms shall be governed by the laws of the Hashemite Kingdom of Jordan. Any disputes shall be resolved in the courts of Amman, Jordan.</p></Section>
+    <Section title="10. Contact"><p style={{margin:"0 0 12px"}}>For any questions regarding these Terms, please contact us at: <strong>diogenes.agnos@gmail.com</strong></p></Section>
   </PolicyPage>
 );
-
 const PrivacyPage = ({onBack}) => (
   <PolicyPage title="Privacy Policy" onBack={onBack}>
-    <Section title="1. Information We Collect">
-      <p style={{margin:"0 0 12px"}}>We collect information you provide directly to us, including:</p>
-      <ul style={{margin:"0 0 12px", paddingLeft:20}}>
-        <li style={{marginBottom:6}}>Contact form submissions (name, email, country, age group, message)</li>
-        <li style={{marginBottom:6}}>Essay content submitted for analysis</li>
-        <li style={{marginBottom:6}}>Payment information (processed and stored by Paddle — we do not store card details)</li>
-        <li style={{marginBottom:6}}>Usage data collected via Google Analytics (anonymised)</li>
-      </ul>
-    </Section>
-    <Section title="2. How We Use Your Information">
-      <p style={{margin:"0 0 12px"}}>We use the information we collect to: provide and improve the Service; process subscription payments; respond to your enquiries; send service-related communications; and analyse usage patterns to improve user experience.</p>
-      <p style={{margin:"0 0 12px"}}>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p>
-    </Section>
-    <Section title="3. Essay Data">
-      <p style={{margin:"0 0 12px"}}>Essays you submit are processed by Anthropic's Claude AI API for analysis. Essays are transmitted securely and are not stored permanently on our servers. We do not use your essays to train AI models. Please refer to Anthropic's Privacy Policy for details on their data handling practices.</p>
-    </Section>
-    <Section title="4. Cookies and Analytics">
-      <p style={{margin:"0 0 12px"}}>We use Google Analytics to collect anonymised data about how users interact with our Service. This includes pages visited, time spent, and general geographic location. You can opt out of Google Analytics by installing the Google Analytics Opt-out Browser Add-on.</p>
-    </Section>
-    <Section title="5. Data Security">
-      <p style={{margin:"0 0 12px"}}>We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction. All data is transmitted over HTTPS encryption.</p>
-    </Section>
-    <Section title="6. Data Retention">
-      <p style={{margin:"0 0 12px"}}>We retain your personal data only as long as necessary to provide the Service and comply with legal obligations. Contact form submissions are retained for up to 2 years. Analytics data is retained according to Google Analytics standard retention policies.</p>
-    </Section>
-    <Section title="7. Your Rights">
-      <p style={{margin:"0 0 12px"}}>You have the right to: access your personal data; correct inaccurate data; request deletion of your data; withdraw consent at any time. To exercise these rights, contact us at <strong>diogenes.agnos@gmail.com</strong>.</p>
-    </Section>
-    <Section title="8. Third-Party Services">
-      <p style={{margin:"0 0 12px"}}>Our Service integrates with: Anthropic Claude API (essay analysis); Paddle (payment processing); Google Analytics (usage analytics); EmailJS (contact form delivery). Each third party has its own privacy policy governing their data practices.</p>
-    </Section>
-    <Section title="9. Contact">
-      <p style={{margin:"0 0 12px"}}>For privacy-related enquiries, contact us at: <strong>diogenes.agnos@gmail.com</strong></p>
-    </Section>
+    <Section title="1. Information We Collect"><p style={{margin:"0 0 12px"}}>We collect information you provide directly to us, including:</p><ul style={{margin:"0 0 12px",paddingLeft:20}}><li style={{marginBottom:6}}>Contact form submissions (name, email, country, age group, message)</li><li style={{marginBottom:6}}>Essay content submitted for analysis</li><li style={{marginBottom:6}}>Payment information (processed and stored by Paddle — we do not store card details)</li><li style={{marginBottom:6}}>Usage data collected via Google Analytics (anonymised)</li></ul></Section>
+    <Section title="2. How We Use Your Information"><p style={{margin:"0 0 12px"}}>We use the information we collect to: provide and improve the Service; process subscription payments; respond to your enquiries; send service-related communications; and analyse usage patterns to improve user experience.</p><p style={{margin:"0 0 12px"}}>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p></Section>
+    <Section title="3. Essay Data"><p style={{margin:"0 0 12px"}}>Essays you submit are processed by Anthropic's Claude AI API for analysis. Essays are transmitted securely and are not stored permanently on our servers. We do not use your essays to train AI models.</p></Section>
+    <Section title="4. Cookies and Analytics"><p style={{margin:"0 0 12px"}}>We use Google Analytics to collect anonymised data about how users interact with our Service. You can opt out of Google Analytics by installing the Google Analytics Opt-out Browser Add-on.</p></Section>
+    <Section title="5. Data Security"><p style={{margin:"0 0 12px"}}>We implement appropriate technical and organisational measures to protect your personal data. All data is transmitted over HTTPS encryption.</p></Section>
+    <Section title="6. Data Retention"><p style={{margin:"0 0 12px"}}>We retain your personal data only as long as necessary to provide the Service and comply with legal obligations.</p></Section>
+    <Section title="7. Your Rights"><p style={{margin:"0 0 12px"}}>You have the right to: access your personal data; correct inaccurate data; request deletion of your data; withdraw consent at any time. Contact us at <strong>diogenes.agnos@gmail.com</strong>.</p></Section>
+    <Section title="8. Third-Party Services"><p style={{margin:"0 0 12px"}}>Our Service integrates with: Anthropic Claude API; Paddle (payments); Google Analytics; EmailJS (contact form).</p></Section>
+    <Section title="9. Contact"><p style={{margin:"0 0 12px"}}>For privacy-related enquiries: <strong>diogenes.agnos@gmail.com</strong></p></Section>
   </PolicyPage>
 );
-
 const RefundPage = ({onBack}) => (
   <PolicyPage title="Refund Policy" onBack={onBack}>
-    <Section title="1. Subscription Cancellation">
-      <p style={{margin:"0 0 12px"}}>You may cancel your BandUp AI Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No further charges will be made after cancellation.</p>
-    </Section>
-    <Section title="2. Refund Eligibility">
-      <p style={{margin:"0 0 12px"}}>We offer a <strong>7-day money-back guarantee</strong> for new Pro subscribers. If you are not satisfied with BandUp AI Pro within 7 days of your initial subscription, contact us at diogenes.agnos@gmail.com for a full refund.</p>
-      <p style={{margin:"0 0 12px"}}>After the 7-day period, subscription fees are generally non-refundable. However, we review refund requests on a case-by-case basis and may issue refunds in exceptional circumstances at our sole discretion.</p>
-    </Section>
-    <Section title="3. How to Request a Refund">
-      <p style={{margin:"0 0 12px"}}>To request a refund, please email <strong>diogenes.agnos@gmail.com</strong> with:</p>
-      <ul style={{margin:"0 0 12px", paddingLeft:20}}>
-        <li style={{marginBottom:6}}>Your registered email address</li>
-        <li style={{marginBottom:6}}>Date of purchase</li>
-        <li style={{marginBottom:6}}>Reason for refund request</li>
-      </ul>
-      <p style={{margin:"0 0 12px"}}>We will process your request within 5 business days. Approved refunds are issued to the original payment method and may take 5-10 business days to appear.</p>
-    </Section>
-    <Section title="4. Free Tier">
-      <p style={{margin:"0 0 12px"}}>The free tier of BandUp AI (2 free analyses) is provided at no cost and is not eligible for any refund or credit.</p>
-    </Section>
-    <Section title="5. Technical Issues">
-      <p style={{margin:"0 0 12px"}}>If you experience technical issues that prevent you from using the Service, please contact us immediately at <strong>diogenes.agnos@gmail.com</strong>. We will work to resolve the issue and may offer a refund or account credit if the issue cannot be resolved within a reasonable timeframe.</p>
-    </Section>
-    <Section title="6. Payment Processing">
-      <p style={{margin:"0 0 12px"}}>All payments are processed by Paddle.com as our Merchant of Record. Refunds are issued through Paddle's payment system. For payment disputes, you may also contact Paddle's support directly at support@paddle.com.</p>
-    </Section>
-    <Section title="7. Contact">
-      <p style={{margin:"0 0 12px"}}>For refund enquiries: <strong>diogenes.agnos@gmail.com</strong></p>
-    </Section>
+    <Section title="1. Subscription Cancellation"><p style={{margin:"0 0 12px"}}>You may cancel your BandUp AI Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period.</p></Section>
+    <Section title="2. Refund Eligibility"><p style={{margin:"0 0 12px"}}>We offer a <strong>7-day money-back guarantee</strong> for new Pro subscribers. If you are not satisfied within 7 days of your initial subscription, contact us for a full refund.</p></Section>
+    <Section title="3. How to Request a Refund"><p style={{margin:"0 0 12px"}}>Email <strong>diogenes.agnos@gmail.com</strong> with your registered email, date of purchase, and reason for refund. We process requests within 5 business days.</p></Section>
+    <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries: <strong>diogenes.agnos@gmail.com</strong></p></Section>
   </PolicyPage>
 );
 
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
-  const [mainView,setMainView]=useState("analyze"); // analyze | practice | progress | toolkit | contact
+  const [mainView,setMainView]=useState("analyze");
   const [taskType,setTaskType]=useState("task2");
   const [topic,setTopic]=useState("");
   const [essay,setEssay]=useState("");
@@ -939,10 +780,7 @@ export default function IELTSBot(){
   const fileRef=useRef();
   const analyzeRef=useRef(null);
 
-  const switchLang=(newLang)=>{
-    setLang(newLang);
-    if(result){ setTimeout(()=>analyzeRef.current?.click(),150); }
-  };
+  const switchLang=(newLang)=>{ setLang(newLang); if(result){ setTimeout(()=>analyzeRef.current?.click(),150); } };
 
   const usesLeft=FREE_USES_LIMIT-uses;
   const minWords=TASK_TYPES[taskType].minWords;
@@ -967,7 +805,6 @@ export default function IELTSBot(){
       const text=data.content.map(b=>b.text||"").join("");
       const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
       if(!proUser){ const n=uses+1; setUses(n); saveUses(n); }
-      // Save to history
       addToHistory({ band:parsed.overallBand, taskType, wordCount:parsed.wordCount||wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } });
       setResult(parsed); setActiveTab("annotated");
       trackEvent("essay_analyzed", { task_type: taskType, band_score: parsed.overallBand, language: lang, is_pro: proUser });
@@ -976,148 +813,87 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh", background:"#f9f9f9", fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif", color:T.text}}>
+    <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
-      {/* ══ NAV BAR 1 — black top bar like Coursera ══ */}
-      <div style={{background:"#1c1d1f", padding:"0 24px"}}>
-        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", alignItems:"center", height:40, gap:24}}>
+      {/* NAV BAR 1 */}
+      <div style={{background:"#1c1d1f",padding:"0 24px"}}>
+        <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",height:40,gap:24}}>
           {["For Students","For Schools","For Teachers"].map(item=>(
-            <span key={item} style={{color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:400, cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui", transition:"color 0.15s"}}
-              onMouseEnter={e=>e.target.style.color="#fff"}
-              onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.7)"}
-            >{item}</span>
+            <span key={item} style={{color:"rgba(255,255,255,0.7)",fontSize:13,fontWeight:400,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"color 0.15s"}}
+              onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.7)"}>{item}</span>
           ))}
         </div>
       </div>
 
-      {/* ══ NAV BAR 2 — white logo + tabs like Coursera ══ */}
-      <div style={{position:"sticky", top:0, zIndex:200, background:T.bg, borderBottom:`1px solid ${T.border}`, boxShadow:T.shadowNav}}>
-        <div style={{maxWidth:1200, margin:"0 auto", padding:"0 24px", display:"flex", alignItems:"center", justifyContent:"space-between", height:64}}>
-          {/* Logo */}
-          <div style={{display:"flex", alignItems:"center", gap:24}}>
-            <span style={{color:T.primary, fontWeight:800, fontSize:26, fontFamily:"'Source Sans Pro','Inter',system-ui", letterSpacing:"-0.8px", lineHeight:1}}>BandUp AI</span>
-            <div style={{display:"flex", gap:4}}>
-              <MainTab label="🎓 Analyze" active={mainView==="analyze"} onClick={()=>{setMainView("analyze"); trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{setMainView("practice"); trackEvent("nav_click",{page:"practice"});}}/>
-              <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{setMainView("progress"); trackEvent("nav_click",{page:"progress"});}}/>
-              <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{setMainView("toolkit"); trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{setMainView("contact"); trackEvent("nav_click",{page:"contact"});}}/>
+      {/* NAV BAR 2 */}
+      <div style={{position:"sticky",top:0,zIndex:200,background:T.bg,borderBottom:`1px solid ${T.border}`,boxShadow:T.shadowNav}}>
+        <div style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
+          <div style={{display:"flex",alignItems:"center",gap:24}}>
+            <span style={{color:T.primary,fontWeight:800,fontSize:26,fontFamily:"'Source Sans Pro','Inter',system-ui",letterSpacing:"-0.8px",lineHeight:1}}>BandUp AI</span>
+            <div style={{display:"flex",gap:4}}>
+              <MainTab label="🎓 Analyze" active={mainView==="analyze"} onClick={()=>{setMainView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{setMainView("practice");trackEvent("nav_click",{page:"practice"});}}/>
+              <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{setMainView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{setMainView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{setMainView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
           </div>
-          {/* Right side */}
-          <div style={{display:"flex", alignItems:"center", gap:12}}>
-            <span style={{fontSize:13, color:proUser?T.green:usesLeft<=0?T.red:T.textMuted, fontWeight:600, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <span style={{fontSize:13,color:proUser?T.green:usesLeft<=0?T.red:T.textMuted,fontWeight:600,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
               {proUser?"✓ Pro — Unlimited":usesLeft>0?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"Free limit reached"}
             </span>
-            <div style={{width:1, height:20, background:T.border}}/>
+            <div style={{width:1,height:20,background:T.border}}/>
             {["en","ar"].map(l=>(
-              <button key={l} onClick={()=>switchLang(l)} style={{
-                background:lang===l?T.primaryLight:"transparent",
-                border:`1px solid ${lang===l?T.primaryBorder:T.border}`,
-                borderRadius:4, padding:"5px 12px", fontSize:13,
-                fontWeight:lang===l?700:400,
-                color:lang===l?T.primary:T.textMuted,
-                cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui",
-                transition:"all 0.15s"
-              }}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
+              <button key={l} onClick={()=>switchLang(l)} style={{background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:4,padding:"5px 12px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"all 0.15s"}}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
             ))}
-            {!proUser&&(
-              <button onClick={()=>setShowPaywall(true)} style={{
-                background:T.primary, color:"white",
-                border:"none", borderRadius:4, padding:"8px 18px",
-                fontSize:13, fontWeight:700, cursor:"pointer",
-                fontFamily:"'Source Sans Pro','Inter',system-ui",
-                transition:"background 0.15s"
-              }}>Upgrade to Pro →</button>
-            )}
+            {!proUser&&(<button onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"background 0.15s"}}>Upgrade to Pro →</button>)}
           </div>
         </div>
       </div>
 
-      {/* ══ HERO — Coursera style warm + image ══ */}
-      <div style={{background:"#f0f4ff", overflow:"hidden", position:"relative"}}>
-        <div style={{maxWidth:1200, margin:"0 auto", padding:"0 24px", display:"flex", alignItems:"stretch", minHeight:340}}>
-          {/* Left text */}
-          <div style={{flex:"0 0 55%", padding:"48px 40px 48px 0", display:"flex", flexDirection:"column", justifyContent:"center", zIndex:2}}>
-            <div style={{
-              display:"inline-flex", alignItems:"center", gap:8,
-              background:"rgba(0,86,210,0.1)", border:"1px solid rgba(0,86,210,0.2)",
-              borderRadius:4, padding:"4px 12px", marginBottom:18, alignSelf:"flex-start"
-            }}>
-              <span style={{color:T.primary, fontSize:12, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-Powered · IELTS Writing Examiner</span>
+      {/* HERO */}
+      <div style={{background:"#f0f4ff",overflow:"hidden",position:"relative"}}>
+        <div style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
+          <div style={{flex:"0 0 55%",padding:"48px 40px 48px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
+            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(0,86,210,0.1)",border:"1px solid rgba(0,86,210,0.2)",borderRadius:4,padding:"4px 12px",marginBottom:18,alignSelf:"flex-start"}}>
+              <span style={{color:T.primary,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-Powered · IELTS Writing Examiner</span>
             </div>
-            <h1 style={{
-              margin:"0 0 14px",
-              fontSize:"clamp(26px,3.2vw,42px)",
-              fontWeight:700,
-              fontFamily:"'Source Sans Pro','Inter',system-ui",
-              color:"#1c1d1f",
-              lineHeight:1.2,
-              letterSpacing:"-0.3px"
-            }}>
-              Write better.<br/>Score higher.<br/>
-              <span style={{color:T.primary}}>Get the IELTS band you deserve.</span>
+            <h1 style={{margin:"0 0 14px",fontSize:"clamp(26px,3.2vw,42px)",fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",color:"#1c1d1f",lineHeight:1.2,letterSpacing:"-0.3px"}}>
+              Write better.<br/>Score higher.<br/><span style={{color:T.primary}}>Get the IELTS band you deserve.</span>
             </h1>
-            <p style={{
-              color:T.textMuted, fontSize:16, lineHeight:1.6,
-              fontFamily:"'Source Sans Pro','Inter',system-ui",
-              margin:"0 0 24px", maxWidth:460
-            }}>
+            <p style={{color:T.textMuted,fontSize:16,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 24px",maxWidth:460}}>
               Instant AI band scores · Complete mistake detection · Band 8+ model essays · Practice Mode with live coaching
             </p>
-            <div style={{display:"flex", gap:12, flexWrap:"wrap"}}>
-              <button onClick={()=>setMainView("analyze")} style={{
-                background:T.primary, color:"white", border:"none",
-                borderRadius:4, padding:"13px 24px", fontSize:15,
-                fontWeight:700, cursor:"pointer",
-                fontFamily:"'Source Sans Pro','Inter',system-ui",
-                boxShadow:"0 2px 8px rgba(0,86,210,0.3)"
-              }}>Start Analyzing →</button>
-              <button onClick={()=>setMainView("practice")} style={{
-                background:"transparent", color:T.primary,
-                border:`2px solid ${T.primary}`,
-                borderRadius:4, padding:"11px 24px", fontSize:15,
-                fontWeight:700, cursor:"pointer",
-                fontFamily:"'Source Sans Pro','Inter',system-ui"
-              }}>Try Practice Mode</button>
+            <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+              <button onClick={()=>setMainView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
+              <button onClick={()=>setMainView("practice")} style={{background:"transparent",color:T.primary,border:`2px solid ${T.primary}`,borderRadius:4,padding:"11px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Try Practice Mode</button>
             </div>
           </div>
-          {/* Right image */}
-          <div style={{flex:"0 0 45%", position:"relative", overflow:"hidden", minHeight:320}}>
-            <img
-              src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=85&auto=format&fit=crop"
-              alt="Student studying for IELTS"
-              style={{
-                position:"absolute", inset:0,
-                width:"100%", height:"100%",
-                objectFit:"cover",
-                objectPosition:"center top"
-              }}
-            />
-            {/* Gradient fade left edge */}
-            <div style={{position:"absolute", inset:0, background:"linear-gradient(90deg, #f0f4ff 0%, transparent 30%)"}}/>
+          <div style={{flex:"0 0 45%",position:"relative",overflow:"hidden",minHeight:320}}>
+            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=85&auto=format&fit=crop" alt="Student studying for IELTS" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top"}}/>
+            <div style={{position:"absolute",inset:0,background:"linear-gradient(90deg, #f0f4ff 0%, transparent 30%)"}}/>
           </div>
         </div>
       </div>
 
-      {/* ══ QUICK STATS BAR ══ */}
-      <div style={{background:T.bg, borderBottom:`1px solid ${T.border}`, padding:"16px 24px"}}>
-        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", gap:32, alignItems:"center", flexWrap:"wrap"}}>
+      {/* STATS BAR */}
+      <div style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"16px 24px"}}>
+        <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:32,alignItems:"center",flexWrap:"wrap"}}>
           {[["9","Band levels covered"],["4","IELTS criteria scored"],["100%","AI-powered analysis"],["Task 1 & 2","Academic + General Training"]].map(([num,label])=>(
-            <div key={label} style={{display:"flex", alignItems:"center", gap:10}}>
-              <span style={{color:T.primary, fontWeight:700, fontSize:18, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{num}</span>
-              <span style={{color:T.textMuted, fontSize:13, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</span>
+            <div key={label} style={{display:"flex",alignItems:"center",gap:10}}>
+              <span style={{color:T.primary,fontWeight:700,fontSize:18,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{num}</span>
+              <span style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ══ CONTENT AREA ══ */}
-      <div style={{maxWidth:1200, margin:"24px auto 80px", padding:"0 24px"}}>
-        <div style={{background:T.bg, border:`1px solid ${T.border}`, borderRadius:8, padding:"32px", boxShadow:T.shadow}}>
+      {/* CONTENT AREA */}
+      <div style={{maxWidth:1200,margin:"24px auto 80px",padding:"0 24px"}}>
+        <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"32px",boxShadow:T.shadow}}>
 
-        {/* ── ANALYZE ── */}
+        {/* ANALYZE */}
         {mainView==="analyze"&&(
           <div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px",backdropFilter:"blur(20px)"}}>
             <div style={{marginBottom:20}}>
@@ -1126,18 +902,9 @@ export default function IELTSBot(){
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
                   <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); }}
-                    style={{
-                      background: taskType===key ? T.primaryLight : "#f9f9f9",
-                      border: `2px solid ${taskType===key ? T.primary : T.border}`,
-                      borderRadius: 8,
-                      padding: "20px 14px",
-                      cursor: "pointer",
-                      textAlign: "center",
-                      boxShadow: taskType===key ? `0 0 0 2px ${T.primaryBorder}` : T.shadow,
-                      transition: "all 0.18s"
-                    }}>
+                    style={{background:taskType===key?T.primaryLight:"#f9f9f9",border:`2px solid ${taskType===key?T.primary:T.border}`,borderRadius:8,padding:"20px 14px",cursor:"pointer",textAlign:"center",boxShadow:taskType===key?`0 0 0 2px ${T.primaryBorder}`:T.shadow,transition:"all 0.18s"}}>
                     <div style={{fontSize:22,marginBottom:6}}>{task.icon}</div>
-                    <div style={{fontSize:12,fontWeight:700,color:taskType===key?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4,fontWeight:600,fontSize:13}}>{task.label}</div>
+                    <div style={{fontSize:13,fontWeight:600,color:taskType===key?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>{task.label}</div>
                     <div style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{task.description}</div>
                   </button>
                 ))}
@@ -1165,9 +932,10 @@ export default function IELTSBot(){
               </div>
               <div>
                 <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
-                  Student's Response <span style={{fontSize:11,color:T.textMuted,fontWeight:400,textTransform:"none",letterSpacing:0}}>(minimum {minWords} words required for Task {taskType==="task2"?"2":"1"})</span>
+                  Student's Response
+                  <span style={{fontSize:11,color:T.textMuted,fontWeight:400,textTransform:"none",letterSpacing:0}}> (minimum {minWords} words required)</span>
                   <span style={{color:wordCount>=minWords?T.green:wordCount>=(minWords*0.6)?T.amber:T.red,marginLeft:10,fontWeight:500,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-                    {wordCount} words {wordCount>=minWords?"✓":`(min. ${minWords} required${wordCount>10&&wordCount<minWords?" — penalty applies":""})`}
+                    {wordCount} words {wordCount>=minWords?"✓":`(min. ${minWords} required)`}
                   </span>
                 </label>
                 <textarea value={essay} onChange={e=>setEssay(e.target.value)}
@@ -1184,48 +952,29 @@ export default function IELTSBot(){
                 </Card>
               )}
               <button ref={analyzeRef} onClick={analyze} disabled={loading}
-                style={{
-                  background: loading ? T.bgGray : T.primary,
-                  border: "none",
-                  borderRadius: 4,
-                  color: loading ? T.textMuted : "#fff",
-                  fontSize: 15,
-                  fontWeight: 700,
-                  padding: "14px 32px",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  fontFamily: "'Source Sans Pro', 'Inter', system-ui",
-                  transition: "background 0.15s",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  justifyContent: "center",
-                  boxShadow: "none",
-                  letterSpacing: "0.01em"
-                }}>
-                {loading ? "⏳ Examining..." : !proUser&&usesLeft<=0 ? "🔓 Upgrade to Continue" : `Analyze ${TASK_TYPES[taskType].label} →`}
+                style={{background:loading?T.bgGray:T.primary,border:"none",borderRadius:4,color:loading?T.textMuted:"#fff",fontSize:15,fontWeight:700,padding:"14px 32px",cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"background 0.15s",display:"flex",alignItems:"center",gap:10,justifyContent:"center",letterSpacing:"0.01em"}}>
+                {loading?"⏳ Examining...":!proUser&&usesLeft<=0?"🔓 Upgrade to Continue":`Analyze ${TASK_TYPES[taskType].label} →`}
               </button>
 
               {/* Language Selector */}
               <Card style={{background:T.bgGray,border:`1px solid ${T.border}`,marginTop:4}}>
                 <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?T.red:"white",border:`1px solid ${lang==="en"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?T.primaryLight:"white",border:`1px solid ${lang==="en"?T.primaryBorder:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇬🇧</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?"white":T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>English — Feedback in English</div>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>English — Feedback in English</div>
                       <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>All scores, corrections and tips will appear in English.</div>
-                      {lang==="en"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>⚠️ Switching language will re-run the analysis.</div>}
                     </div>
-                    {lang==="en"&&<span style={{background:T.red,color:"white",borderRadius:2,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ Active</span>}
+                    {lang==="en"&&<span style={{background:T.primary,color:"white",borderRadius:4,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ Active</span>}
                   </div>
-                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="ar"?T.red:"white",border:`1px solid ${lang==="ar"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s",direction:"ltr"}} onClick={()=>switchLang("ar")}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="ar"?T.primaryLight:"white",border:`1px solid ${lang==="ar"?T.primaryBorder:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s",direction:"ltr"}} onClick={()=>switchLang("ar")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇸🇦</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?"white":T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
                       <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",direction:"rtl",textAlign:"right"}}>ستظهر جميع الدرجات والتصحيحات والنصائح باللغة العربية.</div>
-                      {lang==="ar"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4,direction:"rtl",textAlign:"right"}}>⚠️ تغيير اللغة سيُعيد تحليل المقال من جديد.</div>}
                     </div>
-                    {lang==="ar"&&<span style={{background:T.red,color:"white",borderRadius:2,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ نشط</span>}
+                    {lang==="ar"&&<span style={{background:T.primary,color:"white",borderRadius:4,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ نشط</span>}
                   </div>
                 </div>
               </Card>
@@ -1233,26 +982,17 @@ export default function IELTSBot(){
 
             {result&&(
               <div style={{marginTop:32}}>
-                <div style={{
-                  background:`linear-gradient(135deg, ${T.primary} 0%, #003a99 100%)`,
-                  borderRadius:12,
-                  padding:"28px 32px",
-                  marginBottom:24,
-                  display:"flex",
-                  alignItems:"center",
-                  gap:28,
-                  flexWrap:"wrap",
-                  boxShadow:"0 8px 32px rgba(0,0,0,0.2)",
-                  borderLeft:`6px solid ${bandColor(result.overallBand)}`
-                }}>
+                {/* FIX 1: Overall band header — score now visible with proper contrasting colors */}
+                <div style={{background:`linear-gradient(135deg, ${T.primary} 0%, #003a99 100%)`,borderRadius:12,padding:"28px 32px",marginBottom:24,display:"flex",alignItems:"center",gap:28,flexWrap:"wrap",boxShadow:"0 8px 32px rgba(0,0,0,0.2)",borderLeft:`6px solid ${bandColor(result.overallBand)}`}}>
                   <div style={{textAlign:"center",minWidth:100}}>
                     <div style={{fontSize:72,fontWeight:900,color:bandColor(result.overallBand),lineHeight:1,fontFamily:"Georgia,serif",textShadow:`0 0 40px ${bandColor(result.overallBand)}60`}}>{result.overallBand}</div>
-                    <div style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"monospace",letterSpacing:"0.15em",textTransform:"uppercase",marginTop:4}}>Overall Band</div>
+                    <div style={{fontSize:10,color:"rgba(255,255,255,0.6)",fontFamily:"monospace",letterSpacing:"0.15em",textTransform:"uppercase",marginTop:4}}>Overall Band</div>
                   </div>
                   <div style={{flex:1,minWidth:180}}>
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
                       <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand)}}>User</span></div>
-                      <span style={{background:"white",border:`1px solid ${result.wordCount>=minWords?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.2)"}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:"rgba(255,255,255,0.9)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
+                      {/* FIX 1: word count badge — dark text on white background, color-coded */}
+                      <span style={{background:"white",border:`1px solid ${T.border}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:result.wordCount>=minWords?T.green:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
                         {result.wordCount} words {result.wordCount>=minWords?"✓":"⚠ below minimum"}
                       </span>
                     </div>
@@ -1291,7 +1031,7 @@ export default function IELTSBot(){
                 {activeTab==="annotated"&&(
                   <Card>
                     <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                      <span>📝 Your Essay — 👆 Click underlined words for corrections / اضغط على الكلمات لرؤية التصحيح</span>
+                      <span>📝 Your Essay — 👆 Click underlined words for corrections</span>
                       <span style={{color:T.red,fontWeight:600}}>{result.mistakes?.length} mistakes found</span>
                     </div>
                     <AnnotatedEssay essay={essay} mistakes={result.mistakes}/>
@@ -1361,7 +1101,8 @@ export default function IELTSBot(){
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
                     {result.examinerTips?.map((tip,i)=>(
                       <Card key={i} style={{display:"flex",gap:14,alignItems:"flex-start"}}>
-                        <span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{i+1}</span>
+                        {/* FIX 2: tip number circles — solid red background so number is visible */}
+                        <span style={{background:T.red,border:"none",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{i+1}</span>
                         <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{tip}</p>
                       </Card>
                     ))}
@@ -1405,30 +1146,27 @@ export default function IELTSBot(){
         {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="contact"&&<ContactPage/>}
-        </div>{/* end page content card */}
-      </div>{/* end maxWidth */}
+        </div>
+      </div>
 
-      {/* Policy pages render outside the content card */}
       {mainView==="terms"&&<TermsPage onBack={()=>setMainView("analyze")}/>}
       {mainView==="privacy"&&<PrivacyPage onBack={()=>setMainView("analyze")}/>}
       {mainView==="refund"&&<RefundPage onBack={()=>setMainView("analyze")}/>}
-      {/* ══ FOOTER ══ */}
-      <div style={{background:"#1c1d1f", borderTop:"1px solid #333", padding:"32px 24px", marginTop:40}}>
-        <div style={{maxWidth:1200, margin:"0 auto"}}>
-          <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:16, marginBottom:20}}>
-            <span style={{color:"#fff", fontWeight:800, fontSize:20, fontFamily:"'Source Sans Pro','Inter',system-ui", letterSpacing:"-0.5px"}}>BandUp AI</span>
-            <div style={{display:"flex", gap:24, flexWrap:"wrap"}}>
+
+      {/* FOOTER */}
+      <div style={{background:"#1c1d1f",borderTop:"1px solid #333",padding:"32px 24px",marginTop:40}}>
+        <div style={{maxWidth:1200,margin:"0 auto"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16,marginBottom:20}}>
+            <span style={{color:"#fff",fontWeight:800,fontSize:20,fontFamily:"'Source Sans Pro','Inter',system-ui",letterSpacing:"-0.5px"}}>BandUp AI</span>
+            <div style={{display:"flex",gap:24,flexWrap:"wrap"}}>
               {[["terms","Terms of Service"],["privacy","Privacy Policy"],["refund","Refund Policy"]].map(([key,label])=>(
-                <button key={key} onClick={()=>setMainView(key)}
-                  style={{background:"none", border:"none", color:"rgba(255,255,255,0.6)", fontSize:13, cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui", padding:0}}>
-                  {label}
-                </button>
+                <button key={key} onClick={()=>setMainView(key)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:0}}>{label}</button>
               ))}
             </div>
           </div>
-          <div style={{borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:16, display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:8}}>
-            <span style={{color:"rgba(255,255,255,0.35)", fontSize:12, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>© {new Date().getFullYear()} BandUp AI. All rights reserved.</span>
-            <span style={{color:"rgba(255,255,255,0.35)", fontSize:12, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-powered IELTS Writing Examiner</span>
+          <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>© {new Date().getFullYear()} BandUp AI. All rights reserved.</span>
+            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-powered IELTS Writing Examiner</span>
           </div>
         </div>
       </div>
