@@ -7,20 +7,35 @@ const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
 
 const T = {
-  bg:"#f5f5f5", bg2:"#ffffff", bg3:"#f0f0f0",
-  border:"#e0e0e0", borderStrong:"#cccccc",
-  // IELTS.org red + black
-  red:"#e2001a", redHover:"#c0001a", redLight:"#fff0f0", redBorder:"#ffb3bc",
-  navy:"#1a1a1a", navyLight:"#f5f5f5", navyBorder:"#dddddd",
-  teal:"#e2001a", tealLight:"#fff0f0", tealBorder:"#ffb3bc",
-  gold:"#e2001a", goldLight:"#fff0f0", goldBorder:"#ffb3bc",
-  text:"#1a1a1a", textMid:"#444444", textMuted:"#888888",
-  green:"#007a5e", greenBg:"#e6f6f2", greenBorder:"#5cc8ad",
-  blue:"#0066cc", blueBg:"#e8f0ff", blueBorder:"#99bbee",
-  redBg:"#fff0f0", redBorder2:"#ffb3bc",
-  amber:"#c47a00", amberBg:"#fff8e6", amberBorder:"#fcd77a",
-  purple:"#5b3fa0", purpleBg:"#f0ecfa", purpleBorder:"#c4aff0",
-  shadow:"0 1px 3px rgba(0,0,0,0.08)", shadowMd:"0 4px 12px rgba(0,0,0,0.1)", shadowLg:"0 10px 32px rgba(0,0,0,0.15)"
+  // Core palette — Midnight + Crimson + Cream
+  bg:        "#0a0e1a",          // page background
+  bg2:       "#ffffff",          // card background
+  bg3:       "#f7f6f1",          // muted card
+  surface:   "#12172a",          // elevated surface on dark
+  border:    "#e8e4dc",          // card borders
+  borderDark:"rgba(255,255,255,0.07)", // borders on dark
+  // Brand
+  red:       "#e2001a",          // primary action
+  redDark:   "#b50016",          // hover
+  redGlow:   "rgba(226,0,26,0.25)",
+  cream:     "#fefdf8",          // off-white
+  // Semantic
+  text:      "#0f1520",          // dark text on light
+  textMid:   "#4a5568",
+  textMuted: "#94a3b8",
+  textLight: "#ffffff",
+  textDim:   "rgba(255,255,255,0.55)",
+  // Status
+  green:     "#059669", greenBg:"#ecfdf5", greenBorder:"#6ee7b7",
+  blue:      "#2563eb", blueBg:"#eff6ff",  blueBorder:"#bfdbfe",
+  amber:     "#d97706", amberBg:"#fffbeb", amberBorder:"#fde68a",
+  redBg:     "#fef2f2", redBorder:"#fecaca",
+  purple:    "#7c3aed", purpleBg:"#f5f3ff",purpleBorder:"#ddd6fe",
+  // Shadows
+  shadow:    "0 1px 4px rgba(0,0,0,0.08)",
+  shadowMd:  "0 4px 16px rgba(0,0,0,0.12)",
+  shadowLg:  "0 16px 48px rgba(0,0,0,0.18)",
+  shadowCard:"0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)"
 };
 
 const TASK_TYPES = {
@@ -217,24 +232,48 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
 };
 
 // ── Components ─────────────────────────────────
-const Card=({children,style})=><div style={{background:"white",border:"1px solid #e8e8e8",borderRadius:8,padding:"20px 24px",boxShadow:"0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03)",...style}}>{children}</div>;
+const Card=({children,style})=>(
+  <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:12,padding:"20px 24px",boxShadow:T.shadowCard,...style}}>
+    {children}
+  </div>
+);
 const CriteriaCard=({label,data})=>(
-  <div style={{background:"white",border:"1px solid #e8e8e8",borderRadius:10,padding:"20px 24px",boxShadow:"0 2px 8px rgba(0,0,0,0.06)",borderLeft:`5px solid ${bandColor(data.band)}`}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-      <span style={{color:"#333",fontSize:13,fontWeight:700,letterSpacing:"0.04em",textTransform:"uppercase",fontFamily:"system-ui"}}>{label}</span>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <div style={{background:bandBg(data.band),borderRadius:6,padding:"6px 16px",border:`1px solid ${bandColor(data.band)}30`}}>
-          <span style={{color:bandColor(data.band),fontWeight:900,fontSize:22,fontFamily:"Georgia,serif",lineHeight:1}}>{data.band}</span>
-        </div>
+  <div style={{
+    background: T.bg2,
+    border: `1px solid ${T.border}`,
+    borderRadius: 12,
+    padding: "20px 24px",
+    boxShadow: T.shadowCard,
+    borderLeft: `5px solid ${bandColor(data.band)}`,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10
+  }}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <span style={{
+        color: T.textMid, fontSize: 11, fontWeight: 700,
+        letterSpacing: "0.08em", textTransform: "uppercase",
+        fontFamily: "'Mulish', system-ui"
+      }}>{label}</span>
+      <div style={{
+        background: bandBg(data.band),
+        border: `1px solid ${bandColor(data.band)}40`,
+        borderRadius: 8, padding: "6px 14px", textAlign: "center"
+      }}>
+        <span style={{color: bandColor(data.band), fontWeight: 900, fontSize: 20, fontFamily:"'Syne', Georgia, serif", lineHeight:1}}>
+          {data.band}
+        </span>
       </div>
     </div>
-    <p style={{color:"#555",fontSize:14,lineHeight:1.7,margin:0,fontFamily:"system-ui"}}>{data.feedback}</p>
+    <p style={{color: T.textMid, fontSize: 14, lineHeight: 1.7, margin: 0, fontFamily:"'Mulish', system-ui"}}>
+      {data.feedback}
+    </p>
   </div>
 );
 const MistakeCard=({mistake,i})=>(
   <div style={{background:severityBg(mistake.severity),border:`1px solid ${severityColor(mistake.severity)}40`,borderLeft:`3px solid ${severityColor(mistake.severity)}`,borderRadius:10,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8}}>
     <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
-      <span style={{fontSize:11,fontWeight:700,color:taskType===key?"rgba(255,255,255,0.6)":"#999",fontFamily:"system-ui"}}>#{i+1}</span>
+      <span style={{fontSize:11,fontWeight:700,color:taskType===key?"rgba(255,255,255,0.65)":T.textMuted,fontFamily:"'Mulish', system-ui",fontSize:11}}>#{i+1}</span>
       <span style={{background:"white",border:`1px solid ${severityColor(mistake.severity)}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:severityColor(mistake.severity),fontFamily:"system-ui",fontWeight:700}}>{mistake.severity}</span>
       <span style={{background:"white",border:`1px solid ${categoryColor(mistake.category)}50`,borderRadius:20,padding:"1px 8px",fontSize:11,color:categoryColor(mistake.category),fontFamily:"system-ui",fontWeight:600}}>{mistake.category}</span>
     </div>
@@ -248,50 +287,57 @@ const MistakeCard=({mistake,i})=>(
 );
 const TabBtn=({label,active,onClick,badge})=>(
   <button onClick={onClick} style={{
-    background:active?T.red:"transparent",
-    border:"none",
-    borderRadius:active?6:6,
-    color:active?"white":"#666",
-    padding:"8px 16px",
-    cursor:"pointer",
-    fontSize:12,
-    fontWeight:active?700:500,
-    fontFamily:"system-ui",
-    display:"flex",
-    alignItems:"center",
-    gap:6,
-    whiteSpace:"nowrap",
-    transition:"all 0.2s",
-    boxShadow:active?"0 2px 8px rgba(226,0,26,0.3)":"none"
+    background: active ? T.red : T.bg3,
+    border: active ? "none" : `1px solid ${T.border}`,
+    borderRadius: 8,
+    color: active ? "#fff" : T.textMid,
+    padding: "8px 16px",
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: active ? 700 : 500,
+    fontFamily: "'Mulish', system-ui",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    whiteSpace: "nowrap",
+    transition: "all 0.18s",
+    boxShadow: active ? `0 3px 10px ${T.redGlow}` : "none",
   }}>
-    {label}{badge>0&&<span style={{background:active?"white":T.red,color:active?T.red:"white",borderRadius:20,padding:"1px 7px",fontSize:10,fontWeight:800}}>{badge}</span>}
+    {label}
+    {badge > 0 && (
+      <span style={{
+        background: active ? "rgba(255,255,255,0.25)" : T.red,
+        color: "#fff", borderRadius: 20, padding:"1px 7px",
+        fontSize: 10, fontWeight: 800, lineHeight: 1.6
+      }}>{badge}</span>
+    )}
   </button>
 );
 const MainTab=({label,active,onClick})=>(
-  <button onClick={onClick}
-    style={{
-      flex:1, minWidth:120,
-      background:active?T.red:"transparent",
-      border:"none",
-      borderRadius:0,
-      color:active?"white":"rgba(255,255,255,0.55)",
-      padding:"18px 16px",
-      cursor:"pointer",
-      fontSize:13,
-      fontWeight:active?800:500,
-      fontFamily:"system-ui",
-      transition:"all 0.2s",
-      whiteSpace:"nowrap",
-      borderBottom:active?"none":"1px solid rgba(255,255,255,0.05)"
-    }}>
+  <button onClick={onClick} style={{
+    flex:1, minWidth:110,
+    background: active ? T.red : "transparent",
+    border: "none",
+    color: active ? "#fff" : T.textDim,
+    padding: "17px 10px",
+    cursor: "pointer",
+    fontSize: 13,
+    fontWeight: active ? 700 : 400,
+    fontFamily: "'Mulish', system-ui",
+    transition: "all 0.2s",
+    whiteSpace: "nowrap",
+    letterSpacing: "0.01em",
+    position: "relative",
+  }}>
     {label}
+    {active && <div style={{position:"absolute",bottom:0,left:"20%",right:"20%",height:3,background:"white",borderRadius:"3px 3px 0 0"}}/>}
   </button>
 );
 
 // ── Paywall ───────────────────────────────────
 const PaywallModal=({onClose,onSuccess})=>(
   <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-    <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:"40px 32px",maxWidth:440,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
+    <div style={{background:T.cream,border:`1px solid ${T.border}`,borderRadius:20,padding:"40px 32px",maxWidth:440,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
       <button onClick={onClose} style={{position:"absolute",top:16,right:20,background:"none",border:"none",color:T.textMuted,fontSize:22,cursor:"pointer"}}>✕</button>
       <div style={{textAlign:"center",marginBottom:24}}>
         <div style={{fontSize:36,marginBottom:8}}>🎓</div>
@@ -308,7 +354,7 @@ const PaywallModal=({onClose,onSuccess})=>(
           <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
         ))}
       </ul>
-      <button onClick={()=>{savePro();onSuccess();}} style={{width:"100%",background:T.red,color:"white",fontWeight:700,fontSize:15,padding:"16px",borderRadius:4,border:"none",cursor:"pointer",fontFamily:"system-ui"}}>
+      <button onClick={()=>{savePro();onSuccess();}} style={{width:"100%",background:T.red,color:"white",fontWeight:700,fontSize:15,padding:"16px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:"'Mulish', system-ui",boxShadow:`0 6px 20px ${T.redGlow}`}}>
         🔓 {STRIPE_CONFIGURED?"Start Pro — $19/month":"Unlock Pro (Test Mode)"}
       </button>
       {!STRIPE_CONFIGURED&&<p style={{textAlign:"center",color:T.textMuted,fontSize:11,marginTop:10,fontFamily:"system-ui"}}>Add Stripe keys to enable real payments.</p>}
@@ -451,7 +497,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>
         {sections.map(s=>(
           <button key={s.key} onClick={()=>setSection(s.key)}
-            style={{background:section===s.key?T.red:"white",border:section===s.key?`1px solid ${T.red}`:`1px solid ${T.border}`,color:section===s.key?"white":T.textMid,borderRadius:4,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"system-ui",display:"flex",alignItems:"center",gap:5}}>
+            style={{background:section===s.key?T.red:T.bg3,border:section===s.key?`1px solid ${T.red}`:`1px solid ${T.border}`,color:section===s.key?"white":T.textMid,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"system-ui",display:"flex",alignItems:"center",gap:5}}>
             {s.label}{!s.free&&!isPro&&<span style={{fontSize:10}}>🔒</span>}
           </button>
         ))}
@@ -544,11 +590,11 @@ const PracticeMode=({isPro,onUpgrade})=>{
               <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"system-ui",fontWeight:600}}>Your Question</label>
               <textarea value={customQuestion} onChange={e=>setCustomQuestion(e.target.value)} rows={3}
                 placeholder="Paste your own IELTS question here..."
-                style={{width:"100%",background:"white",border:`1px solid ${T.border}`,borderRadius:10,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",boxShadow:T.shadow}}/>
+                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
             </div>
           )}
           <button onClick={()=>{ if(question) setStarted(true); }} disabled={!question}
-            style={{background:question?T.red:"#e2e8f0",border:"none",borderRadius:4,color:question?"white":T.textMuted,fontSize:15,fontWeight:700,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"system-ui"}}>
+            style={{background:question?T.red:T.bg3,border:`2px solid ${question?T.red:T.border}`,borderRadius:10,color:question?"white":T.textMuted,fontSize:15,fontWeight:700,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"'Mulish', system-ui",boxShadow:question?`0 6px 20px ${T.redGlow}`:"none",transition:"all 0.2s"}}>
             {question?"🖊️ Start Practice Session":"Select a question to begin"}
           </button>
         </div>
@@ -568,7 +614,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
               </label>
               <textarea value={practiceEssay} onChange={handleEssayChange} rows={12}
                 placeholder="Start writing here — live feedback and inline corrections appear as you pause!"
-                style={{width:"100%",background:"white",border:`1px solid ${T.border}`,borderRadius:10,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",boxShadow:T.shadow}}/>
+                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
 
               {/* Annotated preview */}
               {showAnnotated&&liveFeedback&&practiceAnnotations.length>0&&(
@@ -741,7 +787,7 @@ const ContactPage = () => {
 
           {/* Submit button */}
           <button onClick={handleSubmit} disabled={status==="sending"}
-            style={{background:status==="sending"?"#ccc":T.red,border:"none",borderRadius:4,color:"white",fontSize:15,fontWeight:700,padding:"16px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"system-ui"}}>
+            style={{background:status==="sending"?"#94a3b8":T.red,border:"none",borderRadius:10,color:"white",fontSize:15,fontWeight:700,padding:"16px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Mulish', system-ui",boxShadow:status==="sending"?"none":`0 6px 20px ${T.redGlow}`}}>
             {status==="sending"?"⏳ Sending...":"Send Message →"}
           </button>
 
@@ -815,111 +861,178 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh",background:"#f0f2f5",color:T.text,paddingBottom:80}}>
+    <div style={{minHeight:"100vh", background:T.bg, fontFamily:"'Mulish', system-ui"}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
-      {/* ── TOP NAV BAR ── */}
-      <div style={{background:"rgba(20,20,20,0.97)",backdropFilter:"blur(12px)",position:"sticky",top:0,zIndex:200,borderBottom:"1px solid rgba(255,255,255,0.08)"}}>
-        <div style={{maxWidth:1100,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:60}}>
-          {/* Logo */}
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{background:T.red,color:"white",fontWeight:900,fontSize:16,padding:"5px 12px",letterSpacing:"-0.5px",fontFamily:"Arial Black,system-ui",borderRadius:3}}>BandUp</div>
-            <div style={{color:"white",fontWeight:900,fontSize:16,fontFamily:"Arial Black,system-ui",letterSpacing:"-0.5px"}}>AI</div>
-            <div style={{width:1,height:20,background:"rgba(255,255,255,0.2)",margin:"0 8px"}}/>
-            <div style={{color:"rgba(255,255,255,0.5)",fontSize:11,fontFamily:"system-ui",letterSpacing:"0.1em",textTransform:"uppercase"}}>IELTS Writing</div>
-          </div>
-          {/* Right side */}
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{background:proUser?"rgba(0,180,100,0.2)":usesLeft<=0?"rgba(226,0,26,0.3)":"rgba(255,255,255,0.1)",border:`1px solid ${proUser?"rgba(0,200,100,0.4)":usesLeft<=0?"rgba(226,0,26,0.5)":"rgba(255,255,255,0.2)"}`,borderRadius:20,padding:"4px 14px",fontSize:12,fontFamily:"system-ui",color:proUser?"#5ef0a0":usesLeft<=0?"#ff8888":"rgba(255,255,255,0.85)",fontWeight:600}}>
-              {proUser?"✓ Pro":usesLeft>0?`${usesLeft} free left`:"Limit reached"}
-            </div>
-            <button onClick={()=>switchLang("en")} style={{background:lang==="en"?T.red:"transparent",border:`1px solid ${lang==="en"?T.red:"rgba(255,255,255,0.25)"}`,borderRadius:3,padding:"5px 12px",fontSize:11,fontWeight:700,color:"white",cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇬🇧 EN</button>
-            <button onClick={()=>switchLang("ar")} style={{background:lang==="ar"?T.red:"transparent",border:`1px solid ${lang==="ar"?T.red:"rgba(255,255,255,0.25)"}`,borderRadius:3,padding:"5px 12px",fontSize:11,fontWeight:700,color:"white",cursor:"pointer",fontFamily:"system-ui",transition:"all 0.2s"}}>🇸🇦 AR</button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── HERO (now just a title strip since bg continues) ── */}
+      {/* ══════════════════════════════════════
+          TOP NAVIGATION BAR
+      ══════════════════════════════════════ */}
       <div style={{
-        position:"relative",
-        background:"transparent",
-        padding:"48px 24px 36px",
-        textAlign:"center",
-        overflow:"hidden"
+        background: "#0d1120",
+        borderBottom: `1px solid ${T.borderDark}`,
+        position: "sticky", top: 0, zIndex: 300,
       }}>
-        <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:T.red}}/>
-        {/* Content */}
-        <div style={{position:"relative",textAlign:"center",maxWidth:700}}>
-          <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(226,0,26,0.15)",border:"1px solid rgba(226,0,26,0.4)",borderRadius:20,padding:"5px 16px",marginBottom:20}}>
-            <div style={{width:6,height:6,borderRadius:"50%",background:T.red,animation:"pulse 2s infinite"}}/>
-            <span style={{color:"#ff9999",fontSize:11,fontFamily:"system-ui",letterSpacing:"0.15em",textTransform:"uppercase",fontWeight:600}}>AI-Powered · IELTS Writing Examiner</span>
+        <div style={{
+          maxWidth: 1100, margin: "0 auto",
+          padding: "0 24px",
+          display: "flex", alignItems: "center",
+          justifyContent: "space-between", height: 58
+        }}>
+          {/* Logo */}
+          <div style={{display:"flex", alignItems:"center", gap:12}}>
+            <div style={{
+              background: T.red, color: "#fff",
+              fontWeight: 900, fontSize: 15,
+              padding: "5px 11px", borderRadius: 5,
+              fontFamily: "'Syne', Georgia, serif",
+              letterSpacing: "0.5px"
+            }}>BandUp</div>
+            <span style={{color:"#fff", fontWeight:700, fontSize:15, fontFamily:"'Syne', Georgia, serif"}}>AI</span>
+            <div style={{width:1, height:18, background:"rgba(255,255,255,0.15)", margin:"0 6px"}}/>
+            <span style={{color:"rgba(255,255,255,0.4)", fontSize:11, letterSpacing:"0.12em", textTransform:"uppercase"}}>IELTS Writing</span>
           </div>
-          <h1 style={{margin:"0 0 16px",fontSize:"clamp(32px,5.5vw,62px)",fontWeight:900,fontFamily:"Arial Black,system-ui",color:"white",lineHeight:1.05,letterSpacing:"-1px"}}>
-            Write better.<br/><span style={{color:T.red}}>Score higher.</span>
-          </h1>
-          <p style={{color:"rgba(255,255,255,0.7)",fontSize:16,fontFamily:"system-ui",margin:"0 0 28px",lineHeight:1.6}}>
-            Instant AI band scores · Complete mistake detection · Band 8+ model essays · Practice Mode
-          </p>
-          <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-            {[["📊","Task 1 Academic"],["✍️","Task 2 Essay"],["✉️","Task 1 General"]].map(([icon,label])=>(
-              <div key={label} style={{background:"rgba(255,255,255,0.1)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:8,padding:"8px 18px",color:"white",fontSize:13,fontFamily:"system-ui",fontWeight:600}}>{icon} {label}</div>
+          {/* Right controls */}
+          <div style={{display:"flex", alignItems:"center", gap:8}}>
+            {/* Usage badge */}
+            <div style={{
+              background: proUser ? "rgba(5,150,105,0.2)" : usesLeft<=0 ? "rgba(226,0,26,0.2)" : "rgba(255,255,255,0.07)",
+              border: `1px solid ${proUser ? "rgba(5,150,105,0.4)" : usesLeft<=0 ? "rgba(226,0,26,0.4)" : "rgba(255,255,255,0.12)"}`,
+              borderRadius: 20, padding: "4px 13px",
+              fontSize: 12, fontWeight: 600,
+              color: proUser ? "#34d399" : usesLeft<=0 ? "#fca5a5" : "rgba(255,255,255,0.8)",
+            }}>
+              {proUser ? "✓ Pro" : usesLeft>0 ? `${usesLeft} free left` : "Upgrade"}
+            </div>
+            {/* Language toggles */}
+            {["en","ar"].map(l => (
+              <button key={l} onClick={()=>switchLang(l)} style={{
+                background: lang===l ? T.red : "rgba(255,255,255,0.06)",
+                border: `1px solid ${lang===l ? T.red : "rgba(255,255,255,0.1)"}`,
+                borderRadius: 5, padding: "5px 13px",
+                fontSize: 11, fontWeight: 700,
+                color: "#fff", cursor: "pointer",
+                transition: "all 0.18s",
+                fontFamily: "'Mulish', system-ui",
+              }}>{l==="en" ? "🇬🇧 EN" : "🇸🇦 AR"}</button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── MAIN CONTENT WITH BACKGROUND ── */}
+      {/* ══════════════════════════════════════
+          HERO SECTION
+      ══════════════════════════════════════ */}
       <div style={{
-        background:"#111",
-        backgroundImage:"url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1600&q=80&auto=format&fit=crop')",
-        backgroundSize:"cover",
-        backgroundPosition:"center",
-        backgroundAttachment:"fixed",
-        position:"relative",
-        minHeight:"100vh"
+        background: `linear-gradient(160deg, #0d1120 0%, #14071a 50%, #0d1120 100%)`,
+        padding: "52px 24px 56px",
+        position: "relative",
+        overflow: "hidden",
       }}>
-        {/* Semi-transparent overlay */}
-        <div style={{position:"absolute",inset:0,background:"rgba(10,10,15,0.82)"}}/>
+        {/* Mesh glow effects */}
+        <div style={{position:"absolute", top:-80, right:"10%", width:400, height:400, background:`radial-gradient(circle, ${T.redGlow} 0%, transparent 70%)`, pointerEvents:"none"}}/>
+        <div style={{position:"absolute", bottom:-100, left:"5%", width:350, height:350, background:"radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%)", pointerEvents:"none"}}/>
+        {/* Grid texture */}
+        <div style={{position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)", backgroundSize:"40px 40px", pointerEvents:"none"}}/>
 
-        <div style={{maxWidth:980,margin:"0 auto",padding:"0 20px 80px",position:"relative",zIndex:1}}>
-
-        {/* ── NAVIGATION TABS ── */}
-        <div style={{background:"rgba(20,20,20,0.95)",backdropFilter:"blur(20px)",borderRadius:"0 0 16px 16px",boxShadow:"0 8px 32px rgba(0,0,0,0.4)",border:"1px solid rgba(255,255,255,0.06)",borderTop:"none",marginBottom:28}}>
-          <div style={{display:"flex",gap:0,overflowX:"auto"}}>
-            <MainTab label="🎓 Analyze Essay" active={mainView==="analyze"} onClick={()=>{ setMainView("analyze"); trackEvent("nav_click",{page:"analyze"}); }}/>
-            <MainTab label="🖊️ Practice Mode" active={mainView==="practice"} onClick={()=>{ setMainView("practice"); trackEvent("nav_click",{page:"practice"}); }}/>
-            <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{ setMainView("progress"); trackEvent("nav_click",{page:"progress"}); }}/>
-            <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{ setMainView("toolkit"); trackEvent("nav_click",{page:"toolkit"}); }}/>
-            <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{ setMainView("contact"); trackEvent("nav_click",{page:"contact"}); }}/>
+        <div style={{maxWidth:700, position:"relative", zIndex:1}}>
+          <div style={{
+            display:"inline-flex", alignItems:"center", gap:8,
+            background:"rgba(226,0,26,0.1)",
+            border:"1px solid rgba(226,0,26,0.3)",
+            borderRadius:20, padding:"5px 14px", marginBottom:24
+          }}>
+            <div style={{width:6, height:6, borderRadius:"50%", background:T.red}}/>
+            <span style={{color:"#ff9999", fontSize:11, letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:700}}>AI-Powered · IELTS Writing Examiner</span>
+          </div>
+          <h1 style={{
+            margin:"0 0 16px", lineHeight:1.05,
+            fontSize:"clamp(36px,5vw,64px)",
+            fontWeight:800,
+            fontFamily:"'Syne', Georgia, serif",
+            color:"#fff",
+            letterSpacing:"-1px"
+          }}>
+            Write better.<br/>
+            <span style={{color:T.red}}>Score higher.</span>
+          </h1>
+          <p style={{
+            color:"rgba(255,255,255,0.55)", fontSize:16,
+            fontFamily:"'Mulish', system-ui",
+            margin:"0 0 32px", lineHeight:1.7, maxWidth:520
+          }}>
+            Instant AI band scores · Complete mistake detection · Band 8+ model essays · Practice Mode
+          </p>
+          <div style={{display:"flex", gap:10, flexWrap:"wrap"}}>
+            {[["✍️","Task 2 Essay","Academic & GT"], ["📊","Task 1 Academic","Graphs & Charts"], ["✉️","Task 1 General","Formal Letters"]].map(([icon,label,sub])=>(
+              <div key={label} style={{
+                background:"rgba(255,255,255,0.05)",
+                border:"1px solid rgba(255,255,255,0.1)",
+                borderRadius:10, padding:"10px 16px",
+                backdropFilter:"blur(8px)"
+              }}>
+                <div style={{fontSize:18, marginBottom:3}}>{icon}</div>
+                <div style={{color:"#fff", fontSize:13, fontWeight:700, fontFamily:"'Mulish', system-ui"}}>{label}</div>
+                <div style={{color:"rgba(255,255,255,0.4)", fontSize:11, fontFamily:"'Mulish', system-ui"}}>{sub}</div>
+              </div>
+            ))}
           </div>
         </div>
+      </div>
 
-        {/* ── PAGE CONTENT ── */}
-        <div style={{padding:"8px 0 0"}}>
+      {/* ══════════════════════════════════════
+          SECTION TABS + CONTENT
+      ══════════════════════════════════════ */}
+      <div style={{maxWidth:980, margin:"0 auto", padding:"0 20px 80px"}}>
+
+        {/* Tab bar */}
+        <div style={{
+          background:"#0d1120",
+          border:`1px solid ${T.borderDark}`,
+          borderTop:"none",
+          borderRadius:"0 0 14px 14px",
+          marginBottom:28,
+          display:"flex",
+          overflowX:"auto",
+          boxShadow:"0 8px 32px rgba(0,0,0,0.4)"
+        }}>
+          <MainTab label="🎓 Analyze Essay" active={mainView==="analyze"} onClick={()=>{ setMainView("analyze"); trackEvent("nav_click",{page:"analyze"}); }}/>
+          <MainTab label="🖊️ Practice Mode" active={mainView==="practice"} onClick={()=>{ setMainView("practice"); trackEvent("nav_click",{page:"practice"}); }}/>
+          <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{ setMainView("progress"); trackEvent("nav_click",{page:"progress"}); }}/>
+          <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{ setMainView("toolkit"); trackEvent("nav_click",{page:"toolkit"}); }}/>
+          <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{ setMainView("contact"); trackEvent("nav_click",{page:"contact"}); }}/>
+        </div>
+
+        {/* Content glass card */}
+        <div style={{
+          background:T.cream,
+          borderRadius:16,
+          boxShadow:"0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)",
+          padding:"32px 32px 40px",
+          minHeight:400
+        }}>
 
         {/* ── ANALYZE ── */}
         {mainView==="analyze"&&(
           <div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px",backdropFilter:"blur(20px)"}}>
             <div style={{marginBottom:20}}>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"system-ui",fontWeight:600}}>Select Task Type</label>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"'Mulish', system-ui",fontWeight:700}}>Select Task Type</label>
               <p style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
                   <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); }}
                     style={{
-                      background:taskType===key?"#1a1a1a":"white",
-                      border:taskType===key?`2px solid #1a1a1a`:"1px solid #e8e8e8",
-                      borderBottom:taskType===key?`4px solid ${T.red}`:"4px solid #e8e8e8",
-                      borderRadius:8,
-                      padding:"18px 12px",
-                      cursor:"pointer",
-                      textAlign:"center",
-                      boxShadow:taskType===key?"0 8px 24px rgba(0,0,0,0.2)":"0 2px 8px rgba(0,0,0,0.06)",
-                      transform:taskType===key?"translateY(-2px)":"none",
-                      transition:"all 0.2s"
+                      background: taskType===key ? T.red : T.bg3,
+                      border: `2px solid ${taskType===key ? T.red : T.border}`,
+                      borderRadius: 10,
+                      padding: "20px 12px",
+                      cursor: "pointer",
+                      textAlign: "center",
+                      boxShadow: taskType===key ? `0 6px 20px ${T.redGlow}` : T.shadow,
+                      transform: taskType===key ? "translateY(-2px)" : "none",
+                      transition: "all 0.2s"
                     }}>
                     <div style={{fontSize:22,marginBottom:6}}>{task.icon}</div>
-                    <div style={{fontSize:12,fontWeight:700,color:taskType===key?"white":T.text,fontFamily:"system-ui",marginBottom:2,fontWeight:700}}>{task.label}</div>
+                    <div style={{fontSize:12,fontWeight:700,color:taskType===key?"white":T.text,fontFamily:"'Syne', Georgia, serif",marginBottom:4,fontWeight:700,fontSize:13}}>{task.label}</div>
                     <div style={{fontSize:11,color:T.textMuted,fontFamily:"system-ui"}}>{task.description}</div>
                   </button>
                 ))}
@@ -938,15 +1051,15 @@ export default function IELTSBot(){
 
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
               <div>
-                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"system-ui",fontWeight:600}}>
+                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Mulish', system-ui",fontWeight:700}}>
                   {taskType==="task1general"?"Letter Task Instructions":taskType==="task1academic"?"Task Description":"Essay Question / Topic"}
                 </label>
                 <textarea value={topic} onChange={e=>setTopic(e.target.value)} rows={3}
                   placeholder={taskType==="task2"?"e.g. Some people think universities should focus on job skills. Discuss both views and give your opinion.":taskType==="task1academic"?"e.g. The graph below shows changes in energy consumption. Summarise the information and make comparisons.":"e.g. You recently bought a laptop online but it arrived damaged. Write a letter to the manager."}
-                  style={{width:"100%",background:"white",border:`1px solid ${T.border}`,borderRadius:10,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",boxShadow:T.shadow}}/>
+                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               <div>
-                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"system-ui",fontWeight:600}}>
+                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Mulish', system-ui",fontWeight:700}}>
                   Student's Response <span style={{fontSize:11,color:T.textMuted,fontWeight:400,textTransform:"none",letterSpacing:0}}>(minimum {minWords} words required for Task {taskType==="task2"?"2":"1"})</span>
                   <span style={{color:wordCount>=minWords?T.green:wordCount>=(minWords*0.6)?T.amber:T.red,marginLeft:10,fontWeight:500,fontFamily:"system-ui"}}>
                     {wordCount} words {wordCount>=minWords?"✓":`(min. ${minWords} required${wordCount>10&&wordCount<minWords?" — penalty applies":""})`}
@@ -955,7 +1068,7 @@ export default function IELTSBot(){
                 <textarea value={essay} onChange={e=>setEssay(e.target.value)}
                   placeholder={taskType==="task1general"?"Dear Sir/Madam,\n\nI am writing to...":taskType==="task1academic"?"The graph illustrates...":"Paste the student's essay here..."}
                   rows={10}
-                  style={{width:"100%",background:"white",border:`1px solid ${T.border}`,borderRadius:10,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",boxShadow:T.shadow}}/>
+                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"system-ui"}}>{error}</p></Card>}
               {!proUser&&usesLeft===1&&(
@@ -967,25 +1080,24 @@ export default function IELTSBot(){
               )}
               <button ref={analyzeRef} onClick={analyze} disabled={loading}
                 style={{
-                  background:loading?"#ccc":"#1a1a1a",
-                  border:"none",
-                  borderRadius:8,
-                  borderBottom:loading?"4px solid #aaa":`4px solid ${T.red}`,
-                  color:"white",
-                  fontSize:16,
-                  fontWeight:800,
-                  padding:"16px 40px",
-                  cursor:loading?"not-allowed":"pointer",
-                  fontFamily:"system-ui",
-                  transition:"all 0.2s",
-                  display:"flex",
-                  alignItems:"center",
-                  gap:10,
-                  justifyContent:"center",
-                  letterSpacing:"-0.3px",
-                  boxShadow:loading?"none":"0 4px 20px rgba(0,0,0,0.2)"
+                  background: loading ? "#94a3b8" : T.red,
+                  border: "none",
+                  borderRadius: 10,
+                  color: "#fff",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  padding: "16px 36px",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  fontFamily: "'Mulish', system-ui",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  justifyContent: "center",
+                  boxShadow: loading ? "none" : `0 6px 20px ${T.redGlow}`,
+                  letterSpacing: "0.01em"
                 }}>
-                {loading?"⏳ Examining...":!proUser&&usesLeft<=0?"🔓 Upgrade to Continue":`Analyze ${TASK_TYPES[taskType].label} →`}
+                {loading ? "⏳ Examining..." : !proUser&&usesLeft<=0 ? "🔓 Upgrade to Continue" : `Analyze ${TASK_TYPES[taskType].label} →`}
               </button>
 
               {/* Language Selector */}
@@ -1017,7 +1129,7 @@ export default function IELTSBot(){
             {result&&(
               <div style={{marginTop:32}}>
                 <div style={{
-                  background:`linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)`,
+                  background:`linear-gradient(135deg, #12172a 0%, #1e2a4a 100%)`,
                   borderRadius:12,
                   padding:"28px 32px",
                   marginBottom:24,
@@ -1061,7 +1173,7 @@ export default function IELTSBot(){
                   </Card>
                 )}
 
-                <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap",background:"#f0f2f5",padding:6,borderRadius:10,border:"1px solid #e4e4e4"}}>
+                <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap",background:T.bg,padding:6,borderRadius:10,border:"1px solid #e4e4e4"}}>
                   <TabBtn label="📝 Annotated Essay" active={activeTab==="annotated"} onClick={()=>setActiveTab("annotated")}/>
                   <TabBtn label="📊 Scores" active={activeTab==="scores"} onClick={()=>setActiveTab("scores")}/>
                   <TabBtn label="🔍 Mistakes" active={activeTab==="mistakes"} onClick={()=>setActiveTab("mistakes")} badge={result.mistakes?.length}/>
@@ -1184,13 +1296,12 @@ export default function IELTSBot(){
           </div>
         )}
 
-        {mainView==="practice"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
-        {mainView==="progress"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
-        {mainView==="toolkit"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
-        {mainView==="contact"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><ContactPage/></div>}
-        </div>{/* end page content */}
-        </div>{/* end maxWidth container */}
-      </div>{/* end bg image wrapper */}
+        {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="contact"&&<ContactPage/>}
+        </div>{/* end cream card */}
+      </div>{/* end maxWidth */}
     </div>
   );
 }
