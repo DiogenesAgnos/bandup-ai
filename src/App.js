@@ -271,19 +271,18 @@ const MainTab=({label,active,onClick})=>(
   <button onClick={onClick}
     style={{
       flex:1, minWidth:120,
-      background:active?"white":"transparent",
+      background:active?T.red:"transparent",
       border:"none",
-      borderBottom:active?`4px solid ${T.red}`:"4px solid transparent",
-      borderTop:active?"4px solid transparent":"4px solid transparent",
-      color:active?T.red:"#666",
-      padding:"18px 12px 14px",
+      borderRadius:0,
+      color:active?"white":"rgba(255,255,255,0.55)",
+      padding:"18px 16px",
       cursor:"pointer",
       fontSize:13,
       fontWeight:active?800:500,
       fontFamily:"system-ui",
       transition:"all 0.2s",
-      letterSpacing:active?"-0.2px":"0",
-      whiteSpace:"nowrap"
+      whiteSpace:"nowrap",
+      borderBottom:active?"none":"1px solid rgba(255,255,255,0.05)"
     }}>
     {label}
   </button>
@@ -840,25 +839,15 @@ export default function IELTSBot(){
         </div>
       </div>
 
-      {/* ── HERO WITH BACKGROUND IMAGE ── */}
+      {/* ── HERO (now just a title strip since bg continues) ── */}
       <div style={{
         position:"relative",
-        minHeight:340,
-        background:"#111",
-        backgroundImage:"url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&q=80&auto=format&fit=crop')",
-        backgroundSize:"cover",
-        backgroundPosition:"center 30%",
-        display:"flex",
-        flexDirection:"column",
-        alignItems:"center",
-        justifyContent:"center",
-        padding:"60px 24px 48px",
+        background:"transparent",
+        padding:"48px 24px 36px",
+        textAlign:"center",
         overflow:"hidden"
       }}>
-        {/* Dark overlay with red tint at bottom */}
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(20,0,0,0.8) 100%)"}}/>
-        {/* Red accent line at top */}
-        <div style={{position:"absolute",top:0,left:0,right:0,height:4,background:T.red}}/>
+        <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:T.red}}/>
         {/* Content */}
         <div style={{position:"relative",textAlign:"center",maxWidth:700}}>
           <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(226,0,26,0.15)",border:"1px solid rgba(226,0,26,0.4)",borderRadius:20,padding:"5px 16px",marginBottom:20}}>
@@ -879,11 +868,23 @@ export default function IELTSBot(){
         </div>
       </div>
 
-      {/* ── MAIN CONTENT WRAPPER ── */}
-      <div style={{maxWidth:960,margin:"-1px auto 0",position:"relative"}}>
+      {/* ── MAIN CONTENT WITH BACKGROUND ── */}
+      <div style={{
+        background:"#111",
+        backgroundImage:"url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1600&q=80&auto=format&fit=crop')",
+        backgroundSize:"cover",
+        backgroundPosition:"center",
+        backgroundAttachment:"fixed",
+        position:"relative",
+        minHeight:"100vh"
+      }}>
+        {/* Semi-transparent overlay */}
+        <div style={{position:"absolute",inset:0,background:"rgba(10,10,15,0.82)"}}/>
+
+        <div style={{maxWidth:980,margin:"0 auto",padding:"0 20px 80px",position:"relative",zIndex:1}}>
 
         {/* ── NAVIGATION TABS ── */}
-        <div style={{background:"white",boxShadow:"0 4px 20px rgba(0,0,0,0.12)",borderRadius:"0 0 0 0",position:"relative",zIndex:10}}>
+        <div style={{background:"rgba(20,20,20,0.95)",backdropFilter:"blur(20px)",borderRadius:"0 0 16px 16px",boxShadow:"0 8px 32px rgba(0,0,0,0.4)",border:"1px solid rgba(255,255,255,0.06)",borderTop:"none",marginBottom:28}}>
           <div style={{display:"flex",gap:0,overflowX:"auto"}}>
             <MainTab label="🎓 Analyze Essay" active={mainView==="analyze"} onClick={()=>{ setMainView("analyze"); trackEvent("nav_click",{page:"analyze"}); }}/>
             <MainTab label="🖊️ Practice Mode" active={mainView==="practice"} onClick={()=>{ setMainView("practice"); trackEvent("nav_click",{page:"practice"}); }}/>
@@ -894,11 +895,11 @@ export default function IELTSBot(){
         </div>
 
         {/* ── PAGE CONTENT ── */}
-        <div style={{padding:"28px 24px 60px"}}>
+        <div style={{padding:"8px 0 0"}}>
 
         {/* ── ANALYZE ── */}
         {mainView==="analyze"&&(
-          <div style={{padding:"24px 0"}}>
+          <div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px",backdropFilter:"blur(20px)"}}>
             <div style={{marginBottom:20}}>
               <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"system-ui",fontWeight:600}}>Select Task Type</label>
               <p style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
@@ -991,19 +992,19 @@ export default function IELTSBot(){
               <Card style={{background:T.bg3,border:`1px solid ${T.border}`,marginTop:4}}>
                 <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?"#fff0f0":"white",border:`1px solid ${lang==="en"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?T.red:"white",border:`1px solid ${lang==="en"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇬🇧</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?T.red:T.text,fontFamily:"system-ui",marginBottom:2}}>English — Feedback in English</div>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?"white":T.text,fontFamily:"system-ui",marginBottom:2}}>English — Feedback in English</div>
                       <div style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui"}}>All scores, corrections and tips will appear in English.</div>
                       {lang==="en"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"system-ui",marginTop:4}}>⚠️ Switching language will re-run the analysis.</div>}
                     </div>
                     {lang==="en"&&<span style={{background:T.red,color:"white",borderRadius:2,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"system-ui",flexShrink:0}}>✓ Active</span>}
                   </div>
-                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="ar"?"#fff0f0":"white",border:`1px solid ${lang==="ar"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s",direction:"ltr"}} onClick={()=>switchLang("ar")}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="ar"?T.red:"white",border:`1px solid ${lang==="ar"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s",direction:"ltr"}} onClick={()=>switchLang("ar")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇸🇦</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?T.red:T.text,fontFamily:"system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?"white":T.text,fontFamily:"system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
                       <div style={{fontSize:12,color:T.textMuted,fontFamily:"system-ui",direction:"rtl",textAlign:"right"}}>ستظهر جميع الدرجات والتصحيحات والنصائح باللغة العربية.</div>
                       {lang==="ar"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"system-ui",marginTop:4,direction:"rtl",textAlign:"right"}}>⚠️ تغيير اللغة سيُعيد تحليل المقال من جديد.</div>}
                     </div>
@@ -1183,12 +1184,13 @@ export default function IELTSBot(){
           </div>
         )}
 
-        {mainView==="practice"&&<div style={{padding:"24px 0"}}><PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
-        {mainView==="progress"&&<div style={{padding:"24px 0"}}><ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
-        {mainView==="toolkit"&&<div style={{padding:"24px 0"}}><ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
-        {mainView==="contact"&&<ContactPage/>}
+        {mainView==="practice"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
+        {mainView==="progress"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
+        {mainView==="toolkit"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/></div>}
+        {mainView==="contact"&&<div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}><ContactPage/></div>}
         </div>{/* end page content */}
-      </div>{/* end main wrapper */}
+        </div>{/* end maxWidth container */}
+      </div>{/* end bg image wrapper */}
     </div>
   );
 }
