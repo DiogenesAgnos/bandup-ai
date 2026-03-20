@@ -842,17 +842,7 @@ export default function IELTSBot(){
     <div style={{minHeight:"100vh", background:"#f9f9f9", fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif", color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
-      {/* ══ NAV BAR 1 — black top bar like Coursera ══ */}
-      <div style={{background:"#1c1d1f", padding:"0 24px"}}>
-        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", alignItems:"center", height:40, gap:24}}>
-          {["For Students","For Schools","For Teachers"].map(item=>(
-            <span key={item} style={{color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:400, cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui", transition:"color 0.15s"}}
-              onMouseEnter={e=>e.target.style.color="#fff"}
-              onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.7)"}
-            >{item}</span>
-          ))}
-        </div>
-      </div>
+   
 
       {/* ══ NAV BAR 2 — white logo + tabs like Coursera ══ */}
       <div style={{position:"sticky", top:0, zIndex:200, background:T.bg, borderBottom:`1px solid ${T.border}`, boxShadow:T.shadowNav}}>
