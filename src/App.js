@@ -783,6 +783,141 @@ const ContactPage = () => {
   );
 };
 
+
+// ── POLICY PAGES ─────────────────────────────────────────────────────────────
+const PolicyPage = ({ title, children, onBack }) => (
+  <div style={{maxWidth:800, margin:"0 auto", padding:"0 24px 80px"}}>
+    <button onClick={onBack} style={{
+      background:"none", border:"none", color:T.primary,
+      fontSize:14, fontWeight:600, cursor:"pointer",
+      fontFamily:"'Source Sans Pro','Inter',system-ui",
+      padding:"24px 0 16px", display:"flex", alignItems:"center", gap:6
+    }}>← Back to BandUp AI</button>
+    <div style={{background:T.bg, border:`1px solid ${T.border}`, borderRadius:8, padding:"40px 48px", boxShadow:T.shadow}}>
+      <h1 style={{fontFamily:"'Source Sans Pro','Inter',system-ui", fontSize:28, fontWeight:700, color:T.text, marginBottom:8, marginTop:0}}>{title}</h1>
+      <p style={{color:T.textMuted, fontSize:13, fontFamily:"'Source Sans Pro','Inter',system-ui", marginBottom:32}}>Last updated: {new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}</p>
+      <div style={{color:T.textMid, fontSize:15, lineHeight:1.8, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const Section = ({title, children}) => (
+  <div style={{marginBottom:28}}>
+    <h2 style={{fontSize:17, fontWeight:700, color:"#1c1d1f", marginBottom:10, marginTop:0, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{title}</h2>
+    {children}
+  </div>
+);
+
+const TermsPage = ({onBack}) => (
+  <PolicyPage title="Terms of Service" onBack={onBack}>
+    <Section title="1. Acceptance of Terms">
+      <p style={{margin:"0 0 12px"}}>By accessing or using BandUp AI ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. BandUp AI is operated by Ahmad Sartawi ("we", "us", "our").</p>
+    </Section>
+    <Section title="2. Description of Service">
+      <p style={{margin:"0 0 12px"}}>BandUp AI is an AI-powered IELTS Writing examination tool that provides automated band score assessment, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p>
+    </Section>
+    <Section title="3. User Accounts and Subscriptions">
+      <p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $19 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p>
+      <p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings. Cancellation takes effect at the end of the current billing period.</p>
+    </Section>
+    <Section title="4. Acceptable Use">
+      <p style={{margin:"0 0 12px"}}>You agree to use BandUp AI only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy the AI systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p>
+    </Section>
+    <Section title="5. AI Accuracy Disclaimer">
+      <p style={{margin:"0 0 12px"}}>BandUp AI uses artificial intelligence to provide IELTS writing feedback. While we strive for accuracy, AI-generated scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p>
+    </Section>
+    <Section title="6. Intellectual Property">
+      <p style={{margin:"0 0 12px"}}>All content, design, software, and materials on BandUp AI are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p>
+    </Section>
+    <Section title="7. Limitation of Liability">
+      <p style={{margin:"0 0 12px"}}>To the maximum extent permitted by law, BandUp AI shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability to you shall not exceed the amount paid by you in the 12 months preceding the claim.</p>
+    </Section>
+    <Section title="8. Modifications to Terms">
+      <p style={{margin:"0 0 12px"}}>We reserve the right to modify these Terms at any time. We will notify users of material changes via email or prominent notice on the Service. Continued use after changes constitutes acceptance of the new Terms.</p>
+    </Section>
+    <Section title="9. Governing Law">
+      <p style={{margin:"0 0 12px"}}>These Terms shall be governed by the laws of the Hashemite Kingdom of Jordan. Any disputes shall be resolved in the courts of Amman, Jordan.</p>
+    </Section>
+    <Section title="10. Contact">
+      <p style={{margin:"0 0 12px"}}>For any questions regarding these Terms, please contact us at: <strong>diogenes.agnos@gmail.com</strong></p>
+    </Section>
+  </PolicyPage>
+);
+
+const PrivacyPage = ({onBack}) => (
+  <PolicyPage title="Privacy Policy" onBack={onBack}>
+    <Section title="1. Information We Collect">
+      <p style={{margin:"0 0 12px"}}>We collect information you provide directly to us, including:</p>
+      <ul style={{margin:"0 0 12px", paddingLeft:20}}>
+        <li style={{marginBottom:6}}>Contact form submissions (name, email, country, age group, message)</li>
+        <li style={{marginBottom:6}}>Essay content submitted for analysis</li>
+        <li style={{marginBottom:6}}>Payment information (processed and stored by Paddle — we do not store card details)</li>
+        <li style={{marginBottom:6}}>Usage data collected via Google Analytics (anonymised)</li>
+      </ul>
+    </Section>
+    <Section title="2. How We Use Your Information">
+      <p style={{margin:"0 0 12px"}}>We use the information we collect to: provide and improve the Service; process subscription payments; respond to your enquiries; send service-related communications; and analyse usage patterns to improve user experience.</p>
+      <p style={{margin:"0 0 12px"}}>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p>
+    </Section>
+    <Section title="3. Essay Data">
+      <p style={{margin:"0 0 12px"}}>Essays you submit are processed by Anthropic's Claude AI API for analysis. Essays are transmitted securely and are not stored permanently on our servers. We do not use your essays to train AI models. Please refer to Anthropic's Privacy Policy for details on their data handling practices.</p>
+    </Section>
+    <Section title="4. Cookies and Analytics">
+      <p style={{margin:"0 0 12px"}}>We use Google Analytics to collect anonymised data about how users interact with our Service. This includes pages visited, time spent, and general geographic location. You can opt out of Google Analytics by installing the Google Analytics Opt-out Browser Add-on.</p>
+    </Section>
+    <Section title="5. Data Security">
+      <p style={{margin:"0 0 12px"}}>We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction. All data is transmitted over HTTPS encryption.</p>
+    </Section>
+    <Section title="6. Data Retention">
+      <p style={{margin:"0 0 12px"}}>We retain your personal data only as long as necessary to provide the Service and comply with legal obligations. Contact form submissions are retained for up to 2 years. Analytics data is retained according to Google Analytics standard retention policies.</p>
+    </Section>
+    <Section title="7. Your Rights">
+      <p style={{margin:"0 0 12px"}}>You have the right to: access your personal data; correct inaccurate data; request deletion of your data; withdraw consent at any time. To exercise these rights, contact us at <strong>diogenes.agnos@gmail.com</strong>.</p>
+    </Section>
+    <Section title="8. Third-Party Services">
+      <p style={{margin:"0 0 12px"}}>Our Service integrates with: Anthropic Claude API (essay analysis); Paddle (payment processing); Google Analytics (usage analytics); EmailJS (contact form delivery). Each third party has its own privacy policy governing their data practices.</p>
+    </Section>
+    <Section title="9. Contact">
+      <p style={{margin:"0 0 12px"}}>For privacy-related enquiries, contact us at: <strong>diogenes.agnos@gmail.com</strong></p>
+    </Section>
+  </PolicyPage>
+);
+
+const RefundPage = ({onBack}) => (
+  <PolicyPage title="Refund Policy" onBack={onBack}>
+    <Section title="1. Subscription Cancellation">
+      <p style={{margin:"0 0 12px"}}>You may cancel your BandUp AI Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No further charges will be made after cancellation.</p>
+    </Section>
+    <Section title="2. Refund Eligibility">
+      <p style={{margin:"0 0 12px"}}>We offer a <strong>7-day money-back guarantee</strong> for new Pro subscribers. If you are not satisfied with BandUp AI Pro within 7 days of your initial subscription, contact us at diogenes.agnos@gmail.com for a full refund.</p>
+      <p style={{margin:"0 0 12px"}}>After the 7-day period, subscription fees are generally non-refundable. However, we review refund requests on a case-by-case basis and may issue refunds in exceptional circumstances at our sole discretion.</p>
+    </Section>
+    <Section title="3. How to Request a Refund">
+      <p style={{margin:"0 0 12px"}}>To request a refund, please email <strong>diogenes.agnos@gmail.com</strong> with:</p>
+      <ul style={{margin:"0 0 12px", paddingLeft:20}}>
+        <li style={{marginBottom:6}}>Your registered email address</li>
+        <li style={{marginBottom:6}}>Date of purchase</li>
+        <li style={{marginBottom:6}}>Reason for refund request</li>
+      </ul>
+      <p style={{margin:"0 0 12px"}}>We will process your request within 5 business days. Approved refunds are issued to the original payment method and may take 5-10 business days to appear.</p>
+    </Section>
+    <Section title="4. Free Tier">
+      <p style={{margin:"0 0 12px"}}>The free tier of BandUp AI (2 free analyses) is provided at no cost and is not eligible for any refund or credit.</p>
+    </Section>
+    <Section title="5. Technical Issues">
+      <p style={{margin:"0 0 12px"}}>If you experience technical issues that prevent you from using the Service, please contact us immediately at <strong>diogenes.agnos@gmail.com</strong>. We will work to resolve the issue and may offer a refund or account credit if the issue cannot be resolved within a reasonable timeframe.</p>
+    </Section>
+    <Section title="6. Payment Processing">
+      <p style={{margin:"0 0 12px"}}>All payments are processed by Paddle.com as our Merchant of Record. Refunds are issued through Paddle's payment system. For payment disputes, you may also contact Paddle's support directly at support@paddle.com.</p>
+    </Section>
+    <Section title="7. Contact">
+      <p style={{margin:"0 0 12px"}}>For refund enquiries: <strong>diogenes.agnos@gmail.com</strong></p>
+    </Section>
+  </PolicyPage>
+);
+
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
   const [mainView,setMainView]=useState("analyze"); // analyze | practice | progress | toolkit | contact
@@ -842,7 +977,17 @@ export default function IELTSBot(){
     <div style={{minHeight:"100vh", background:"#f9f9f9", fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif", color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
-   
+      {/* ══ NAV BAR 1 — black top bar like Coursera ══ */}
+      <div style={{background:"#1c1d1f", padding:"0 24px"}}>
+        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", alignItems:"center", height:40, gap:24}}>
+          {["For Students","For Schools","For Teachers"].map(item=>(
+            <span key={item} style={{color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:400, cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui", transition:"color 0.15s"}}
+              onMouseEnter={e=>e.target.style.color="#fff"}
+              onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.7)"}
+            >{item}</span>
+          ))}
+        </div>
+      </div>
 
       {/* ══ NAV BAR 2 — white logo + tabs like Coursera ══ */}
       <div style={{position:"sticky", top:0, zIndex:200, background:T.bg, borderBottom:`1px solid ${T.border}`, boxShadow:T.shadowNav}}>
@@ -1260,6 +1405,32 @@ export default function IELTSBot(){
         {mainView==="contact"&&<ContactPage/>}
         </div>{/* end page content card */}
       </div>{/* end maxWidth */}
+
+      {/* Policy pages render outside the content card */}
+      {mainView==="terms"&&<TermsPage onBack={()=>setMainView("analyze")}/>}
+      {mainView==="privacy"&&<PrivacyPage onBack={()=>setMainView("analyze")}/>}
+      {mainView==="refund"&&<RefundPage onBack={()=>setMainView("analyze")}/>}
+      {/* ══ FOOTER ══ */}
+      <div style={{background:"#1c1d1f", borderTop:"1px solid #333", padding:"32px 24px", marginTop:40}}>
+        <div style={{maxWidth:1200, margin:"0 auto"}}>
+          <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:16, marginBottom:20}}>
+            <span style={{color:"#fff", fontWeight:800, fontSize:20, fontFamily:"'Source Sans Pro','Inter',system-ui", letterSpacing:"-0.5px"}}>BandUp AI</span>
+            <div style={{display:"flex", gap:24, flexWrap:"wrap"}}>
+              {[["terms","Terms of Service"],["privacy","Privacy Policy"],["refund","Refund Policy"]].map(([key,label])=>(
+                <button key={key} onClick={()=>setMainView(key)}
+                  style={{background:"none", border:"none", color:"rgba(255,255,255,0.6)", fontSize:13, cursor:"pointer", fontFamily:"'Source Sans Pro','Inter',system-ui", padding:0}}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:16, display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:8}}>
+            <span style={{color:"rgba(255,255,255,0.35)", fontSize:12, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>© {new Date().getFullYear()} BandUp AI. All rights reserved.</span>
+            <span style={{color:"rgba(255,255,255,0.35)", fontSize:12, fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-powered IELTS Writing Examiner</span>
+          </div>
+        </div>
+      </div>
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
         * { box-sizing: border-box; }
