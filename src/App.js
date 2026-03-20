@@ -610,9 +610,9 @@ const trackEvent = (eventName, params={}) => {
 // Uses EmailJS to send emails to your Gmail (free)
 // Setup: go to emailjs.com → create account → create service → create template
 // Then replace the three placeholders below
-const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";    // ← from emailjs.com
-const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";  // ← from emailjs.com
-const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";     // ← from emailjs.com
+const EMAILJS_SERVICE_ID = "service_9es76g1";
+const EMAILJS_TEMPLATE_ID = "template_jrd4i4n";
+const EMAILJS_PUBLIC_KEY = "Wl_oo3VnUzPGW3MB4";
 
 const ContactPage = () => {
   const [form, setForm] = useState({ name:"", country:"", age:"", email:"", message:"" });
