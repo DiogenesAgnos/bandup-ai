@@ -7,39 +7,35 @@ const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
 
 const T = {
-  // Layout
-  maxWidth: 1200,
+  // ── Coursera exact design system ──────────────────────────────
+  // Brand: #0056d2 blue family
+  primary:      "#0056d2",
+  primaryHover: "#0041a8",
+  primaryLight: "#e8f0fc",
+  primaryBorder:"#b3ccf5",
   // Backgrounds
-  bg:        "#F9FAFB",   // page
-  bg2:       "#ffffff",   // card
-  bg3:       "#F3F4F6",   // muted surface
-  // Primary: trust blue
-  primary:   "#2563EB",
-  primaryBg: "#EFF6FF",
-  primaryBorder: "#BFDBFE",
-  // Accent: action orange
-  accent:    "#F59E0B",
-  accentBg:  "#FFFBEB",
-  accentBorder:"#FDE68A",
-  // Text
-  text:      "#111827",
-  textMid:   "#374151",
-  textMuted: "#6B7280",
-  textLight: "#9CA3AF",
-  // Borders
-  border:    "#E5E7EB",
-  borderMid: "#D1D5DB",
-  // Status
-  green:     "#059669", greenBg:"#ECFDF5", greenBorder:"#6EE7B7",
-  red:       "#DC2626", redBg:"#FEF2F2",   redBorder:"#FECACA",
-  amber:     "#D97706", amberBg:"#FFFBEB", amberBorder:"#FDE68A",
-  blue:      "#2563EB", blueBg:"#EFF6FF",  blueBorder:"#BFDBFE",
-  purple:    "#7C3AED", purpleBg:"#F5F3FF",purpleBorder:"#DDD6FE",
-  // Shadows
-  shadow:    "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-  shadowMd:  "0 4px 12px rgba(0,0,0,0.08)",
-  shadowLg:  "0 10px 40px rgba(0,0,0,0.1)",
-  shadowNav: "0 2px 8px rgba(0,0,0,0.05)",
+  bg:           "#ffffff",   // page white
+  bgMuted:      "#f9f9f9",   // section alternate
+  bgGray:       "#f3f3f3",   // card muted
+  // Text - Coursera neutral scale
+  text:         "#1f1f1f",   // primary text
+  textMid:      "#3c3c3c",   // secondary
+  textMuted:    "#636363",   // muted / labels
+  textLight:    "#8c8c8c",   // placeholder
+  // Borders - very subtle
+  border:       "#e0e0e0",
+  borderMid:    "#c7c7c7",
+  // Status colors
+  green:        "#00785a", greenBg:"#e6f4f1",  greenBorder:"#99d6c8",
+  red:          "#c0392b", redBg:"#fdf2f2",    redBorder:"#f0a09a",
+  amber:        "#b45309", amberBg:"#fef9ec",  amberBorder:"#fcd97a",
+  blue:         "#0056d2", blueBg:"#e8f0fc",   blueBorder:"#b3ccf5",
+  purple:       "#6554af", purpleBg:"#f2f0ff", purpleBorder:"#c2b8ff",
+  // Shadows — very subtle like Coursera
+  shadow:    "0 2px 4px rgba(0,0,0,0.08)",
+  shadowMd:  "0 4px 12px rgba(0,0,0,0.1)",
+  shadowLg:  "0 8px 32px rgba(0,0,0,0.12)",
+  shadowNav: "0 2px 4px rgba(0,0,0,0.1)",
 };
 
 const TASK_TYPES = {
@@ -218,7 +214,7 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
               {seg.text}
             </span>
             {activeTooltip===seg.idx&&(
-              <span style={{position:"absolute",bottom:"calc(100% + 8px)",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Inter',system-ui",width:260,zIndex:100,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal"}}>
+              <span style={{position:"absolute",bottom:"calc(100% + 8px)",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",width:260,zIndex:100,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal"}}>
                 <span style={{position:"absolute",bottom:-6,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:"6px solid #1e293b"}}/>
                 <div style={{display:"flex",gap:6,marginBottom:6,flexWrap:"wrap"}}>
                   <span style={{background:`${c}30`,border:`1px solid ${c}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:c,fontWeight:700}}>{seg.mistake.severity}</span>
@@ -237,83 +233,80 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
 
 // ── Components ─────────────────────────────────
 const Card=({children,style})=>(
-  <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,padding:"20px 24px",boxShadow:T.shadow,...style}}>
+  <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"20px 24px",boxShadow:T.shadow,...style}}>
     {children}
   </div>
 );
 const CriteriaCard=({label,data})=>(
   <div style={{
-    background: T.bg2, border: `1px solid ${T.border}`,
-    borderRadius: 10, padding: "18px 22px",
-    boxShadow: T.shadow,
+    background: T.bg, border: `1px solid ${T.border}`,
+    borderRadius: 8, padding: "20px 24px", boxShadow: T.shadow,
     borderLeft: `4px solid ${bandColor(data.band)}`,
   }}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-      <span style={{color:T.textMid,fontSize:12,fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",fontFamily:"'Inter',system-ui"}}>{label}</span>
-      <span style={{background:bandBg(data.band),color:bandColor(data.band),fontWeight:700,fontSize:18,borderRadius:8,padding:"4px 14px",border:`1px solid ${bandColor(data.band)}30`,fontFamily:"'Inter',system-ui"}}>{data.band}</span>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+      <span style={{color:T.textMuted,fontSize:12,fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</span>
+      <span style={{background:bandBg(data.band),color:bandColor(data.band),fontWeight:700,fontSize:20,borderRadius:6,padding:"4px 14px",border:`1px solid ${bandColor(data.band)}30`}}>{data.band}</span>
     </div>
-    <p style={{color:T.textMid,fontSize:14,lineHeight:1.65,margin:0,fontFamily:"'Inter',system-ui"}}>{data.feedback}</p>
+    <p style={{color:T.textMid,fontSize:15,lineHeight:1.65,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{data.feedback}</p>
   </div>
 );
 const MistakeCard=({mistake,i})=>(
   <div style={{background:severityBg(mistake.severity),border:`1px solid ${severityColor(mistake.severity)}40`,borderLeft:`3px solid ${severityColor(mistake.severity)}`,borderRadius:10,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8}}>
     <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
-      <span style={{fontSize:11,fontWeight:700,color:taskType===key?T.primary:T.textMuted,fontFamily:"'Inter',system-ui",fontSize:11,opacity:taskType===key?0.8:1}}>#{i+1}</span>
-      <span style={{background:"white",border:`1px solid ${severityColor(mistake.severity)}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:severityColor(mistake.severity),fontFamily:"'Inter',system-ui",fontWeight:700}}>{mistake.severity}</span>
-      <span style={{background:"white",border:`1px solid ${categoryColor(mistake.category)}50`,borderRadius:20,padding:"1px 8px",fontSize:11,color:categoryColor(mistake.category),fontFamily:"'Inter',system-ui",fontWeight:600}}>{mistake.category}</span>
+      <span style={{fontSize:11,fontWeight:700,color:taskType===key?T.primary:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",fontSize:11,opacity:taskType===key?0.8:1}}>#{i+1}</span>
+      <span style={{background:"white",border:`1px solid ${severityColor(mistake.severity)}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:severityColor(mistake.severity),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>{mistake.severity}</span>
+      <span style={{background:"white",border:`1px solid ${categoryColor(mistake.category)}50`,borderRadius:20,padding:"1px 8px",fontSize:11,color:categoryColor(mistake.category),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>{mistake.category}</span>
     </div>
     <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Inter',system-ui",fontWeight:600}}>ORIGINAL</div><div style={{background:"#fee2e2",borderRadius:6,padding:"5px 10px",color:"#991b1b",fontSize:13,fontStyle:"italic"}}>"{mistake.original}"</div></div>
+      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>ORIGINAL</div><div style={{background:"#fee2e2",borderRadius:6,padding:"5px 10px",color:"#991b1b",fontSize:13,fontStyle:"italic"}}>"{mistake.original}"</div></div>
       <div style={{fontSize:16,color:T.textMuted,alignSelf:"center"}}>→</div>
-      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Inter',system-ui",fontWeight:600}}>CORRECTION</div><div style={{background:"#dcfce7",borderRadius:6,padding:"5px 10px",color:"#166534",fontSize:13}}>"{mistake.correction}"</div></div>
+      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>CORRECTION</div><div style={{background:"#dcfce7",borderRadius:6,padding:"5px 10px",color:"#166534",fontSize:13}}>"{mistake.correction}"</div></div>
     </div>
-    <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Inter',system-ui"}}>💡 {mistake.explanation}</p>
+    <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 {mistake.explanation}</p>
   </div>
 );
 const TabBtn=({label,active,onClick,badge})=>(
   <button onClick={onClick} style={{
-    background: active ? T.primaryBg : "transparent",
+    background: "transparent",
     border: "none",
-    borderBottom: active ? `2px solid ${T.primary}` : "2px solid transparent",
+    borderBottom: active ? `3px solid ${T.primary}` : "3px solid transparent",
     color: active ? T.primary : T.textMuted,
-    padding: "10px 16px",
+    padding: "12px 16px",
     cursor: "pointer",
-    fontSize: 13,
-    fontWeight: active ? 600 : 400,
-    fontFamily: "'Inter', system-ui",
+    fontSize: 14,
+    fontWeight: active ? 700 : 400,
+    fontFamily: "'Source Sans Pro', 'Inter', system-ui",
     display: "flex",
     alignItems: "center",
     gap: 6,
     whiteSpace: "nowrap",
-    transition: "all 0.15s",
+    transition: "color 0.15s, border-color 0.15s",
+    flexShrink: 0,
   }}>
     {label}
     {badge > 0 && (
       <span style={{
-        background: T.red, color: "#fff",
-        borderRadius: 20, padding: "1px 7px",
-        fontSize: 10, fontWeight: 700
+        background: T.red, color: "#fff", borderRadius: 20,
+        padding: "1px 7px", fontSize: 11, fontWeight: 700
       }}>{badge}</span>
     )}
   </button>
 );
 const MainTab=({label,active,onClick})=>(
   <button onClick={onClick} style={{
-    background: active ? T.primaryBg : "transparent",
+    background: "transparent",
     border: "none",
-    borderBottom: active ? `2px solid ${T.primary}` : "2px solid transparent",
+    borderBottom: active ? `3px solid ${T.primary}` : "3px solid transparent",
     color: active ? T.primary : T.textMuted,
-    padding: "0 16px",
-    height: 52,
+    padding: "0 20px",
+    height: 56,
     cursor: "pointer",
     fontSize: 14,
-    fontWeight: active ? 600 : 400,
-    fontFamily: "'Inter', system-ui",
-    transition: "all 0.15s",
+    fontWeight: active ? 700 : 400,
+    fontFamily: "'Source Sans Pro', 'Inter', system-ui",
+    transition: "color 0.15s, border-color 0.15s",
     whiteSpace: "nowrap",
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
+    flexShrink: 0,
   }}>
     {label}
   </button>
@@ -326,23 +319,23 @@ const PaywallModal=({onClose,onSuccess})=>(
       <button onClick={onClose} style={{position:"absolute",top:16,right:20,background:"none",border:"none",color:T.textMuted,fontSize:22,cursor:"pointer"}}>✕</button>
       <div style={{textAlign:"center",marginBottom:24}}>
         <div style={{fontSize:36,marginBottom:8}}>🎓</div>
-        <div style={{display:"inline-block",background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:100,padding:"5px 16px",fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Inter',system-ui"}}>Free analyses used up</div>
+        <div style={{display:"inline-block",background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:100,padding:"5px 16px",fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Free analyses used up</div>
         <h2 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:24,marginBottom:8}}>Unlock Unlimited Access</h2>
-        <p style={{color:T.textMid,fontSize:14,lineHeight:1.6,fontFamily:"'Inter',system-ui"}}>Full IELTS Writing coverage — Task 1 & 2, Academic & General Training.</p>
+        <p style={{color:T.textMid,fontSize:14,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Full IELTS Writing coverage — Task 1 & 2, Academic & General Training.</p>
       </div>
       <div style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:12,padding:"16px",marginBottom:20,textAlign:"center"}}>
         <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>19<sub style={{fontSize:14,color:T.textMuted}}>/month</sub></div>
-        <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Inter',system-ui"}}>Cancel anytime · No hidden fees</div>
+        <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Cancel anytime · No hidden fees</div>
       </div>
       <ul style={{listStyle:"none",padding:0,display:"flex",flexDirection:"column",gap:8,marginBottom:22}}>
         {["Unlimited analyses — Task 1 & 2, Academic & General","Complete mistake detection — spelling, grammar & punctuation","Inline essay annotations with correction bubbles","Progress tracker — see your improvement over time","Band Booster + Vocabulary upgrades from YOUR essay","Full IELTS Toolkit (Grammar, Templates, Pet Peeves)","Practice Mode with live AI coaching + inline corrections","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i)=>(
-          <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"'Inter',system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
+          <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
         ))}
       </ul>
-      <button onClick={()=>{savePro();onSuccess();}} style={{width:"100%",background:T.primary,color:"white",fontWeight:600,fontSize:15,padding:"15px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Inter',system-ui",boxShadow:T.shadowMd}}>
+      <button onClick={()=>{savePro();onSuccess();}} style={{width:"100%",background:T.primary,color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:4,border:"none",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadowMd}}>
         🔓 {STRIPE_CONFIGURED?"Start Pro — $19/month":"Unlock Pro (Test Mode)"}
       </button>
-      {!STRIPE_CONFIGURED&&<p style={{textAlign:"center",color:T.textMuted,fontSize:11,marginTop:10,fontFamily:"'Inter',system-ui"}}>Add Stripe keys to enable real payments.</p>}
+      {!STRIPE_CONFIGURED&&<p style={{textAlign:"center",color:T.textMuted,fontSize:11,marginTop:10,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Add Stripe keys to enable real payments.</p>}
     </div>
   </div>
 );
@@ -354,13 +347,13 @@ const ProgressTracker=({onUpgrade,isPro})=>{
     <Card style={{textAlign:"center",padding:"40px 24px"}}>
       <div style={{fontSize:40,marginBottom:16}}>📈</div>
       <h3 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:20,marginBottom:8}}>Track Your Progress</h3>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Inter',system-ui",marginBottom:20,lineHeight:1.6}}>Complete your first essay analysis to start tracking your band score improvement over time.</p>
+      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:20,lineHeight:1.6}}>Complete your first essay analysis to start tracking your band score improvement over time.</p>
     </Card>
   );
   if(history.length===0) return (
     <Card style={{textAlign:"center",padding:"40px 24px"}}>
       <div style={{fontSize:40,marginBottom:16}}>📈</div>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Inter',system-ui"}}>No essays analysed yet. Complete your first analysis to start tracking progress!</p>
+      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>No essays analysed yet. Complete your first analysis to start tracking progress!</p>
     </Card>
   );
   const latest=history[0];
@@ -374,7 +367,7 @@ const ProgressTracker=({onUpgrade,isPro})=>{
         <Card style={{textAlign:"center",background:bandBg(latest.band),border:`1px solid ${bandColor(latest.band)}30`}}>
           <div style={{fontSize:42,fontWeight:900,color:bandColor(latest.band),fontFamily:"Georgia,serif",lineHeight:1}}>{latest.band}</div>
           <div style={{fontSize:11,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase",marginTop:4}}>Latest Band</div>
-          {bandDiff!==null&&<div style={{fontSize:13,color:parseFloat(bandDiff)>=0?T.green:T.red,fontWeight:700,fontFamily:"'Inter',system-ui",marginTop:4}}>{parseFloat(bandDiff)>=0?`▲ +${bandDiff}`:`▼ ${bandDiff}`} vs previous</div>}
+          {bandDiff!==null&&<div style={{fontSize:13,color:parseFloat(bandDiff)>=0?T.green:T.red,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{parseFloat(bandDiff)>=0?`▲ +${bandDiff}`:`▼ ${bandDiff}`} vs previous</div>}
         </Card>
         <Card style={{textAlign:"center"}}>
           <div style={{fontSize:42,fontWeight:900,color:T.text,fontFamily:"Georgia,serif",lineHeight:1}}>{history.length}</div>
@@ -383,7 +376,7 @@ const ProgressTracker=({onUpgrade,isPro})=>{
         <Card style={{textAlign:"center"}}>
           <div style={{fontSize:42,fontWeight:900,color:T.red,fontFamily:"Georgia,serif",lineHeight:1}}>{latest.mistakeCount}</div>
           <div style={{fontSize:11,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase",marginTop:4}}>Latest Mistakes</div>
-          {mistakeDiff!==null&&<div style={{fontSize:13,color:mistakeDiff<=0?T.green:T.red,fontWeight:700,fontFamily:"'Inter',system-ui",marginTop:4}}>{mistakeDiff<=0?`▲ ${Math.abs(mistakeDiff)} fewer`:`▼ ${mistakeDiff} more`} vs previous</div>}
+          {mistakeDiff!==null&&<div style={{fontSize:13,color:mistakeDiff<=0?T.green:T.red,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{mistakeDiff<=0?`▲ ${Math.abs(mistakeDiff)} fewer`:`▼ ${mistakeDiff} more`} vs previous</div>}
         </Card>
         {history.length>=2&&(
           <Card style={{textAlign:"center",background:T.greenBg,border:`1px solid ${T.greenBorder}`}}>
@@ -396,15 +389,15 @@ const ProgressTracker=({onUpgrade,isPro})=>{
       {/* Band score history visual */}
       {history.length>=2&&(
         <Card>
-          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Inter',system-ui"}}>📊 Band Score History</div>
+          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📊 Band Score History</div>
           <div style={{display:"flex",alignItems:"flex-end",gap:8,height:120,padding:"0 8px"}}>
             {[...history].reverse().map((h,i)=>{
               const heightPct=((h.band-4)/(9-4))*100;
               return (
                 <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{fontSize:11,fontWeight:700,color:bandColor(h.band),fontFamily:"'Inter',system-ui"}}>{h.band}</div>
+                  <div style={{fontSize:11,fontWeight:700,color:bandColor(h.band),fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{h.band}</div>
                   <div style={{width:"100%",background:bandColor(h.band),borderRadius:"4px 4px 0 0",height:`${heightPct}%`,minHeight:8,opacity:i===history.length-1?1:0.7,transition:"all 0.3s"}}/>
-                  <div style={{fontSize:9,color:T.textMuted,fontFamily:"'Inter',system-ui",textAlign:"center"}}>{new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}</div>
+                  <div style={{fontSize:9,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",textAlign:"center"}}>{new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}</div>
                 </div>
               );
             })}
@@ -415,19 +408,19 @@ const ProgressTracker=({onUpgrade,isPro})=>{
       {/* Criteria breakdown comparison */}
       {previous&&(
         <Card>
-          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Inter',system-ui"}}>📋 Criteria Comparison — Latest vs Previous</div>
+          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📋 Criteria Comparison — Latest vs Previous</div>
           {[["Task Achievement","taskAchievement"],["Coherence & Cohesion","coherenceCohesion"],["Lexical Resource","lexicalResource"],["Grammatical Range","grammaticalRange"]].map(([label,key])=>{
             const curr=latest.criteria?.[key]||0;
             const prev=previous.criteria?.[key]||0;
             const diff=(curr-prev).toFixed(1);
             return (
               <div key={key} style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
-                <div style={{width:160,fontSize:13,color:T.textMid,fontFamily:"'Inter',system-ui",flexShrink:0}}>{label}</div>
+                <div style={{width:160,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>{label}</div>
                 <div style={{flex:1,background:T.bg3,borderRadius:6,height:8,position:"relative"}}>
                   <div style={{position:"absolute",left:0,top:0,height:"100%",width:`${(curr/9)*100}%`,background:bandColor(curr),borderRadius:6,transition:"width 0.5s"}}/>
                 </div>
-                <div style={{fontSize:13,fontWeight:700,color:bandColor(curr),fontFamily:"'Inter',system-ui",width:32}}>{curr}</div>
-                <div style={{fontSize:12,fontWeight:700,color:parseFloat(diff)>0?T.green:parseFloat(diff)<0?T.red:T.textMuted,fontFamily:"'Inter',system-ui",width:40}}>
+                <div style={{fontSize:13,fontWeight:700,color:bandColor(curr),fontFamily:"'Source Sans Pro','Inter',system-ui",width:32}}>{curr}</div>
+                <div style={{fontSize:12,fontWeight:700,color:parseFloat(diff)>0?T.green:parseFloat(diff)<0?T.red:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",width:40}}>
                   {parseFloat(diff)>0?`+${diff}`:diff}
                 </div>
               </div>
@@ -438,16 +431,16 @@ const ProgressTracker=({onUpgrade,isPro})=>{
 
       {/* Essay history list */}
       <Card>
-        <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Inter',system-ui"}}>📝 Essay History</div>
+        <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📝 Essay History</div>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {history.map((h,i)=>(
             <div key={h.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:i===0?bandBg(h.band):T.bg3,borderRadius:10,border:i===0?`1px solid ${bandColor(h.band)}30`:`1px solid ${T.border}`}}>
               <div style={{fontSize:24,fontWeight:900,color:bandColor(h.band),fontFamily:"Georgia,serif",lineHeight:1,width:40}}>{h.band}</div>
               <div style={{flex:1}}>
-                <div style={{fontSize:13,color:T.text,fontFamily:"'Inter',system-ui",fontWeight:600,marginBottom:2}}>{h.taskType==="task2"?"Task 2 Essay":h.taskType==="task1academic"?"Task 1 Academic":"Task 1 General"} {i===0&&<span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:20,padding:"1px 8px",fontSize:10,color:T.gold,fontWeight:700}}>Latest</span>}</div>
-                <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Inter',system-ui"}}>{h.wordCount} words · {h.mistakeCount} mistakes · {new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</div>
+                <div style={{fontSize:13,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,marginBottom:2}}>{h.taskType==="task2"?"Task 2 Essay":h.taskType==="task1academic"?"Task 1 Academic":"Task 1 General"} {i===0&&<span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:20,padding:"1px 8px",fontSize:10,color:T.gold,fontWeight:700}}>Latest</span>}</div>
+                <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{h.wordCount} words · {h.mistakeCount} mistakes · {new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</div>
               </div>
-              <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Inter',system-ui",textAlign:"right"}}>{bandLabel(h.band)}</div>
+              <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",textAlign:"right"}}>{bandLabel(h.band)}</div>
             </div>
           ))}
         </div>
@@ -468,8 +461,8 @@ const ToolkitContent=({isPro,onUpgrade})=>{
       <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}>
         <div style={{fontSize:36}}>🔒</div>
         <div style={{textAlign:"center"}}>
-          <div style={{color:T.text,fontWeight:700,fontSize:15,fontFamily:"'Inter',system-ui",marginBottom:4}}>Pro Feature</div>
-          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Inter',system-ui"}}>Upgrade to Pro — $19/mo</button>
+          <div style={{color:T.text,fontWeight:700,fontSize:15,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Pro Feature</div>
+          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro — $19/mo</button>
         </div>
       </div>
     </div>
@@ -477,21 +470,21 @@ const ToolkitContent=({isPro,onUpgrade})=>{
   return (
     <div>
       <Card style={{marginBottom:16,background:"#fff5f5",border:"1px solid #ffcccc"}}>
-        <p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Inter',system-ui"}}>🎓 Your personal IELTS reference guide. {!isPro&&<span style={{color:T.textMid}}>Linking Words free. Upgrade for full access.</span>}</p>
+        <p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎓 Your personal IELTS reference guide. {!isPro&&<span style={{color:T.textMid}}>Linking Words free. Upgrade for full access.</span>}</p>
       </Card>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>
         {sections.map(s=>(
           <button key={s.key} onClick={()=>setSection(s.key)}
-            style={{background:section===s.key?T.primaryBg:T.bg3,border:section===s.key?`1px solid ${T.primary}`:`1px solid ${T.border}`,color:section===s.key?T.primary:T.textMid,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"'Inter',system-ui",display:"flex",alignItems:"center",gap:5}}>
+            style={{background:section===s.key?T.primaryLight:T.bgGray,border:section===s.key?`1px solid ${T.primary}`:`1px solid ${T.border}`,color:section===s.key?T.primary:T.textMid,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",alignItems:"center",gap:5}}>
             {s.label}{!s.free&&!isPro&&<span style={{fontSize:10}}>🔒</span>}
           </button>
         ))}
       </div>
-      {section==="linking"&&<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.linkingWords.map((cat,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:cat.color,marginBottom:10,fontFamily:"'Inter',system-ui",textTransform:"uppercase",letterSpacing:"0.06em"}}>{cat.category}</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{cat.words.map((w,j)=><span key={j} style={{background:`${cat.color}12`,border:`1px solid ${cat.color}40`,borderRadius:8,padding:"4px 12px",fontSize:13,color:cat.color,fontFamily:"'Inter',system-ui"}}>{w}</span>)}</div></Card>)}</div>}
-      {section==="vocab"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.vocabulary.map((topic,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:T.gold,marginBottom:10,fontFamily:"'Inter',system-ui",textTransform:"uppercase"}}>{topic.topic}</div><div style={{display:"flex",flexDirection:"column",gap:6}}>{topic.words.map((pair,j)=><div key={j} style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><span style={{background:"#fee2e2",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#991b1b",fontFamily:"'Inter',system-ui"}}>✗ {pair[0]}</span><span style={{color:T.textMuted}}>→</span><span style={{background:"#dcfce7",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#166534",fontFamily:"'Inter',system-ui"}}>✓ {pair[1]}</span></div>)}</div></Card>)}</div>:<LockedSection/>)}
-      {section==="grammar"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.grammarRules.map((item,i)=><Card key={i} style={{border:`1px solid ${T.blueBorder}`,background:T.blueBg}}><div style={{fontSize:13,fontWeight:700,color:T.blue,marginBottom:6,fontFamily:"'Inter',system-ui"}}>📐 {item.rule}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Inter',system-ui"}}>{item.tip}</p></Card>)}</div>:<LockedSection/>)}
-      {section==="peeves"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.petPeeves.map((item,i)=><Card key={i} style={{border:`1px solid ${T.redBorder}`,background:T.redBg}}><div style={{fontSize:13,fontWeight:700,color:T.red,marginBottom:6,fontFamily:"'Inter',system-ui"}}>⚠️ {item.peeve}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Inter',system-ui"}}>✅ {item.fix}</p></Card>)}</div>:<LockedSection/>)}
-      {section==="templates"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.templates.map((item,i)=><Card key={i} style={{border:`1px solid ${T.amberBorder}`,background:T.amberBg}}><div style={{fontSize:11,fontWeight:700,color:T.amber,marginBottom:8,fontFamily:"'Inter',system-ui",textTransform:"uppercase"}}>📝 {item.type}</div><p style={{color:T.text,fontSize:13,lineHeight:1.8,margin:0,fontFamily:"Georgia,serif",fontStyle:"italic",background:"white",padding:"10px 14px",borderRadius:8,whiteSpace:"pre-wrap",border:`1px solid ${T.amberBorder}`}}>{item.template}</p></Card>)}</div>:<LockedSection/>)}
+      {section==="linking"&&<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.linkingWords.map((cat,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:cat.color,marginBottom:10,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase",letterSpacing:"0.06em"}}>{cat.category}</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{cat.words.map((w,j)=><span key={j} style={{background:`${cat.color}12`,border:`1px solid ${cat.color}40`,borderRadius:8,padding:"4px 12px",fontSize:13,color:cat.color,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{w}</span>)}</div></Card>)}</div>}
+      {section==="vocab"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.vocabulary.map((topic,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:T.gold,marginBottom:10,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase"}}>{topic.topic}</div><div style={{display:"flex",flexDirection:"column",gap:6}}>{topic.words.map((pair,j)=><div key={j} style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><span style={{background:"#fee2e2",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#991b1b",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✗ {pair[0]}</span><span style={{color:T.textMuted}}>→</span><span style={{background:"#dcfce7",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#166534",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ {pair[1]}</span></div>)}</div></Card>)}</div>:<LockedSection/>)}
+      {section==="grammar"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.grammarRules.map((item,i)=><Card key={i} style={{border:`1px solid ${T.blueBorder}`,background:T.blueBg}}><div style={{fontSize:13,fontWeight:700,color:T.blue,marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📐 {item.rule}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{item.tip}</p></Card>)}</div>:<LockedSection/>)}
+      {section==="peeves"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.petPeeves.map((item,i)=><Card key={i} style={{border:`1px solid ${T.redBorder}`,background:T.redBg}}><div style={{fontSize:13,fontWeight:700,color:T.red,marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ {item.peeve}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✅ {item.fix}</p></Card>)}</div>:<LockedSection/>)}
+      {section==="templates"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.templates.map((item,i)=><Card key={i} style={{border:`1px solid ${T.amberBorder}`,background:T.amberBg}}><div style={{fontSize:11,fontWeight:700,color:T.amber,marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase"}}>📝 {item.type}</div><p style={{color:T.text,fontSize:13,lineHeight:1.8,margin:0,fontFamily:"Georgia,serif",fontStyle:"italic",background:"white",padding:"10px 14px",borderRadius:8,whiteSpace:"pre-wrap",border:`1px solid ${T.amberBorder}`}}>{item.template}</p></Card>)}</div>:<LockedSection/>)}
     </div>
   );
 };
@@ -543,13 +536,13 @@ const PracticeMode=({isPro,onUpgrade})=>{
   return (
     <div>
       <Card style={{marginBottom:20,background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-        <p style={{color:T.blue,fontSize:13,margin:0,fontFamily:"'Inter',system-ui"}}>🎯 <strong>Practice Mode</strong> — Write freely and get live AI coaching every ~1.5 seconds. Mistakes are highlighted inline in your essay. Each feedback uses one free try.</p>
+        <p style={{color:T.blue,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎯 <strong>Practice Mode</strong> — Write freely and get live AI coaching every ~1.5 seconds. Mistakes are highlighted inline in your essay. Each feedback uses one free try.</p>
       </Card>
       {!started?(
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
           <div style={{display:"flex",gap:8}}>
             {[["choose","📋 Choose a Question"],["custom","✏️ Write My Own"]].map(([mode,label])=>(
-              <button key={mode} onClick={()=>setQuestionMode(mode)} style={{flex:1,background:questionMode===mode?T.primary:T.bg3,border:`2px solid ${questionMode===mode?T.primary:T.border}`,borderRadius:10,padding:"10px",cursor:"pointer",color:questionMode===mode?"white":T.textMid,fontSize:13,fontWeight:700,fontFamily:"'Mulish', system-ui",boxShadow:questionMode===mode?T.shadowMd:'none',transition:'all 0.2s'}}>{label}</button>
+              <button key={mode} onClick={()=>setQuestionMode(mode)} style={{flex:1,background:questionMode===mode?T.primary:T.bgGray,border:`2px solid ${questionMode===mode?T.primary:T.border}`,borderRadius:10,padding:"10px",cursor:"pointer",color:questionMode===mode?"white":T.textMid,fontSize:13,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:questionMode===mode?T.shadowMd:'none',transition:'all 0.2s'}}>{label}</button>
             ))}
           </div>
           {questionMode==="choose"&&(
@@ -557,13 +550,13 @@ const PracticeMode=({isPro,onUpgrade})=>{
               <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
                 {Object.keys(PRACTICE_QUESTIONS).map(topic=>(
                   <button key={topic} onClick={()=>{ setSelectedTopic(topic); setSelectedQuestion(""); }}
-                    style={{background:selectedTopic===topic?T.primary:T.bg3,border:`1px solid ${selectedTopic===topic?T.primary:T.border}`,borderRadius:20,padding:"6px 16px",cursor:"pointer",color:selectedTopic===topic?"white":T.textMid,fontSize:12,fontWeight:700,fontFamily:"'Mulish', system-ui",boxShadow:selectedTopic===topic?T.shadowMd:'none',transition:'all 0.18s'}}>{topic}</button>
+                    style={{background:selectedTopic===topic?T.primary:T.bgGray,border:`1px solid ${selectedTopic===topic?T.primary:T.border}`,borderRadius:20,padding:"6px 16px",cursor:"pointer",color:selectedTopic===topic?"white":T.textMid,fontSize:12,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:selectedTopic===topic?T.shadowMd:'none',transition:'all 0.18s'}}>{topic}</button>
                 ))}
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 {PRACTICE_QUESTIONS[selectedTopic].map((q,i)=>(
                   <div key={i} onClick={()=>setSelectedQuestion(q)}
-                    style={{background:selectedQuestion===q?"#fff5f5":T.bg3,border:selectedQuestion===q?`2px solid ${T.red}`:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",color:selectedQuestion===q?T.red:T.textMid,fontSize:13,fontFamily:"'Inter',system-ui",lineHeight:1.6,transition:"all 0.15s",boxShadow:T.shadow}}>
+                    style={{background:selectedQuestion===q?T.primaryLight:T.bgGray,border:selectedQuestion===q?`2px solid ${T.primary}`:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",color:selectedQuestion===q?T.primary:T.textMid,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,transition:"all 0.15s",boxShadow:T.shadow}}>
                     {i+1}. {q}
                   </div>
                 ))}
@@ -572,39 +565,39 @@ const PracticeMode=({isPro,onUpgrade})=>{
           )}
           {questionMode==="custom"&&(
             <div>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Inter',system-ui",fontWeight:600}}>Your Question</label>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>Your Question</label>
               <textarea value={customQuestion} onChange={e=>setCustomQuestion(e.target.value)} rows={3}
                 placeholder="Paste your own IELTS question here..."
-                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
             </div>
           )}
           <button onClick={()=>{ if(question) setStarted(true); }} disabled={!question}
-            style={{background:question?T.primary:T.bg3,border:`2px solid ${question?T.primary:T.border}`,borderRadius:10,color:question?"white":T.textMuted,fontSize:15,fontWeight:700,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"'Mulish', system-ui",boxShadow:question?T.shadowMd:"none",transition:"all 0.2s"}}>
+            style={{background:question?T.primary:T.bgGray,border:`1px solid ${question?T.primary:T.border}`,borderRadius:10,color:question?"white":T.textMuted,fontSize:15,fontWeight:700,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:question?T.shadowMd:"none",transition:"all 0.2s"}}>
             {question?"🖊️ Start Practice Session":"Select a question to begin"}
           </button>
         </div>
       ):(
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
           <Card style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-            <div style={{fontSize:11,color:T.blue,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6,fontFamily:"'Inter',system-ui"}}>Your Question</div>
-            <p style={{color:T.text,fontSize:14,margin:0,lineHeight:1.6,fontFamily:"'Inter',system-ui"}}>{question}</p>
+            <div style={{fontSize:11,color:T.blue,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Question</div>
+            <p style={{color:T.text,fontSize:14,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{question}</p>
           </Card>
 
           <div style={{display:"flex",gap:16,alignItems:"flex-start",flexWrap:"wrap"}}>
             {/* Writing area */}
             <div style={{flex:2,minWidth:280,display:"flex",flexDirection:"column",gap:10}}>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Inter',system-ui",fontWeight:600}}>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
                 Your Essay
                 <span style={{color:wordCount>=250?T.green:wordCount>=150?T.amber:T.red,marginLeft:10,fontWeight:400}}>{wordCount} words {wordCount>=250?"✓":wordCount>=150?"(keep going!)":"(too short)"}</span>
               </label>
               <textarea value={practiceEssay} onChange={handleEssayChange} rows={12}
                 placeholder="Start writing here — live feedback and inline corrections appear as you pause!"
-                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
 
               {/* Annotated preview */}
               {showAnnotated&&liveFeedback&&practiceAnnotations.length>0&&(
                 <Card style={{border:`1px solid ${T.amberBorder}`}}>
-                  <div style={{fontSize:11,color:T.amber,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Inter',system-ui",display:"flex",justifyContent:"space-between"}}>
+                  <div style={{fontSize:11,color:T.amber,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between"}}>
                     <span>✏️ Your Essay — Click underlined mistakes</span>
                     <span style={{color:T.red}}>{practiceAnnotations.length} spotted</span>
                   </div>
@@ -613,25 +606,25 @@ const PracticeMode=({isPro,onUpgrade})=>{
               )}
 
               <button onClick={()=>{ setStarted(false); setPracticeEssay(""); setLiveFeedback(null); setShowAnnotated(false); setSelectedQuestion(""); setCustomQuestion(""); }}
-                style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,color:T.textMid,fontSize:12,padding:"6px 14px",cursor:"pointer",fontFamily:"'Inter',system-ui",alignSelf:"flex-start"}}>← Change Question</button>
+                style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,color:T.textMid,fontSize:12,padding:"6px 14px",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",alignSelf:"flex-start"}}>← Change Question</button>
             </div>
 
             {/* Live feedback panel */}
             <div style={{flex:1,minWidth:220,display:"flex",flexDirection:"column",gap:10}}>
-              <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Inter',system-ui"}}>
+              <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
                 {loadingFeedback?"🔍 Analysing...":"💬 Live Coaching"}
               </div>
-              {loadingFeedback&&<Card style={{textAlign:"center",background:T.blueBg,border:`1px solid ${T.blueBorder}`}}><div style={{color:T.blue,fontSize:13,fontFamily:"'Inter',system-ui"}}>Reading your essay... 🎓</div></Card>}
+              {loadingFeedback&&<Card style={{textAlign:"center",background:T.blueBg,border:`1px solid ${T.blueBorder}`}}><div style={{color:T.blue,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Reading your essay... 🎓</div></Card>}
               {liveFeedback&&!loadingFeedback&&(
                 <>
                   <Card style={{display:"flex",alignItems:"center",gap:12}}>
                     <div style={{fontSize:36,fontWeight:900,color:bandColor(liveFeedback.estimatedBand),fontFamily:"Georgia,serif",lineHeight:1}}>{liveFeedback.estimatedBand}</div>
-                    <div><div style={{fontSize:10,color:T.textMuted,fontFamily:"'Inter',system-ui",textTransform:"uppercase",letterSpacing:"0.08em"}}>Estimated Band</div><div style={{fontSize:13,color:bandColor(liveFeedback.estimatedBand),fontFamily:"'Inter',system-ui",fontWeight:700}}>{bandLabel(liveFeedback.estimatedBand)}</div></div>
+                    <div><div style={{fontSize:10,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase",letterSpacing:"0.08em"}}>Estimated Band</div><div style={{fontSize:13,color:bandColor(liveFeedback.estimatedBand),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>{bandLabel(liveFeedback.estimatedBand)}</div></div>
                   </Card>
-                  {liveFeedback.quickFix&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><div style={{fontSize:11,color:T.red,fontWeight:700,marginBottom:4,fontFamily:"'Inter',system-ui"}}>🚨 QUICK FIX</div><p style={{color:"#991b1b",fontSize:13,margin:0,lineHeight:1.5,fontFamily:"'Inter',system-ui"}}>{liveFeedback.quickFix}</p></Card>}
+                  {liveFeedback.quickFix&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><div style={{fontSize:11,color:T.red,fontWeight:700,marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🚨 QUICK FIX</div><p style={{color:"#991b1b",fontSize:13,margin:0,lineHeight:1.5,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{liveFeedback.quickFix}</p></Card>}
                   {liveFeedback.spotErrors?.length>0&&(
                     <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`}}>
-                      <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:8,fontFamily:"'Inter',system-ui"}}>✏️ ERRORS SPOTTED ({liveFeedback.spotErrors.length})</div>
+                      <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✏️ ERRORS SPOTTED ({liveFeedback.spotErrors.length})</div>
                       {liveFeedback.spotErrors.map((e,i)=>(
                         <div key={i} style={{marginBottom:8,paddingBottom:8,borderBottom:i<liveFeedback.spotErrors.length-1?`1px solid ${T.amberBorder}`:"none"}}>
                           <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:4,flexWrap:"wrap"}}>
@@ -639,19 +632,19 @@ const PracticeMode=({isPro,onUpgrade})=>{
                             <span style={{color:T.textMuted,fontSize:12}}>→</span>
                             <span style={{background:"#dcfce7",borderRadius:4,padding:"1px 6px",fontSize:12,color:"#166534",fontWeight:600}}>"{e.correction}"</span>
                           </div>
-                          <div style={{fontSize:11,color:T.textMid,fontFamily:"'Inter',system-ui"}}>{e.explanation}</div>
+                          <div style={{fontSize:11,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{e.explanation}</div>
                         </div>
                       ))}
                     </Card>
                   )}
                   <Card style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-                    <div style={{fontSize:11,color:T.blue,fontWeight:700,marginBottom:8,fontFamily:"'Inter',system-ui"}}>💡 TIPS</div>
-                    {liveFeedback.tips?.map((tip,i)=><div key={i} style={{color:T.textMid,fontSize:13,lineHeight:1.5,marginBottom:5,fontFamily:"'Inter',system-ui"}}>• {tip}</div>)}
+                    <div style={{fontSize:11,color:T.blue,fontWeight:700,marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 TIPS</div>
+                    {liveFeedback.tips?.map((tip,i)=><div key={i} style={{color:T.textMid,fontSize:13,lineHeight:1.5,marginBottom:5,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>• {tip}</div>)}
                   </Card>
-                  {liveFeedback.encouragement&&<Card style={{background:"#fff5f5",border:"1px solid #ffcccc"}}><p style={{color:T.gold,fontSize:12,margin:0,fontStyle:"italic",fontFamily:"'Inter',system-ui"}}>💬 {liveFeedback.encouragement}</p></Card>}
+                  {liveFeedback.encouragement&&<Card style={{background:"#fff5f5",border:"1px solid #ffcccc"}}><p style={{color:T.gold,fontSize:12,margin:0,fontStyle:"italic",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💬 {liveFeedback.encouragement}</p></Card>}
                 </>
               )}
-              {!liveFeedback&&!loadingFeedback&&<Card style={{textAlign:"center",padding:"24px 16px"}}><div style={{fontSize:28,marginBottom:8}}>🖊️</div><p style={{color:T.textMuted,fontSize:13,margin:0,fontFamily:"'Inter',system-ui"}}>Start writing — feedback and corrections appear after a short pause!</p></Card>}
+              {!liveFeedback&&!loadingFeedback&&<Card style={{textAlign:"center",padding:"24px 16px"}}><div style={{fontSize:28,marginBottom:8}}>🖊️</div><p style={{color:T.textMuted,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Start writing — feedback and corrections appear after a short pause!</p></Card>}
             </div>
           </div>
         </div>
@@ -715,8 +708,8 @@ const ContactPage = () => {
     }
   };
 
-  const inputStyle = { width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", fontFamily:"'Inter',system-ui", outline:"none", boxSizing:"border-box", boxShadow:T.shadow, transition:"border-color 0.2s" };
-  const labelStyle = { display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6, fontFamily:"'Inter',system-ui", fontWeight:600 };
+  const inputStyle = { width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", fontFamily:"'Source Sans Pro','Inter',system-ui", outline:"none", boxSizing:"border-box", boxShadow:T.shadow, transition:"border-color 0.2s" };
+  const labelStyle = { display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6, fontFamily:"'Source Sans Pro','Inter',system-ui", fontWeight:600 };
 
   return (
     <div style={{maxWidth:600,margin:"0 auto",padding:"24px 16px 0"}}>
@@ -724,8 +717,8 @@ const ContactPage = () => {
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{fontSize:48,marginBottom:12}}>✉️</div>
         <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900}}>Contact Us</h2>
-        <p style={{color:T.textMid,fontSize:15,fontFamily:"'Inter',system-ui",margin:0,lineHeight:1.6}}>Have a question, feedback or need support? We'd love to hear from you.</p>
-        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Inter',system-ui",marginTop:4,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور.</p>
+        <p style={{color:T.textMid,fontSize:15,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0,lineHeight:1.6}}>Have a question, feedback or need support? We'd love to hear from you.</p>
+        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور.</p>
       </div>
 
       <Card style={{border:"2px solid #e0e0e0"}}>
@@ -767,18 +760,18 @@ const ContactPage = () => {
           </div>
 
           {/* Status messages */}
-          {status==="error"&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Inter',system-ui"}}>⚠️ Please fill in all required fields (Name, Email, Message).</p></Card>}
-          {status==="success"&&<Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Inter',system-ui"}}>✅ Message sent successfully! We'll get back to you soon. / تم إرسال رسالتك بنجاح!</p></Card>}
+          {status==="error"&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Please fill in all required fields (Name, Email, Message).</p></Card>}
+          {status==="success"&&<Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✅ Message sent successfully! We'll get back to you soon. / تم إرسال رسالتك بنجاح!</p></Card>}
 
           {/* Submit button */}
           <button onClick={handleSubmit} disabled={status==="sending"}
-            style={{background:status==="sending"?T.bg3:T.primary,border:"none",borderRadius:8,color:status==="sending"?T.textMuted:"white",fontSize:14,fontWeight:600,padding:"14px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Inter',system-ui",boxShadow:status==="sending"?"none":T.shadowMd}}>
+            style={{background:status==="sending"?T.bgGray:T.primary,border:"none",borderRadius:4,color:status==="sending"?T.textMuted:"white",fontSize:14,fontWeight:600,padding:"14px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadow}}>
             {status==="sending"?"⏳ Sending...":"Send Message →"}
           </button>
 
           {/* EmailJS setup note */}
           {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(
-            <p style={{textAlign:"center",color:T.textMuted,fontSize:11,fontFamily:"'Inter',system-ui",fontStyle:"italic",margin:0}}>
+            <p style={{textAlign:"center",color:T.textMuted,fontSize:11,fontFamily:"'Source Sans Pro','Inter',system-ui",fontStyle:"italic",margin:0}}>
               📧 EmailJS not configured yet — messages won't be delivered until you add your EmailJS keys in the code.
             </p>
           )}
@@ -846,95 +839,162 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh", background:T.bg, fontFamily:"'Inter', system-ui, sans-serif"}}>
+    <div style={{minHeight:"100vh", background:T.bgMuted, fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif", color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
 
-      {/* ══ STICKY NAV BAR ══ */}
+      {/* ══════════════════════════════════════
+          STICKY NAV — exact Coursera layout
+      ══════════════════════════════════════ */}
       <div style={{
         position:"sticky", top:0, zIndex:200,
-        background:T.bg2,
+        background:T.bg,
         borderBottom:`1px solid ${T.border}`,
-        boxShadow:T.shadowNav
+        boxShadow:T.shadowNav,
       }}>
         <div style={{maxWidth:1200, margin:"0 auto", padding:"0 24px", display:"flex", alignItems:"center", justifyContent:"space-between", height:64}}>
           {/* Logo */}
-          <div style={{display:"flex", alignItems:"center", gap:8}}>
-            <div style={{background:T.primary, color:"white", fontWeight:700, fontSize:15, padding:"5px 12px", borderRadius:6, fontFamily:"'Inter',system-ui", letterSpacing:"-0.2px"}}>BandUp AI</div>
-            <span style={{color:T.textMuted, fontSize:12, fontFamily:"'Inter',system-ui", letterSpacing:"0.05em", textTransform:"uppercase", marginLeft:4}}>IELTS Writing</span>
+          <div style={{display:"flex", alignItems:"center", gap:10}}>
+            <span style={{
+              color:T.primary, fontWeight:800, fontSize:22,
+              fontFamily:"'Source Sans Pro','Inter',system-ui",
+              letterSpacing:"-0.5px"
+            }}>BandUp AI</span>
+            <span style={{
+              background:T.primaryLight, color:T.primary,
+              fontSize:11, fontWeight:700, padding:"2px 8px",
+              borderRadius:4, letterSpacing:"0.05em", textTransform:"uppercase"
+            }}>IELTS</span>
           </div>
           {/* Right controls */}
-          <div style={{display:"flex", alignItems:"center", gap:10}}>
+          <div style={{display:"flex", alignItems:"center", gap:12}}>
             <div style={{
-              background: proUser ? T.greenBg : usesLeft<=0 ? T.redBg : T.primaryBg,
-              border: `1px solid ${proUser ? T.greenBorder : usesLeft<=0 ? T.redBorder : T.primaryBorder}`,
-              borderRadius:20, padding:"4px 14px", fontSize:12, fontWeight:600,
-              color: proUser ? T.green : usesLeft<=0 ? T.red : T.primary,
-              fontFamily:"'Inter',system-ui"
+              fontSize:13, fontWeight:600, color:T.textMuted,
+              fontFamily:"'Source Sans Pro','Inter',system-ui"
             }}>
-              {proUser ? "✓ Pro — Unlimited" : usesLeft>0 ? `${usesLeft} free ${usesLeft===1?"analysis":"analyses"} left` : "Free limit reached"}
+              {proUser
+                ? <span style={{color:T.green}}>✓ Pro — Unlimited</span>
+                : usesLeft>0
+                  ? `${usesLeft} free ${usesLeft===1?"analysis":"analyses"} left`
+                  : <span style={{color:T.red}}>Upgrade to continue</span>
+              }
             </div>
+            <div style={{width:1, height:20, background:T.border}}/>
             {["en","ar"].map(l=>(
               <button key={l} onClick={()=>switchLang(l)} style={{
-                background: lang===l ? T.primaryBg : "transparent",
+                background: lang===l ? T.primaryLight : "transparent",
                 border: `1px solid ${lang===l ? T.primaryBorder : T.border}`,
-                borderRadius:6, padding:"5px 12px", fontSize:12, fontWeight:600,
+                borderRadius:4, padding:"5px 12px",
+                fontSize:13, fontWeight:lang===l?700:400,
                 color: lang===l ? T.primary : T.textMuted,
-                cursor:"pointer", fontFamily:"'Inter',system-ui", transition:"all 0.15s"
-              }}>{l==="en"?"🇬🇧 EN":"🇸🇦 AR"}</button>
+                cursor:"pointer",
+                fontFamily:"'Source Sans Pro','Inter',system-ui",
+                transition:"all 0.15s"
+              }}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ══ HERO SECTION ══ */}
-      <div style={{background:`linear-gradient(135deg, ${T.primary} 0%, #1d4ed8 100%)`, padding:"52px 24px 56px"}}>
-        <div style={{maxWidth:1200, margin:"0 auto"}}>
-          <div style={{display:"inline-flex", alignItems:"center", gap:8, background:"rgba(255,255,255,0.15)", borderRadius:20, padding:"5px 14px", marginBottom:20}}>
-            <div style={{width:6, height:6, borderRadius:"50%", background:T.accent}}/>
-            <span style={{color:"rgba(255,255,255,0.9)", fontSize:11, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:600, fontFamily:"'Inter',system-ui"}}>AI-Powered · IELTS Writing Examiner</span>
+      {/* ══════════════════════════════════════
+          HERO — Coursera style dark blue banner
+      ══════════════════════════════════════ */}
+      <div style={{background:"#1c1d1f", padding:"40px 24px 44px"}}>
+        <div style={{maxWidth:1200, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", gap:32, flexWrap:"wrap"}}>
+          <div style={{flex:1, minWidth:300}}>
+            <div style={{
+              display:"inline-flex", alignItems:"center", gap:8,
+              background:"rgba(255,255,255,0.1)", borderRadius:4,
+              padding:"4px 12px", marginBottom:16
+            }}>
+              <span style={{color:"rgba(255,255,255,0.85)", fontSize:12, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-Powered · IELTS Writing</span>
+            </div>
+            <h1 style={{
+              margin:"0 0 12px",
+              fontSize:"clamp(26px,3.5vw,40px)",
+              fontWeight:700,
+              fontFamily:"'Source Sans Pro','Inter',system-ui",
+              color:"#fff",
+              lineHeight:1.2,
+              letterSpacing:"-0.3px"
+            }}>
+              The smarter way to prepare<br/>
+              for IELTS Writing
+            </h1>
+            <p style={{
+              color:"rgba(255,255,255,0.7)",
+              fontSize:16, lineHeight:1.6,
+              fontFamily:"'Source Sans Pro','Inter',system-ui",
+              margin:"0 0 24px", maxWidth:520
+            }}>
+              Instant AI band scores · Complete mistake detection ·<br/>Band 8+ model essays · Practice Mode
+            </p>
+            <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
+              {["✍️ Task 2 Essay","📊 Task 1 Academic","✉️ Task 1 General"].map(label=>(
+                <div key={label} style={{
+                  background:"rgba(255,255,255,0.1)",
+                  border:"1px solid rgba(255,255,255,0.2)",
+                  borderRadius:4, padding:"6px 14px",
+                  color:"rgba(255,255,255,0.85)",
+                  fontSize:13, fontFamily:"'Source Sans Pro','Inter',system-ui", fontWeight:500
+                }}>{label}</div>
+              ))}
+            </div>
           </div>
-          <h1 style={{margin:"0 0 14px", fontSize:"clamp(28px,4vw,48px)", fontWeight:700, fontFamily:"'Inter',system-ui", color:"#fff", lineHeight:1.15, letterSpacing:"-0.5px"}}>
-            Write better. Score higher.
-          </h1>
-          <p style={{color:"rgba(255,255,255,0.8)", fontSize:16, fontFamily:"'Inter',system-ui", margin:"0 0 28px", lineHeight:1.6, maxWidth:560}}>
-            Instant AI band scores · Complete mistake detection · Band 8+ model essays · Practice Mode
-          </p>
-          <div style={{display:"flex", gap:10, flexWrap:"wrap"}}>
-            {[["✍️","Task 2 Essay"], ["📊","Task 1 Academic"], ["✉️","Task 1 General"]].map(([icon,label])=>(
-              <div key={label} style={{background:"rgba(255,255,255,0.15)", border:"1px solid rgba(255,255,255,0.25)", borderRadius:8, padding:"8px 16px", color:"white", fontSize:13, fontFamily:"'Inter',system-ui", fontWeight:500, backdropFilter:"blur(4px)"}}>
-                {icon} {label}
+          {/* Stats */}
+          <div style={{display:"flex", gap:32, flexWrap:"wrap"}}>
+            {[["9", "Band Levels"], ["4", "Criteria Assessed"], ["100%", "AI Powered"]].map(([num, label])=>(
+              <div key={label} style={{textAlign:"center"}}>
+                <div style={{fontSize:32, fontWeight:700, color:"#fff", fontFamily:"'Source Sans Pro','Inter',system-ui", lineHeight:1}}>{num}</div>
+                <div style={{fontSize:13, color:"rgba(255,255,255,0.6)", fontFamily:"'Source Sans Pro','Inter',system-ui", marginTop:4}}>{label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ══ CONTENT AREA ══ */}
+      {/* ══════════════════════════════════════
+          MAIN CONTENT WRAPPER
+      ══════════════════════════════════════ */}
       <div style={{maxWidth:1200, margin:"0 auto", padding:"0 24px 80px"}}>
 
-        {/* Secondary nav tabs */}
-        <div style={{background:T.bg2, border:`1px solid ${T.border}`, borderRadius:"0 0 10px 10px", marginBottom:24, boxShadow:T.shadow, display:"flex", overflowX:"auto"}}>
-          <MainTab label="🎓 Analyze Essay"  active={mainView==="analyze"}  onClick={()=>{ setMainView("analyze");  trackEvent("nav_click",{page:"analyze"}); }}/>
-          <MainTab label="🖊️ Practice Mode"  active={mainView==="practice"} onClick={()=>{ setMainView("practice"); trackEvent("nav_click",{page:"practice"}); }}/>
-          <MainTab label="📈 Progress"        active={mainView==="progress"} onClick={()=>{ setMainView("progress"); trackEvent("nav_click",{page:"progress"}); }}/>
-          <MainTab label="📚 Toolkit"         active={mainView==="toolkit"}  onClick={()=>{ setMainView("toolkit");  trackEvent("nav_click",{page:"toolkit"}); }}/>
-          <MainTab label="✉️ Contact"         active={mainView==="contact"}  onClick={()=>{ setMainView("contact");  trackEvent("nav_click",{page:"contact"}); }}/>
+        {/* Tab navigation — Coursera style horizontal underline */}
+        <div style={{
+          background:T.bg,
+          borderBottom:`1px solid ${T.border}`,
+          display:"flex", overflowX:"auto",
+          marginBottom:0,
+          position:"sticky", top:64, zIndex:100,
+          boxShadow:T.shadowNav
+        }}>
+          <MainTab label="🎓 Analyze Essay"  active={mainView==="analyze"}  onClick={()=>{setMainView("analyze"); trackEvent("nav_click",{page:"analyze"});}}/>
+          <MainTab label="🖊️ Practice Mode"  active={mainView==="practice"} onClick={()=>{setMainView("practice"); trackEvent("nav_click",{page:"practice"});}}/>
+          <MainTab label="📈 My Progress"    active={mainView==="progress"} onClick={()=>{setMainView("progress"); trackEvent("nav_click",{page:"progress"});}}/>
+          <MainTab label="📚 IELTS Toolkit"  active={mainView==="toolkit"}  onClick={()=>{setMainView("toolkit"); trackEvent("nav_click",{page:"toolkit"});}}/>
+          <MainTab label="✉️ Contact"        active={mainView==="contact"}  onClick={()=>{setMainView("contact"); trackEvent("nav_click",{page:"contact"});}}/>
         </div>
 
-        {/* Page content */}
-        <div style={{background:T.bg2, border:`1px solid ${T.border}`, borderRadius:10, padding:"28px 28px 36px", boxShadow:T.shadow}}>
+        {/* Content card */}
+        <div style={{
+          background:T.bg,
+          border:`1px solid ${T.border}`,
+          borderTop:"none",
+          borderRadius:"0 0 8px 8px",
+          padding:"32px 32px 40px",
+          boxShadow:T.shadow,
+          minHeight:400
+        }}>
 
         {/* ── ANALYZE ── */}
         {mainView==="analyze"&&(
           <div style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px",backdropFilter:"blur(20px)"}}>
             <div style={{marginBottom:20}}>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"'Mulish', system-ui",fontWeight:700}}>Select Task Type</label>
-              <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Inter',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>Select Task Type</label>
+              <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
                   <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); }}
                     style={{
-                      background: taskType===key ? T.primaryBg : T.bg3,
+                      background: taskType===key ? T.primaryLight : T.bgGray,
                       border: `2px solid ${taskType===key ? T.primary : T.border}`,
                       borderRadius: 10,
                       padding: "18px 12px",
@@ -945,8 +1005,8 @@ export default function IELTSBot(){
                       transition: "all 0.2s"
                     }}>
                     <div style={{fontSize:22,marginBottom:6}}>{task.icon}</div>
-                    <div style={{fontSize:12,fontWeight:700,color:taskType===key?T.primary:T.text,fontFamily:"'Inter',system-ui",marginBottom:4,fontWeight:600,fontSize:13}}>{task.label}</div>
-                    <div style={{fontSize:11,color:T.textMuted,fontFamily:"'Inter',system-ui"}}>{task.description}</div>
+                    <div style={{fontSize:12,fontWeight:700,color:taskType===key?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4,fontWeight:600,fontSize:13}}>{task.label}</div>
+                    <div style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{task.description}</div>
                   </button>
                 ))}
               </div>
@@ -954,9 +1014,9 @@ export default function IELTSBot(){
 
             {taskType==="task1academic"&&(
               <div style={{marginBottom:16}}>
-                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Inter',system-ui",fontWeight:600}}>Upload Graph / Chart Image *</label>
+                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>Upload Graph / Chart Image *</label>
                 <div onClick={()=>fileRef.current.click()} style={{border:`2px dashed ${imagePreview?T.greenBorder:"#e2001a"}`,borderRadius:12,padding:"20px",textAlign:"center",cursor:"pointer",background:"white",boxShadow:T.shadow}}>
-                  {imagePreview?(<div><img src={imagePreview} alt="graph" style={{maxHeight:180,maxWidth:"100%",borderRadius:8,marginBottom:8}}/><div style={{fontSize:12,color:T.green,fontFamily:"'Inter',system-ui"}}>✓ Uploaded — click to change</div></div>):(<div><div style={{fontSize:32,marginBottom:8}}>📊</div><div style={{fontSize:14,color:T.gold,fontFamily:"'Inter',system-ui",marginBottom:4}}>Click to upload graph/chart image</div><div style={{fontSize:12,color:T.textMuted,fontFamily:"'Inter',system-ui"}}>JPG, PNG — AI reads and evaluates the graph</div></div>)}
+                  {imagePreview?(<div><img src={imagePreview} alt="graph" style={{maxHeight:180,maxWidth:"100%",borderRadius:8,marginBottom:8}}/><div style={{fontSize:12,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Uploaded — click to change</div></div>):(<div><div style={{fontSize:32,marginBottom:8}}>📊</div><div style={{fontSize:14,color:T.gold,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Click to upload graph/chart image</div><div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>JPG, PNG — AI reads and evaluates the graph</div></div>)}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{display:"none"}}/>
               </div>
@@ -964,50 +1024,50 @@ export default function IELTSBot(){
 
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
               <div>
-                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Mulish', system-ui",fontWeight:700}}>
+                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
                   {taskType==="task1general"?"Letter Task Instructions":taskType==="task1academic"?"Task Description":"Essay Question / Topic"}
                 </label>
                 <textarea value={topic} onChange={e=>setTopic(e.target.value)} rows={3}
                   placeholder={taskType==="task2"?"e.g. Some people think universities should focus on job skills. Discuss both views and give your opinion.":taskType==="task1academic"?"e.g. The graph below shows changes in energy consumption. Summarise the information and make comparisons.":"e.g. You recently bought a laptop online but it arrived damaged. Write a letter to the manager."}
-                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               <div>
-                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Mulish', system-ui",fontWeight:700}}>
+                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:7,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
                   Student's Response <span style={{fontSize:11,color:T.textMuted,fontWeight:400,textTransform:"none",letterSpacing:0}}>(minimum {minWords} words required for Task {taskType==="task2"?"2":"1"})</span>
-                  <span style={{color:wordCount>=minWords?T.green:wordCount>=(minWords*0.6)?T.amber:T.red,marginLeft:10,fontWeight:500,fontFamily:"'Inter',system-ui"}}>
+                  <span style={{color:wordCount>=minWords?T.green:wordCount>=(minWords*0.6)?T.amber:T.red,marginLeft:10,fontWeight:500,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
                     {wordCount} words {wordCount>=minWords?"✓":`(min. ${minWords} required${wordCount>10&&wordCount<minWords?" — penalty applies":""})`}
                   </span>
                 </label>
                 <textarea value={essay} onChange={e=>setEssay(e.target.value)}
                   placeholder={taskType==="task1general"?"Dear Sir/Madam,\n\nI am writing to...":taskType==="task1academic"?"The graph illustrates...":"Paste the student's essay here..."}
                   rows={10}
-                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Mulish', system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                  style={{width:"100%",background:T.bg3,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
-              {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"'Inter',system-ui"}}>{error}</p></Card>}
+              {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</p></Card>}
               {!proUser&&usesLeft===1&&(
                 <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center"}}>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Inter',system-ui"}}>⚠️ Last free analysis! </span>
-                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Inter',system-ui"}}>Upgrade to Pro</button>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Inter',system-ui"}}> for unlimited access.</span>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Last free analysis! </span>
+                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro</button>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}> for unlimited access.</span>
                 </Card>
               )}
               <button ref={analyzeRef} onClick={analyze} disabled={loading}
                 style={{
-                  background: loading ? T.bg3 : T.primary,
+                  background: loading ? T.bgGray : T.primary,
                   border: "none",
-                  borderRadius: 10,
-                  color: "#fff",
+                  borderRadius: 4,
+                  color: loading ? T.textMuted : "#fff",
                   fontSize: 15,
                   fontWeight: 700,
-                  padding: "16px 36px",
+                  padding: "14px 32px",
                   cursor: loading ? "not-allowed" : "pointer",
-                  fontFamily: "'Mulish', system-ui",
-                  transition: "all 0.2s",
+                  fontFamily: "'Source Sans Pro', 'Inter', system-ui",
+                  transition: "background 0.15s",
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
                   justifyContent: "center",
-                  boxShadow: loading ? "none" : T.shadowMd,
+                  boxShadow: "none",
                   letterSpacing: "0.01em"
                 }}>
                 {loading ? "⏳ Examining..." : !proUser&&usesLeft<=0 ? "🔓 Upgrade to Continue" : `Analyze ${TASK_TYPES[taskType].label} →`}
@@ -1015,25 +1075,25 @@ export default function IELTSBot(){
 
               {/* Language Selector */}
               <Card style={{background:T.bg3,border:`1px solid ${T.border}`,marginTop:4}}>
-                <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Inter',system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
+                <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
                   <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?T.red:"white",border:`1px solid ${lang==="en"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇬🇧</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?"white":T.text,fontFamily:"'Inter',system-ui",marginBottom:2}}>English — Feedback in English</div>
-                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Inter',system-ui"}}>All scores, corrections and tips will appear in English.</div>
-                      {lang==="en"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"'Inter',system-ui",marginTop:4}}>⚠️ Switching language will re-run the analysis.</div>}
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?"white":T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>English — Feedback in English</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>All scores, corrections and tips will appear in English.</div>
+                      {lang==="en"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>⚠️ Switching language will re-run the analysis.</div>}
                     </div>
-                    {lang==="en"&&<span style={{background:T.red,color:"white",borderRadius:2,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Inter',system-ui",flexShrink:0}}>✓ Active</span>}
+                    {lang==="en"&&<span style={{background:T.red,color:"white",borderRadius:2,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ Active</span>}
                   </div>
                   <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="ar"?T.red:"white",border:`1px solid ${lang==="ar"?T.red:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s",direction:"ltr"}} onClick={()=>switchLang("ar")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇸🇦</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?"white":T.text,fontFamily:"'Inter',system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
-                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Inter',system-ui",direction:"rtl",textAlign:"right"}}>ستظهر جميع الدرجات والتصحيحات والنصائح باللغة العربية.</div>
-                      {lang==="ar"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"'Inter',system-ui",marginTop:4,direction:"rtl",textAlign:"right"}}>⚠️ تغيير اللغة سيُعيد تحليل المقال من جديد.</div>}
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?"white":T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",direction:"rtl",textAlign:"right"}}>ستظهر جميع الدرجات والتصحيحات والنصائح باللغة العربية.</div>
+                      {lang==="ar"&&result&&<div style={{fontSize:11,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4,direction:"rtl",textAlign:"right"}}>⚠️ تغيير اللغة سيُعيد تحليل المقال من جديد.</div>}
                     </div>
-                    {lang==="ar"&&<span style={{background:T.red,color:"white",borderRadius:2,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Inter',system-ui",flexShrink:0}}>✓ نشط</span>}
+                    {lang==="ar"&&<span style={{background:T.red,color:"white",borderRadius:2,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ نشط</span>}
                   </div>
                 </div>
               </Card>
@@ -1042,7 +1102,7 @@ export default function IELTSBot(){
             {result&&(
               <div style={{marginTop:32}}>
                 <div style={{
-                  background:`linear-gradient(135deg, ${T.primary} 0%, #1d4ed8 100%)`,
+                  background:`linear-gradient(135deg, #1c1d1f 0%, #2d3748 100%)`,
                   borderRadius:12,
                   padding:"28px 32px",
                   marginBottom:24,
@@ -1060,12 +1120,12 @@ export default function IELTSBot(){
                   <div style={{flex:1,minWidth:180}}>
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
                       <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand)}}>User</span></div>
-                      <span style={{background:"white",border:`1px solid ${result.wordCount>=minWords?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.2)"}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:"white",fontFamily:"'Inter',system-ui",fontWeight:600}}>
+                      <span style={{background:"white",border:`1px solid ${result.wordCount>=minWords?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.2)"}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
                         {result.wordCount} words {result.wordCount>=minWords?"✓":"⚠ below minimum"}
                       </span>
                     </div>
                     <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                      {result.strengths?.map((s,i)=><span key={i} style={{background:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"3px 12px",fontSize:12,color:"white",fontFamily:"'Inter',system-ui",fontWeight:600}}>✓ {s}</span>)}
+                      {result.strengths?.map((s,i)=><span key={i} style={{background:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"3px 12px",fontSize:12,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>✓ {s}</span>)}
                     </div>
                   </div>
                 </div>
@@ -1073,12 +1133,12 @@ export default function IELTSBot(){
                 {result.mistakes?.length>0&&(
                   <Card style={{marginBottom:16,background:T.bg3}}>
                     <div style={{marginBottom:8}}>
-                      <div style={{fontSize:13,color:T.text,fontFamily:"'Inter',system-ui",marginBottom:2,fontWeight:700}}>👆 Click any underlined word to see its correction and explanation.</div>
-                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Inter',system-ui",direction:"rtl",textAlign:"right",marginBottom:8}}>اضغط على أي كلمة تحتها خط لرؤية التصحيح والشرح.</div>
+                      <div style={{fontSize:13,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2,fontWeight:700}}>👆 Click any underlined word to see its correction and explanation.</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",direction:"rtl",textAlign:"right",marginBottom:8}}>اضغط على أي كلمة تحتها خط لرؤية التصحيح والشرح.</div>
                     </div>
                     <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
                       {[["major",T.red,"Major — خطأ كبير"],["moderate",T.amber,"Moderate — خطأ متوسط"],["minor",T.blue,"Minor — خطأ بسيط"]].map(([s,c,l])=>(
-                        <span key={s} style={{fontSize:12,fontFamily:"'Inter',system-ui",display:"flex",alignItems:"center",gap:4}}>
+                        <span key={s} style={{fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",alignItems:"center",gap:4}}>
                           <span style={{display:"inline-block",width:20,height:2,background:c,borderRadius:1}}/><span style={{color:c,fontWeight:600}}>{l}</span>
                         </span>
                       ))}
@@ -1098,7 +1158,7 @@ export default function IELTSBot(){
 
                 {activeTab==="annotated"&&(
                   <Card>
-                    <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Inter',system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <span>📝 Your Essay — 👆 Click underlined words for corrections / اضغط على الكلمات لرؤية التصحيح</span>
                       <span style={{color:T.red,fontWeight:600}}>{result.mistakes?.length} mistakes found</span>
                     </div>
@@ -1114,8 +1174,8 @@ export default function IELTSBot(){
                     <CriteriaCard label="Grammatical Range & Accuracy" data={result.criteria.grammaticalRange}/>
                     {result.improvements?.length>0&&(
                       <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`}}>
-                        <div style={{fontSize:11,color:T.amber,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Inter',system-ui"}}>Key Improvements Needed</div>
-                        {result.improvements.map((imp,i)=><div key={i} style={{color:T.textMid,fontSize:14,lineHeight:1.6,marginBottom:4,fontFamily:"'Inter',system-ui"}}>→ {imp}</div>)}
+                        <div style={{fontSize:11,color:T.amber,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Key Improvements Needed</div>
+                        {result.improvements.map((imp,i)=><div key={i} style={{color:T.textMid,fontSize:14,lineHeight:1.6,marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>→ {imp}</div>)}
                       </Card>
                     )}
                   </div>
@@ -1125,11 +1185,11 @@ export default function IELTSBot(){
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
                     <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:4}}>
                       {[["major",T.red],["moderate",T.amber],["minor",T.blue]].map(([s,c])=>(
-                        <span key={s} style={{background:"white",border:`1px solid ${c}60`,borderRadius:20,padding:"3px 10px",fontSize:11,color:c,fontFamily:"'Inter',system-ui",fontWeight:600}}>● {s}</span>
+                        <span key={s} style={{background:"white",border:`1px solid ${c}60`,borderRadius:20,padding:"3px 10px",fontSize:11,color:c,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>● {s}</span>
                       ))}
-                      <span style={{color:T.textMuted,fontSize:12,fontFamily:"'Inter',system-ui",alignSelf:"center"}}>— {result.mistakes?.length} total</span>
+                      <span style={{color:T.textMuted,fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",alignSelf:"center"}}>— {result.mistakes?.length} total</span>
                     </div>
-                    {result.mistakes?.length===0?<Card style={{textAlign:"center",color:T.green,padding:36,fontFamily:"'Inter',system-ui"}}>No mistakes — excellent!</Card>:result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i}/>)}
+                    {result.mistakes?.length===0?<Card style={{textAlign:"center",color:T.green,padding:36,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>No mistakes — excellent!</Card>:result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i}/>)}
                   </div>
                 )}
 
@@ -1139,12 +1199,12 @@ export default function IELTSBot(){
                       <div style={{textAlign:"center"}}><div style={{fontSize:36,fontWeight:900,color:bandColor(result.bandBooster.currentBand),fontFamily:"Georgia,serif"}}>{result.bandBooster.currentBand}</div><div style={{fontSize:10,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase"}}>Current</div></div>
                       <div style={{fontSize:24,color:T.red}}>→</div>
                       <div style={{textAlign:"center"}}><div style={{fontSize:36,fontWeight:900,color:bandColor(result.bandBooster.targetBand),fontFamily:"Georgia,serif"}}>{result.bandBooster.targetBand}</div><div style={{fontSize:10,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase"}}>Target</div></div>
-                      <div style={{flex:1}}><div style={{fontSize:14,color:T.gold,fontWeight:700,fontFamily:"'Inter',system-ui"}}>What to do:</div></div>
+                      <div style={{flex:1}}><div style={{fontSize:14,color:T.gold,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>What to do:</div></div>
                     </div>
                     {result.bandBooster.specificActions?.map((a,i)=>(
                       <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:10}}>
-                        <span style={{background:T.red,borderRadius:2,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Inter',system-ui"}}>{i+1}</span>
-                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Inter',system-ui"}}>{a}</p>
+                        <span style={{background:T.red,borderRadius:2,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{i+1}</span>
+                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{a}</p>
                       </div>
                     ))}
                   </Card>
@@ -1159,7 +1219,7 @@ export default function IELTSBot(){
                           <div style={{fontSize:16,color:T.textMuted}}>→</div>
                           <div style={{background:"#dcfce7",borderRadius:6,padding:"4px 12px",color:"#166534",fontSize:14,fontWeight:600}}>"{v.advanced}"</div>
                         </div>
-                        <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Inter',system-ui"}}>💡 {v.reason}</p>
+                        <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 {v.reason}</p>
                       </Card>
                     ))}
                   </div>
@@ -1169,8 +1229,8 @@ export default function IELTSBot(){
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
                     {result.examinerTips?.map((tip,i)=>(
                       <Card key={i} style={{display:"flex",gap:14,alignItems:"flex-start"}}>
-                        <span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Inter',system-ui"}}>{i+1}</span>
-                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Inter',system-ui"}}>{tip}</p>
+                        <span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{i+1}</span>
+                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{tip}</p>
                       </Card>
                     ))}
                   </div>
@@ -1180,25 +1240,25 @@ export default function IELTSBot(){
                   <div style={{display:"flex",flexDirection:"column",gap:14}}>
                     <Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:8}}>
-                        <div style={{fontSize:11,color:T.green,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'Inter',system-ui"}}>Band 8+ Model Response</div>
-                        <div style={{fontSize:12,fontFamily:"'Inter',system-ui",fontWeight:600,color:sampleWordCount>=minWords?T.green:T.red}}>{sampleWordCount} words {sampleWordCount>=minWords?"✓":"⚠ below minimum"}</div>
+                        <div style={{fontSize:11,color:T.green,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Band 8+ Model Response</div>
+                        <div style={{fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,color:sampleWordCount>=minWords?T.green:T.red}}>{sampleWordCount} words {sampleWordCount>=minWords?"✓":"⚠ below minimum"}</div>
                       </div>
                       <p style={{color:T.text,fontSize:15,lineHeight:1.9,whiteSpace:"pre-wrap",margin:0,fontFamily:"Georgia,serif"}}>{result.sampleEssay}</p>
                     </Card>
                     {result.sampleEssayExplanation&&(
                       <Card>
-                        <div style={{fontSize:11,color:T.blue,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Inter',system-ui"}}>Why This Response Scores High</div>
+                        <div style={{fontSize:11,color:T.blue,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Why This Response Scores High</div>
                         <div style={{display:"flex",flexDirection:"column",gap:12}}>
                           {[["Introduction",result.sampleEssayExplanation.introduction],["Body Paragraphs",result.sampleEssayExplanation.bodyParagraphs],["Conclusion",result.sampleEssayExplanation.conclusion]].map(([lbl,txt])=>(
-                            <div key={lbl}><div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:4,fontFamily:"'Inter',system-ui"}}>{lbl}</div><p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Inter',system-ui"}}>{txt}</p></div>
+                            <div key={lbl}><div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{lbl}</div><p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{txt}</p></div>
                           ))}
                           {result.sampleEssayExplanation.vocabularyHighlights?.length>0&&(
                             <div>
-                              <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:6,fontFamily:"'Inter',system-ui"}}>Advanced Vocabulary Used</div>
-                              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{result.sampleEssayExplanation.vocabularyHighlights.map((v,i)=><span key={i} style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"2px 9px",fontSize:12,color:T.blue,fontFamily:"'Inter',system-ui"}}>{v}</span>)}</div>
+                              <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Advanced Vocabulary Used</div>
+                              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{result.sampleEssayExplanation.vocabularyHighlights.map((v,i)=><span key={i} style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"2px 9px",fontSize:12,color:T.blue,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{v}</span>)}</div>
                             </div>
                           )}
-                          <Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Inter',system-ui"}}>🏆 {result.sampleEssayExplanation.whyHighScore}</p></Card>
+                          <Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🏆 {result.sampleEssayExplanation.whyHighScore}</p></Card>
                         </div>
                       </Card>
                     )}
@@ -1216,10 +1276,10 @@ export default function IELTSBot(){
         </div>{/* end page content card */}
       </div>{/* end maxWidth */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', system-ui, sans-serif; margin: 0; }
-        textarea, input, select, button { font-family: 'Inter', system-ui, sans-serif; }
+        body { font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif; margin: 0; }
+        textarea, input, select, button { font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #F3F4F6; }
         ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
