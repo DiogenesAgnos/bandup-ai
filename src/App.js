@@ -805,7 +805,7 @@ export default function IELTSBot(){
       const text=data.content.map(b=>b.text||"").join("");
       const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
       if(!proUser){ const n=uses+1; setUses(n); saveUses(n); }
-      addToHistory({ band:parsed.overallBand, taskType, wordCount:parsed.wordCount||wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } });
+      addToHistory({ band:parsed.overallBand, taskType, wordCount:wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } });
       setResult(parsed); setActiveTab("annotated");
       trackEvent("essay_analyzed", { task_type: taskType, band_score: parsed.overallBand, language: lang, is_pro: proUser });
     }catch(e){ setError("Something went wrong. Please try again."); }
@@ -993,7 +993,7 @@ export default function IELTSBot(){
                       <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand),background:"rgba(255,255,255,0.15)",borderRadius:6,padding:"2px 10px",fontSize:16}}>{result.overallBand}</span></div>
                       {/* FIX 1: word count badge — dark text on white background, color-coded */}
                       <span style={{background:"white",border:`1px solid ${T.border}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:result.wordCount>=minWords?T.green:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
-                        {result.wordCount} words {result.wordCount>=minWords?"✓":"⚠ below minimum"}
+                        {wordCount} words {wordCount>=minWords?"✓":"⚠ below minimum"}
                       </span>
                     </div>
                     <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
