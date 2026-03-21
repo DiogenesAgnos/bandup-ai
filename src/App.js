@@ -701,7 +701,7 @@ const ContactPage = () => {
           <button onClick={handleSubmit} disabled={status==="sending"} style={{background:status==="sending"?T.bgGray:T.primary,border:"none",borderRadius:4,color:status==="sending"?T.textMuted:"white",fontSize:14,fontWeight:600,padding:"14px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadow}}>
             {status==="sending"?"⏳ Sending...":"Send Message →"}
           </button>
-          {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(<p style={{textAlign:"center",color:T.textMuted,fontSize:11,fontFamily:"'Source Sans Pro','Inter',system-ui",fontStyle:"italic",margin:0}}>📧 EmailJS not configured yet.</p>)}
+          {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(<p style={{textAlign:"center",color:T.amber,fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",fontStyle:"italic",margin:0}}>📧 EmailJS verification pending — messages will be delivered once account is verified (up to 48hrs).</p>)}
         </div>
       </Card>
     </div>
@@ -985,12 +985,12 @@ export default function IELTSBot(){
                 {/* FIX 1: Overall band header — score now visible with proper contrasting colors */}
                 <div style={{background:`linear-gradient(135deg, ${T.primary} 0%, #003a99 100%)`,borderRadius:12,padding:"28px 32px",marginBottom:24,display:"flex",alignItems:"center",gap:28,flexWrap:"wrap",boxShadow:"0 8px 32px rgba(0,0,0,0.2)",borderLeft:`6px solid ${bandColor(result.overallBand)}`}}>
                   <div style={{textAlign:"center",minWidth:100}}>
-                    <div style={{fontSize:72,fontWeight:900,color:bandColor(result.overallBand),lineHeight:1,fontFamily:"Georgia,serif",textShadow:`0 0 40px ${bandColor(result.overallBand)}60`}}>{result.overallBand}</div>
+                    <div style={{fontSize:72,fontWeight:900,color:"#ffffff",lineHeight:1,fontFamily:"Georgia,serif",textShadow:`0 0 40px ${bandColor(result.overallBand)}`}}>{result.overallBand}</div>
                     <div style={{fontSize:10,color:"rgba(255,255,255,0.6)",fontFamily:"monospace",letterSpacing:"0.15em",textTransform:"uppercase",marginTop:4}}>Overall Band</div>
                   </div>
                   <div style={{flex:1,minWidth:180}}>
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
-                      <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand)}}>User</span></div>
+                      <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand),background:"rgba(255,255,255,0.15)",borderRadius:6,padding:"2px 10px",fontSize:16}}>{result.overallBand}</span></div>
                       {/* FIX 1: word count badge — dark text on white background, color-coded */}
                       <span style={{background:"white",border:`1px solid ${T.border}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:result.wordCount>=minWords?T.green:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
                         {result.wordCount} words {result.wordCount>=minWords?"✓":"⚠ below minimum"}
