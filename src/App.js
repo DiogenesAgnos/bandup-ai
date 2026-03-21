@@ -862,7 +862,8 @@ export default function IELTSBot(){
   const [uses,setUses]=useState(getStoredUses);
   const [proUser,setProUser]=useState(getStoredPro);
   const [lang,setLang]=useState("en");
-  const fileRef=useRef();
+  const [menuOpen,setMenuOpen]=useState(false);
+  const [showStayToast,setShowStayToast]=useState(false);
   const analyzeRef=useRef(null);
 
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setTimeout(()=>analyzeRef.current?.click(),150); } };
@@ -905,6 +906,8 @@ export default function IELTSBot(){
     if(taskType==="task1academic"&&!image){ setError("Please upload the graph/chart image for Academic Task 1."); return; }
     if(!proUser&&uses>=FREE_USES_LIMIT){ setShowPaywall(true); trackEvent('paywall_shown',{task_type:taskType}); return; }
     setError(""); setLoading(true); setResult(null);
+    setShowStayToast(true);
+    setTimeout(()=>setShowStayToast(false), 6000);
     try{
       const messageContent=taskType==="task1academic"&&image
         ?[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:image}},{type:"text",text:`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`}]
@@ -932,6 +935,8 @@ export default function IELTSBot(){
         <div className="nav-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
           <div style={{display:"flex",alignItems:"center",gap:24}}>
             <span style={{color:T.primary,fontWeight:800,fontSize:26,fontFamily:"'Source Sans Pro','Inter',system-ui",letterSpacing:"-0.8px",lineHeight:1}}>BandUp AI</span>
+            {/* Hamburger — mobile only */}
+            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:18,color:T.text}}>☰</button>
             <div className="nav-tabs" style={{display:"flex",gap:4}}>
               <MainTab label="🎓 Analyze" active={mainView==="analyze"} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{switchView("practice");trackEvent("nav_click",{page:"practice"});}}/>
@@ -1288,7 +1293,113 @@ export default function IELTSBot(){
         </div>
       </div>
 
-      <style>{`
+      {/* ── STAY ON PAGE TOAST ── */}
+      {showStayToast&&(
+        <div style={{
+          position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",
+          background:"#1c1d1f",color:"white",borderRadius:12,padding:"14px 24px",
+          fontSize:14,fontWeight:600,zIndex:999,boxShadow:"0 8px 32px rgba(0,0,0,0.3)",
+          fontFamily:"'Source Sans Pro','Inter',system-ui",
+          display:"flex",alignItems:"center",gap:10,whiteSpace:"nowrap",
+          animation:"slideUp 0.3s ease"
+        }}>
+          <span style={{fontSize:20}}>⏳</span>
+          Analysing your essay — please stay on this page
+        </div>
+      )}
+
+      {/* ── MOBILE HAMBURGER MENU OVERLAY ── */}
+      {menuOpen&&(
+        <div style={{position:"fixed",inset:0,zIndex:500}} onClick={()=>setMenuOpen(false)}>
+          <div style={{
+            position:"absolute",top:0,right:0,width:280,height:"100%",
+            background:"white",boxShadow:"-4px 0 24px rgba(0,0,0,0.18)",
+            display:"flex",flexDirection:"column",padding:"0 0 32px"
+          }} onClick={e=>e.stopPropagation()}>
+            {/* Header */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"18px 20px",borderBottom:`1px solid ${T.border}`}}>
+              <span style={{color:T.primary,fontWeight:800,fontSize:20,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>BandUp AI</span>
+              <button onClick={()=>setMenuOpen(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:T.textMuted,padding:4}}>✕</button>
+            </div>
+            {/* Nav items */}
+            <div style={{flex:1,overflowY:"auto",padding:"8px 0"}}>
+              {[
+                {view:"analyze",icon:"🎓",label:"Analyze"},
+                {view:"practice",icon:"🖊️",label:"Practice Mode"},
+                {view:"progress",icon:"📈",label:"Progress Tracker"},
+                {view:"toolkit",icon:"📚",label:"IELTS Toolkit"},
+                {view:"contact",icon:"✉️",label:"Contact Us"},
+              ].map(item=>(
+                <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
+                  style={{
+                    width:"100%",background:mainView===item.view?T.primaryLight:"transparent",
+                    border:"none",borderLeft:mainView===item.view?`4px solid ${T.primary}`:"4px solid transparent",
+                    padding:"14px 20px",display:"flex",alignItems:"center",gap:12,
+                    cursor:"pointer",textAlign:"left",
+                    color:mainView===item.view?T.primary:T.text,
+                    fontSize:15,fontWeight:mainView===item.view?700:400,
+                    fontFamily:"'Source Sans Pro','Inter',system-ui"
+                  }}>
+                  <span style={{fontSize:18}}>{item.icon}</span>{item.label}
+                </button>
+              ))}
+              <div style={{height:1,background:T.border,margin:"12px 20px"}}/>
+              {/* Language switcher inside menu */}
+              <div style={{padding:"8px 20px"}}>
+                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Feedback Language</div>
+                <div style={{display:"flex",gap:8}}>
+                  {["en","ar"].map(l=>(
+                    <button key={l} onClick={()=>switchLang(l)} style={{
+                      flex:1,background:lang===l?T.primaryLight:"transparent",
+                      border:`1px solid ${lang===l?T.primaryBorder:T.border}`,
+                      borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,
+                      color:lang===l?T.primary:T.textMuted,cursor:"pointer",
+                      fontFamily:"'Source Sans Pro','Inter',system-ui"
+                    }}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* Upgrade button at bottom of menu */}
+            {!proUser&&(
+              <div style={{padding:"0 20px"}}>
+                <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
+                  width:"100%",background:T.primary,color:"white",border:"none",
+                  borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,
+                  cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"
+                }}>🔓 Upgrade to Pro — $19/mo</button>
+              </div>
+            )}
+            {proUser&&(
+              <div style={{padding:"0 20px"}}>
+                <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 16px",textAlign:"center",fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Pro — Unlimited Access</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── MOBILE BOTTOM BAR ── */}
+      <div style={{
+        display:"none",
+        position:"fixed",bottom:0,left:0,right:0,zIndex:300,
+        background:"white",borderTop:`2px solid ${T.border}`,
+        padding:"8px 16px 16px",gap:10,
+        boxShadow:"0 -4px 16px rgba(0,0,0,0.12)"
+      }} className="mobile-bottom-bar">
+        <button onClick={()=>switchView("analyze")} style={{flex:1,background:mainView==="analyze"?T.primaryLight:T.bgGray,border:`1px solid ${mainView==="analyze"?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 4px",fontSize:11,fontWeight:700,color:mainView==="analyze"?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+          <span>🎓</span>Analyze
+        </button>
+        <button onClick={()=>switchView("practice")} style={{flex:1,background:mainView==="practice"?T.primaryLight:T.bgGray,border:`1px solid ${mainView==="practice"?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 4px",fontSize:11,fontWeight:700,color:mainView==="practice"?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+          <span>🖊️</span>Practice
+        </button>
+        <button onClick={()=>switchView("progress")} style={{flex:1,background:mainView==="progress"?T.primaryLight:T.bgGray,border:`1px solid ${mainView==="progress"?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 4px",fontSize:11,fontWeight:700,color:mainView==="progress"?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+          <span>📈</span>Progress
+        </button>
+        <button onClick={()=>setMenuOpen(true)} style={{flex:1,background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 4px",fontSize:11,fontWeight:700,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+          <span>☰</span>More
+        </button>
+      </div>
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
         * { box-sizing: border-box; }
         html, body { overflow-x: hidden; max-width: 100%; }
@@ -1301,7 +1412,20 @@ export default function IELTSBot(){
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
         /* ── MOBILE ── */
+        @keyframes slideUp {
+          from { opacity:0; transform: translateX(-50%) translateY(20px); }
+          to   { opacity:1; transform: translateX(-50%) translateY(0);    }
+        }
+
         @media (max-width: 768px) {
+          /* show bottom bar + hamburger, hide desktop nav tabs */
+          .mobile-bottom-bar { display: flex !important; }
+          .hamburger-btn { display: block !important; }
+          .nav-tabs { display: none !important; }
+          .nav-right { display: none !important; }
+          /* add padding so content not hidden behind bottom bar */
+          body { padding-bottom: 80px; }
+
           /* nav */
           .nav-tabs { overflow-x: auto; flex-wrap: nowrap !important; scrollbar-width: none; -ms-overflow-style: none; }
           .nav-tabs::-webkit-scrollbar { display: none; }
