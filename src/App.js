@@ -234,8 +234,35 @@ const TOOLKIT = {
 const AnnotatedEssay = ({ essay, mistakes }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
   if(!mistakes||mistakes.length===0) return <p style={{color:T.text,fontSize:15,lineHeight:1.9,margin:0,fontFamily:"Georgia,serif",whiteSpace:"pre-wrap"}}>{essay}</p>;
+
+  // Robust matching: try exact first, then normalized whitespace, then case-insensitive
+  const findInEssay = (original, essayText) => {
+    if(!original) return -1;
+    // 1. Exact match
+    let pos = essayText.indexOf(original);
+    if(pos !== -1) return { pos, len: original.length };
+    // 2. Normalize whitespace (collapse multiple spaces/newlines)
+    const norm = (s) => s.replace(/\s+/g,' ').trim();
+    const normEssay = norm(essayText);
+    const normOrig = norm(original);
+    pos = normEssay.indexOf(normOrig);
+    if(pos !== -1) {
+      // Map position back to original essay
+      let origPos = 0, normPos = 0;
+      while(normPos < pos && origPos < essayText.length) {
+        if(essayText[origPos].match(/\s/)) { while(origPos < essayText.length && essayText[origPos].match(/\s/)) origPos++; normPos++; }
+        else { origPos++; normPos++; }
+      }
+      return { pos: origPos, len: normOrig.length };
+    }
+    // 3. Case-insensitive match
+    pos = essayText.toLowerCase().indexOf(normOrig.toLowerCase());
+    if(pos !== -1) return { pos, len: normOrig.length };
+    return -1;
+  };
+
   const found=[];
-  mistakes.forEach((m,idx)=>{ if(!m.original) return; const pos=essay.indexOf(m.original); if(pos!==-1) found.push({pos,end:pos+m.original.length,mistake:m,idx}); });
+  mistakes.forEach((m,idx)=>{ if(!m.original) return; const result=findInEssay(m.original, essay); if(result!==-1) found.push({pos:result.pos,end:result.pos+result.len,mistake:m,idx}); });
   found.sort((a,b)=>a.pos-b.pos);
   const clean=[]; let lastEnd=0;
   found.forEach(f=>{ if(f.pos>=lastEnd){ clean.push(f); lastEnd=f.end; } });
@@ -293,13 +320,20 @@ const CriteriaCard=({label,data})=>(
   </div>
 );
 
-const MistakeCard=({mistake,i})=>(
+const MistakeCard=({mistake,i,essay})=>{
+  // Check if this mistake can be found in the essay
+  const norm = (s) => s ? s.replace(/\s+/g,' ').trim() : '';
+  const isLocated = mistake.original && (
+    essay.indexOf(mistake.original) !== -1 ||
+    essay.toLowerCase().indexOf(norm(mistake.original).toLowerCase()) !== -1
+  );
+  return (
   <div style={{background:severityBg(mistake.severity),border:`1px solid ${severityColor(mistake.severity)}40`,borderLeft:`3px solid ${severityColor(mistake.severity)}`,borderRadius:10,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8}}>
     <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
-      {/* FIX 3: removed broken taskType===key reference */}
       <span style={{fontSize:11,fontWeight:700,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>#{i+1}</span>
       <span style={{background:"white",border:`1px solid ${severityColor(mistake.severity)}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:severityColor(mistake.severity),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>{mistake.severity}</span>
       <span style={{background:"white",border:`1px solid ${categoryColor(mistake.category)}50`,borderRadius:20,padding:"1px 8px",fontSize:11,color:categoryColor(mistake.category),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>{mistake.category}</span>
+      {!isLocated&&<span style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:20,padding:"1px 8px",fontSize:10,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>⚠ not highlighted in essay</span>}
     </div>
     <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
       <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>ORIGINAL</div><div style={{background:"#fee2e2",borderRadius:6,padding:"5px 10px",color:"#991b1b",fontSize:13,fontStyle:"italic"}}>"{mistake.original}"</div></div>
@@ -308,7 +342,8 @@ const MistakeCard=({mistake,i})=>(
     </div>
     <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 {mistake.explanation}</p>
   </div>
-);
+  );
+};
 
 const TabBtn=({label,active,onClick,badge})=>(
   <button onClick={onClick} style={{
@@ -1105,7 +1140,7 @@ export default function IELTSBot(){
                       ))}
                       <span style={{color:T.textMuted,fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",alignSelf:"center"}}>— {result.mistakes?.length} total</span>
                     </div>
-                    {result.mistakes?.length===0?<Card style={{textAlign:"center",color:T.green,padding:36,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>No mistakes — excellent!</Card>:result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i}/>)}
+                    {result.mistakes?.length===0?<Card style={{textAlign:"center",color:T.green,padding:36,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>No mistakes — excellent!</Card>:result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i} essay={essay}/>)}
                   </div>
                 )}
 
