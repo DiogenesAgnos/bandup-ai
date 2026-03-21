@@ -1400,6 +1400,7 @@ export default function IELTSBot(){
           <span>☰</span>More
         </button>
       </div>
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
         * { box-sizing: border-box; }
         html, body { overflow-x: hidden; max-width: 100%; }
