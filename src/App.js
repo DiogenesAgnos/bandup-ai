@@ -130,7 +130,51 @@ Respond ONLY with valid JSON (no markdown, no backticks):
   "sampleEssayExplanation":{"introduction":"...","bodyParagraphs":"...","conclusion":"...","vocabularyHighlights":["word 1","word 2"],"whyHighScore":"..."}
 }
 
-Find ALL mistakes — spelling, grammar, punctuation, sentence structure, word choice, register. No limit. The "original" field must match the essay text EXACTLY character for character.
+MISTAKE DETECTION — MANDATORY EXHAUSTIVE SCAN:
+You are acting as a strict IELTS examiner who must find EVERY imperfection. Go through the essay sentence by sentence. Check ALL of the following without exception:
+
+GRAMMAR:
+- Subject-verb agreement errors ("governments...is" → "are")
+- Wrong tense or tense inconsistency
+- Missing or incorrect articles (a/an/the)
+- Wrong prepositions (consist of, rely on, invest in, etc.)
+- Incorrect verb forms (infinitive vs gerund)
+- Passive voice errors
+- Dangling or misplaced modifiers
+- Incomplete sentences or run-on sentences
+- Conditional errors (if + wrong tense)
+
+PUNCTUATION:
+- Missing commas after introductory phrases ("In conclusion[,]")
+- Missing commas before coordinating conjunctions in compound sentences
+- Comma splices (two independent clauses joined by just a comma)
+- Missing apostrophes in contractions or possessives
+- Incorrect semicolon usage
+- Unnecessary or missing hyphens
+
+SPELLING:
+- Any misspelled word, including commonly confused words (affect/effect, their/there, etc.)
+
+WORD CHOICE & ACADEMIC STYLE:
+- Informal or conversational language ("a lot", "things", "stuff", "good", "bad", "big")
+- Vague language that weakens the argument
+- Repetition of the same word/phrase within 2-3 sentences
+- Weak verbs that should be replaced with stronger academic verbs
+- Colloquial expressions
+- Any contraction (don't, can't, it's → do not, cannot, it is)
+
+SENTENCE STRUCTURE:
+- Short simplistic sentences that could be combined for sophistication
+- Overuse of the same sentence structure
+- Starting consecutive sentences with the same word
+
+TASK-SPECIFIC:
+- Copying exact phrases from the question without paraphrasing
+- Weak or absent topic sentences
+- Claims made without any supporting evidence or example
+- Conclusion that merely repeats the introduction
+
+MINIMUM EXPECTED: A Band 7-8 essay typically has 5-10 annotatable items. A Band 5-6 essay typically has 10-20+. Never return fewer than 5 mistakes unless the essay is genuinely flawless (Band 9). Each "original" field must match the essay text EXACTLY character for character — copy it precisely.
 
 CRITICAL SCORING RULE: You must determine and lock in all band scores (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammatical Range & Accuracy, and Overall Band) before considering the feedback language. Scores must be identical whether feedback is in English or Arabic. The language of feedback must never influence the numerical scores.
 
@@ -207,7 +251,7 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
         return (
           <span key={i} style={{position:"relative",display:"inline"}}>
             <span onClick={()=>setActiveTooltip(activeTooltip===seg.idx?null:seg.idx)}
-              style={{borderBottom:`2px solid ${c}`,cursor:"pointer",background:activeTooltip===seg.idx?`${c}18`:"transparent",borderRadius:3,padding:"0 1px",transition:"background 0.15s"}}>
+              style={{borderBottom:`2px solid ${T.red}`,cursor:"pointer",background:activeTooltip===seg.idx?`${T.red}18`:"transparent",borderRadius:3,padding:"0 1px",transition:"background 0.15s"}}>
               {seg.text}
             </span>
             {activeTooltip===seg.idx&&(
@@ -992,7 +1036,7 @@ export default function IELTSBot(){
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
                       <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand),background:"rgba(255,255,255,0.15)",borderRadius:6,padding:"2px 10px",fontSize:16}}>{result.overallBand}</span></div>
                       {/* FIX 1: word count badge — dark text on white background, color-coded */}
-                      <span style={{background:"white",border:`1px solid ${T.border}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:result.wordCount>=minWords?T.green:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
+                      <span style={{background:"white",border:`1px solid ${T.border}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:wordCount>=minWords?T.green:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
                         {wordCount} words {wordCount>=minWords?"✓":"⚠ below minimum"}
                       </span>
                     </div>
