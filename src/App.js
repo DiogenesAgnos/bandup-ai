@@ -533,7 +533,7 @@ const PaywallModal=({onClose,onSuccess})=>(
           <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
         ))}
       </ul>
-      <button onClick={()=>{ if(STRIPE_CONFIGURED){ savePro(); onSuccess(); } }}
+      <button onClick={()=>{ if(STRIPE_CONFIGURED){ onSuccess(); } }}
         disabled={!STRIPE_CONFIGURED}
         style={{width:"100%",background:STRIPE_CONFIGURED?T.primary:"#94a3b8",color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:4,border:"none",cursor:STRIPE_CONFIGURED?"pointer":"not-allowed",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:STRIPE_CONFIGURED?T.shadowMd:"none"}}>
         {STRIPE_CONFIGURED?"🔓 Start Pro — $19/month":"🔒 Payments Coming Soon"}
