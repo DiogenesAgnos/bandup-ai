@@ -395,9 +395,9 @@ const MainTab=({label,active,onClick})=>(
 
 // ── Paywall ───────────────────────────────────
 const PaywallModal=({onClose,onSuccess})=>(
-  <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+  <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
     <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,padding:"40px 32px",maxWidth:440,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
-      <button onClick={onClose} style={{position:"absolute",top:16,right:20,background:"none",border:"none",color:T.textMuted,fontSize:22,cursor:"pointer"}}>✕</button>
+      <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",color:T.text,fontSize:18,cursor:"pointer",width:40,height:40,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,zIndex:10}}>✕</button>
       <div style={{textAlign:"center",marginBottom:24}}>
         <div style={{fontSize:36,marginBottom:8}}>🎓</div>
         <div style={{display:"inline-block",background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:100,padding:"5px 16px",fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Free analyses used up</div>
@@ -834,7 +834,7 @@ const PrivacyPage = ({onBack}) => (
 const RefundPage = ({onBack}) => (
   <PolicyPage title="Refund Policy" onBack={onBack}>
     <Section title="1. Subscription Cancellation"><p style={{margin:"0 0 12px"}}>You may cancel your BandUp AI Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period.</p></Section>
-    <Section title="2. Refund Eligibility"><p style={{margin:"0 0 12px"}}>We offer a <strong>7-day money-back guarantee</strong> for new Pro subscribers. If you are not satisfied within 7 days of your initial subscription, contact us for a full refund.</p></Section>
+    <Section title="2. Refund Eligibility"><p style={{margin:"0 0 12px"}}>We offer a <strong>1-day money-back guarantee</strong> for new Pro subscribers. If you are not satisfied within 24 hours of your initial subscription, contact us for a full refund.</p></Section>
     <Section title="3. How to Request a Refund"><p style={{margin:"0 0 12px"}}>Email <strong>diogenes.agnos@gmail.com</strong> with your registered email, date of purchase, and reason for refund. We process requests within 5 business days.</p></Section>
     <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries: <strong>diogenes.agnos@gmail.com</strong></p></Section>
   </PolicyPage>
