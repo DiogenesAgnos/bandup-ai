@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pricing — BandUp AI</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f9f9f9;color:#1f1f1f}
+  .nav{background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+  .logo{color:#0056d2;font-weight:800;font-size:22px;text-decoration:none}
+  .back{color:#0056d2;font-size:14px;text-decoration:none;font-weight:600}
+  .hero{text-align:center;padding:60px 24px 40px;background:linear-gradient(135deg,#e8f0fc 0%,#f0f4ff 100%)}
+  .hero h1{font-size:36px;font-weight:800;color:#1c1d1f;margin-bottom:12px}
+  .hero p{font-size:17px;color:#636363;max-width:520px;margin:0 auto}
+  .plans{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;padding:48px 24px;max-width:900px;margin:0 auto}
+  .card{background:#fff;border:2px solid #e0e0e0;border-radius:16px;padding:32px 28px;flex:1;min-width:260px;max-width:360px}
+  .card.pro{border-color:#0056d2;position:relative}
+  .badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#0056d2;color:#fff;border-radius:20px;padding:4px 16px;font-size:12px;font-weight:700;white-space:nowrap}
+  .plan-name{font-size:18px;font-weight:700;color:#1f1f1f;margin-bottom:6px}
+  .price{font-size:48px;font-weight:900;color:#1c1d1f;line-height:1;margin:16px 0 4px}
+  .price sup{font-size:20px;vertical-align:super}
+  .price sub{font-size:14px;color:#636363;font-weight:400}
+  .desc{font-size:13px;color:#636363;margin-bottom:24px}
+  .features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+  .features li{font-size:14px;color:#3c3c3c;display:flex;gap:8px;align-items:flex-start}
+  .features li::before{content:"✓";color:#00785a;font-weight:700;flex-shrink:0}
+  .btn{display:block;width:100%;padding:13px;border-radius:8px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;text-decoration:none;border:none}
+  .btn-free{background:#f3f3f3;color:#636363}
+  .btn-pro{background:#0056d2;color:#fff}
+  .faq{max-width:720px;margin:0 auto 60px;padding:0 24px}
+  .faq h2{font-size:24px;font-weight:700;text-align:center;margin-bottom:28px;color:#1c1d1f}
+  .faq-item{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:18px 20px;margin-bottom:12px}
+  .faq-item h3{font-size:15px;font-weight:700;color:#1c1d1f;margin-bottom:6px}
+  .faq-item p{font-size:14px;color:#636363;line-height:1.6}
+  .footer{background:#1c1d1f;color:rgba(255,255,255,0.5);text-align:center;padding:20px;font-size:13px}
+  .footer a{color:rgba(255,255,255,0.6);margin:0 10px;text-decoration:none}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="logo" href="/">BandUp AI</a>
+  <a class="back" href="/">← Back to App</a>
+</nav>
+
+<div class="hero">
+  <h1>Simple, transparent pricing</h1>
+  <p>Start free, upgrade when you're ready. No hidden fees, cancel anytime.</p>
+</div>
+
+<div class="plans">
+  <div class="card">
+    <div class="plan-name">Free</div>
+    <div class="price"><sup>$</sup>0<sub>/forever</sub></div>
+    <div class="desc">Get started with no commitment</div>
+    <ul class="features">
+      <li>2 free essay analyses</li>
+      <li>Task 1 & Task 2 support</li>
+      <li>Band score + 4 criteria</li>
+      <li>Mistake detection</li>
+      <li>Linking Words toolkit</li>
+    </ul>
+    <a href="/" class="btn btn-free">Start Free →</a>
+  </div>
+
+  <div class="card pro">
+    <div class="badge">Most Popular</div>
+    <div class="plan-name">Pro</div>
+    <div class="price"><sup>$</sup>19<sub>/month</sub></div>
+    <div class="desc">Everything you need to reach your target band</div>
+    <ul class="features">
+      <li>Unlimited essay analyses</li>
+      <li>Task 1 Academic, Task 1 General & Task 2</li>
+      <li>Complete mistake detection — grammar, spelling, punctuation</li>
+      <li>Inline essay annotations with correction bubbles</li>
+      <li>Progress tracker — track improvement over time</li>
+      <li>Band Booster — personalised action plan</li>
+      <li>Vocabulary upgrades from your own essay</li>
+      <li>Full IELTS Toolkit (Grammar, Templates, Pet Peeves)</li>
+      <li>Practice Mode with live AI coaching</li>
+      <li>Graph image upload for Task 1 Academic</li>
+      <li>Unlimited Band 8+ model responses</li>
+      <li>Arabic & English feedback</li>
+    </ul>
+    <a href="/" class="btn btn-pro">Upgrade to Pro →</a>
+  </div>
+</div>
+
+<div class="faq">
+  <h2>Frequently Asked Questions</h2>
+  <div class="faq-item">
+    <h3>Can I cancel anytime?</h3>
+    <p>Yes. You can cancel your Pro subscription at any time. You'll keep access until the end of your billing period with no additional charges.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Is there a money-back guarantee?</h3>
+    <p>Yes. We offer a 7-day money-back guarantee for new Pro subscribers. Contact us at diogenes.agnos@gmail.com within 7 days of your first payment.</p>
+  </div>
+  <div class="faq-item">
+    <h3>What payment methods do you accept?</h3>
+    <p>We accept all major credit and debit cards (Visa, Mastercard, American Express) via our secure payment processor Paddle.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Is BandUp AI a replacement for the real IELTS exam?</h3>
+    <p>No. BandUp AI is an AI-powered preparation tool. Actual IELTS scores are determined solely by certified IELTS examiners. Our scores are for practice and guidance only.</p>
+  </div>
+  <div class="faq-item">
+    <h3>What tasks does BandUp AI support?</h3>
+    <p>BandUp AI supports IELTS Writing Task 2 (essay), Task 1 Academic (graphs/charts), and Task 1 General Training (letters) — all with full AI feedback.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>© 2025 BandUp AI · Ahmad Sartawi</p>
+  <div style="margin-top:8px">
+    <a href="/terms.html">Terms of Service</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/refund.html">Refund Policy</a>
+  </div>
+</footer>
+</body>
+</html>
