@@ -7,9 +7,12 @@ const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
 const USERS_KEY = "bandup_users";
 const SESSION_KEY = "bandup_session";
+const LAST_RESULT_KEY = "bandup_last_result";
 
 // ── Auth helpers ──────────────────────────────
-const getUsers = () => { try{ return JSON.parse(localStorage.getItem(USERS_KEY)||"{}"); }catch{ return {}; } };
+const saveLastResult = (data) => { try{ localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(data)); }catch{} };
+const getLastResult = () => { try{ return JSON.parse(localStorage.getItem(LAST_RESULT_KEY)||"null"); }catch{ return null; } };
+const clearLastResult = () => { try{ localStorage.removeItem(LAST_RESULT_KEY); }catch{} };
 const saveUsers = (u) => { try{ localStorage.setItem(USERS_KEY,JSON.stringify(u)); }catch{} };
 const getSession = () => { try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||"null"); }catch{ return null; } };
 const saveSession = (s) => { try{ localStorage.setItem(SESSION_KEY,JSON.stringify(s)); }catch{} };
@@ -962,9 +965,9 @@ const RefundPage = ({onBack}) => (
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
   const [mainView,setMainView]=useState("analyze");
-  const [taskType,setTaskType]=useState("task2");
-  const [topic,setTopic]=useState("");
-  const [essay,setEssay]=useState("");
+  const [taskType,setTaskType]=useState(()=>getLastResult()?.taskType||"task2");
+  const [topic,setTopic]=useState(()=>getLastResult()?.topic||"");
+  const [essay,setEssay]=useState(()=>getLastResult()?.essay||"");
   const [image,setImage]=useState(null);
   const [imagePreview,setImagePreview]=useState(null);
   const [topicImage,setTopicImage]=useState(null);
@@ -974,9 +977,9 @@ export default function IELTSBot(){
   const topicImgRef=useRef();
   const essayImgRef=useRef();
   const [loading,setLoading]=useState(false);
-  const [result,setResult]=useState(null);
+  const [result,setResult]=useState(()=>getLastResult());
   const [error,setError]=useState("");
-  const [activeTab,setActiveTab]=useState("scores");
+  const [activeTab,setActiveTab]=useState(()=>getLastResult()?"annotated":"scores");
   const [showPaywall,setShowPaywall]=useState(false);
   const [showAuth,setShowAuth]=useState(false);
   const [session,setSession]=useState(()=>getSession());
@@ -1043,7 +1046,7 @@ export default function IELTSBot(){
     if(wordCount<30){ setError("Response too short."); return; }
     if(taskType==="task1academic"&&!image){ setError("Please upload the graph/chart image for Academic Task 1."); return; }
     if(!proUser&&uses>=FREE_USES_LIMIT){ setShowPaywall(true); trackEvent('paywall_shown',{task_type:taskType}); return; }
-    setError(""); setLoading(true); setResult(null);
+    setError(""); setLoading(true); setResult(null); clearLastResult();
     try{
       const messageContent=taskType==="task1academic"&&image
         ?[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:image}},{type:"text",text:`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`}]
@@ -1055,6 +1058,7 @@ export default function IELTSBot(){
       if(!proUser){ const n=uses+1; setUses(n); saveUses(n,session?.email); }
       addToHistory({ band:parsed.overallBand, taskType, wordCount:wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } },session?.email);
       setResult(parsed); setActiveTab("annotated");
+      saveLastResult({result:parsed, topic, essay, taskType, lang});
       trackEvent("essay_analyzed", { task_type: taskType, band_score: parsed.overallBand, language: lang, is_pro: proUser });
     }catch(e){ setError("Something went wrong. Please try again."); }
     finally{ setLoading(false); }
@@ -1152,7 +1156,7 @@ export default function IELTSBot(){
               <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
               <div className="task-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
-                  <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); }}
+                  <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); clearLastResult(); }}
                     style={{background:taskType===key?T.primaryLight:"#f9f9f9",border:`2px solid ${taskType===key?T.primary:T.border}`,borderRadius:8,padding:"20px 14px",cursor:"pointer",textAlign:"center",boxShadow:taskType===key?`0 0 0 2px ${T.primaryBorder}`:T.shadow,transition:"all 0.18s"}}>
                     <div style={{fontSize:22,marginBottom:6}}>{task.icon}</div>
                     <div style={{fontSize:13,fontWeight:600,color:taskType===key?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>{task.label}</div>
@@ -1249,6 +1253,12 @@ export default function IELTSBot(){
 
             {result&&(
               <div style={{marginTop:32}}>
+                <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
+                  <button onClick={()=>{ setResult(null); clearLastResult(); setTopic(""); setEssay(""); window.scrollTo({top:0,behavior:"smooth"}); }}
+                    style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    ✏️ New Analysis
+                  </button>
+                </div>
                 {/* FIX 1: Overall band header — score now visible with proper contrasting colors */}
                 <div className="result-header" style={{background:`linear-gradient(135deg, ${T.primary} 0%, #003a99 100%)`,borderRadius:12,padding:"28px 32px",marginBottom:24,display:"flex",alignItems:"center",gap:28,flexWrap:"wrap",boxShadow:"0 8px 32px rgba(0,0,0,0.2)",borderLeft:`6px solid ${bandColor(result.overallBand)}`}}>
                   <div style={{textAlign:"center",minWidth:100}}>
@@ -1407,6 +1417,7 @@ export default function IELTSBot(){
                 )}
                 </div>{/* end minHeight tab wrapper */}
               </div>
+            </div>
             )}
           </div>
         )}
@@ -1452,19 +1463,26 @@ export default function IELTSBot(){
           alignItems:"center",
           justifyContent:"center",
           gap:20,
-          padding:24
+          padding:24,
+          touchAction:"none",
+          userSelect:"none"
         }}>
           <div style={{
-            fontSize:56,
-            animation:"spin 1.5s linear infinite",
+            fontSize:64,
+            lineHeight:1,
+            pointerEvents:"none",
+            animation:"spin 2s linear infinite",
+            display:"block",
+            transformOrigin:"center center"
           }}>⏳</div>
           <div style={{
             background:"white",
             borderRadius:16,
-            padding:"20px 32px",
+            padding:"24px 32px",
             textAlign:"center",
             boxShadow:"0 8px 40px rgba(0,0,0,0.3)",
-            maxWidth:320
+            maxWidth:300,
+            pointerEvents:"none"
           }}>
             <div style={{fontSize:17,fontWeight:700,color:"#1f1f1f",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:8}}>
               Analysing your essay...
