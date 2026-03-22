@@ -54,7 +54,7 @@ const setUserPro = (email) => {
 };
 
 // Seed admin account as pro
-(()=>{
+try{(()=>{
   const users = getUsers();
   if(!users["diogenes.agnos@gmail.com"]){
     users["diogenes.agnos@gmail.com"] = { name:"Ahmad", email:"diogenes.agnos@gmail.com", password:hashPass("BandUpAdmin2025!"), pro:true, createdAt:Date.now() };
@@ -63,9 +63,8 @@ const setUserPro = (email) => {
     users["diogenes.agnos@gmail.com"].pro = true;
     saveUsers(users);
   }
-  // Clear old stuck localStorage pro flag
   try{ localStorage.removeItem("bandup_pro"); }catch{}
-})();
+})();}catch(e){}
 
 const T = {
   primary:      "#0056d2",
@@ -977,9 +976,9 @@ export default function IELTSBot(){
   const topicImgRef=useRef();
   const essayImgRef=useRef();
   const [loading,setLoading]=useState(false);
-  const [result,setResult]=useState(()=>getLastResult());
+  const [result,setResult]=useState(()=>getLastResult()?.result||null);
   const [error,setError]=useState("");
-  const [activeTab,setActiveTab]=useState(()=>getLastResult()?"annotated":"scores");
+  const [activeTab,setActiveTab]=useState(()=>getLastResult()?.result?"annotated":"scores");
   const [showPaywall,setShowPaywall]=useState(false);
   const [showAuth,setShowAuth]=useState(false);
   const [session,setSession]=useState(()=>getSession());
