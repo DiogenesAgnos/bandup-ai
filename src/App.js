@@ -5,6 +5,64 @@ const FREE_USES_LIMIT = 2;
 const STORAGE_KEY = "bandup_uses";
 const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
+const USERS_KEY = "bandup_users";
+const SESSION_KEY = "bandup_session";
+
+// ── Auth helpers ──────────────────────────────
+const getUsers = () => { try{ return JSON.parse(localStorage.getItem(USERS_KEY)||"{}"); }catch{ return {}; } };
+const saveUsers = (u) => { try{ localStorage.setItem(USERS_KEY,JSON.stringify(u)); }catch{} };
+const getSession = () => { try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||"null"); }catch{ return null; } };
+const saveSession = (s) => { try{ localStorage.setItem(SESSION_KEY,JSON.stringify(s)); }catch{} };
+const clearSession = () => { try{ localStorage.removeItem(SESSION_KEY); }catch{} };
+
+const hashPass = (p) => btoa(unescape(encodeURIComponent(p+"-bandup-salt")));
+
+const authRegister = (email, password, name) => {
+  const users = getUsers();
+  const key = email.toLowerCase().trim();
+  if(users[key]) return { error: "An account with this email already exists." };
+  users[key] = { name, email:key, password:hashPass(password), pro:false, createdAt:Date.now() };
+  saveUsers(users);
+  const session = { email:key, name };
+  saveSession(session);
+  return { session };
+};
+
+const authLogin = (email, password) => {
+  const users = getUsers();
+  const key = email.toLowerCase().trim();
+  if(!users[key]) return { error: "No account found with this email." };
+  if(users[key].password !== hashPass(password)) return { error: "Incorrect password." };
+  const session = { email:key, name:users[key].name };
+  saveSession(session);
+  return { session };
+};
+
+const getUserPro = (email) => {
+  if(!email) return false;
+  const users = getUsers();
+  return users[email.toLowerCase().trim()]?.pro || false;
+};
+
+const setUserPro = (email) => {
+  const users = getUsers();
+  const key = email.toLowerCase().trim();
+  if(users[key]) { users[key].pro = true; saveUsers(users); }
+};
+
+// Seed admin account as pro
+(()=>{
+  const users = getUsers();
+  if(!users["diogenes.agnos@gmail.com"]){
+    users["diogenes.agnos@gmail.com"] = { name:"Ahmad", email:"diogenes.agnos@gmail.com", password:hashPass("BandUpAdmin2025!"), pro:true, createdAt:Date.now() };
+    saveUsers(users);
+  } else {
+    users["diogenes.agnos@gmail.com"].pro = true;
+    saveUsers(users);
+  }
+  // Clear old stuck localStorage pro flag
+  try{ localStorage.removeItem("bandup_pro"); }catch{}
+})();
 
 const T = {
   primary:      "#0056d2",
@@ -52,16 +110,14 @@ const categoryColor = (c) => {
   return T.textMid;
 };
 
-const getStoredUses = () => { try{ return parseInt(localStorage.getItem(STORAGE_KEY)||"0"); }catch{ return 0; } };
-const saveUses = (n) => { try{ localStorage.setItem(STORAGE_KEY,String(n)); }catch{} };
-const getStoredPro = () => { try{ return localStorage.getItem("bandup_pro")==="true"; }catch{ return false; } };
-const savePro = () => { try{ localStorage.setItem("bandup_pro","true"); }catch{} };
-const getHistory = () => { try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]"); }catch{ return []; } };
-const saveHistory = (h) => { try{ localStorage.setItem(HISTORY_KEY,JSON.stringify(h)); }catch{} };
-const addToHistory = (entry) => {
-  const h = getHistory();
+const getStoredUses = (email) => { try{ return parseInt(localStorage.getItem(STORAGE_KEY+(email||""))||"0"); }catch{ return 0; } };
+const saveUses = (n,email) => { try{ localStorage.setItem(STORAGE_KEY+(email||""),String(n)); }catch{} };
+const getHistory = (email) => { try{ return JSON.parse(localStorage.getItem(HISTORY_KEY+(email||""))||"[]"); }catch{ return []; } };
+const saveHistory = (h,email) => { try{ localStorage.setItem(HISTORY_KEY+(email||""),JSON.stringify(h)); }catch{} };
+const addToHistory = (entry,email) => {
+  const h = getHistory(email);
   h.unshift({ ...entry, date: new Date().toISOString(), id: Date.now() });
-  saveHistory(h.slice(0,20));
+  saveHistory(h.slice(0,20),email);
 };
 
 const PRACTICE_QUESTIONS = {
@@ -393,6 +449,62 @@ const MainTab=({label,active,onClick})=>(
   </button>
 );
 
+// ── Auth Modal ────────────────────────────────
+const AuthModal=({onClose,onSuccess})=>{
+  const [mode,setMode]=useState("login"); // login | register | forgot
+  const [email,setEmail]=useState("");
+  const [password,setPassword]=useState("");
+  const [name,setName]=useState("");
+  const [error,setError]=useState("");
+  const [loading,setLoading]=useState(false);
+
+  const handle=async()=>{
+    setError(""); setLoading(true);
+    await new Promise(r=>setTimeout(r,400));
+    if(mode==="login"){
+      const res=authLogin(email,password);
+      if(res.error){ setError(res.error); setLoading(false); return; }
+      onSuccess(res.session);
+    } else {
+      if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
+      if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
+      const res=authRegister(email,password,name);
+      if(res.error){ setError(res.error); setLoading(false); return; }
+      onSuccess(res.session);
+    }
+    setLoading(false);
+  };
+
+  const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
+
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
+      <div style={{background:"white",borderRadius:20,padding:"36px 28px",maxWidth:400,width:"100%",position:"relative",boxShadow:"0 20px 60px rgba(0,0,0,0.2)"}}>
+        <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",fontSize:16,cursor:"pointer",width:36,height:36,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,color:T.text}}>✕</button>
+        <div style={{textAlign:"center",marginBottom:24}}>
+          <div style={{fontSize:32,marginBottom:8}}>🎓</div>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 4px"}}>{mode==="login"?"Welcome back":"Create account"}</h2>
+          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>{mode==="login"?"Sign in to access your account":"Join BandUp AI today"}</p>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          {mode==="register"&&<input value={name} onChange={e=>setName(e.target.value)} placeholder="Full name" style={inp}/>}
+          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email address" type="email" style={inp}/>
+          <input value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" type="password" style={inp}
+            onKeyDown={e=>e.key==="Enter"&&handle()}/>
+          {error&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</div>}
+          <button onClick={handle} disabled={loading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",opacity:loading?0.7:1}}>
+            {loading?"⏳ Please wait...":mode==="login"?"Sign In →":"Create Account →"}
+          </button>
+        </div>
+        <div style={{textAlign:"center",marginTop:16,fontSize:13,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+          {mode==="login"?<>Don't have an account? <button onClick={()=>{setMode("register");setError("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign up free</button></>
+          :<>Already have an account? <button onClick={()=>{setMode("login");setError("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign in</button></>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ── Paywall ───────────────────────────────────
 const PaywallModal=({onClose,onSuccess})=>(
   <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
@@ -424,8 +536,8 @@ const PaywallModal=({onClose,onSuccess})=>(
 );
 
 // ── Progress Tracker ──────────────────────────
-const ProgressTracker=({onUpgrade,isPro})=>{
-  const history=getHistory();
+const ProgressTracker=({onUpgrade,isPro,email})=>{
+  const history=getHistory(email);
   if(!isPro&&history.length===0) return (
     <Card style={{textAlign:"center",padding:"40px 24px"}}>
       <div style={{fontSize:40,marginBottom:16}}>📈</div>
@@ -861,22 +973,42 @@ export default function IELTSBot(){
   const [error,setError]=useState("");
   const [activeTab,setActiveTab]=useState("scores");
   const [showPaywall,setShowPaywall]=useState(false);
-  const [uses,setUses]=useState(getStoredUses);
-  const [proUser,setProUser]=useState(getStoredPro);
+  const [showAuth,setShowAuth]=useState(false);
+  const [session,setSession]=useState(()=>getSession());
+  const [uses,setUses]=useState(()=>getStoredUses(getSession()?.email));
   const [lang,setLang]=useState("en");
   const [menuOpen,setMenuOpen]=useState(false);
   const [showStayToast,setShowStayToast]=useState(false);
   const analyzeRef=useRef(null);
 
+  const proUser = session ? getUserPro(session.email) : false;
+  const usesLeft = FREE_USES_LIMIT - uses;
+
+  const handleAuthSuccess=(sess)=>{
+    setSession(sess);
+    saveSession(sess);
+    setUses(getStoredUses(sess.email));
+    setShowAuth(false);
+    setShowPaywall(false);
+  };
+
+  const handleSignOut=()=>{
+    clearSession();
+    setSession(null);
+    setUses(0);
+    setResult(null);
+    setMenuOpen(false);
+    setMainView("analyze");
+  };
+
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setTimeout(()=>analyzeRef.current?.click(),150); } };
   const switchView=(view)=>{ setMainView(view); window.scrollTo({top:0,behavior:'smooth'}); };
 
-  const usesLeft=FREE_USES_LIMIT-uses;
   const minWords=TASK_TYPES[taskType].minWords;
   const wordCount=countWords(essay);
   const sampleWordCount=result?.sampleEssay?countWords(result.sampleEssay):0;
 
-  const handleProSuccess=()=>{ savePro(); setProUser(true); setShowPaywall(false); trackEvent('upgrade_to_pro'); };
+  const handleProSuccess=()=>{ if(session){ setUserPro(session.email); setShowPaywall(false); trackEvent('upgrade_to_pro'); } };
   const handleImageUpload=(e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=(ev)=>{ setImage(ev.target.result.split(",")[1]); setImagePreview(ev.target.result); }; reader.readAsDataURL(file); };
 
   const extractTextFromImage = async (file, target) => {
@@ -918,8 +1050,8 @@ export default function IELTSBot(){
       const data=await res.json();
       const text=data.content.map(b=>b.text||"").join("");
       const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
-      if(!proUser){ const n=uses+1; setUses(n); saveUses(n); }
-      addToHistory({ band:parsed.overallBand, taskType, wordCount:wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } });
+      if(!proUser){ const n=uses+1; setUses(n); saveUses(n,session?.email); }
+      addToHistory({ band:parsed.overallBand, taskType, wordCount:wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } },session?.email);
       setResult(parsed); setActiveTab("annotated");
       trackEvent("essay_analyzed", { task_type: taskType, band_score: parsed.overallBand, language: lang, is_pro: proUser });
     }catch(e){ setError("Something went wrong. Please try again."); }
@@ -929,6 +1061,7 @@ export default function IELTSBot(){
   return (
     <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
+      {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
 
 
 
@@ -949,13 +1082,21 @@ export default function IELTSBot(){
           </div>
           <div className="nav-right" style={{display:"flex",alignItems:"center",gap:12}}>
             <span style={{fontSize:13,color:proUser?T.green:usesLeft<=0?T.red:T.textMuted,fontWeight:600,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-              {proUser?"✓ Pro — Unlimited":usesLeft>0?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"Free limit reached"}
+              {proUser?"✓ Pro — Unlimited":session?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"2 free analyses"}
             </span>
             <div style={{width:1,height:20,background:T.border}}/>
             {["en","ar"].map(l=>(
               <button key={l} onClick={()=>switchLang(l)} style={{background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:4,padding:"5px 12px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"all 0.15s"}}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
             ))}
-            {!proUser&&(<button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"background 0.15s"}}>Upgrade to Pro →</button>)}
+            {session?(
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
+                <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign Out</button>
+              </div>
+            ):(
+              <button onClick={()=>setShowAuth(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In →</button>
+            )}
+            {session&&!proUser&&(<button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro →</button>)}
           </div>
         </div>
       </div>
@@ -1267,7 +1408,7 @@ export default function IELTSBot(){
         )}
 
         {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="contact"&&<ContactPage/>}
         </div>
@@ -1377,6 +1518,15 @@ export default function IELTSBot(){
                 <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 16px",textAlign:"center",fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Pro — Unlimited Access</div>
               </div>
             )}
+            <div style={{padding:"12px 20px 0"}}>
+              {session?(
+                <button onClick={handleSignOut} style={{width:"100%",background:"#f3f3f3",border:`1px solid ${T.border}`,borderRadius:8,padding:"12px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  🚪 Sign Out ({session.email})
+                </button>
+              ):(
+                <button onClick={()=>{setShowAuth(true);setMenuOpen(false);}} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In / Register →</button>
+              )}
+            </div>
           </div>
         </div>
       )}
