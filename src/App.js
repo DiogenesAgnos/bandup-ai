@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 
 const STRIPE_CONFIGURED = false;
 const FREE_USES_LIMIT = 2;
@@ -354,6 +354,11 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
     </div>
   );
 };
+
+// Memoized — prevents expensive re-render when switching tabs
+const MemoAnnotatedEssay = memo(AnnotatedEssay, (prev, next) =>
+  prev.essay === next.essay && prev.mistakes === next.mistakes
+);
 
 // ── Components ─────────────────────────────────
 const Card=({children,style})=>(
@@ -978,7 +983,6 @@ export default function IELTSBot(){
   const [uses,setUses]=useState(()=>getStoredUses(getSession()?.email));
   const [lang,setLang]=useState("en");
   const [menuOpen,setMenuOpen]=useState(false);
-  const [showStayToast,setShowStayToast]=useState(false);
   const analyzeRef=useRef(null);
 
   const proUser = session ? getUserPro(session.email) : false;
@@ -1040,8 +1044,6 @@ export default function IELTSBot(){
     if(taskType==="task1academic"&&!image){ setError("Please upload the graph/chart image for Academic Task 1."); return; }
     if(!proUser&&uses>=FREE_USES_LIMIT){ setShowPaywall(true); trackEvent('paywall_shown',{task_type:taskType}); return; }
     setError(""); setLoading(true); setResult(null);
-    setShowStayToast(true);
-    setTimeout(()=>setShowStayToast(false), 6000);
     try{
       const messageContent=taskType==="task1academic"&&image
         ?[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:image}},{type:"text",text:`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`}]
@@ -1293,13 +1295,14 @@ export default function IELTSBot(){
                   <TabBtn label="✨ Sample" active={activeTab==="sample"} onClick={()=>setActiveTab("sample")}/>
                 </div>
 
+                <div style={{minHeight:400}}>
                 {activeTab==="annotated"&&(
                   <Card>
                     <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <span>📝 Your Essay — 👆 Click underlined words for corrections</span>
                       <span style={{color:T.red,fontWeight:600}}>{result.mistakes?.length} mistakes found</span>
                     </div>
-                    <AnnotatedEssay essay={essay} mistakes={result.mistakes}/>
+                    <MemoAnnotatedEssay essay={essay} mistakes={result.mistakes}/>
                   </Card>
                 )}
 
@@ -1402,6 +1405,7 @@ export default function IELTSBot(){
                     )}
                   </div>
                 )}
+                </div>{/* end minHeight tab wrapper */}
               </div>
             )}
           </div>
@@ -1436,18 +1440,39 @@ export default function IELTSBot(){
         </div>
       </div>
 
-      {/* ── STAY ON PAGE TOAST ── */}
-      {showStayToast&&(
+      {/* ── LOADING OVERLAY ── */}
+      {loading&&(
         <div style={{
-          position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",
-          background:"#1c1d1f",color:"white",borderRadius:12,padding:"14px 24px",
-          fontSize:14,fontWeight:600,zIndex:999,boxShadow:"0 8px 32px rgba(0,0,0,0.3)",
-          fontFamily:"'Source Sans Pro','Inter',system-ui",
-          display:"flex",alignItems:"center",gap:10,whiteSpace:"nowrap",
-          animation:"slideUp 0.3s ease"
+          position:"fixed",inset:0,
+          background:"rgba(0,0,0,0.6)",
+          backdropFilter:"blur(4px)",
+          zIndex:900,
+          display:"flex",
+          flexDirection:"column",
+          alignItems:"center",
+          justifyContent:"center",
+          gap:20,
+          padding:24
         }}>
-          <span style={{fontSize:20}}>⏳</span>
-          Analysing your essay — please stay on this page
+          <div style={{
+            fontSize:56,
+            animation:"spin 1.5s linear infinite",
+          }}>⏳</div>
+          <div style={{
+            background:"white",
+            borderRadius:16,
+            padding:"20px 32px",
+            textAlign:"center",
+            boxShadow:"0 8px 40px rgba(0,0,0,0.3)",
+            maxWidth:320
+          }}>
+            <div style={{fontSize:17,fontWeight:700,color:"#1f1f1f",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:8}}>
+              Analysing your essay...
+            </div>
+            <div style={{fontSize:13,color:"#636363",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6}}>
+              Please stay on this page.<br/>This usually takes 15–30 seconds.
+            </div>
+          </div>
         </div>
       )}
 
@@ -1565,9 +1590,9 @@ export default function IELTSBot(){
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
         /* ── MOBILE ── */
-        @keyframes slideUp {
-          from { opacity:0; transform: translateX(-50%) translateY(20px); }
-          to   { opacity:1; transform: translateX(-50%) translateY(0);    }
+        @keyframes spin {
+          0%   { transform: rotate(0deg);   }
+          100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
