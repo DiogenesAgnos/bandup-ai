@@ -1417,7 +1417,6 @@ export default function IELTSBot(){
                 )}
                 </div>{/* end minHeight tab wrapper */}
               </div>
-            </div>
             )}
           </div>
         )}
