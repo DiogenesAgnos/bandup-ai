@@ -459,24 +459,37 @@ const MainTab=({label,active,onClick})=>(
 // ── Auth Modal ────────────────────────────────
 const AuthModal=({onClose,onSuccess})=>{
   const [mode,setMode]=useState("login"); // login | register | forgot
-  const [email,setEmail]=useState("");
+  const [email,setEmail]=useState(()=>{ try{ return localStorage.getItem("bandup_saved_email")||""; }catch{ return ""; } });
   const [password,setPassword]=useState("");
   const [name,setName]=useState("");
+  const [showPass,setShowPass]=useState(false);
+  const [rememberMe,setRememberMe]=useState(true);
   const [error,setError]=useState("");
+  const [success,setSuccess]=useState("");
   const [loading,setLoading]=useState(false);
 
   const handle=async()=>{
-    setError(""); setLoading(true);
+    setError(""); setSuccess(""); setLoading(true);
     await new Promise(r=>setTimeout(r,400));
+    if(mode==="forgot"){
+      // Simulate forgot password — just show success message
+      if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
+      setSuccess("If an account exists for this email, a reset link has been sent. Please check your inbox.");
+      setLoading(false);
+      return;
+    }
     if(mode==="login"){
       const res=authLogin(email,password);
       if(res.error){ setError(res.error); setLoading(false); return; }
+      if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
+      else { try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
       onSuccess(res.session);
     } else {
       if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
       if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
       const res=authRegister(email,password,name);
       if(res.error){ setError(res.error); setLoading(false); return; }
+      if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
       onSuccess(res.session);
     }
     setLoading(false);
@@ -490,22 +503,61 @@ const AuthModal=({onClose,onSuccess})=>{
         <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",fontSize:16,cursor:"pointer",width:36,height:36,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,color:T.text}}>✕</button>
         <div style={{textAlign:"center",marginBottom:24}}>
           <div style={{fontSize:32,marginBottom:8}}>🎓</div>
-          <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 4px"}}>{mode==="login"?"Welcome back":"Create account"}</h2>
-          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>{mode==="login"?"Sign in to access your account":"Join BandUp AI today"}</p>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 4px"}}>
+            {mode==="login"?"Welcome back":mode==="register"?"Create account":"Reset password"}
+          </h2>
+          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>
+            {mode==="login"?"Sign in to access your account":mode==="register"?"Join BandUp AI today":"Enter your email to reset your password"}
+          </p>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          {mode==="register"&&<input value={name} onChange={e=>setName(e.target.value)} placeholder="Full name" style={inp}/>}
-          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email address" type="email" style={inp}/>
-          <input value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" type="password" style={inp}
-            onKeyDown={e=>e.key==="Enter"&&handle()}/>
+          {mode==="register"&&(
+            <input value={name} onChange={e=>setName(e.target.value)}
+              placeholder="Full name" autoComplete="name" style={inp}/>
+          )}
+          <input value={email} onChange={e=>setEmail(e.target.value)}
+            placeholder="Email address" type="email" autoComplete="email" style={inp}/>
+          {mode!=="forgot"&&(
+            <div style={{position:"relative"}}>
+              <input value={password} onChange={e=>setPassword(e.target.value)}
+                placeholder="Password" type={showPass?"text":"password"}
+                autoComplete={mode==="login"?"current-password":"new-password"}
+                style={{...inp,paddingRight:48}}
+                onKeyDown={e=>e.key==="Enter"&&handle()}/>
+              <button type="button" onClick={()=>setShowPass(!showPass)}
+                style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16,color:T.textMuted,padding:4}}>
+                {showPass?"🙈":"👁️"}
+              </button>
+            </div>
+          )}
+          {/* Remember me — login only */}
+          {mode==="login"&&(
+            <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+              <input type="checkbox" checked={rememberMe} onChange={e=>setRememberMe(e.target.checked)}
+                style={{width:16,height:16,cursor:"pointer",accentColor:T.primary}}/>
+              Remember my email
+            </label>
+          )}
           {error&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</div>}
-          <button onClick={handle} disabled={loading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",opacity:loading?0.7:1}}>
-            {loading?"⏳ Please wait...":mode==="login"?"Sign In →":"Create Account →"}
+          {success&&<div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{success}</div>}
+          <button onClick={handle} disabled={loading}
+            style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",opacity:loading?0.7:1}}>
+            {loading?"⏳ Please wait...":mode==="login"?"Sign In →":mode==="register"?"Create Account →":"Send Reset Link →"}
           </button>
         </div>
-        <div style={{textAlign:"center",marginTop:16,fontSize:13,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-          {mode==="login"?<>Don't have an account? <button onClick={()=>{setMode("register");setError("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign up free</button></>
-          :<>Already have an account? <button onClick={()=>{setMode("login");setError("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign in</button></>}
+        <div style={{textAlign:"center",marginTop:16,fontSize:13,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",gap:8}}>
+          {mode==="login"&&(
+            <>
+              <div>Don't have an account? <button onClick={()=>{setMode("register");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign up free</button></div>
+              <div><button onClick={()=>{setMode("forgot");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.textMuted,cursor:"pointer",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline"}}>Forgot password?</button></div>
+            </>
+          )}
+          {mode==="register"&&(
+            <div>Already have an account? <button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign in</button></div>
+          )}
+          {mode==="forgot"&&(
+            <div><button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>← Back to sign in</button></div>
+          )}
         </div>
       </div>
     </div>
