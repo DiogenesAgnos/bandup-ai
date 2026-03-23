@@ -1070,10 +1070,10 @@ const ContactPage = () => {
       await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
         from_name: form.name, from_email: form.email, country: form.country,
         age_group: form.age, message: form.message, to_email: "diogenes.agnos@gmail.com"
-      }, EMAILJS_PUBLIC_KEY);
+      });
       setStatus("success");
       setForm({ name:"", country:"", age:"", email:"", message:"" });
-    } catch(e) { setStatus("error"); }
+    } catch(e) { console.error("EmailJS error:", e); setStatus("error"); }
   };
   const inputStyle = { width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", fontFamily:"'Source Sans Pro','Inter',system-ui", outline:"none", boxSizing:"border-box", boxShadow:T.shadow, transition:"border-color 0.2s" };
   const labelStyle = { display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6, fontFamily:"'Source Sans Pro','Inter',system-ui", fontWeight:600 };
