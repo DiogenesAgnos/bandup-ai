@@ -1041,15 +1041,15 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
 };
 
 // ── Analytics Helper ─────────────────────────
-const GA_ID = "G-XXXXXXXXXX";
+const GA_ID = "G-9JN8WF1R0M";
 const trackEvent = (eventName, params={}) => {
   try { if(window.gtag) window.gtag("event", eventName, params); } catch(e) {}
 };
 
 // ── Contact Page ─────────────────────────────
-const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+const EMAILJS_SERVICE_ID = "service_9es76g1";
+const EMAILJS_TEMPLATE_ID = "template_n7d7dbj";
+const EMAILJS_PUBLIC_KEY = "Wl_oo3VnUzPGW3MB4";
 
 const ContactPage = () => {
   const [form, setForm] = useState({ name:"", country:"", age:"", email:"", message:"" });
