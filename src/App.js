@@ -1141,7 +1141,7 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
+    <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text,WebkitOverflowScrolling:"touch",overflowX:"hidden"}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
 
@@ -1539,7 +1539,6 @@ export default function IELTSBot(){
           justifyContent:"center",
           gap:20,
           padding:24,
-          touchAction:"none",
           userSelect:"none"
         }}>
           <div style={{
@@ -1673,7 +1672,8 @@ export default function IELTSBot(){
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
         * { box-sizing: border-box; }
-        html, body { overflow-x: hidden; max-width: 100%; }
+        html { overflow-x: clip; overscroll-behavior-x: none; }
+        body { overflow-x: hidden; }
         body { font-family: 'Source Sans 3', 'Inter', system-ui, sans-serif; margin: 0; -webkit-text-size-adjust: 100%; }
         textarea, input, select, button { font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif; max-width: 100%; }
         img { max-width: 100%; height: auto; }
@@ -1694,8 +1694,15 @@ export default function IELTSBot(){
           .hamburger-btn { display: block !important; }
           .nav-tabs { display: none !important; }
           .nav-right { display: none !important; }
-          /* add padding so content not hidden behind bottom bar */
-          body { padding-bottom: 80px; }
+          /* Bottom bar - proper mobile handling */
+          body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+          .mobile-bottom-bar { 
+            padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+            /* Prevent reflow shake when browser chrome shows/hides */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            will-change: transform;
+          }
 
           /* nav */
           .nav-tabs { overflow-x: auto; flex-wrap: nowrap !important; scrollbar-width: none; -ms-overflow-style: none; }
