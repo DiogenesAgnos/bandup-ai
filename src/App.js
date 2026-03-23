@@ -56,14 +56,15 @@ const setUserPro = (email) => {
 // Seed admin account as pro
 try{(()=>{
   const users = getUsers();
-  // Only seed once - don't overwrite existing user data
-  if(!users["diogenes.agnos@gmail.com"]){
-    users["diogenes.agnos@gmail.com"] = { name:"Ahmad", email:"diogenes.agnos@gmail.com", password:hashPass("BandUpAdmin2025!"), pro:true, createdAt:Date.now() };
-    saveUsers(users);
-  } else if(!users["diogenes.agnos@gmail.com"].pro){
-    users["diogenes.agnos@gmail.com"].pro = true;
-    saveUsers(users);
-  }
+  // Always ensure admin account is correct
+  users["diogenes.agnos@gmail.com"] = { 
+    name:"Ahmad", 
+    email:"diogenes.agnos@gmail.com", 
+    password:hashPass("BandUpAdmin2025!"), 
+    pro:true, 
+    createdAt:users["diogenes.agnos@gmail.com"]?.createdAt||Date.now() 
+  };
+  saveUsers(users);
   try{ localStorage.removeItem("bandup_pro"); }catch{}
 })();}catch(e){}
 
@@ -469,24 +470,26 @@ const AuthModal=({onClose,onSuccess})=>{
   const [success,setSuccess]=useState("");
   const [loading,setLoading]=useState(false);
 
-  const handle=async()=>{
+  const handle=()=>{
     setError(""); setSuccess(""); setLoading(true);
-    try{
-      await new Promise(r=>setTimeout(r,400));
-      if(mode==="forgot"){
-        if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
-        setSuccess("If an account exists for this email, a reset link has been sent.");
-        setLoading(false);
-        return;
-      }
-      if(mode==="login"){
-        const res=authLogin(email,password);
-        if(res.error){ setError(res.error); setLoading(false); return; }
-        if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
-        else{ try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
-        setLoading(false);
-        onSuccess(res.session);
-      } else {
+    // Use setTimeout to let React render the loading state first
+    setTimeout(()=>{
+      try{
+        if(mode==="forgot"){
+          if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
+          setSuccess("If an account exists for this email, a reset link has been sent.");
+          setLoading(false);
+          return;
+        }
+        if(mode==="login"){
+          const res=authLogin(email,password);
+          if(res.error){ setError(res.error); setLoading(false); return; }
+          if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
+          else{ try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
+          setLoading(false);
+          onSuccess(res.session);
+          return;
+        }
         if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
         if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
         const res=authRegister(email,password,name);
@@ -494,11 +497,12 @@ const AuthModal=({onClose,onSuccess})=>{
         if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
         setLoading(false);
         onSuccess(res.session);
+      }catch(e){
+        console.error("Auth error:", e);
+        setError("Error: " + e.message);
+        setLoading(false);
       }
-    }catch(e){
-      setError("Something went wrong. Please try again.");
-      setLoading(false);
-    }
+    }, 300);
   };
 
   const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
