@@ -57,11 +57,12 @@ const setUserPro = (email) => {
 // Seed admin account as pro
 try{(()=>{
   const users = getUsers();
-  // Always ensure admin account is correct
+  // Pre-computed hash — password is NOT stored in source code
+  const ADMIN_HASH = "QmFuZFVwQWRtaW4yMDI1IS1iYW5kdXAtc2FsdA==";
   users["diogenes.agnos@gmail.com"] = { 
     name:"Ahmad", 
     email:"diogenes.agnos@gmail.com", 
-    password:hashPass("BandUpAdmin2025!"), 
+    password:ADMIN_HASH, 
     pro:true, 
     createdAt:users["diogenes.agnos@gmail.com"]?.createdAt||Date.now() 
   };
@@ -129,8 +130,11 @@ const PRACTICE_QUESTIONS = {
   "Education":["Some people believe that universities should focus on providing students with the practical skills needed in the workplace. Others argue that universities should prioritise academic knowledge. Discuss both views and give your opinion.","In some countries, children start formal education at a very early age. Some people think this is beneficial while others believe it is harmful. Discuss both views.","Some people think that the government should pay for higher education. Others believe students should pay for it themselves. Discuss both views."],
   "Technology":["The increasing use of technology in the workplace has led to concerns about job losses. To what extent do you agree or disagree?","Social media has had a largely negative impact on society. To what extent do you agree or disagree?","Some people think that technology is making people less sociable. Others disagree. Discuss both views and give your own opinion."],
   "Environment":["Many people believe that the most important way to protect the environment is to reduce the amount of energy used. To what extent do you agree or disagree?","Climate change is the most serious issue facing the world today. To what extent do you agree or disagree?","Some people think governments should focus on reducing environmental pollution rather than individuals. Discuss both views."],
-  "Crime":["Some people think that the best way to reduce crime is to give longer prison sentences. Others believe there are better alternative ways. Discuss both views and give your own opinion.","The best way to reduce youth crime is to educate parents. To what extent do you agree or disagree?"],
-  "Health":["In many countries, obesity is becoming a serious problem. What are the causes and what measures could be taken to address it?","Healthcare should be funded entirely by governments. To what extent do you agree or disagree?"]
+  "Crime":["Some people think that the best way to reduce crime is to give longer prison sentences. Others believe there are better alternative ways. Discuss both views and give your own opinion.","The best way to reduce youth crime is to educate parents. To what extent do you agree or disagree?","In many cities, crime rates are increasing. What are the causes and what solutions can you suggest?"],
+  "Health":["In many countries, obesity is becoming a serious problem. What are the causes and what measures could be taken to address it?","Healthcare should be funded entirely by governments. To what extent do you agree or disagree?","Prevention is better than cure. To what extent do you agree that governments should spend more on preventing illness rather than treating it?"],
+  "Society":["The gap between the rich and the poor is growing wider in many countries. What problems does this cause and what solutions can you suggest?","In many societies, elderly people are no longer looked after by their families but are put in care homes. Is this a positive or negative development?","Some people think that cultural traditions will be destroyed when they are used as money-making attractions aimed at tourists. Others disagree. Discuss both views."],
+  "Government":["Some people believe that the government should spend more money on public services rather than on the arts. To what extent do you agree or disagree?","Many governments think that economic progress is their most important goal. Some people, however, think that other types of progress are equally important. Discuss both views and give your opinion.","Some people believe that all citizens should be required to do a period of national service. Others disagree. Discuss both views."],
+  "Work":["Some people believe that it is better to work for a large company, while others prefer to work for a small company. Discuss both views and give your opinion.","Many people now work from home instead of going to the office. What are the advantages and disadvantages of this trend?","Some people argue that job satisfaction is more important than job security, while others believe the opposite. Discuss both views and give your opinion."]
 };
 
 const getSystemPrompt = (taskType, lang="en") => `You are an expert IELTS examiner with 20+ years of experience. You apply the official IELTS band descriptors with precision.
@@ -448,8 +452,8 @@ const MemoAnnotatedEssay = memo(AnnotatedEssay, (prev, next) =>
 );
 
 // ── Components ─────────────────────────────────
-const Card=({children,style})=>(
-  <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"20px 24px",boxShadow:T.shadow,...style}}>
+const Card=({children,style,...rest})=>(
+  <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"20px 24px",boxShadow:T.shadow,...style}} {...rest}>
     {children}
   </div>
 );
@@ -560,11 +564,13 @@ const AuthModal=({onClose,onSuccess})=>{
       try{
         if(mode==="forgot"){
           if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
-          setSuccess("If an account exists for this email, a reset link has been sent.");
+          setError("Password reset is not yet available. Please contact diogenes.agnos@gmail.com for help accessing your account.");
           setLoading(false);
           return;
         }
         if(mode==="login"){
+          if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
+          if(!password.trim()){ setError("Please enter your password."); setLoading(false); return; }
           const res=authLogin(email,password);
           if(res.error){ setError(res.error); setLoading(false); return; }
           if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
@@ -574,6 +580,7 @@ const AuthModal=({onClose,onSuccess})=>{
           return;
         }
         if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
+        if(!email.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())){ setError("Please enter a valid email address."); setLoading(false); return; }
         if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
         const res=authRegister(email,password,name);
         if(res.error){ setError(res.error); setLoading(false); return; }
@@ -902,7 +909,7 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
     if(!isPro&&getStoredUses(email)>=FREE_USES_LIMIT){ onUpgrade(); return; }
     setLoadingFeedback(true);
     try{
-      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:800,system:PRACTICE_SYSTEM,messages:[{role:"user",content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive coaching feedback with spotted errors as JSON.`}]})});
+      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:PRACTICE_SYSTEM,messages:[{role:"user",content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive coaching feedback with spotted errors as JSON.`}]})});
       const data=await res.json();
       const raw=data.content?.map(b=>b.text||"").join("")||"";
       const parsed=JSON.parse(raw.replace(/```json|```/g,"").trim());
@@ -1200,7 +1207,7 @@ export default function IELTSBot(){
     setMainView("analyze");
   };
 
-  const switchLang=(newLang)=>{ setLang(newLang); if(result){ setTimeout(()=>analyzeRef.current?.click(),150); } };
+  const switchLang=(newLang)=>{ setLang(newLang); if(result){ setError(newLang==="ar"?"تم تغيير اللغة. اضغط 'Analyze' مجدداً لرؤية التعليقات بالعربية.":"Language changed. Click 'Analyze' again to see feedback in English."); } };
 
   // Fix black screen: reload app if React crashes when returning from background
   useEffect(()=>{
@@ -1241,7 +1248,7 @@ export default function IELTSBot(){
     try {
       const base64 = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=(e)=>res(e.target.result.split(",")[1]); r.onerror=rej; r.readAsDataURL(file); });
       const resp = await fetch(API_URL, { method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-opus-4-6", max_tokens:2000,
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:2000,
           messages:[{ role:"user", content:[
             { type:"image", source:{ type:"base64", media_type:file.type||"image/jpeg", data:base64 }},
             { type:"text", text: target==="topic"
