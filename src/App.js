@@ -1160,10 +1160,65 @@ const RefundPage = ({onBack}) => (
     <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries: <strong>diogenes.agnos@gmail.com</strong></p></Section>
   </PolicyPage>
 );
+const PricingPage = ({onBack, onUpgrade, isPro}) => (
+  <PolicyPage title="Pricing" onBack={onBack}>
+    <div style={{textAlign:"center",marginBottom:32}}>
+      <p style={{fontSize:16,lineHeight:1.7,color:T.textMid}}>BandUp AI offers a simple, transparent pricing model with no hidden fees.</p>
+    </div>
+    <div className="pricing-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:32}}>
+      <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:12,padding:"28px 24px",textAlign:"center"}}>
+        <div style={{fontSize:13,fontWeight:700,color:T.textMuted,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:12}}>Free Plan</div>
+        <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:8}}>$0</div>
+        <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>Get started — no credit card required</div>
+        <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8}}>
+          {["2 free essay analyses","Task 1 & Task 2 support","Band scores for all 4 criteria","Basic mistake detection","Linking Words toolkit","Grammar reference guide"].map((f,i)=>(
+            <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
+          ))}
+        </ul>
+      </div>
+      <div style={{background:"#fefdf8",border:`2px solid ${T.primary}`,borderRadius:12,padding:"28px 24px",textAlign:"center",position:"relative",boxShadow:T.shadowMd}}>
+        <div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:T.primary,color:"white",borderRadius:20,padding:"3px 16px",fontSize:11,fontWeight:700,letterSpacing:"0.05em"}}>MOST POPULAR</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.primary,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:12}}>Pro Plan</div>
+        <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:4}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>19</div>
+        <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>per month · cancel anytime</div>
+        <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
+          {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live AI coaching","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
+            <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
+          ))}
+        </ul>
+        {isPro?(
+          <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ You're on Pro — Unlimited Access</div>
+        ):(
+          <button onClick={onUpgrade} style={{width:"100%",background:STRIPE_CONFIGURED?T.primary:"#94a3b8",color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:STRIPE_CONFIGURED?"pointer":"not-allowed",boxShadow:STRIPE_CONFIGURED?T.shadowMd:"none"}}>
+            {STRIPE_CONFIGURED?"Start Pro — $19/month":"🔒 Payments Coming Soon"}
+          </button>
+        )}
+      </div>
+    </div>
+    <Section title="Billing & Payments">
+      <p style={{margin:"0 0 12px"}}>Payments are processed securely by <strong>Paddle.com</strong> as our Merchant of Record. Paddle handles all billing, VAT/tax collection, invoicing, and payment processing on behalf of BandUp AI.</p>
+      <p style={{margin:"0 0 12px"}}>We accept all major credit and debit cards, PayPal, Apple Pay, Google Pay, and selected local payment methods depending on your region.</p>
+    </Section>
+    <Section title="Cancellation">
+      <p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No further charges will be made after cancellation.</p>
+    </Section>
+    <Section title="Refunds">
+      <p style={{margin:"0 0 12px"}}>We offer a <strong>1-day money-back guarantee</strong> for new subscribers. If you are not satisfied within 24 hours of your initial purchase, contact <strong>diogenes.agnos@gmail.com</strong> for a full refund. See our full <button onClick={()=>{const path="/refund";window.history.pushState({},"",path);window.location.reload();}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:15,fontFamily:"inherit",padding:0,textDecoration:"underline"}}>Refund Policy</button> for details.</p>
+    </Section>
+    <Section title="Questions?">
+      <p style={{margin:"0 0 12px"}}>Contact us at <strong>diogenes.agnos@gmail.com</strong> for any billing or pricing enquiries.</p>
+    </Section>
+  </PolicyPage>
+);
+
+// ── URL Routing ──────────────────────────────
+const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact"};
+const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
+const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
 
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
-  const [mainView,setMainView]=useState("analyze");
+  const [mainView,setMainView]=useState(()=>getViewFromPath());
   const [taskType,setTaskType]=useState(()=>getLastResult()?.taskType||"task2");
   const [topic,setTopic]=useState(()=>getLastResult()?.topic||"");
   const [essay,setEssay]=useState(()=>getLastResult()?.essay||"");
@@ -1204,7 +1259,7 @@ export default function IELTSBot(){
     setUses(0);
     setResult(null);
     setMenuOpen(false);
-    setMainView("analyze");
+    switchView("analyze");
   };
 
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setError(newLang==="ar"?"تم تغيير اللغة. اضغط 'Analyze' مجدداً لرؤية التعليقات بالعربية.":"Language changed. Click 'Analyze' again to see feedback in English."); } };
@@ -1232,7 +1287,28 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const switchView=(view)=>{ setMainView(view); window.scrollTo({top:0,behavior:'smooth'}); };
+  const PAGE_TITLES = {analyze:"BandUp AI — IELTS Writing Examiner",practice:"Practice Mode — BandUp AI",progress:"Progress Tracker — BandUp AI",toolkit:"IELTS Toolkit — BandUp AI",contact:"Contact Us — BandUp AI",terms:"Terms of Service — BandUp AI",privacy:"Privacy Policy — BandUp AI",refund:"Refund Policy — BandUp AI",pricing:"Pricing — BandUp AI"};
+  const switchView=(view)=>{ 
+    setMainView(view); 
+    const path = VIEW_TO_PATH[view] || "/";
+    if(window.location.pathname !== path) window.history.pushState({view}, "", path);
+    document.title = PAGE_TITLES[view] || "BandUp AI";
+    window.scrollTo({top:0,behavior:'smooth'}); 
+  };
+
+  // Handle browser back/forward buttons
+  useEffect(()=>{
+    const onPop = () => { 
+      const view = getViewFromPath();
+      setMainView(view); 
+      document.title = PAGE_TITLES[view] || "BandUp AI";
+      window.scrollTo({top:0}); 
+    };
+    window.addEventListener('popstate', onPop);
+    // Set title on initial load
+    document.title = PAGE_TITLES[mainView] || "BandUp AI";
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
   const minWords=TASK_TYPES[taskType].minWords;
   const wordCount=countWords(essay);
@@ -1332,6 +1408,7 @@ export default function IELTSBot(){
       </div>
 
       {/* HERO */}
+      {!["terms","privacy","refund","pricing"].includes(mainView)&&(<>
       <div style={{background:"#f0f4ff",position:"relative"}}>
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"48px 40px 48px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
@@ -1345,8 +1422,8 @@ export default function IELTSBot(){
               Instant AI band scores · Complete mistake detection · Band 8+ model essays · Practice Mode with live coaching
             </p>
             <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-              <button onClick={()=>setMainView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
-              <button onClick={()=>setMainView("practice")} style={{background:"transparent",color:T.primary,border:`2px solid ${T.primary}`,borderRadius:4,padding:"11px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Try Practice Mode</button>
+              <button onClick={()=>switchView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
+              <button onClick={()=>switchView("practice")} style={{background:"transparent",color:T.primary,border:`2px solid ${T.primary}`,borderRadius:4,padding:"11px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Try Practice Mode</button>
             </div>
           </div>
           <div className="hero-image" style={{flex:"0 0 45%",position:"relative",overflow:"hidden",minHeight:320}}>
@@ -1651,10 +1728,12 @@ export default function IELTSBot(){
         {mainView==="contact"&&<ContactPage/>}
         </div>
       </div>
+      </>)}
 
-      {mainView==="terms"&&<TermsPage onBack={()=>setMainView("analyze")}/>}
-      {mainView==="privacy"&&<PrivacyPage onBack={()=>setMainView("analyze")}/>}
-      {mainView==="refund"&&<RefundPage onBack={()=>setMainView("analyze")}/>}
+      {mainView==="terms"&&<TermsPage onBack={()=>switchView("analyze")}/>}
+      {mainView==="privacy"&&<PrivacyPage onBack={()=>switchView("analyze")}/>}
+      {mainView==="refund"&&<RefundPage onBack={()=>switchView("analyze")}/>}
+      {mainView==="pricing"&&<PricingPage onBack={()=>switchView("analyze")} onUpgrade={()=>setShowPaywall(true)} isPro={proUser}/>}
 
       {/* FOOTER */}
       <div style={{background:"#1c1d1f",borderTop:"1px solid #333",padding:"32px 24px",marginTop:40}}>
@@ -1662,8 +1741,8 @@ export default function IELTSBot(){
           <div className="footer-top" style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16,marginBottom:20}}>
             <span style={{color:"#fff",fontWeight:800,fontSize:20,fontFamily:"'Source Sans Pro','Inter',system-ui",letterSpacing:"-0.5px"}}>BandUp AI</span>
             <div className="footer-links" style={{display:"flex",gap:24,flexWrap:"wrap"}}>
-              {[["terms","Terms of Service"],["privacy","Privacy Policy"],["refund","Refund Policy"]].map(([key,label])=>(
-                <button key={key} onClick={()=>setMainView(key)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:0}}>{label}</button>
+              {[["terms","Terms of Service"],["privacy","Privacy Policy"],["refund","Refund Policy"],["pricing","Pricing"]].map(([key,label])=>(
+                <button key={key} onClick={()=>switchView(key)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:0}}>{label}</button>
               ))}
             </div>
           </div>
@@ -1837,6 +1916,7 @@ export default function IELTSBot(){
           .tab-row { overflow-x: auto !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; scrollbar-width: none !important; }
           .tab-row::-webkit-scrollbar { display: none !important; }
           .contact-grid { grid-template-columns: 1fr !important; }
+          .pricing-grid { grid-template-columns: 1fr !important; }
           .footer-top { flex-direction: column !important; gap: 12px !important; }
           .footer-links { flex-wrap: wrap !important; gap: 12px !important; }
           .mobile-hide { display: none !important; }
