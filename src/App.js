@@ -1696,7 +1696,7 @@ export default function IELTSBot(){
           .mobile-hide { display: none !important; }
           .upgrade-btn { display: none !important; }
         }
-      \`}</style>
+      `}</style>
     </div>
   );
 }
