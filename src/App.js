@@ -1008,6 +1008,30 @@ export default function IELTSBot(){
   };
 
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setTimeout(()=>analyzeRef.current?.click(),150); } };
+
+  // Fix black screen: reload app if React crashes when returning from background
+  useEffect(()=>{
+    const onVisibility = () => {
+      if(document.visibilityState === 'visible'){
+        // If the root div is empty, React crashed — force reload
+        setTimeout(()=>{
+          const root = document.getElementById('root');
+          if(root && root.children.length === 0){
+            window.location.reload();
+          }
+        }, 500);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  // Safety net: if loading stays true for more than 90 seconds, force-clear it
+  useEffect(()=>{
+    if(!loading) return;
+    const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
+    return ()=>clearTimeout(timer);
+  }, [loading]);
   const switchView=(view)=>{ setMainView(view); window.scrollTo({top:0,behavior:'smooth'}); };
 
   const minWords=TASK_TYPES[taskType].minWords;
@@ -1056,11 +1080,12 @@ export default function IELTSBot(){
       const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
       if(!proUser){ const n=uses+1; setUses(n); saveUses(n,session?.email); }
       addToHistory({ band:parsed.overallBand, taskType, wordCount:wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } },session?.email);
-      setResult(parsed); setActiveTab("annotated");
       saveLastResult({result:parsed, topic, essay, taskType, lang});
       trackEvent("essay_analyzed", { task_type: taskType, band_score: parsed.overallBand, language: lang, is_pro: proUser });
-    }catch(e){ setError("Something went wrong. Please try again."); }
-    finally{ setLoading(false); }
+      setLoading(false);
+      setResult(parsed);
+      setActiveTab("annotated");
+    }catch(e){ setLoading(false); setError("Something went wrong. Please try again."); }
   };
 
   return (
