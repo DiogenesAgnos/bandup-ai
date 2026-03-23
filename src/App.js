@@ -56,10 +56,11 @@ const setUserPro = (email) => {
 // Seed admin account as pro
 try{(()=>{
   const users = getUsers();
+  // Only seed once - don't overwrite existing user data
   if(!users["diogenes.agnos@gmail.com"]){
     users["diogenes.agnos@gmail.com"] = { name:"Ahmad", email:"diogenes.agnos@gmail.com", password:hashPass("BandUpAdmin2025!"), pro:true, createdAt:Date.now() };
     saveUsers(users);
-  } else {
+  } else if(!users["diogenes.agnos@gmail.com"].pro){
     users["diogenes.agnos@gmail.com"].pro = true;
     saveUsers(users);
   }
@@ -1142,7 +1143,7 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text,WebkitOverflowScrolling:"touch",overflowX:"hidden"}}>
+    <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
 
@@ -1661,75 +1662,41 @@ export default function IELTSBot(){
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
-        * { box-sizing: border-box; }
-        html { overflow-x: clip; overscroll-behavior-x: none; }
-        body { overflow-x: hidden; }
-        body { font-family: 'Source Sans 3', 'Inter', system-ui, sans-serif; margin: 0; -webkit-text-size-adjust: 100%; }
-        textarea, input, select, button { font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif; max-width: 100%; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body { font-family: 'Source Sans 3','Inter',system-ui,sans-serif; margin: 0; -webkit-font-smoothing: antialiased; }
+        textarea, input, select, button { font-family: 'Source Sans Pro','Inter',system-ui,sans-serif; }
         img { max-width: 100%; height: auto; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #F3F4F6; }
         ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
-
-        /* ── MOBILE ── */
-        @keyframes spin {
-          0%   { transform: rotate(0deg);   }
-          100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
 
         @media (max-width: 768px) {
-          /* show bottom bar + hamburger, hide desktop nav tabs */
           .hamburger-btn { display: block !important; }
           .nav-tabs { display: none !important; }
           .nav-right { display: none !important; }
-          /* Bottom bar - proper mobile handling */
-
-
-          /* nav */
-          .nav-tabs { overflow-x: auto; flex-wrap: nowrap !important; scrollbar-width: none; -ms-overflow-style: none; }
-          .nav-tabs::-webkit-scrollbar { display: none; }
-          .upgrade-btn { display: none !important; }
-          .nav-right { gap: 6px !important; }
-
-          /* hero */
           .hero-inner { flex-direction: column !important; min-height: auto !important; padding: 28px 16px 32px !important; }
           .hero-text { flex: none !important; width: 100% !important; padding: 0 !important; }
           .hero-image { display: none !important; }
           .hero-btns { flex-direction: column !important; }
-          .hero-btns button { width: 100% !important; text-align: center; }
-
-          /* stats */
+          .hero-btns button { width: 100% !important; }
           .stats-inner { gap: 16px !important; padding: 12px 16px !important; }
-
-          /* content */
-          .content-outer { padding: 0 10px !important; margin: 12px auto 60px !important; }
-          .content-card { padding: 14px !important; border-radius: 8px !important; }
-          .analyze-box { padding: 16px 12px !important; border-radius: 10px !important; }
-
-          /* task type grid — stack on mobile */
+          .content-outer { padding: 0 10px !important; margin: 12px auto 40px !important; }
+          .content-card { padding: 14px !important; }
+          .analyze-box { padding: 16px 12px !important; }
           .task-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
-
-          /* result header */
           .result-header { padding: 18px 16px !important; gap: 12px !important; }
-          .result-band-num { font-size: 52px !important; }
-
-          /* tabs scroll */
-          .tab-row { overflow-x: auto !important; flex-wrap: nowrap !important; scrollbar-width: none !important; -ms-overflow-style: none !important; }
+          .tab-row { overflow-x: auto !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; scrollbar-width: none !important; }
           .tab-row::-webkit-scrollbar { display: none !important; }
-
-          /* contact grid */
           .contact-grid { grid-template-columns: 1fr !important; }
-
-          /* footer */
-          .footer-top { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .footer-top { flex-direction: column !important; gap: 12px !important; }
           .footer-links { flex-wrap: wrap !important; gap: 12px !important; }
-
-          /* misc */
           .mobile-hide { display: none !important; }
-          .criteria-label { width: auto !important; min-width: 120px; font-size: 11px !important; }
+          .upgrade-btn { display: none !important; }
         }
-      `}</style>
+      \`}</style>
     </div>
   );
 }
