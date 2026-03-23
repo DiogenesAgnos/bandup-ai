@@ -18,7 +18,7 @@ const getSession = () => { try{ return JSON.parse(localStorage.getItem(SESSION_K
 const saveSession = (s) => { try{ localStorage.setItem(SESSION_KEY,JSON.stringify(s)); }catch{} };
 const clearSession = () => { try{ localStorage.removeItem(SESSION_KEY); }catch{} };
 
-const hashPass = (p) => btoa(unescape(encodeURIComponent(p+"-bandup-salt")));
+const hashPass = (p) => { try{ return btoa(encodeURIComponent(p+'-bandup-salt').replace(/%([0-9A-F]{2})/g,(_,p1)=>String.fromCharCode(parseInt(p1,16)))); }catch(e){ return btoa(p+'-bandup-salt'); } };
 
 const authRegister = (email, password, name) => {
   const users = getUsers();
@@ -471,29 +471,33 @@ const AuthModal=({onClose,onSuccess})=>{
 
   const handle=async()=>{
     setError(""); setSuccess(""); setLoading(true);
-    await new Promise(r=>setTimeout(r,400));
-    if(mode==="forgot"){
-      // Simulate forgot password — just show success message
-      if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
-      setSuccess("If an account exists for this email, a reset link has been sent. Please check your inbox.");
+    try{
+      await new Promise(r=>setTimeout(r,400));
+      if(mode==="forgot"){
+        if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
+        setSuccess("If an account exists for this email, a reset link has been sent.");
+        setLoading(false);
+        return;
+      }
+      if(mode==="login"){
+        const res=authLogin(email,password);
+        if(res.error){ setError(res.error); setLoading(false); return; }
+        if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
+        else{ try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
+        setLoading(false);
+        onSuccess(res.session);
+      } else {
+        if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
+        if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
+        const res=authRegister(email,password,name);
+        if(res.error){ setError(res.error); setLoading(false); return; }
+        if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
+        setLoading(false);
+        onSuccess(res.session);
+      }
+    }catch(e){
+      setError("Something went wrong. Please try again.");
       setLoading(false);
-      return;
-    }
-    if(mode==="login"){
-      const res=authLogin(email,password);
-      if(res.error){ setError(res.error); setLoading(false); return; }
-      if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
-      else { try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
-      setLoading(false);
-      onSuccess(res.session);
-    } else {
-      if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
-      if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
-      const res=authRegister(email,password,name);
-      if(res.error){ setError(res.error); setLoading(false); return; }
-      if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
-      setLoading(false);
-      onSuccess(res.session);
     }
   };
 
@@ -1150,7 +1154,7 @@ export default function IELTSBot(){
 
 
       {/* NAV BAR 2 */}
-      <div style={{position:"sticky",top:0,zIndex:200,background:T.bg,borderBottom:`1px solid ${T.border}`,boxShadow:T.shadowNav}}>
+      <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,background:T.bg,borderBottom:`1px solid ${T.border}`,boxShadow:T.shadowNav}}>
         <div className="nav-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
           <div style={{display:"flex",alignItems:"center",gap:24}}>
             <span style={{color:T.primary,fontWeight:800,fontSize:26,fontFamily:"'Source Sans Pro','Inter',system-ui",letterSpacing:"-0.8px",lineHeight:1}}>BandUp AI</span>
@@ -1186,7 +1190,7 @@ export default function IELTSBot(){
       </div>
 
       {/* HERO */}
-      <div style={{background:"#f0f4ff",overflow:"hidden",position:"relative"}}>
+      <div style={{background:"#f0f4ff",position:"relative"}}>
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"48px 40px 48px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(0,86,210,0.1)",border:"1px solid rgba(0,86,210,0.2)",borderRadius:4,padding:"4px 12px",marginBottom:18,alignSelf:"flex-start"}}>
@@ -1383,7 +1387,7 @@ export default function IELTSBot(){
                   <TabBtn label="✨ Sample" active={activeTab==="sample"} onClick={()=>setActiveTab("sample")}/>
                 </div>
 
-                <div style={{minHeight:400}}>
+                <div>
                 {activeTab==="annotated"&&(
                   <Card>
                     <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -1695,6 +1699,8 @@ export default function IELTSBot(){
           .footer-links { flex-wrap: wrap !important; gap: 12px !important; }
           .mobile-hide { display: none !important; }
           .upgrade-btn { display: none !important; }
+          /* Sticky nav can cause scroll issues on Android - make relative on mobile */
+          .sticky-nav { position: relative !important; top: auto !important; }
         }
       `}</style>
     </div>
