@@ -181,7 +181,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
 {
   "wordCount":201,"overallBand":7.5,
   "criteria":{"taskAchievement":{"band":7.0,"feedback":"..."},"coherenceCohesion":{"band":7.5,"feedback":"..."},"lexicalResource":{"band":7.0,"feedback":"..."},"grammaticalRange":{"band":7.5,"feedback":"..."}},
-  "mistakes":[{"original":"exact phrase from text","correction":"corrected version","explanation":"clear explanation","category":"Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register","severity":"minor|moderate|major"}],
+  "mistakes":[{"original":"exact phrase from text","correction":"the EXACT replacement text that should replace the original — NEVER advice or descriptions like 'use a stronger word', ALWAYS a concrete drop-in phrase the student can copy-paste","explanation":"clear explanation of WHY this is wrong and HOW the correction improves it","category":"Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register","severity":"minor|moderate|major"}],
   "vocabularyUpgrades":[{"weak":"exact weak phrase from essay","advanced":"better IELTS alternative","reason":"why this upgrade helps"}],
   "bandBooster":{"currentBand":7.0,"targetBand":7.5,"specificActions":["specific action 1","action 2","action 3"]},
   "examinerTips":["insider tip 1 specific to this essay","tip 2","tip 3"],
@@ -224,6 +224,17 @@ WORD CHOICE & ACADEMIC STYLE:
 - Colloquial expressions
 - Any contraction (don't, can't, it's → do not, cannot, it is)
 
+CRITICAL — CORRECTION FIELD RULES:
+The "correction" field must ALWAYS contain a concrete replacement phrase that the student can directly substitute into their essay. NEVER write advice, descriptions, or suggestions like "use a stronger word" or "consider more formal language".
+Examples of CORRECT corrections:
+  - original: "a lot of people", correction: "a significant proportion of individuals" (NOT "use a more formal quantifier")
+  - original: "things", correction: "factors" or "aspects" (NOT "be more specific")
+  - original: "good", correction: "beneficial" or "advantageous" (NOT "use a stronger adjective")
+  - original: "is very important", correction: "is of paramount importance" (NOT "strengthen this phrase")
+  - original: "In my opinion, I think", correction: "I firmly contend that" (NOT "remove redundancy")
+  - original: "people who break the law", correction: "offenders" or "those who contravene legislation" (NOT "use more academic language")
+For Word Choice and Academic Style mistakes, the correction IS the upgraded academic phrase. For Grammar mistakes, the correction IS the grammatically fixed version.
+
 SENTENCE STRUCTURE:
 - Short simplistic sentences that could be combined for sophistication
 - Overuse of the same sentence structure
@@ -249,9 +260,9 @@ Respond ONLY with valid JSON (no markdown):
   "quickFix":"The most important fix right now — be specific",
   "encouragement":"One short honest comment",
   "estimatedBand":6.0,
-  "spotErrors":[{"original":"exact error text","correction":"corrected","explanation":"why this is wrong","category":"Grammar|Spelling|Punctuation|Word Choice|Academic Style"}]
+  "spotErrors":[{"original":"exact error text","correction":"the exact replacement phrase to substitute in — NEVER advice like 'use a stronger word', ALWAYS a concrete phrase","explanation":"why this is wrong","category":"Grammar|Spelling|Punctuation|Word Choice|Academic Style"}]
 }
-spotErrors: find up to 5 real errors from the text. Each original must be exact text from the essay.`;
+spotErrors: find up to 5 real errors from the text. Each original must be exact text from the essay. Each correction must be a direct drop-in replacement, not advice. Example: original "a lot of", correction "a considerable amount of" (NOT "use formal language").`;
 
 const TOOLKIT = {
   linkingWords:[
@@ -867,7 +878,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
 };
 
 // ── Practice Mode ─────────────────────────────
-const PracticeMode=({isPro,onUpgrade})=>{
+const PracticeMode=({isPro,onUpgrade,email})=>{
   const [questionMode,setQuestionMode]=useState("choose");
   const [selectedTopic,setSelectedTopic]=useState("Education");
   const [selectedQuestion,setSelectedQuestion]=useState("");
@@ -888,7 +899,7 @@ const PracticeMode=({isPro,onUpgrade})=>{
 
   const fetchLiveFeedback=useCallback(async(text)=>{
     if(countWords(text)<25) return;
-    if(!isPro&&getStoredUses()>=FREE_USES_LIMIT){ onUpgrade(); return; }
+    if(!isPro&&getStoredUses(email)>=FREE_USES_LIMIT){ onUpgrade(); return; }
     setLoadingFeedback(true);
     try{
       const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:800,system:PRACTICE_SYSTEM,messages:[{role:"user",content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive coaching feedback with spotted errors as JSON.`}]})});
@@ -896,10 +907,10 @@ const PracticeMode=({isPro,onUpgrade})=>{
       const raw=data.content?.map(b=>b.text||"").join("")||"";
       const parsed=JSON.parse(raw.replace(/```json|```/g,"").trim());
       setLiveFeedback(parsed);
-      if(!isPro){ const n=getStoredUses()+1; saveUses(n); }
+      if(!isPro){ const n=getStoredUses(email)+1; saveUses(n,email); }
     }catch(e){ console.error(e); }
     finally{ setLoadingFeedback(false); }
-  },[question,isPro,onUpgrade]);
+  },[question,isPro,onUpgrade,email]);
 
   const handleEssayChange=(e)=>{
     const val=e.target.value;
@@ -1627,7 +1638,7 @@ export default function IELTSBot(){
           </div>
         )}
 
-        {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="contact"&&<ContactPage/>}
