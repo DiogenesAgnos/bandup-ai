@@ -1048,7 +1048,7 @@ const trackEvent = (eventName, params={}) => {
 
 // ── Contact Page ─────────────────────────────
 const EMAILJS_SERVICE_ID = "service_9es76g1";
-const EMAILJS_TEMPLATE_ID = "template_n7d7dbj";
+const EMAILJS_TEMPLATE_ID = "template_jrd4i4n";
 const EMAILJS_PUBLIC_KEY = "Wl_oo3VnUzPGW3MB4";
 
 const ContactPage = () => {
