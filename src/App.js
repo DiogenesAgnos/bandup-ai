@@ -14,6 +14,7 @@ const saveLastResult = (data) => { try{ localStorage.setItem(LAST_RESULT_KEY, JS
 const getLastResult = () => { try{ return JSON.parse(localStorage.getItem(LAST_RESULT_KEY)||"null"); }catch{ return null; } };
 const clearLastResult = () => { try{ localStorage.removeItem(LAST_RESULT_KEY); }catch{} };
 const saveUsers = (u) => { try{ localStorage.setItem(USERS_KEY,JSON.stringify(u)); }catch{} };
+const getUsers = () => { try{ return JSON.parse(localStorage.getItem(USERS_KEY)||"{}"); }catch{ return {}; } };
 const getSession = () => { try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||"null"); }catch{ return null; } };
 const saveSession = (s) => { try{ localStorage.setItem(SESSION_KEY,JSON.stringify(s)); }catch{} };
 const clearSession = () => { try{ localStorage.removeItem(SESSION_KEY); }catch{} };
@@ -1236,7 +1237,7 @@ export default function IELTSBot(){
 
         {/* ANALYZE */}
         {mainView==="analyze"&&(
-          <div className="analyze-box" style={{background:"rgba(255,255,255,0.97)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px",backdropFilter:"blur(20px)"}}>
+          <div className="analyze-box" style={{background:"#ffffff",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}>
             <div style={{marginBottom:20}}>
               <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>Select Task Type</label>
               <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
@@ -1671,8 +1672,8 @@ export default function IELTSBot(){
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-        body { font-family: 'Source Sans 3','Inter',system-ui,sans-serif; margin: 0; -webkit-font-smoothing: antialiased; }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-y: scroll; overscroll-behavior: none; }
+        body { font-family: 'Source Sans 3','Inter',system-ui,sans-serif; margin: 0; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
         textarea, input, select, button { font-family: 'Source Sans Pro','Inter',system-ui,sans-serif; }
         img { max-width: 100%; height: auto; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -1705,6 +1706,9 @@ export default function IELTSBot(){
           .upgrade-btn { display: none !important; }
           /* Sticky nav can cause scroll issues on Android - make relative on mobile */
           .sticky-nav { position: relative !important; top: auto !important; }
+        }
+        @media (hover: none) and (pointer: coarse) {
+          html, body { overscroll-behavior-y: none; touch-action: pan-y; }
         }
       `}</style>
     </div>
