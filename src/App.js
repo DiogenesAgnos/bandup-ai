@@ -452,6 +452,12 @@ const MemoAnnotatedEssay = memo(AnnotatedEssay, (prev, next) =>
 );
 
 // ── Components ─────────────────────────────────
+const Logo=({size=26,style={}})=>(
+  <span style={{fontFamily:"'Rubik',sans-serif",fontWeight:900,fontSize:size,letterSpacing:"-1px",lineHeight:1,cursor:"pointer",...style}}>
+    <span style={{color:"#DC2626"}}>E</span><span style={{color:"#EA580C"}}>n</span><span style={{color:"#CA8A04"}}>g</span><span style={{color:"#15803D"}}>l</span><span style={{color:"#0E7490"}}>i</span><span style={{color:"#1D4ED8"}}>s</span><span style={{color:"#7E22CE"}}>h</span><span style={{color:"#BE185D"}}>f</span><span style={{color:"#DC2626"}}>o</span><span style={{color:"#EA580C"}}>o</span><span style={{color:"#15803D"}}>l</span>
+  </span>
+);
+
 const Card=({children,style,...rest})=>(
   <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"20px 24px",boxShadow:T.shadow,...style}} {...rest}>
     {children}
@@ -607,7 +613,7 @@ const AuthModal=({onClose,onSuccess})=>{
             {mode==="login"?"Welcome back":mode==="register"?"Create account":"Reset password"}
           </h2>
           <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>
-            {mode==="login"?"Sign in to access your account":mode==="register"?"Join BandUp AI today":"Enter your email to reset your password"}
+            {mode==="login"?"Sign in to access your account":mode==="register"?"Join Englishfool today":"Enter your email to reset your password"}
           </p>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -1111,7 +1117,7 @@ const ContactPage = () => {
 // ── POLICY PAGES ─────────────────────────────
 const PolicyPage = ({ title, children, onBack }) => (
   <div style={{maxWidth:800, margin:"0 auto", padding:"0 24px 80px"}}>
-    <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"24px 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to BandUp AI</button>
+    <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"24px 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
     <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"40px 48px",boxShadow:T.shadow}}>
       <h1 style={{fontFamily:"'Source Sans Pro','Inter',system-ui",fontSize:28,fontWeight:700,color:T.text,marginBottom:8,marginTop:0}}>{title}</h1>
       <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:32}}>Last updated: {new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}</p>
@@ -1127,13 +1133,13 @@ const Section = ({title, children}) => (
 );
 const TermsPage = ({onBack}) => (
   <PolicyPage title="Terms of Service" onBack={onBack}>
-    <Section title="1. Acceptance of Terms"><p style={{margin:"0 0 12px"}}>By accessing or using BandUp AI ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. BandUp AI is operated by Ahmad Sartawi ("we", "us", "our").</p></Section>
-    <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>BandUp AI is an AI-powered IELTS Writing examination tool that provides automated band score assessment, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
+    <Section title="1. Acceptance of Terms"><p style={{margin:"0 0 12px"}}>By accessing or using Englishfool ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. Englishfool is operated by Ahmad Sartawi ("we", "us", "our").</p></Section>
+    <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>Englishfool is an AI-powered IELTS Writing examination tool that provides automated band score assessment, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
     <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $19 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p><p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings or by contacting Paddle directly. Cancellation takes effect at the end of the current billing period.</p><p style={{margin:"0 0 12px"}}>New subscribers are entitled to a full refund within 14 days of their initial purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
-    <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use BandUp AI only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy the AI systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
-    <Section title="5. AI Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>BandUp AI uses artificial intelligence to provide IELTS writing feedback. While we strive for accuracy, AI-generated scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
-    <Section title="6. Intellectual Property"><p style={{margin:"0 0 12px"}}>All content, design, software, and materials on BandUp AI are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p></Section>
-    <Section title="7. Limitation of Liability"><p style={{margin:"0 0 12px"}}>To the maximum extent permitted by law, BandUp AI shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability to you shall not exceed the amount paid by you in the 12 months preceding the claim.</p></Section>
+    <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use Englishfool only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy the AI systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
+    <Section title="5. AI Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>Englishfool uses artificial intelligence to provide IELTS writing feedback. While we strive for accuracy, AI-generated scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
+    <Section title="6. Intellectual Property"><p style={{margin:"0 0 12px"}}>All content, design, software, and materials on Englishfool are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p></Section>
+    <Section title="7. Limitation of Liability"><p style={{margin:"0 0 12px"}}>To the maximum extent permitted by law, Englishfool shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability to you shall not exceed the amount paid by you in the 12 months preceding the claim.</p></Section>
     <Section title="8. Modifications to Terms"><p style={{margin:"0 0 12px"}}>We reserve the right to modify these Terms at any time. We will notify users of material changes via email or prominent notice on the Service. Continued use after changes constitutes acceptance of the new Terms.</p></Section>
     <Section title="9. Governing Law"><p style={{margin:"0 0 12px"}}>These Terms shall be governed by the laws of the Hashemite Kingdom of Jordan. Any disputes shall be resolved in the courts of Amman, Jordan.</p></Section>
     <Section title="10. Contact"><p style={{margin:"0 0 12px"}}>For any questions regarding these Terms, please reach out via our <strong>Contact Us</strong> page on the website.</p></Section>
@@ -1154,7 +1160,7 @@ const PrivacyPage = ({onBack}) => (
 );
 const RefundPage = ({onBack}) => (
   <PolicyPage title="Refund Policy" onBack={onBack}>
-    <Section title="1. Subscription Cancellation"><p style={{margin:"0 0 12px"}}>You may cancel your BandUp AI Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period.</p></Section>
+    <Section title="1. Subscription Cancellation"><p style={{margin:"0 0 12px"}}>You may cancel your Englishfool Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period.</p></Section>
     <Section title="2. Refund Eligibility"><p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new Pro subscribers, in accordance with Paddle's Buyer Terms and applicable consumer protection regulations. If you are not satisfied within 14 days of your initial subscription, you are entitled to a full refund.</p><p style={{margin:"0 0 12px"}}>Refund requests made after 14 days will be assessed on a case-by-case basis. Refunds may be prorated based on usage during the subscription period.</p></Section>
     <Section title="3. How to Request a Refund"><p style={{margin:"0 0 12px"}}>To request a refund, you may either contact Paddle directly through your purchase confirmation email, or reach out via our <strong>Contact Us</strong> page with your registered email, date of purchase, and reason for refund. All refund requests are processed within 5–10 business days.</p></Section>
     <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries, please use our <strong>Contact Us</strong> page.</p></Section>
@@ -1163,7 +1169,7 @@ const RefundPage = ({onBack}) => (
 const PricingPage = ({onBack, onUpgrade, isPro}) => (
   <PolicyPage title="Pricing" onBack={onBack}>
     <div style={{textAlign:"center",marginBottom:32}}>
-      <p style={{fontSize:16,lineHeight:1.7,color:T.textMid}}>BandUp AI offers a simple, transparent pricing model with no hidden fees.</p>
+      <p style={{fontSize:16,lineHeight:1.7,color:T.textMid}}>Englishfool offers a simple, transparent pricing model with no hidden fees.</p>
     </div>
     <div className="pricing-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:32}}>
       <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:12,padding:"28px 24px",textAlign:"center"}}>
@@ -1196,7 +1202,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
       </div>
     </div>
     <Section title="Billing & Payments">
-      <p style={{margin:"0 0 12px"}}>Payments are processed securely by <strong>Paddle.com</strong> as our Merchant of Record. Paddle handles all billing, VAT/tax collection, invoicing, and payment processing on behalf of BandUp AI.</p>
+      <p style={{margin:"0 0 12px"}}>Payments are processed securely by <strong>Paddle.com</strong> as our Merchant of Record. Paddle handles all billing, VAT/tax collection, invoicing, and payment processing on behalf of Englishfool.</p>
       <p style={{margin:"0 0 12px"}}>We accept all major credit and debit cards, PayPal, Apple Pay, Google Pay, and selected local payment methods depending on your region.</p>
     </Section>
     <Section title="Cancellation">
@@ -1287,12 +1293,12 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {analyze:"BandUp AI — IELTS Writing Examiner",practice:"Practice Mode — BandUp AI",progress:"Progress Tracker — BandUp AI",toolkit:"IELTS Toolkit — BandUp AI",contact:"Contact Us — BandUp AI",terms:"Terms of Service — BandUp AI",privacy:"Privacy Policy — BandUp AI",refund:"Refund Policy — BandUp AI",pricing:"Pricing — BandUp AI"};
+  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
   const switchView=(view)=>{ 
     setMainView(view); 
     const path = VIEW_TO_PATH[view] || "/";
     if(window.location.pathname !== path) window.history.pushState({view}, "", path);
-    document.title = PAGE_TITLES[view] || "BandUp AI";
+    document.title = PAGE_TITLES[view] || "Englishfool";
     window.scrollTo({top:0,behavior:'smooth'}); 
   };
 
@@ -1301,12 +1307,12 @@ export default function IELTSBot(){
     const onPop = () => { 
       const view = getViewFromPath();
       setMainView(view); 
-      document.title = PAGE_TITLES[view] || "BandUp AI";
+      document.title = PAGE_TITLES[view] || "Englishfool";
       window.scrollTo({top:0}); 
     };
     window.addEventListener('popstate', onPop);
     // Set title on initial load
-    document.title = PAGE_TITLES[mainView] || "BandUp AI";
+    document.title = PAGE_TITLES[mainView] || "Englishfool";
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
@@ -1375,7 +1381,7 @@ export default function IELTSBot(){
       <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,background:T.bg,borderBottom:`1px solid ${T.border}`,boxShadow:T.shadowNav}}>
         <div className="nav-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
           <div style={{display:"flex",alignItems:"center",gap:24}}>
-            <span style={{color:T.primary,fontWeight:800,fontSize:26,fontFamily:"'Source Sans Pro','Inter',system-ui",letterSpacing:"-0.8px",lineHeight:1}}>BandUp AI</span>
+            <Logo size={26}/>
             {/* Hamburger — mobile only */}
             <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:18,color:T.text}}>☰</button>
             <div className="nav-tabs" style={{display:"flex",gap:4}}>
@@ -1739,7 +1745,7 @@ export default function IELTSBot(){
       <div style={{background:"#1c1d1f",borderTop:"1px solid #333",padding:"32px 24px",marginTop:40}}>
         <div style={{maxWidth:1200,margin:"0 auto"}}>
           <div className="footer-top" style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16,marginBottom:20}}>
-            <span style={{color:"#fff",fontWeight:800,fontSize:20,fontFamily:"'Source Sans Pro','Inter',system-ui",letterSpacing:"-0.5px"}}>BandUp AI</span>
+            <Logo size={20} style={{cursor:"default"}}/>
             <div className="footer-links" style={{display:"flex",gap:24,flexWrap:"wrap"}}>
               {[["terms","Terms of Service"],["privacy","Privacy Policy"],["refund","Refund Policy"],["pricing","Pricing"]].map(([key,label])=>(
                 <button key={key} onClick={()=>switchView(key)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:0}}>{label}</button>
@@ -1747,7 +1753,7 @@ export default function IELTSBot(){
             </div>
           </div>
           <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
-            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>© {new Date().getFullYear()} BandUp AI. All rights reserved.</span>
+            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>© {new Date().getFullYear()} Englishfool. All rights reserved.</span>
             <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-powered IELTS Writing Examiner</span>
           </div>
         </div>
@@ -1805,7 +1811,7 @@ export default function IELTSBot(){
           }} onClick={e=>e.stopPropagation()}>
             {/* Header */}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"18px 20px",borderBottom:`1px solid ${T.border}`}}>
-              <span style={{color:T.primary,fontWeight:800,fontSize:20,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>BandUp AI</span>
+              <Logo size={20}/>
               <button onClick={()=>setMenuOpen(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:T.textMuted,padding:4}}>✕</button>
             </div>
             {/* Quick nav tabs at top of menu */}
@@ -1886,7 +1892,7 @@ export default function IELTSBot(){
 
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Rubik:wght@900&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-y: scroll; overscroll-behavior: none; }
         body { font-family: 'Source Sans 3','Inter',system-ui,sans-serif; margin: 0; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
