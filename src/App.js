@@ -1046,6 +1046,147 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
   );
 };
 
+// ── Grammar Checker (Free) ───────────────────
+const GRAMMAR_SYSTEM = `You are a precise English language checker. Analyze the input (word, phrase, or sentence) for spelling, grammar, punctuation, and structural issues.
+
+Respond ONLY with valid JSON (no markdown, no backticks):
+{
+  "hasErrors": true/false,
+  "corrected": "the corrected version (or original if no errors)",
+  "issues": [
+    {
+      "type": "Spelling|Grammar|Punctuation|Structure|Word Choice",
+      "original": "the problematic part",
+      "correction": "the fixed version",
+      "explanation": "brief clear explanation"
+    }
+  ],
+  "noErrorReason": "if hasErrors is false, explain why the input is correct (e.g. 'Grammatically correct sentence with proper subject-verb agreement and punctuation.')"
+}
+
+Rules:
+- For single words: check spelling only. If correct, say so and briefly define it.
+- For phrases/sentences: check spelling, grammar, punctuation, verb tense, subject-verb agreement, articles, prepositions, sentence structure.
+- The "corrected" field must always be the full corrected version of the input.
+- Each "correction" must be a concrete replacement, never advice.
+- Be thorough but concise in explanations.`;
+
+const GrammarChecker = () => {
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const check = async () => {
+    if (!input.trim()) { setError("Please enter a word or sentence to check."); return; }
+    setError(""); setLoading(true); setResult(null);
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514", max_tokens: 600,
+          system: GRAMMAR_SYSTEM,
+          messages: [{ role: "user", content: input.trim() }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.map(b => b.text || "").join("") || "";
+      const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+      setResult(parsed);
+    } catch (e) {
+      console.error("Grammar check error:", e);
+      setError("Something went wrong. Please try again.");
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div>
+      <Card style={{ marginBottom: 20, background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
+        <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          ✏️ <strong>Grammar & Spell Checker</strong> — Enter any word, phrase, or sentence and get instant corrections with explanations. Free and unlimited.
+        </p>
+      </Card>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
+        {/* Input side */}
+        <div style={{ flex: 1, minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+            Your Text
+          </div>
+          <textarea value={input} onChange={e => setInput(e.target.value)}
+            placeholder="Type a word, phrase, or full sentence here..."
+            rows={6}
+            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); check(); } }}
+            style={{ width: "100%", background: T.bgGray, border: `1px solid ${T.border}`, borderRadius: 10, color: T.text, fontSize: 15, padding: "14px 16px", resize: "vertical", fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.7, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }} />
+          <button onClick={check} disabled={loading || !input.trim()}
+            style={{ background: loading ? T.bgGray : T.primary, border: "none", borderRadius: 10, color: loading ? T.textMuted : "white", fontSize: 15, fontWeight: 700, padding: "14px", cursor: loading ? "not-allowed" : "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", boxShadow: loading ? "none" : T.shadowMd, transition: "all 0.2s" }}>
+            {loading ? "⏳ Checking..." : "Check Grammar & Spelling →"}
+          </button>
+          {error && <div style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, color: T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{error}</div>}
+        </div>
+        {/* Result side */}
+        <div style={{ flex: 1, minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+            Result
+          </div>
+          {!result && !loading && (
+            <Card style={{ textAlign: "center", padding: "40px 24px", background: T.bgGray, border: `1px dashed ${T.border}` }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>✏️</div>
+              <p style={{ color: T.textMuted, fontSize: 14, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.6 }}>
+                Type something on the left and click "Check" — your corrected text will appear here.
+              </p>
+            </Card>
+          )}
+          {loading && (
+            <Card style={{ textAlign: "center", padding: "40px 24px", background: T.blueBg, border: `1px solid ${T.blueBorder}` }}>
+              <div style={{ color: T.blue, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Checking your text... ✏️</div>
+            </Card>
+          )}
+          {result && !result.hasErrors && (
+            <Card style={{ background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <span style={{ fontSize: 24 }}>✅</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: T.green, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>No corrections needed!</span>
+              </div>
+              <div style={{ background: "white", borderRadius: 8, padding: "12px 16px", border: `1px solid ${T.greenBorder}`, marginBottom: 12 }}>
+                <p style={{ color: T.text, fontSize: 15, margin: 0, lineHeight: 1.7, fontFamily: "Georgia,serif" }}>{result.corrected}</p>
+              </div>
+              <p style={{ color: T.green, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {result.noErrorReason}</p>
+            </Card>
+          )}
+          {result && result.hasErrors && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <Card style={{ background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
+                <div style={{ fontSize: 11, color: T.green, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                  ✅ Corrected Version
+                </div>
+                <p style={{ color: T.text, fontSize: 15, margin: 0, lineHeight: 1.7, fontFamily: "Georgia,serif" }}>{result.corrected}</p>
+              </Card>
+              {result.issues?.map((issue, i) => (
+                <Card key={i} style={{ borderLeft: `3px solid ${issue.type === "Spelling" ? T.red : issue.type === "Punctuation" ? T.purple : issue.type === "Structure" ? T.blue : T.amber}`, background: issue.type === "Spelling" ? T.redBg : issue.type === "Punctuation" ? T.purpleBg : issue.type === "Structure" ? T.blueBg : T.amberBg }}>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
+                    <span style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: issue.type === "Spelling" ? T.red : issue.type === "Punctuation" ? T.purple : issue.type === "Structure" ? T.blue : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{issue.type}</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 8 }}>
+                    <span style={{ background: "#fee2e2", borderRadius: 6, padding: "4px 12px", color: "#991b1b", fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>"{issue.original}"</span>
+                    <span style={{ color: T.textMuted, fontSize: 16 }}>→</span>
+                    <span style={{ background: "#dcfce7", borderRadius: 6, padding: "4px 12px", color: "#166534", fontSize: 14, fontWeight: 600, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>"{issue.correction}"</span>
+                  </div>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {issue.explanation}</p>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <Card style={{ marginTop: 20, background: T.primaryLight, border: `1px solid ${T.primaryBorder}` }}>
+        <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — free for your first 2 essays.
+        </p>
+      </Card>
+    </div>
+  );
+};
+
 // ── Analytics Helper ─────────────────────────
 const GA_ID = "G-9JN8WF1R0M";
 const trackEvent = (eventName, params={}) => {
@@ -1218,7 +1359,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
 );
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact"};
+const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
 
@@ -1293,7 +1434,7 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
+  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
   const switchView=(view)=>{ 
     setMainView(view); 
     const path = VIEW_TO_PATH[view] || "/";
@@ -1389,6 +1530,7 @@ export default function IELTSBot(){
               <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{switchView("practice");trackEvent("nav_click",{page:"practice"});}}/>
               <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label="✏️ Grammar" active={mainView==="grammar"} onClick={()=>{switchView("grammar");trackEvent("nav_click",{page:"grammar"});}}/>
               <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
           </div>
@@ -1731,6 +1873,7 @@ export default function IELTSBot(){
         {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="grammar"&&<GrammarChecker/>}
         {mainView==="contact"&&<ContactPage/>}
         </div>
       </div>
@@ -1830,6 +1973,7 @@ export default function IELTSBot(){
                 {view:"practice",icon:"🖊️",label:"Practice Mode"},
                 {view:"progress",icon:"📈",label:"Progress Tracker"},
                 {view:"toolkit",icon:"📚",label:"IELTS Toolkit"},
+                {view:"grammar",icon:"✏️",label:"Grammar Checker"},
                 {view:"contact",icon:"✉️",label:"Contact Us"},
               ].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
