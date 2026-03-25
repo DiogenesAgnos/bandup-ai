@@ -1208,7 +1208,7 @@ const GrammarChecker = ({isPro}) => {
       </Card>
 
       {/* Grammar Exercises */}
-      <GrammarExercises/>
+      <GrammarExercises isPro={isPro}/>
     </div>
   );
 };
@@ -1225,7 +1225,11 @@ const GRAMMAR_EXERCISES = [
       { sentence: "The news about the earthquakes ___ shocking.", options: ["was","were"], correct: 0, explanation: "'News' is an uncountable noun, always singular. 'The news WAS shocking.'" },
       { sentence: "Every student and teacher ___ expected to attend.", options: ["is","are"], correct: 0, explanation: "'Every' makes compound subjects singular. 'Every student and teacher IS expected.'" },
       { sentence: "The number of applicants ___ increased significantly.", options: ["has","have"], correct: 0, explanation: "'The number of' is singular. 'The number HAS increased.' (But 'A number of applicants HAVE applied' — this is plural.)" },
-      { sentence: "Mathematics ___ my favourite subject at university.", options: ["is","are"], correct: 0, explanation: "Academic subjects ending in 's' (mathematics, economics, physics, politics) are singular. 'Mathematics IS.'" },
+      { sentence: "Mathematics ___ my favourite subject at university.", options: ["is","are"], correct: 0, explanation: "Academic subjects ending in 's' (mathematics, economics, physics, politics) are singular." },
+      { sentence: "A number of students ___ failed the examination.", options: ["has","have"], correct: 1, explanation: "'A number of' = many, so it takes plural. 'A number of students HAVE failed.' Contrast: 'The number of students HAS increased.'" },
+      { sentence: "The committee ___ unable to reach a decision.", options: ["was","were"], correct: 0, explanation: "'Committee' acting as one unit = singular. 'The committee WAS unable to reach a decision.'" },
+      { sentence: "Each of the candidates ___ qualified for the position.", options: ["is","are"], correct: 0, explanation: "'Each of' always takes singular. 'Each of the candidates IS qualified.'" },
+      { sentence: "The police ___ investigating the incident.", options: ["is","are"], correct: 1, explanation: "'Police' is always plural in English. 'The police ARE investigating.' (Not 'the police is.')" }
     ]
   },
   {
@@ -1233,12 +1237,16 @@ const GRAMMAR_EXERCISES = [
     icon: "📝",
     color: "#EA580C",
     exercises: [
-      { sentence: "___ education is important for all children.", options: ["The","An","(no article)"], correct: 2, explanation: "General concepts use zero article. 'Education' here means education in general, not a specific type." },
+      { sentence: "___ education is important for all children.", options: ["The","An","(no article)"], correct: 2, explanation: "General concepts use zero article. 'Education' here means education in general." },
       { sentence: "She is ___ best student in the class.", options: ["a","the","(no article)"], correct: 1, explanation: "Superlatives always take 'the'. 'THE best student.'" },
       { sentence: "He wants to become ___ engineer.", options: ["a","an","the"], correct: 1, explanation: "'Engineer' starts with a vowel sound, so use 'AN engineer.'" },
-      { sentence: "___ United Kingdom is an island nation.", options: ["A","The","(no article)"], correct: 1, explanation: "Countries with 'Kingdom', 'States', 'Republic' take 'the'. 'THE United Kingdom.'" },
-      { sentence: "I had ___ breakfast at 8 AM this morning.", options: ["a","the","(no article)"], correct: 2, explanation: "Meals typically take zero article. 'I had breakfast.' (Unless specific: 'The breakfast at the hotel was excellent.')" },
-      { sentence: "___ unemployment rate has risen by 3% this year.", options: ["A","The","(no article)"], correct: 1, explanation: "Specific, known quantities take 'the'. 'THE unemployment rate' refers to a specific statistic." },
+      { sentence: "___ United Kingdom is an island nation.", options: ["A","The","(no article)"], correct: 1, explanation: "Countries with 'Kingdom', 'States', 'Republic' take 'the'." },
+      { sentence: "I had ___ breakfast at 8 AM this morning.", options: ["a","the","(no article)"], correct: 2, explanation: "Meals typically take zero article. 'I had breakfast.'" },
+      { sentence: "___ unemployment rate has risen by 3%.", options: ["A","The","(no article)"], correct: 1, explanation: "Specific known quantities take 'the'. 'THE unemployment rate.'" },
+      { sentence: "She plays ___ piano beautifully.", options: ["a","the","(no article)"], correct: 1, explanation: "Musical instruments take 'the'. 'She plays THE piano.' (But sports don't: 'She plays tennis.')" },
+      { sentence: "___ honesty is the best policy.", options: ["An","The","(no article)"], correct: 2, explanation: "Abstract qualities used generally take zero article. 'Honesty is the best policy.'" },
+      { sentence: "I saw ___ interesting documentary last night.", options: ["a","an","the"], correct: 1, explanation: "'Interesting' starts with a vowel sound, so 'AN interesting documentary.' First mention = a/an." },
+      { sentence: "Could you pass me ___ salt, please?", options: ["a","the","(no article)"], correct: 1, explanation: "Both speaker and listener know which salt. 'Pass me THE salt.' (The specific salt on the table.)" }
     ]
   },
   {
@@ -1248,10 +1256,14 @@ const GRAMMAR_EXERCISES = [
     exercises: [
       { sentence: "By next year, she ___ her degree.", options: ["will complete","will have completed","completes"], correct: 1, explanation: "'By next year' signals future perfect. 'She WILL HAVE COMPLETED her degree by then.'" },
       { sentence: "The population ___ steadily since 2010.", options: ["grew","has grown","grows"], correct: 1, explanation: "'Since 2010' to now = present perfect. 'The population HAS GROWN steadily since 2010.'" },
-      { sentence: "While I ___ for the exam, the power went out.", options: ["studied","was studying","have studied"], correct: 1, explanation: "A longer action interrupted by a shorter one. 'While I WAS STUDYING (continuous), the power went out (simple past).'" },
-      { sentence: "If the government ___ more in education, literacy rates would improve.", options: ["invests","invested","had invested"], correct: 1, explanation: "Second conditional (hypothetical present/future): 'If + past simple, would + infinitive.' 'If the government INVESTED...'" },
+      { sentence: "While I ___ for the exam, the power went out.", options: ["studied","was studying","have studied"], correct: 1, explanation: "A longer action interrupted by a shorter one = past continuous + past simple." },
+      { sentence: "If the government ___ more in education, literacy rates would improve.", options: ["invests","invested","had invested"], correct: 1, explanation: "Second conditional (hypothetical): 'If + past simple, would + infinitive.'" },
       { sentence: "The report ___ that crime rates fell in 2023.", options: ["states","is stating","has stated"], correct: 0, explanation: "Reporting what a document says uses present simple. 'The report STATES that...'" },
-      { sentence: "Before the new law was introduced, people ___ about the issue for years.", options: ["complained","had been complaining","were complaining"], correct: 1, explanation: "An action continuing up to a point in the past = past perfect continuous. 'People HAD BEEN COMPLAINING for years before the law.'" },
+      { sentence: "Before the law was introduced, people ___ about the issue for years.", options: ["complained","had been complaining","were complaining"], correct: 1, explanation: "Action continuing up to a past point = past perfect continuous." },
+      { sentence: "I ___ three essays so far this week.", options: ["wrote","have written","am writing"], correct: 1, explanation: "'So far this week' = unfinished time period = present perfect. 'I HAVE WRITTEN three essays.'" },
+      { sentence: "Look! The graph ___ a dramatic increase.", options: ["shows","is showing","has shown"], correct: 0, explanation: "Describing what a graph displays = present simple. 'The graph SHOWS a dramatic increase.'" },
+      { sentence: "The company ___ 500 employees before it went bankrupt.", options: ["employs","employed","had employed"], correct: 2, explanation: "An action before another past action = past perfect. 'HAD EMPLOYED 500 before it went bankrupt.'" },
+      { sentence: "This time next year, I ___ at a British university.", options: ["study","will study","will be studying"], correct: 2, explanation: "An ongoing action at a specific future time = future continuous. 'I WILL BE STUDYING this time next year.'" }
     ]
   },
   {
@@ -1259,12 +1271,16 @@ const GRAMMAR_EXERCISES = [
     icon: "📍",
     color: "#15803D",
     exercises: [
-      { sentence: "The success of the project depends ___ teamwork.", options: ["in","on","from"], correct: 1, explanation: "'Depend ON' is a fixed collocation. Not 'depend in' or 'depend from.'" },
-      { sentence: "Many students are interested ___ studying abroad.", options: ["in","to","for"], correct: 0, explanation: "'Interested IN' is correct. A common error is 'interested to' (wrong)." },
-      { sentence: "The increase ___ crime is a cause for concern.", options: ["of","in","on"], correct: 1, explanation: "'Increase IN something' and 'decrease IN something' — always 'in.'" },
+      { sentence: "The success of the project depends ___ teamwork.", options: ["in","on","from"], correct: 1, explanation: "'Depend ON' is a fixed collocation." },
+      { sentence: "Many students are interested ___ studying abroad.", options: ["in","to","for"], correct: 0, explanation: "'Interested IN' is correct. 'Interested to' is wrong." },
+      { sentence: "The increase ___ crime is a cause for concern.", options: ["of","in","on"], correct: 1, explanation: "'Increase IN something' — always 'in.'" },
       { sentence: "This essay will focus ___ the advantages of technology.", options: ["in","at","on"], correct: 2, explanation: "'Focus ON' is the correct collocation." },
       { sentence: "She succeeded ___ passing the IELTS exam.", options: ["in","to","at"], correct: 0, explanation: "'Succeed IN doing something.' Not 'succeed to do.'" },
-      { sentence: "The graph shows a sharp rise ___ 2015 and 2020.", options: ["from","between","during"], correct: 1, explanation: "'Between X and Y' for two specific points. 'A sharp rise BETWEEN 2015 AND 2020.'" },
+      { sentence: "The graph shows a sharp rise ___ 2015 and 2020.", options: ["from","between","during"], correct: 1, explanation: "'Between X and Y' for two specific points." },
+      { sentence: "He is responsible ___ managing the team.", options: ["of","for","to"], correct: 1, explanation: "'Responsible FOR' is the correct collocation. Not 'responsible of.'" },
+      { sentence: "The results are similar ___ those found in previous studies.", options: ["with","to","as"], correct: 1, explanation: "'Similar TO' — always 'to'. Not 'similar with' or 'similar as.'" },
+      { sentence: "She insisted ___ finishing the project herself.", options: ["on","in","to"], correct: 0, explanation: "'Insist ON doing something' is the correct form." },
+      { sentence: "The new law will have a significant impact ___ society.", options: ["to","on","for"], correct: 1, explanation: "'Impact ON' or 'effect ON' — always 'on'. Not 'impact to.'" }
     ]
   },
   {
@@ -1272,10 +1288,14 @@ const GRAMMAR_EXERCISES = [
     icon: "🔄",
     color: "#0E7490",
     exercises: [
-      { sentence: "The new policy ___ by the government last year.", options: ["introduced","was introduced","has introduced"], correct: 1, explanation: "The policy received the action — passive voice. 'The policy WAS INTRODUCED by the government.'" },
-      { sentence: "It ___ that over 50% of students prefer online learning.", options: ["believes","is believed","has believed"], correct: 1, explanation: "Impersonal passive for reporting: 'IT IS BELIEVED that...' Also: it is argued, it is widely known." },
-      { sentence: "More schools ___ in rural areas if funding increases.", options: ["will build","will be built","are building"], correct: 1, explanation: "Schools don't build themselves — they are built. 'More schools WILL BE BUILT.'" },
-      { sentence: "The results ___ to the public next week.", options: ["will announce","will be announced","are announcing"], correct: 1, explanation: "Results are announced (by someone) — passive. 'The results WILL BE ANNOUNCED.'" },
+      { sentence: "The new policy ___ by the government last year.", options: ["introduced","was introduced","has introduced"], correct: 1, explanation: "The policy received the action — passive. 'WAS INTRODUCED by the government.'" },
+      { sentence: "It ___ that over 50% of students prefer online learning.", options: ["believes","is believed","has believed"], correct: 1, explanation: "Impersonal passive: 'IT IS BELIEVED that...' Also: it is argued, it is widely known." },
+      { sentence: "More schools ___ in rural areas if funding increases.", options: ["will build","will be built","are building"], correct: 1, explanation: "Schools don't build themselves. 'More schools WILL BE BUILT.'" },
+      { sentence: "The results ___ to the public next week.", options: ["will announce","will be announced","are announcing"], correct: 1, explanation: "Results are announced by someone — passive. 'WILL BE ANNOUNCED.'" },
+      { sentence: "English ___ in over 60 countries worldwide.", options: ["speaks","is spoken","has spoken"], correct: 1, explanation: "English is spoken (by people) — passive. 'English IS SPOKEN in over 60 countries.'" },
+      { sentence: "The report ___ by the time the meeting started.", options: ["had completed","had been completed","was completing"], correct: 1, explanation: "Past perfect passive for an action completed before another past event. 'HAD BEEN COMPLETED.'" },
+      { sentence: "Smoking ___ in all public buildings since 2010.", options: ["has banned","has been banned","was banning"], correct: 1, explanation: "'Since 2010' = present perfect. Passive: 'Smoking HAS BEEN BANNED.'" },
+      { sentence: "The problem needs ___.", options: ["to address","to be addressed","addressing"], correct: 1, explanation: "'Needs TO BE + past participle' is the formal passive form. 'Needs to be addressed.' ('Needs addressing' is also correct but less formal.)" }
     ]
   },
   {
@@ -1283,10 +1303,14 @@ const GRAMMAR_EXERCISES = [
     icon: "🔀",
     color: "#1D4ED8",
     exercises: [
-      { sentence: "If I ___ the prime minister, I would reform the education system.", options: ["am","was","were"], correct: 2, explanation: "Second conditional uses 'were' for all subjects (subjunctive mood). 'If I WERE the prime minister...' — even though 'I was' is normal past tense." },
-      { sentence: "If the government had invested more, the economy ___.", options: ["would improve","would have improved","will improve"], correct: 1, explanation: "Third conditional (past unreal): 'If + had + past participle, would have + past participle.' 'The economy WOULD HAVE IMPROVED.'" },
-      { sentence: "Unless action ___ soon, the problem will get worse.", options: ["is taken","will be taken","takes"], correct: 0, explanation: "'Unless' = 'if not'. First conditional: 'Unless action IS TAKEN' (present simple after unless, not will)." },
-      { sentence: "Provided that students ___ hard, they will pass the exam.", options: ["study","will study","studied"], correct: 0, explanation: "After 'provided that', 'as long as', 'on condition that' — use present simple for future meaning." },
+      { sentence: "If I ___ the prime minister, I would reform education.", options: ["am","was","were"], correct: 2, explanation: "Second conditional uses 'were' for all subjects (subjunctive mood). 'If I WERE...'" },
+      { sentence: "If the government had invested more, the economy ___.", options: ["would improve","would have improved","will improve"], correct: 1, explanation: "Third conditional (past unreal): 'would have + past participle.'" },
+      { sentence: "Unless action ___ soon, the problem will get worse.", options: ["is taken","will be taken","takes"], correct: 0, explanation: "'Unless' = 'if not'. Use present simple after unless, not 'will'." },
+      { sentence: "Provided that students ___ hard, they will pass.", options: ["study","will study","studied"], correct: 0, explanation: "After 'provided that', 'as long as' — use present simple for future meaning." },
+      { sentence: "If water ___ 100°C, it boils.", options: ["reaches","reached","will reach"], correct: 0, explanation: "Zero conditional (scientific facts): 'If + present simple, present simple.'" },
+      { sentence: "Had I known about the deadline, I ___ submitted earlier.", options: ["will have","would have","had"], correct: 1, explanation: "Inverted third conditional: 'Had I known' = 'If I had known'. '...I WOULD HAVE submitted.'" },
+      { sentence: "If she ___ harder, she would not have failed.", options: ["studies","studied","had studied"], correct: 2, explanation: "Third conditional: 'If + past perfect, would have + past participle.' 'If she HAD STUDIED harder...'" },
+      { sentence: "Should you ___ any questions, please contact us.", options: ["have","had","having"], correct: 0, explanation: "Formal inverted conditional: 'Should you HAVE...' = 'If you have...' Very formal/academic." }
     ]
   },
   {
@@ -1294,10 +1318,14 @@ const GRAMMAR_EXERCISES = [
     icon: "🔗",
     color: "#7E22CE",
     exercises: [
-      { sentence: "Students ___ study abroad gain valuable experience.", options: ["who","which","whom"], correct: 0, explanation: "'WHO' for people. 'Students WHO study abroad.' 'Which' is for things." },
-      { sentence: "The university, ___ was founded in 1850, has an excellent reputation.", options: ["that","which","who"], correct: 1, explanation: "Non-defining clauses (with commas) use 'WHICH' not 'that'. 'The university, WHICH was founded...'" },
-      { sentence: "The country ___ I grew up has changed dramatically.", options: ["where","which","that"], correct: 0, explanation: "'WHERE' for places. 'The country WHERE I grew up.' (Also correct: 'in which I grew up.')" },
-      { sentence: "The teacher ___ class I attended was very inspiring.", options: ["who","whose","whom"], correct: 1, explanation: "'WHOSE' shows possession. 'The teacher WHOSE class I attended' = the teacher's class." },
+      { sentence: "Students ___ study abroad gain valuable experience.", options: ["who","which","whom"], correct: 0, explanation: "'WHO' for people. 'Which' is for things." },
+      { sentence: "The university, ___ was founded in 1850, has an excellent reputation.", options: ["that","which","who"], correct: 1, explanation: "Non-defining clauses (with commas) use 'WHICH' not 'that'." },
+      { sentence: "The country ___ I grew up has changed dramatically.", options: ["where","which","that"], correct: 0, explanation: "'WHERE' for places. 'The country WHERE I grew up.'" },
+      { sentence: "The teacher ___ class I attended was very inspiring.", options: ["who","whose","whom"], correct: 1, explanation: "'WHOSE' shows possession. 'The teacher WHOSE class...'" },
+      { sentence: "The reason ___ many students fail is lack of practice.", options: ["which","why","that"], correct: 1, explanation: "'The reason WHY' or 'the reason that' — 'why' is more natural." },
+      { sentence: "The year ___ she graduated was 2020.", options: ["which","when","where"], correct: 1, explanation: "'WHEN' for times. 'The year WHEN she graduated.'" },
+      { sentence: "The man to ___ I spoke was the manager.", options: ["who","whom","which"], correct: 1, explanation: "After a preposition, use 'WHOM' not 'who'. 'To WHOM I spoke.'" },
+      { sentence: "This is the book ___ changed my perspective.", options: ["who","which","whose"], correct: 1, explanation: "'WHICH' or 'that' for things. 'The book WHICH changed my perspective.'" }
     ]
   },
   {
@@ -1305,12 +1333,16 @@ const GRAMMAR_EXERCISES = [
     icon: "🔤",
     color: "#BE185D",
     exercises: [
-      { sentence: "The new policy had a significant ___ on the economy.", options: ["affect","effect"], correct: 1, explanation: "'Effect' is a noun (the result). 'Affect' is a verb (to influence). 'A significant EFFECT on the economy.'" },
-      { sentence: "The students handed in ___ assignments on time.", options: ["their","there","they're"], correct: 0, explanation: "'THEIR' = possessive (belonging to them). 'There' = place. 'They're' = they are." },
-      { sentence: "The advice given by the ___ was very helpful.", options: ["principle","principal"], correct: 1, explanation: "'PRINCIPAL' = head of a school or main/most important. 'Principle' = a rule or belief." },
-      { sentence: "She could not decide ___ to study medicine or law.", options: ["weather","whether"], correct: 1, explanation: "'WHETHER' introduces alternatives/choices. 'Weather' = climate conditions." },
-      { sentence: "The government needs to ___ that all citizens have access to healthcare.", options: ["assure","ensure","insure"], correct: 1, explanation: "'ENSURE' = make certain something happens. 'Assure' = tell someone confidently. 'Insure' = financial insurance." },
-      { sentence: "The country's economy is ___ than it was five years ago.", options: ["worse","worst"], correct: 0, explanation: "'WORSE' = comparative (comparing two). 'Worst' = superlative (the most bad of all)." },
+      { sentence: "The new policy had a significant ___ on the economy.", options: ["affect","effect"], correct: 1, explanation: "'Effect' = noun (the result). 'Affect' = verb (to influence)." },
+      { sentence: "The students handed in ___ assignments on time.", options: ["their","there","they're"], correct: 0, explanation: "'THEIR' = possessive. 'There' = place. 'They're' = they are." },
+      { sentence: "The ___ of the school gave a welcoming speech.", options: ["principle","principal"], correct: 1, explanation: "'PRINCIPAL' = head of school. 'Principle' = rule or belief." },
+      { sentence: "She could not decide ___ to study medicine or law.", options: ["weather","whether"], correct: 1, explanation: "'WHETHER' = alternatives. 'Weather' = climate." },
+      { sentence: "The government needs to ___ equal access to healthcare.", options: ["assure","ensure","insure"], correct: 1, explanation: "'ENSURE' = make certain. 'Assure' = tell confidently. 'Insure' = financial insurance." },
+      { sentence: "The economy is ___ than it was five years ago.", options: ["worse","worst"], correct: 0, explanation: "'WORSE' = comparative (two things). 'Worst' = superlative (the most bad of all)." },
+      { sentence: "The teacher gave us some useful ___.", options: ["advice","advise"], correct: 0, explanation: "'ADVICE' = noun (what you receive). 'Advise' = verb (to give advice)." },
+      { sentence: "His argument was not very ___.", options: ["convincing","convicting"], correct: 0, explanation: "'CONVINCING' = persuasive. 'Convicting' = finding guilty of a crime." },
+      { sentence: "The two proposals are quite different. The ___ is more practical.", options: ["later","latter"], correct: 1, explanation: "'LATTER' = the second of two things mentioned. 'Later' = at a future time." },
+      { sentence: "The charity event managed to ___ over $50,000.", options: ["raise","rise"], correct: 0, explanation: "'RAISE' = transitive (raise something). 'Rise' = intransitive (it rises on its own). 'Managed to RAISE $50,000.'" }
     ]
   },
   {
@@ -1318,10 +1350,14 @@ const GRAMMAR_EXERCISES = [
     icon: "🏗️",
     color: "#059669",
     exercises: [
-      { sentence: "Which is correct?", options: ["Although the economy improved, but unemployment remained high.","Although the economy improved, unemployment remained high."], correct: 1, explanation: "Never combine 'Although' with 'but' — they both signal contrast. Use one or the other, not both." },
-      { sentence: "Which is correct?", options: ["Not only does exercise improve health, but it also boosts mood.","Not only exercise improves health, but it also boosts mood."], correct: 0, explanation: "'Not only' triggers inversion: 'Not only DOES exercise improve...' The auxiliary verb comes before the subject." },
-      { sentence: "Which is correct?", options: ["The reason is because many people lack education.","The reason is that many people lack education."], correct: 1, explanation: "'The reason is THAT...' not 'the reason is because.' Using 'because' after 'reason' is redundant." },
-      { sentence: "Which is correct?", options: ["Despite of the bad weather, the event was successful.","Despite the bad weather, the event was successful."], correct: 1, explanation: "'Despite' is never followed by 'of'. Use 'despite + noun' or 'in spite of + noun.'" },
+      { sentence: "Which is correct?", options: ["Although the economy improved, but unemployment remained high.","Although the economy improved, unemployment remained high."], correct: 1, explanation: "Never combine 'Although' with 'but'. Use one or the other." },
+      { sentence: "Which is correct?", options: ["Not only does exercise improve health, but it also boosts mood.","Not only exercise improves health, but it also boosts mood."], correct: 0, explanation: "'Not only' triggers inversion: 'Not only DOES exercise improve...'" },
+      { sentence: "Which is correct?", options: ["The reason is because many people lack education.","The reason is that many people lack education."], correct: 1, explanation: "'The reason is THAT...' not 'the reason is because.' 'Because' after 'reason' is redundant." },
+      { sentence: "Which is correct?", options: ["Despite of the bad weather, the event was successful.","Despite the bad weather, the event was successful."], correct: 1, explanation: "'Despite' never takes 'of'. Use 'despite + noun' or 'in spite of + noun.'" },
+      { sentence: "Which is correct?", options: ["I look forward to hear from you.","I look forward to hearing from you."], correct: 1, explanation: "'Look forward to' is followed by a gerund (-ing). 'To' here is a preposition, not part of an infinitive." },
+      { sentence: "Which is correct?", options: ["He suggested to go to the library.","He suggested going to the library."], correct: 1, explanation: "'Suggest' is followed by gerund, not infinitive. 'Suggested GOING.' Not 'suggested to go.'" },
+      { sentence: "Which is correct?", options: ["There is a increasing demand for technology.","There is an increasing demand for technology."], correct: 1, explanation: "'Increasing' starts with a vowel sound. Use 'AN increasing demand.'" },
+      { sentence: "Which is correct?", options: ["The more you practice, the better you become.","The more you practice, the more better you become."], correct: 0, explanation: "'The more...the better' — never double comparatives. 'More better' is always wrong." }
     ]
   },
   {
@@ -1329,20 +1365,135 @@ const GRAMMAR_EXERCISES = [
     icon: "🎩",
     color: "#92400E",
     exercises: [
-      { sentence: "Choose the more formal/academic version:", options: ["A lot of people think that...","A significant proportion of individuals contend that..."], correct: 1, explanation: "Academic writing requires formal register. Avoid 'a lot of', 'people think' — use precise, formal alternatives." },
-      { sentence: "Choose the more formal/academic version:", options: ["The thing is, crime rates went up.","It is worth noting that crime rates experienced a marked increase."], correct: 1, explanation: "Avoid 'the thing is' and 'went up'. Use 'it is worth noting' and 'experienced an increase.'" },
-      { sentence: "Choose the more formal/academic version:", options: ["Kids nowadays don't read enough books.","Young people in contemporary society tend to engage less with literature."], correct: 1, explanation: "Avoid 'kids', 'nowadays', 'don't'. Use 'young people', 'contemporary society', 'tend to', 'do not.'" },
-      { sentence: "Choose the more formal/academic version:", options: ["This shows that the idea is kind of wrong.","This suggests that the premise is fundamentally flawed."], correct: 1, explanation: "Avoid 'shows', 'kind of', 'wrong'. Use 'suggests', 'fundamentally', 'flawed' for academic precision." },
+      { sentence: "Choose the more academic version:", options: ["A lot of people think that...","A significant proportion of individuals contend that..."], correct: 1, explanation: "Avoid 'a lot of' and 'think'. Use formal alternatives." },
+      { sentence: "Choose the more academic version:", options: ["The thing is, crime rates went up.","It is worth noting that crime rates experienced a marked increase."], correct: 1, explanation: "Avoid 'the thing is' and 'went up'. Use formal register." },
+      { sentence: "Choose the more academic version:", options: ["Kids nowadays don't read enough books.","Young people in contemporary society tend to engage less with literature."], correct: 1, explanation: "Avoid 'kids', 'nowadays', 'don't'. Use formal equivalents." },
+      { sentence: "Choose the more academic version:", options: ["This shows that the idea is kind of wrong.","This suggests that the premise is fundamentally flawed."], correct: 1, explanation: "Avoid 'shows', 'kind of', 'wrong'. Use academic precision." },
+      { sentence: "Choose the more academic version:", options: ["We need to do something about pollution.","Urgent measures must be implemented to address environmental contamination."], correct: 1, explanation: "Avoid 'do something about'. Use specific verbs: 'implement measures', 'address contamination.'" },
+      { sentence: "Choose the more academic version:", options: ["There are good and bad things about social media.","Social media presents both significant advantages and notable drawbacks."], correct: 1, explanation: "Avoid 'good and bad things'. Use 'advantages and drawbacks' for academic tone." }
+    ]
+  },
+  {
+    category: "Punctuation",
+    icon: "✍️",
+    color: "#6D28D9",
+    exercises: [
+      { sentence: "Which is correctly punctuated?", options: ["In conclusion the government should act now.","In conclusion, the government should act now."], correct: 1, explanation: "Introductory phrases (In conclusion, However, Furthermore) MUST be followed by a comma." },
+      { sentence: "Which is correctly punctuated?", options: ["The students who passed the exam were happy.","The students, who passed the exam, were happy."], correct: 0, explanation: "No commas = defining clause (only those who passed). Commas = non-defining (all students passed). Both are valid but mean different things. Option A is more likely in context." },
+      { sentence: "Which is correctly punctuated?", options: ["It's important to know its meaning.","Its important to know it's meaning."], correct: 0, explanation: "'IT'S' = it is. 'ITS' = possessive. 'It's important to know its meaning.' is correct." },
+      { sentence: "Which is correctly punctuated?", options: ["The country's economy is growing; however, inequality remains.","The country's economy is growing, however, inequality remains."], correct: 0, explanation: "Use semicolon before 'however' when connecting two independent clauses, not a comma (which creates a comma splice)." },
+      { sentence: "Which is correctly punctuated?", options: ["Students need: books, pens, and a laptop.","Students need books, pens, and a laptop."], correct: 1, explanation: "Don't use a colon after a verb that directly introduces a list. 'Students need: ...' is wrong. Just 'Students need books, pens, and a laptop.'" },
+      { sentence: "Which is correctly punctuated?", options: ["The children's toys were scattered everywhere.","The childrens' toys were scattered everywhere."], correct: 0, explanation: "'Children' is already plural (irregular). Add 's after: 'children's'. Not 'childrens' (not a word).'" },
+      { sentence: "Which is correctly punctuated?", options: ["My brother who lives in London is a doctor.","My brother, who lives in London, is a doctor."], correct: 1, explanation: "If you only have one brother, this is extra info = non-defining clause with commas. 'My brother, who lives in London, is a doctor.'" },
+      { sentence: "Which is correctly punctuated?", options: ["She asked whether I could help?","She asked whether I could help."], correct: 1, explanation: "Indirect questions end with a period, not a question mark. 'She asked whether I could help.' (Direct: 'Can you help?')" }
+    ]
+  },
+  {
+    category: "Gerunds vs Infinitives",
+    icon: "🔧",
+    color: "#0369A1",
+    exercises: [
+      { sentence: "She enjoys ___ classical music.", options: ["to listen to","listening to"], correct: 1, explanation: "'Enjoy' is always followed by gerund (-ing). 'Enjoys LISTENING to.'" },
+      { sentence: "The government decided ___ new regulations.", options: ["implementing","to implement"], correct: 1, explanation: "'Decide' takes infinitive (to + verb). 'Decided TO IMPLEMENT.'" },
+      { sentence: "He avoided ___ the difficult question.", options: ["to answer","answering"], correct: 1, explanation: "'Avoid' takes gerund. 'Avoided ANSWERING.' Other gerund verbs: enjoy, consider, deny, risk." },
+      { sentence: "I would like ___ my English skills.", options: ["improving","to improve"], correct: 1, explanation: "'Would like' takes infinitive. 'Would like TO IMPROVE.' (But 'like improving' is also correct for habits.)" },
+      { sentence: "She stopped ___ when the teacher entered.", options: ["to talk","talking"], correct: 1, explanation: "'Stop talking' = cease talking. 'Stop to talk' = pause in order to talk. Context: she stopped the action of talking." },
+      { sentence: "They suggested ___ the meeting until next week.", options: ["to postpone","postponing"], correct: 1, explanation: "'Suggest' takes gerund. 'Suggested POSTPONING.' Never 'suggested to postpone.'" },
+      { sentence: "He tends ___ late for appointments.", options: ["being","to be"], correct: 1, explanation: "'Tend' takes infinitive. 'Tends TO BE late.'" },
+      { sentence: "I don't mind ___ overtime if it's necessary.", options: ["to work","working"], correct: 1, explanation: "'Don't mind' takes gerund. 'Don't mind WORKING.' (Mind = object to.)" }
+    ]
+  },
+  {
+    category: "Countable vs Uncountable",
+    icon: "🔢",
+    color: "#B45309",
+    exercises: [
+      { sentence: "She gave me some useful ___.", options: ["advices","advice"], correct: 1, explanation: "'Advice' is uncountable — never 'advices'. Say 'some advice' or 'pieces of advice.'" },
+      { sentence: "The company bought new ___ for the office.", options: ["equipments","equipment"], correct: 1, explanation: "'Equipment' is uncountable. Never 'equipments'. Say 'pieces of equipment' if counting." },
+      { sentence: "There ___ not enough information to make a decision.", options: ["is","are"], correct: 0, explanation: "'Information' is uncountable = singular verb. 'There IS not enough information.'" },
+      { sentence: "We need to do more ___.", options: ["researches","research"], correct: 1, explanation: "'Research' is uncountable. Never 'researches' (as a noun). Say 'research studies' or 'pieces of research.'" },
+      { sentence: "How ___ homework do you have tonight?", options: ["many","much"], correct: 1, explanation: "'Homework' is uncountable = 'how MUCH'. Use 'how many' only with countable nouns." },
+      { sentence: "The ___ show that the policy was effective.", options: ["evidence show","evidence shows"], correct: 1, explanation: "'Evidence' is uncountable = singular verb. 'The evidence SHOWS.' Never 'evidences.'" },
+      { sentence: "She made good ___ in her English this year.", options: ["progress","progresses"], correct: 0, explanation: "'Progress' is uncountable. Never 'progresses' (as a noun). 'She made good PROGRESS.'" },
+      { sentence: "The hotel provides excellent ___.", options: ["accommodations","accommodation"], correct: 1, explanation: "'Accommodation' is uncountable in British English. 'Excellent ACCOMMODATION.' (US English sometimes uses plural.)" }
+    ]
+  },
+  {
+    category: "Which Sentence is Correct?",
+    icon: "✅",
+    color: "#DC2626",
+    exercises: [
+      { sentence: "Choose the correct sentence:", options: ["He gave me an advice about my career.","He gave me some advice about my career.","He gave me advices about my career."], correct: 1, explanation: "'Advice' is uncountable. Use 'some advice' — never 'an advice' or 'advices.'" },
+      { sentence: "Choose the correct sentence:", options: ["The informations were very useful.","The information was very useful.","The information were very useful."], correct: 1, explanation: "'Information' is uncountable and singular. 'The information WAS very useful.'" },
+      { sentence: "Choose the correct sentence:", options: ["She is more smarter than her brother.","She is more smart than her brother.","She is smarter than her brother."], correct: 2, explanation: "One-syllable adjectives add -er. 'SMARTER' — never 'more smarter' (double comparative) or 'more smart.'" },
+      { sentence: "Choose the correct sentence:", options: ["I have been living here since five years.","I have been living here for five years.","I am living here for five years."], correct: 1, explanation: "'For' + duration (five years). 'Since' + point in time (since 2020). Present perfect continuous for ongoing action." },
+      { sentence: "Choose the correct sentence:", options: ["According to me, education is important.","In my opinion, education is important.","As per my opinion, education is important."], correct: 1, explanation: "'In my opinion' is correct. 'According to me' and 'as per my opinion' are non-standard English." },
+      { sentence: "Choose the correct sentence:", options: ["He is agree with the proposal.","He is agreed with the proposal.","He agrees with the proposal."], correct: 2, explanation: "'Agree' is a normal verb, not used with 'is'. 'He AGREES with the proposal.' Not 'he is agree.'" },
+      { sentence: "Choose the correct sentence:", options: ["One of the most important thing is education.","One of the most important things is education.","One of the most important things are education."], correct: 1, explanation: "'One of the most important THINGS' (plural after 'one of'). But verb agrees with 'one' = singular 'IS.'" },
+      { sentence: "Choose the correct sentence:", options: ["She suggested that he studies harder.","She suggested that he study harder.","She suggested that he will study harder."], correct: 1, explanation: "Subjunctive after 'suggest': bare infinitive. 'Suggested that he STUDY.' (Not 'studies' or 'will study.')" },
+      { sentence: "Choose the correct sentence:", options: ["I am interesting in learning languages.","I am interested in learning languages.","I am interested to learn languages."], correct: 1, explanation: "'INTERESTED IN + gerund.' 'Interesting' describes the thing, not the person. 'Interested to learn' is non-standard." },
+      { sentence: "Choose the correct sentence:", options: ["The number of road accidents have decreased.","The number of road accidents has decreased.","A number of road accidents has decreased."], correct: 1, explanation: "'THE number of' = singular = 'HAS decreased.' ('A number of accidents HAVE occurred' = plural.)" }
     ]
   }
 ];
 
-const GrammarExercises = () => {
+const EXERCISE_TIMER_KEY = "ef_exercise_timer";
+const EXERCISE_TIMER_LIMIT = 1800; // 30 minutes in seconds
+
+const getExerciseTimer = () => {
+  try {
+    const data = JSON.parse(localStorage.getItem(EXERCISE_TIMER_KEY)||"null");
+    if(!data) return EXERCISE_TIMER_LIMIT;
+    return Math.max(0, data.remaining || 0);
+  } catch { return EXERCISE_TIMER_LIMIT; }
+};
+const saveExerciseTimer = (remaining) => {
+  try { localStorage.setItem(EXERCISE_TIMER_KEY, JSON.stringify({ remaining })); } catch {}
+};
+
+const GrammarExercises = ({isPro}) => {
   const [openCat, setOpenCat] = useState(null);
   const [answers, setAnswers] = useState({});
   const [showExplanation, setShowExplanation] = useState({});
+  const [timeLeft, setTimeLeft] = useState(()=> isPro ? Infinity : getExerciseTimer());
+  const [paused, setPaused] = useState(true);
+  const timerRef = useRef(null);
+
+  const startTimer = useCallback(() => {
+    if(isPro) return;
+    setPaused(false);
+    if(timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        const next = prev - 1;
+        if(next <= 0) { clearInterval(timerRef.current); setPaused(true); saveExerciseTimer(0); return 0; }
+        saveExerciseTimer(next);
+        return next;
+      });
+    }, 1000);
+  }, [isPro]);
+
+  const pauseTimer = useCallback(() => {
+    if(timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+    setPaused(true);
+    if(!isPro) saveExerciseTimer(timeLeft);
+  }, [isPro, timeLeft]);
+
+  useEffect(() => { return () => { if(timerRef.current) clearInterval(timerRef.current); }; }, []);
+
+  const formatTime = (s) => {
+    if(s === Infinity) return "∞";
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec < 10 ? "0" : ""}${sec}`;
+  };
+
+  const canAnswer = isPro || (!paused && timeLeft > 0);
+  const timeExpired = !isPro && timeLeft <= 0;
 
   const handleAnswer = (catIdx, exIdx, optIdx) => {
+    if(!canAnswer) return;
     const key = `${catIdx}-${exIdx}`;
     if (answers[key] !== undefined) return;
     setAnswers(prev => ({ ...prev, [key]: optIdx }));
@@ -1362,16 +1513,65 @@ const GrammarExercises = () => {
     return { correct, attempted, total: cat.exercises.length };
   };
 
+  const totalQ = GRAMMAR_EXERCISES.reduce((sum,c)=>sum+c.exercises.length,0);
+  const totalAnswered = Object.keys(answers).length;
+  const totalCorrect = Object.entries(answers).filter(([key,val])=>{const [ci,ei]=key.split("-").map(Number);return val===GRAMMAR_EXERCISES[ci].exercises[ei].correct;}).length;
+
   return (
     <div style={{ marginTop: 32 }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>🏋️</div>
         <h3 style={{ fontFamily: "Georgia,serif", color: T.text, fontSize: 22, margin: "0 0 8px", fontWeight: 700 }}>Grammar Exercises</h3>
-        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: 0, lineHeight: 1.6, maxWidth: 500, marginLeft: "auto", marginRight: "auto" }}>
-          Practice sentence structures, verb forms, articles, prepositions, and more. Tap a category to start — each exercise gives instant feedback.
+        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: "0 0 16px", lineHeight: 1.6, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
+          Practice sentence structures, verb forms, articles, prepositions, and more. Tap a category to start — each exercise gives instant feedback with detailed explanations.
         </p>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
+      {/* Timer bar */}
+      {!isPro && (
+        <Card style={{ marginBottom: 16, background: timeExpired ? T.redBg : T.amberBg, border: `1px solid ${timeExpired ? T.redBorder : T.amberBorder}` }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 24, fontWeight: 900, color: timeLeft < 300 ? T.red : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                {formatTime(timeLeft)}
+              </span>
+              <span style={{ fontSize: 12, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                {timeExpired ? "Time's up! Upgrade to Pro for unlimited practice." : paused ? "Timer paused — click Play to start" : "Timer running"}
+              </span>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {!timeExpired && (
+                <button onClick={paused ? startTimer : pauseTimer}
+                  style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                  {paused ? "▶ Play" : "⏸ Pause"}
+                </button>
+              )}
+              {timeExpired && (
+                <button onClick={() => {}} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                  🔓 Upgrade to Pro
+                </button>
+              )}
+            </div>
+          </div>
+          {!timeExpired && (
+            <div style={{ marginTop: 8, background: "rgba(0,0,0,0.1)", borderRadius: 4, height: 4 }}>
+              <div style={{ width: `${(timeLeft / EXERCISE_TIMER_LIMIT) * 100}%`, background: timeLeft < 300 ? T.red : T.amber, borderRadius: 4, height: 4, transition: "width 1s linear" }}/>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Overall score */}
+      {totalAnswered > 0 && (
+        <Card style={{ marginBottom: 16, textAlign: "center" }}>
+          <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+            Overall: <strong style={{ color: T.text, fontSize: 16 }}>{totalCorrect}</strong> correct out of <strong>{totalAnswered}</strong> answered ({totalQ} total)
+            {totalAnswered > 0 && <span style={{ color: totalCorrect/totalAnswered >= 0.8 ? T.green : totalCorrect/totalAnswered >= 0.6 ? T.amber : T.red, marginLeft: 8, fontWeight: 700 }}>({Math.round(totalCorrect/totalAnswered*100)}%)</span>}
+          </span>
+        </Card>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, opacity: timeExpired && !isPro ? 0.5 : 1, pointerEvents: timeExpired && !isPro ? "none" : "auto" }}>
         {GRAMMAR_EXERCISES.map((cat, catIdx) => {
           const score = getCatScore(catIdx);
           const isOpen = openCat === catIdx;
@@ -1386,11 +1586,16 @@ const GrammarExercises = () => {
                     {score.correct}/{score.attempted}
                   </span>
                 )}
-                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.exercises.length} questions</span>
+                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.exercises.length}q</span>
                 <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
               </div>
               {isOpen && (
                 <div style={{ border: `1px solid ${cat.color}40`, borderTop: "none", borderRadius: "0 0 10px 10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16, background: `${cat.color}05` }}>
+                  {!canAnswer && !isPro && !timeExpired && (
+                    <Card style={{ background: T.amberBg, border: `1px solid ${T.amberBorder}`, textAlign: "center" }}>
+                      <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>⏸ Timer is paused. Click <strong>Play</strong> above to start answering.</p>
+                    </Card>
+                  )}
                   {cat.exercises.map((ex, exIdx) => {
                     const key = `${catIdx}-${exIdx}`;
                     const answered = answers[key] !== undefined;
@@ -1416,8 +1621,8 @@ const GrammarExercises = () => {
                             }
                             return (
                               <button key={optIdx} onClick={() => handleAnswer(catIdx, exIdx, optIdx)}
-                                disabled={answered}
-                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered ? "default" : "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", opacity: answered && optIdx !== ex.correct && optIdx !== answers[key] ? 0.5 : 1 }}>
+                                disabled={answered || !canAnswer}
+                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered || !canAnswer ? "default" : "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", opacity: answered && optIdx !== ex.correct && optIdx !== answers[key] ? 0.5 : 1 }}>
                                 {opt}
                               </button>
                             );
