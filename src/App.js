@@ -686,7 +686,7 @@ const PaywallModal=({onClose,onSuccess})=>(
         <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Cancel anytime · No hidden fees</div>
       </div>
       <ul style={{listStyle:"none",padding:0,display:"flex",flexDirection:"column",gap:8,marginBottom:22}}>
-        {["Unlimited analyses — Task 1 & 2, Academic & General","Complete mistake detection — spelling, grammar & punctuation","Inline essay annotations with correction bubbles","Progress tracker — see your improvement over time","Band Booster + Vocabulary upgrades from YOUR essay","Full IELTS Toolkit (Grammar, Templates, Pet Peeves)","Practice Mode with live AI coaching + inline corrections","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i)=>(
+        {["Unlimited analyses — Task 1 & 2, Academic & General","Complete mistake detection — spelling, grammar & punctuation","Inline essay annotations with correction bubbles","Progress tracker — see your improvement over time","Band Booster + Vocabulary upgrades from YOUR essay","Full IELTS Toolkit (Grammar, Templates, Pet Peeves)","Practice Mode with live coaching + inline corrections","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i)=>(
           <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
         ))}
       </ul>
@@ -936,7 +936,7 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
   return (
     <div>
       <Card style={{marginBottom:20,background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-        <p style={{color:T.blue,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎯 <strong>Practice Mode</strong> — Write freely and get live AI coaching every ~1.5 seconds. Mistakes are highlighted inline in your essay. Each feedback uses one free try.</p>
+        <p style={{color:T.blue,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎯 <strong>Practice Mode</strong> — Write freely and get live coaching every ~1.5 seconds. Mistakes are highlighted inline in your essay. Each feedback uses one free try.</p>
       </Card>
       {!started?(
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
@@ -1134,10 +1134,10 @@ const Section = ({title, children}) => (
 const TermsPage = ({onBack}) => (
   <PolicyPage title="Terms of Service" onBack={onBack}>
     <Section title="1. Acceptance of Terms"><p style={{margin:"0 0 12px"}}>By accessing or using Englishfool ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. Englishfool is operated by Ahmad Sartawi ("we", "us", "our").</p></Section>
-    <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>Englishfool is an AI-powered IELTS Writing examination tool that provides automated band score assessment, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
+    <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>Englishfool is a smart IELTS Writing examination tool that provides automated band score assessment based on official IELTS band descriptors, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
     <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $19 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p><p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings or by contacting Paddle directly. Cancellation takes effect at the end of the current billing period.</p><p style={{margin:"0 0 12px"}}>New subscribers are entitled to a full refund within 14 days of their initial purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
-    <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use Englishfool only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy the AI systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
-    <Section title="5. AI Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>Englishfool uses artificial intelligence to provide IELTS writing feedback. While we strive for accuracy, AI-generated scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
+    <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use Englishfool only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy our systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
+    <Section title="5. Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>Englishfool uses advanced technology to provide IELTS writing feedback. While we strive for accuracy, scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
     <Section title="6. Intellectual Property"><p style={{margin:"0 0 12px"}}>All content, design, software, and materials on Englishfool are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p></Section>
     <Section title="7. Limitation of Liability"><p style={{margin:"0 0 12px"}}>To the maximum extent permitted by law, Englishfool shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability to you shall not exceed the amount paid by you in the 12 months preceding the claim.</p></Section>
     <Section title="8. Modifications to Terms"><p style={{margin:"0 0 12px"}}>We reserve the right to modify these Terms at any time. We will notify users of material changes via email or prominent notice on the Service. Continued use after changes constitutes acceptance of the new Terms.</p></Section>
@@ -1149,12 +1149,12 @@ const PrivacyPage = ({onBack}) => (
   <PolicyPage title="Privacy Policy" onBack={onBack}>
     <Section title="1. Information We Collect"><p style={{margin:"0 0 12px"}}>We collect information you provide directly to us, including:</p><ul style={{margin:"0 0 12px",paddingLeft:20}}><li style={{marginBottom:6}}>Contact form submissions (name, email, country, age group, message)</li><li style={{marginBottom:6}}>Essay content submitted for analysis</li><li style={{marginBottom:6}}>Payment information (processed and stored by Paddle — we do not store card details)</li><li style={{marginBottom:6}}>Usage data collected via Google Analytics (anonymised)</li></ul></Section>
     <Section title="2. How We Use Your Information"><p style={{margin:"0 0 12px"}}>We use the information we collect to: provide and improve the Service; process subscription payments; respond to your enquiries; send service-related communications; and analyse usage patterns to improve user experience.</p><p style={{margin:"0 0 12px"}}>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p></Section>
-    <Section title="3. Essay Data"><p style={{margin:"0 0 12px"}}>Essays you submit are processed by Anthropic's Claude AI API for analysis. Essays are transmitted securely and are not stored permanently on our servers. We do not use your essays to train AI models.</p></Section>
+    <Section title="3. Essay Data"><p style={{margin:"0 0 12px"}}>Essays you submit are processed securely by our technology partner for analysis. Essays are transmitted over encrypted connections and are not stored permanently on our servers. We do not use your essays to train any models.</p></Section>
     <Section title="4. Cookies and Analytics"><p style={{margin:"0 0 12px"}}>We use Google Analytics to collect anonymised data about how users interact with our Service. You can opt out of Google Analytics by installing the Google Analytics Opt-out Browser Add-on.</p></Section>
     <Section title="5. Data Security"><p style={{margin:"0 0 12px"}}>We implement appropriate technical and organisational measures to protect your personal data. All data is transmitted over HTTPS encryption.</p></Section>
     <Section title="6. Data Retention"><p style={{margin:"0 0 12px"}}>We retain your personal data only as long as necessary to provide the Service and comply with legal obligations.</p></Section>
     <Section title="7. Your Rights"><p style={{margin:"0 0 12px"}}>You have the right to: access your personal data; correct inaccurate data; request deletion of your data; withdraw consent at any time. Reach out via our <strong>Contact Us</strong> page to exercise these rights.</p></Section>
-    <Section title="8. Third-Party Services"><p style={{margin:"0 0 12px"}}>Our Service integrates with: Anthropic Claude API; Paddle (payments); Google Analytics; EmailJS (contact form).</p></Section>
+    <Section title="8. Third-Party Services"><p style={{margin:"0 0 12px"}}>Our Service integrates with: Paddle (payments); Google Analytics; EmailJS (contact form).</p></Section>
     <Section title="9. Contact"><p style={{margin:"0 0 12px"}}>For privacy-related enquiries, please use our <strong>Contact Us</strong> page.</p></Section>
   </PolicyPage>
 );
@@ -1188,7 +1188,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
         <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:4}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>19</div>
         <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>per month · cancel anytime</div>
         <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
-          {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live AI coaching","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
+          {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live coaching","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
             <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
           ))}
         </ul>
@@ -1419,13 +1419,13 @@ export default function IELTSBot(){
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"48px 40px 48px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(0,86,210,0.1)",border:"1px solid rgba(0,86,210,0.2)",borderRadius:4,padding:"4px 12px",marginBottom:18,alignSelf:"flex-start"}}>
-              <span style={{color:T.primary,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-Powered · IELTS Writing Examiner</span>
+              <span style={{color:T.primary,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Smart IELTS Writing Examiner</span>
             </div>
             <h1 style={{margin:"0 0 14px",fontSize:"clamp(26px,3.2vw,42px)",fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",color:"#1c1d1f",lineHeight:1.2,letterSpacing:"-0.3px"}}>
               Write better.<br/>Score higher.<br/><span style={{color:T.primary}}>Get the IELTS band you deserve.</span>
             </h1>
             <p style={{color:T.textMuted,fontSize:16,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 24px",maxWidth:460}}>
-              Instant AI band scores · Complete mistake detection · Band 8+ model essays · Practice Mode with live coaching
+              Instant band scores · Complete mistake detection · Band 8+ model essays · Practice Mode with live coaching
             </p>
             <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap"}}>
               <button onClick={()=>switchView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
@@ -1442,7 +1442,7 @@ export default function IELTSBot(){
       {/* STATS BAR */}
       <div style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"16px 24px"}}>
         <div className="stats-inner" style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:32,alignItems:"center",flexWrap:"wrap"}}>
-          {[["9","Band levels covered"],["4","IELTS criteria scored"],["100%","AI-powered analysis"],["Task 1 & 2","Academic + General Training"]].map(([num,label])=>(
+          {[["9","Band levels covered"],["4","IELTS criteria scored"],["100%","Official band descriptors"],["Task 1 & 2","Academic + General Training"]].map(([num,label])=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:10}}>
               <span style={{color:T.primary,fontWeight:700,fontSize:18,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{num}</span>
               <span style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</span>
@@ -1477,7 +1477,7 @@ export default function IELTSBot(){
               <div style={{marginBottom:16}}>
                 <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>Upload Graph / Chart Image *</label>
                 <div onClick={()=>fileRef.current.click()} style={{border:`2px dashed ${imagePreview?T.greenBorder:"#e2001a"}`,borderRadius:12,padding:"20px",textAlign:"center",cursor:"pointer",background:"white",boxShadow:T.shadow}}>
-                  {imagePreview?(<div><img src={imagePreview} alt="graph" style={{maxHeight:180,maxWidth:"100%",borderRadius:8,marginBottom:8}}/><div style={{fontSize:12,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Uploaded — click to change</div></div>):(<div><div style={{fontSize:32,marginBottom:8}}>📊</div><div style={{fontSize:14,color:T.gold,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Click to upload graph/chart image</div><div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>JPG, PNG — AI reads and evaluates the graph</div></div>)}
+                  {imagePreview?(<div><img src={imagePreview} alt="graph" style={{maxHeight:180,maxWidth:"100%",borderRadius:8,marginBottom:8}}/><div style={{fontSize:12,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Uploaded — click to change</div></div>):(<div><div style={{fontSize:32,marginBottom:8}}>📊</div><div style={{fontSize:14,color:T.gold,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Click to upload graph/chart image</div><div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>JPG, PNG — reads and evaluates the graph</div></div>)}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{display:"none"}}/>
               </div>
@@ -1754,7 +1754,7 @@ export default function IELTSBot(){
           </div>
           <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
             <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>© {new Date().getFullYear()} Englishfool. All rights reserved.</span>
-            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>AI-powered IELTS Writing Examiner</span>
+            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Smart IELTS Writing Examiner</span>
           </div>
         </div>
       </div>
