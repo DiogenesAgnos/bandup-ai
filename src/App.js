@@ -1206,6 +1206,243 @@ const GrammarChecker = ({isPro}) => {
           🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — 1 free analysis, no sign-up needed.
         </p>
       </Card>
+
+      {/* Grammar Exercises */}
+      <GrammarExercises/>
+    </div>
+  );
+};
+
+// ── Grammar Exercises ────────────────────────
+const GRAMMAR_EXERCISES = [
+  {
+    category: "Subject-Verb Agreement",
+    icon: "🔗",
+    color: "#DC2626",
+    exercises: [
+      { sentence: "The group of students ___ working on their project.", options: ["is","are"], correct: 0, explanation: "'Group' is a collective noun treated as singular. 'The group IS working.'" },
+      { sentence: "Neither the teacher nor the students ___ ready.", options: ["was","were"], correct: 1, explanation: "With 'neither...nor', the verb agrees with the nearest subject. 'Students' is plural, so 'WERE ready.'" },
+      { sentence: "The news about the earthquakes ___ shocking.", options: ["was","were"], correct: 0, explanation: "'News' is an uncountable noun, always singular. 'The news WAS shocking.'" },
+      { sentence: "Every student and teacher ___ expected to attend.", options: ["is","are"], correct: 0, explanation: "'Every' makes compound subjects singular. 'Every student and teacher IS expected.'" },
+      { sentence: "The number of applicants ___ increased significantly.", options: ["has","have"], correct: 0, explanation: "'The number of' is singular. 'The number HAS increased.' (But 'A number of applicants HAVE applied' — this is plural.)" },
+      { sentence: "Mathematics ___ my favourite subject at university.", options: ["is","are"], correct: 0, explanation: "Academic subjects ending in 's' (mathematics, economics, physics, politics) are singular. 'Mathematics IS.'" },
+    ]
+  },
+  {
+    category: "Articles (a / an / the / zero)",
+    icon: "📝",
+    color: "#EA580C",
+    exercises: [
+      { sentence: "___ education is important for all children.", options: ["The","An","(no article)"], correct: 2, explanation: "General concepts use zero article. 'Education' here means education in general, not a specific type." },
+      { sentence: "She is ___ best student in the class.", options: ["a","the","(no article)"], correct: 1, explanation: "Superlatives always take 'the'. 'THE best student.'" },
+      { sentence: "He wants to become ___ engineer.", options: ["a","an","the"], correct: 1, explanation: "'Engineer' starts with a vowel sound, so use 'AN engineer.'" },
+      { sentence: "___ United Kingdom is an island nation.", options: ["A","The","(no article)"], correct: 1, explanation: "Countries with 'Kingdom', 'States', 'Republic' take 'the'. 'THE United Kingdom.'" },
+      { sentence: "I had ___ breakfast at 8 AM this morning.", options: ["a","the","(no article)"], correct: 2, explanation: "Meals typically take zero article. 'I had breakfast.' (Unless specific: 'The breakfast at the hotel was excellent.')" },
+      { sentence: "___ unemployment rate has risen by 3% this year.", options: ["A","The","(no article)"], correct: 1, explanation: "Specific, known quantities take 'the'. 'THE unemployment rate' refers to a specific statistic." },
+    ]
+  },
+  {
+    category: "Verb Tenses",
+    icon: "⏰",
+    color: "#CA8A04",
+    exercises: [
+      { sentence: "By next year, she ___ her degree.", options: ["will complete","will have completed","completes"], correct: 1, explanation: "'By next year' signals future perfect. 'She WILL HAVE COMPLETED her degree by then.'" },
+      { sentence: "The population ___ steadily since 2010.", options: ["grew","has grown","grows"], correct: 1, explanation: "'Since 2010' to now = present perfect. 'The population HAS GROWN steadily since 2010.'" },
+      { sentence: "While I ___ for the exam, the power went out.", options: ["studied","was studying","have studied"], correct: 1, explanation: "A longer action interrupted by a shorter one. 'While I WAS STUDYING (continuous), the power went out (simple past).'" },
+      { sentence: "If the government ___ more in education, literacy rates would improve.", options: ["invests","invested","had invested"], correct: 1, explanation: "Second conditional (hypothetical present/future): 'If + past simple, would + infinitive.' 'If the government INVESTED...'" },
+      { sentence: "The report ___ that crime rates fell in 2023.", options: ["states","is stating","has stated"], correct: 0, explanation: "Reporting what a document says uses present simple. 'The report STATES that...'" },
+      { sentence: "Before the new law was introduced, people ___ about the issue for years.", options: ["complained","had been complaining","were complaining"], correct: 1, explanation: "An action continuing up to a point in the past = past perfect continuous. 'People HAD BEEN COMPLAINING for years before the law.'" },
+    ]
+  },
+  {
+    category: "Prepositions",
+    icon: "📍",
+    color: "#15803D",
+    exercises: [
+      { sentence: "The success of the project depends ___ teamwork.", options: ["in","on","from"], correct: 1, explanation: "'Depend ON' is a fixed collocation. Not 'depend in' or 'depend from.'" },
+      { sentence: "Many students are interested ___ studying abroad.", options: ["in","to","for"], correct: 0, explanation: "'Interested IN' is correct. A common error is 'interested to' (wrong)." },
+      { sentence: "The increase ___ crime is a cause for concern.", options: ["of","in","on"], correct: 1, explanation: "'Increase IN something' and 'decrease IN something' — always 'in.'" },
+      { sentence: "This essay will focus ___ the advantages of technology.", options: ["in","at","on"], correct: 2, explanation: "'Focus ON' is the correct collocation." },
+      { sentence: "She succeeded ___ passing the IELTS exam.", options: ["in","to","at"], correct: 0, explanation: "'Succeed IN doing something.' Not 'succeed to do.'" },
+      { sentence: "The graph shows a sharp rise ___ 2015 and 2020.", options: ["from","between","during"], correct: 1, explanation: "'Between X and Y' for two specific points. 'A sharp rise BETWEEN 2015 AND 2020.'" },
+    ]
+  },
+  {
+    category: "Passive Voice",
+    icon: "🔄",
+    color: "#0E7490",
+    exercises: [
+      { sentence: "The new policy ___ by the government last year.", options: ["introduced","was introduced","has introduced"], correct: 1, explanation: "The policy received the action — passive voice. 'The policy WAS INTRODUCED by the government.'" },
+      { sentence: "It ___ that over 50% of students prefer online learning.", options: ["believes","is believed","has believed"], correct: 1, explanation: "Impersonal passive for reporting: 'IT IS BELIEVED that...' Also: it is argued, it is widely known." },
+      { sentence: "More schools ___ in rural areas if funding increases.", options: ["will build","will be built","are building"], correct: 1, explanation: "Schools don't build themselves — they are built. 'More schools WILL BE BUILT.'" },
+      { sentence: "The results ___ to the public next week.", options: ["will announce","will be announced","are announcing"], correct: 1, explanation: "Results are announced (by someone) — passive. 'The results WILL BE ANNOUNCED.'" },
+    ]
+  },
+  {
+    category: "Conditionals",
+    icon: "🔀",
+    color: "#1D4ED8",
+    exercises: [
+      { sentence: "If I ___ the prime minister, I would reform the education system.", options: ["am","was","were"], correct: 2, explanation: "Second conditional uses 'were' for all subjects (subjunctive mood). 'If I WERE the prime minister...' — even though 'I was' is normal past tense." },
+      { sentence: "If the government had invested more, the economy ___.", options: ["would improve","would have improved","will improve"], correct: 1, explanation: "Third conditional (past unreal): 'If + had + past participle, would have + past participle.' 'The economy WOULD HAVE IMPROVED.'" },
+      { sentence: "Unless action ___ soon, the problem will get worse.", options: ["is taken","will be taken","takes"], correct: 0, explanation: "'Unless' = 'if not'. First conditional: 'Unless action IS TAKEN' (present simple after unless, not will)." },
+      { sentence: "Provided that students ___ hard, they will pass the exam.", options: ["study","will study","studied"], correct: 0, explanation: "After 'provided that', 'as long as', 'on condition that' — use present simple for future meaning." },
+    ]
+  },
+  {
+    category: "Relative Clauses",
+    icon: "🔗",
+    color: "#7E22CE",
+    exercises: [
+      { sentence: "Students ___ study abroad gain valuable experience.", options: ["who","which","whom"], correct: 0, explanation: "'WHO' for people. 'Students WHO study abroad.' 'Which' is for things." },
+      { sentence: "The university, ___ was founded in 1850, has an excellent reputation.", options: ["that","which","who"], correct: 1, explanation: "Non-defining clauses (with commas) use 'WHICH' not 'that'. 'The university, WHICH was founded...'" },
+      { sentence: "The country ___ I grew up has changed dramatically.", options: ["where","which","that"], correct: 0, explanation: "'WHERE' for places. 'The country WHERE I grew up.' (Also correct: 'in which I grew up.')" },
+      { sentence: "The teacher ___ class I attended was very inspiring.", options: ["who","whose","whom"], correct: 1, explanation: "'WHOSE' shows possession. 'The teacher WHOSE class I attended' = the teacher's class." },
+    ]
+  },
+  {
+    category: "Commonly Confused Words",
+    icon: "🔤",
+    color: "#BE185D",
+    exercises: [
+      { sentence: "The new policy had a significant ___ on the economy.", options: ["affect","effect"], correct: 1, explanation: "'Effect' is a noun (the result). 'Affect' is a verb (to influence). 'A significant EFFECT on the economy.'" },
+      { sentence: "The students handed in ___ assignments on time.", options: ["their","there","they're"], correct: 0, explanation: "'THEIR' = possessive (belonging to them). 'There' = place. 'They're' = they are." },
+      { sentence: "The advice given by the ___ was very helpful.", options: ["principle","principal"], correct: 1, explanation: "'PRINCIPAL' = head of a school or main/most important. 'Principle' = a rule or belief." },
+      { sentence: "She could not decide ___ to study medicine or law.", options: ["weather","whether"], correct: 1, explanation: "'WHETHER' introduces alternatives/choices. 'Weather' = climate conditions." },
+      { sentence: "The government needs to ___ that all citizens have access to healthcare.", options: ["assure","ensure","insure"], correct: 1, explanation: "'ENSURE' = make certain something happens. 'Assure' = tell someone confidently. 'Insure' = financial insurance." },
+      { sentence: "The country's economy is ___ than it was five years ago.", options: ["worse","worst"], correct: 0, explanation: "'WORSE' = comparative (comparing two). 'Worst' = superlative (the most bad of all)." },
+    ]
+  },
+  {
+    category: "Sentence Structure",
+    icon: "🏗️",
+    color: "#059669",
+    exercises: [
+      { sentence: "Which is correct?", options: ["Although the economy improved, but unemployment remained high.","Although the economy improved, unemployment remained high."], correct: 1, explanation: "Never combine 'Although' with 'but' — they both signal contrast. Use one or the other, not both." },
+      { sentence: "Which is correct?", options: ["Not only does exercise improve health, but it also boosts mood.","Not only exercise improves health, but it also boosts mood."], correct: 0, explanation: "'Not only' triggers inversion: 'Not only DOES exercise improve...' The auxiliary verb comes before the subject." },
+      { sentence: "Which is correct?", options: ["The reason is because many people lack education.","The reason is that many people lack education."], correct: 1, explanation: "'The reason is THAT...' not 'the reason is because.' Using 'because' after 'reason' is redundant." },
+      { sentence: "Which is correct?", options: ["Despite of the bad weather, the event was successful.","Despite the bad weather, the event was successful."], correct: 1, explanation: "'Despite' is never followed by 'of'. Use 'despite + noun' or 'in spite of + noun.'" },
+    ]
+  },
+  {
+    category: "Formal vs Informal",
+    icon: "🎩",
+    color: "#92400E",
+    exercises: [
+      { sentence: "Choose the more formal/academic version:", options: ["A lot of people think that...","A significant proportion of individuals contend that..."], correct: 1, explanation: "Academic writing requires formal register. Avoid 'a lot of', 'people think' — use precise, formal alternatives." },
+      { sentence: "Choose the more formal/academic version:", options: ["The thing is, crime rates went up.","It is worth noting that crime rates experienced a marked increase."], correct: 1, explanation: "Avoid 'the thing is' and 'went up'. Use 'it is worth noting' and 'experienced an increase.'" },
+      { sentence: "Choose the more formal/academic version:", options: ["Kids nowadays don't read enough books.","Young people in contemporary society tend to engage less with literature."], correct: 1, explanation: "Avoid 'kids', 'nowadays', 'don't'. Use 'young people', 'contemporary society', 'tend to', 'do not.'" },
+      { sentence: "Choose the more formal/academic version:", options: ["This shows that the idea is kind of wrong.","This suggests that the premise is fundamentally flawed."], correct: 1, explanation: "Avoid 'shows', 'kind of', 'wrong'. Use 'suggests', 'fundamentally', 'flawed' for academic precision." },
+    ]
+  }
+];
+
+const GrammarExercises = () => {
+  const [openCat, setOpenCat] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [showExplanation, setShowExplanation] = useState({});
+
+  const handleAnswer = (catIdx, exIdx, optIdx) => {
+    const key = `${catIdx}-${exIdx}`;
+    if (answers[key] !== undefined) return;
+    setAnswers(prev => ({ ...prev, [key]: optIdx }));
+    setShowExplanation(prev => ({ ...prev, [key]: true }));
+  };
+
+  const getCatScore = (catIdx) => {
+    const cat = GRAMMAR_EXERCISES[catIdx];
+    let correct = 0, attempted = 0;
+    cat.exercises.forEach((_, exIdx) => {
+      const key = `${catIdx}-${exIdx}`;
+      if (answers[key] !== undefined) {
+        attempted++;
+        if (answers[key] === cat.exercises[exIdx].correct) correct++;
+      }
+    });
+    return { correct, attempted, total: cat.exercises.length };
+  };
+
+  return (
+    <div style={{ marginTop: 32 }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ fontSize: 28, marginBottom: 8 }}>🏋️</div>
+        <h3 style={{ fontFamily: "Georgia,serif", color: T.text, fontSize: 22, margin: "0 0 8px", fontWeight: 700 }}>Grammar Exercises</h3>
+        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: 0, lineHeight: 1.6, maxWidth: 500, marginLeft: "auto", marginRight: "auto" }}>
+          Practice sentence structures, verb forms, articles, prepositions, and more. Tap a category to start — each exercise gives instant feedback.
+        </p>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {GRAMMAR_EXERCISES.map((cat, catIdx) => {
+          const score = getCatScore(catIdx);
+          const isOpen = openCat === catIdx;
+          return (
+            <div key={catIdx}>
+              <div onClick={() => setOpenCat(isOpen ? null : catIdx)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: "pointer", transition: "all 0.15s" }}>
+                <span style={{ fontSize: 20 }}>{cat.icon}</span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.category}</span>
+                {score.attempted > 0 && (
+                  <span style={{ background: score.correct === score.attempted ? T.greenBg : T.amberBg, border: `1px solid ${score.correct === score.attempted ? T.greenBorder : T.amberBorder}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: score.correct === score.attempted ? T.green : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    {score.correct}/{score.attempted}
+                  </span>
+                )}
+                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.exercises.length} questions</span>
+                <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
+              </div>
+              {isOpen && (
+                <div style={{ border: `1px solid ${cat.color}40`, borderTop: "none", borderRadius: "0 0 10px 10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16, background: `${cat.color}05` }}>
+                  {cat.exercises.map((ex, exIdx) => {
+                    const key = `${catIdx}-${exIdx}`;
+                    const answered = answers[key] !== undefined;
+                    const isCorrect = answered && answers[key] === ex.correct;
+                    return (
+                      <div key={exIdx} style={{ background: T.bg, border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}`, borderRadius: 10, padding: "14px 16px" }}>
+                        <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 10 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{exIdx + 1}</span>
+                          {answered && (
+                            <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                              {isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                            </span>
+                          )}
+                        </div>
+                        <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{ex.sentence}</p>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          {ex.options.map((opt, optIdx) => {
+                            let bg = T.bgGray, border = T.border, color = T.text;
+                            if (answered) {
+                              if (optIdx === ex.correct) { bg = T.greenBg; border = T.greenBorder; color = T.green; }
+                              else if (optIdx === answers[key] && !isCorrect) { bg = T.redBg; border = T.redBorder; color = T.red; }
+                              else { bg = T.bgGray; color = T.textMuted; }
+                            }
+                            return (
+                              <button key={optIdx} onClick={() => handleAnswer(catIdx, exIdx, optIdx)}
+                                disabled={answered}
+                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered ? "default" : "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", opacity: answered && optIdx !== ex.correct && optIdx !== answers[key] ? 0.5 : 1 }}>
+                                {opt}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {showExplanation[key] && (
+                          <div style={{ marginTop: 10, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
+                            <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {ex.explanation}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div style={{ textAlign: "center", padding: "8px 0" }}>
+                    <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                      Score: <strong style={{ color: score.correct === score.total ? T.green : T.text }}>{score.correct}</strong> / {score.total}
+                      {score.correct === score.total && score.attempted === score.total && " — Perfect! 🎉"}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
