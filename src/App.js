@@ -564,7 +564,7 @@ const AuthModal=({onClose,onSuccess})=>{
       try{
         if(mode==="forgot"){
           if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
-          setError("Password reset is not yet available. Please contact diogenes.agnos@gmail.com for help accessing your account.");
+          setError("Password reset is not yet available. Please use the Contact form on our website for help accessing your account.");
           setLoading(false);
           return;
         }
@@ -1136,7 +1136,7 @@ const TermsPage = ({onBack}) => (
     <Section title="7. Limitation of Liability"><p style={{margin:"0 0 12px"}}>To the maximum extent permitted by law, BandUp AI shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability to you shall not exceed the amount paid by you in the 12 months preceding the claim.</p></Section>
     <Section title="8. Modifications to Terms"><p style={{margin:"0 0 12px"}}>We reserve the right to modify these Terms at any time. We will notify users of material changes via email or prominent notice on the Service. Continued use after changes constitutes acceptance of the new Terms.</p></Section>
     <Section title="9. Governing Law"><p style={{margin:"0 0 12px"}}>These Terms shall be governed by the laws of the Hashemite Kingdom of Jordan. Any disputes shall be resolved in the courts of Amman, Jordan.</p></Section>
-    <Section title="10. Contact"><p style={{margin:"0 0 12px"}}>For any questions regarding these Terms, please contact us at: <strong>diogenes.agnos@gmail.com</strong></p></Section>
+    <Section title="10. Contact"><p style={{margin:"0 0 12px"}}>For any questions regarding these Terms, please reach out via our <strong>Contact Us</strong> page on the website.</p></Section>
   </PolicyPage>
 );
 const PrivacyPage = ({onBack}) => (
@@ -1147,17 +1147,17 @@ const PrivacyPage = ({onBack}) => (
     <Section title="4. Cookies and Analytics"><p style={{margin:"0 0 12px"}}>We use Google Analytics to collect anonymised data about how users interact with our Service. You can opt out of Google Analytics by installing the Google Analytics Opt-out Browser Add-on.</p></Section>
     <Section title="5. Data Security"><p style={{margin:"0 0 12px"}}>We implement appropriate technical and organisational measures to protect your personal data. All data is transmitted over HTTPS encryption.</p></Section>
     <Section title="6. Data Retention"><p style={{margin:"0 0 12px"}}>We retain your personal data only as long as necessary to provide the Service and comply with legal obligations.</p></Section>
-    <Section title="7. Your Rights"><p style={{margin:"0 0 12px"}}>You have the right to: access your personal data; correct inaccurate data; request deletion of your data; withdraw consent at any time. Contact us at <strong>diogenes.agnos@gmail.com</strong>.</p></Section>
+    <Section title="7. Your Rights"><p style={{margin:"0 0 12px"}}>You have the right to: access your personal data; correct inaccurate data; request deletion of your data; withdraw consent at any time. Reach out via our <strong>Contact Us</strong> page to exercise these rights.</p></Section>
     <Section title="8. Third-Party Services"><p style={{margin:"0 0 12px"}}>Our Service integrates with: Anthropic Claude API; Paddle (payments); Google Analytics; EmailJS (contact form).</p></Section>
-    <Section title="9. Contact"><p style={{margin:"0 0 12px"}}>For privacy-related enquiries: <strong>diogenes.agnos@gmail.com</strong></p></Section>
+    <Section title="9. Contact"><p style={{margin:"0 0 12px"}}>For privacy-related enquiries, please use our <strong>Contact Us</strong> page.</p></Section>
   </PolicyPage>
 );
 const RefundPage = ({onBack}) => (
   <PolicyPage title="Refund Policy" onBack={onBack}>
     <Section title="1. Subscription Cancellation"><p style={{margin:"0 0 12px"}}>You may cancel your BandUp AI Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period.</p></Section>
     <Section title="2. Refund Eligibility"><p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new Pro subscribers, in accordance with Paddle's Buyer Terms and applicable consumer protection regulations. If you are not satisfied within 14 days of your initial subscription, you are entitled to a full refund.</p><p style={{margin:"0 0 12px"}}>Refund requests made after 14 days will be assessed on a case-by-case basis. Refunds may be prorated based on usage during the subscription period.</p></Section>
-    <Section title="3. How to Request a Refund"><p style={{margin:"0 0 12px"}}>To request a refund, you may either contact Paddle directly through your purchase confirmation email, or email <strong>diogenes.agnos@gmail.com</strong> with your registered email, date of purchase, and reason for refund. All refund requests are processed within 5–10 business days.</p></Section>
-    <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries: <strong>diogenes.agnos@gmail.com</strong></p></Section>
+    <Section title="3. How to Request a Refund"><p style={{margin:"0 0 12px"}}>To request a refund, you may either contact Paddle directly through your purchase confirmation email, or reach out via our <strong>Contact Us</strong> page with your registered email, date of purchase, and reason for refund. All refund requests are processed within 5–10 business days.</p></Section>
+    <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries, please use our <strong>Contact Us</strong> page.</p></Section>
   </PolicyPage>
 );
 const PricingPage = ({onBack, onUpgrade, isPro}) => (
@@ -1203,10 +1203,10 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
       <p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No further charges will be made after cancellation.</p>
     </Section>
     <Section title="Refunds">
-      <p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new subscribers, in accordance with Paddle's Buyer Terms. If you are not satisfied within 14 days of your initial purchase, you are entitled to a full refund via Paddle or by contacting <strong>diogenes.agnos@gmail.com</strong>. See our full <button onClick={()=>{const path="/refund";window.history.pushState({},"",path);window.location.reload();}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:15,fontFamily:"inherit",padding:0,textDecoration:"underline"}}>Refund Policy</button> for details.</p>
+      <p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new subscribers, in accordance with Paddle's Buyer Terms. If you are not satisfied within 14 days of your initial purchase, you are entitled to a full refund via Paddle or through our <strong>Contact Us</strong> page. See our full <button onClick={()=>{const path="/refund";window.history.pushState({},"",path);window.location.reload();}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:15,fontFamily:"inherit",padding:0,textDecoration:"underline"}}>Refund Policy</button> for details.</p>
     </Section>
     <Section title="Questions?">
-      <p style={{margin:"0 0 12px"}}>Contact us at <strong>diogenes.agnos@gmail.com</strong> for any billing or pricing enquiries.</p>
+      <p style={{margin:"0 0 12px"}}>For any billing or pricing enquiries, please use our <strong>Contact Us</strong> page.</p>
     </Section>
   </PolicyPage>
 );
