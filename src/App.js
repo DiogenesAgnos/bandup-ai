@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 
 const STRIPE_CONFIGURED = false;
-const FREE_USES_LIMIT = 2;
+const FREE_USES_LIMIT = 1;
 const STORAGE_KEY = "bandup_uses";
 const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
@@ -591,6 +591,8 @@ const AuthModal=({onClose,onSuccess})=>{
         const res=authRegister(email,password,name);
         if(res.error){ setError(res.error); setLoading(false); return; }
         if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
+        // Notify admin of new signup
+        try{ if(window.emailjs) window.emailjs.send("service_9es76g1","template_jrd4i4n",{from_name:"NEW SIGNUP: "+name.trim(),from_email:email.toLowerCase().trim(),country:"",age_group:"",message:"New user registered on Englishfool.\n\nName: "+name.trim()+"\nEmail: "+email.toLowerCase().trim()+"\nDate: "+new Date().toLocaleString("en-GB",{dateStyle:"full",timeStyle:"short"}),to_email:"diogenes.agnos@gmail.com"}); }catch(e){ console.error("Signup notification failed",e); }
         setLoading(false);
         onSuccess(res.session);
       }catch(e){
@@ -686,7 +688,7 @@ const PaywallModal=({onClose,onSuccess})=>(
         <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Cancel anytime · No hidden fees</div>
       </div>
       <ul style={{listStyle:"none",padding:0,display:"flex",flexDirection:"column",gap:8,marginBottom:22}}>
-        {["Unlimited analyses — Task 1 & 2, Academic & General","Complete mistake detection — spelling, grammar & punctuation","Inline essay annotations with correction bubbles","Progress tracker — see your improvement over time","Band Booster + Vocabulary upgrades from YOUR essay","Full IELTS Toolkit (Grammar, Templates, Pet Peeves)","Practice Mode with live coaching + inline corrections","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i)=>(
+        {["Unlimited analyses — Task 1 & 2, Academic & General","Complete mistake detection — spelling, grammar & punctuation","Inline essay annotations with correction bubbles","Progress tracker — see your improvement over time","Band Booster + Vocabulary upgrades from YOUR essay","Full IELTS Toolkit (Grammar, Templates, Pet Peeves)","Practice Mode with live coaching + inline corrections","Unlimited Grammar & Spell Checker","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i)=>(
           <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
         ))}
       </ul>
@@ -1071,14 +1073,34 @@ Rules:
 - Each "correction" must be a concrete replacement, never advice.
 - Be thorough but concise in explanations.`;
 
-const GrammarChecker = () => {
+const GRAMMAR_DAILY_LIMIT = 10;
+const getGrammarUsesToday = () => { 
+  try { 
+    const data = JSON.parse(localStorage.getItem("ef_grammar_daily")||"{}");
+    const today = new Date().toDateString();
+    return data.date === today ? data.count : 0;
+  } catch { return 0; }
+};
+const saveGrammarUse = () => {
+  try {
+    const today = new Date().toDateString();
+    const data = JSON.parse(localStorage.getItem("ef_grammar_daily")||"{}");
+    const count = data.date === today ? data.count + 1 : 1;
+    localStorage.setItem("ef_grammar_daily", JSON.stringify({ date: today, count }));
+  } catch {}
+};
+
+const GrammarChecker = ({isPro}) => {
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [dailyUses, setDailyUses] = useState(()=>getGrammarUsesToday());
+  const dailyLeft = GRAMMAR_DAILY_LIMIT - dailyUses;
 
   const check = async () => {
     if (!input.trim()) { setError("Please enter a word or sentence to check."); return; }
+    if (!isPro && dailyUses >= GRAMMAR_DAILY_LIMIT) { setError("Daily limit reached (10/day). Upgrade to Pro for unlimited grammar checks."); return; }
     setError(""); setLoading(true); setResult(null);
     try {
       const res = await fetch(API_URL, {
@@ -1093,6 +1115,7 @@ const GrammarChecker = () => {
       const text = data.content?.map(b => b.text || "").join("") || "";
       const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
       setResult(parsed);
+      if(!isPro){ saveGrammarUse(); setDailyUses(prev=>prev+1); }
     } catch (e) {
       console.error("Grammar check error:", e);
       setError("Something went wrong. Please try again.");
@@ -1103,7 +1126,7 @@ const GrammarChecker = () => {
     <div>
       <Card style={{ marginBottom: 20, background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
         <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
-          ✏️ <strong>Grammar & Spell Checker</strong> — Enter any word, phrase, or sentence and get instant corrections with explanations. Free and unlimited.
+          ✏️ <strong>Grammar & Spell Checker</strong> — Enter any word, phrase, or sentence and get instant corrections with explanations. {isPro?"Unlimited checks with Pro.":(<><strong>{dailyLeft}</strong> of {GRAMMAR_DAILY_LIMIT} free checks remaining today.</>)}
         </p>
       </Card>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
@@ -1180,7 +1203,7 @@ const GrammarChecker = () => {
       </div>
       <Card style={{ marginTop: 20, background: T.primaryLight, border: `1px solid ${T.primaryBorder}` }}>
         <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
-          🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — free for your first 2 essays.
+          🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — 1 free analysis, no sign-up needed.
         </p>
       </Card>
     </div>
@@ -1318,7 +1341,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
         <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:8}}>$0</div>
         <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>Get started — no credit card required</div>
         <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8}}>
-          {["2 free essay analyses","Task 1 & Task 2 support","Band scores for all 4 criteria","Basic mistake detection","Linking Words toolkit","Grammar reference guide"].map((f,i)=>(
+          {["1 free essay analysis (1 more after sign-up)","Task 1 & Task 2 support","Band scores for all 4 criteria","Basic mistake detection","Linking Words toolkit","Grammar reference guide","Grammar & Spell Checker (10/day)"].map((f,i)=>(
             <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
           ))}
         </ul>
@@ -1329,7 +1352,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
         <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:4}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>19</div>
         <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>per month · cancel anytime</div>
         <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
-          {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live coaching","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
+          {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live coaching","Unlimited Grammar & Spell Checker","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
             <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
           ))}
         </ul>
@@ -1491,7 +1514,11 @@ export default function IELTSBot(){
     if(!topic.trim()||!essay.trim()){ setError("Please provide both the task question and your response."); return; }
     if(wordCount<30){ setError("Response too short."); return; }
     if(taskType==="task1academic"&&!image){ setError("Please upload the graph/chart image for Academic Task 1."); return; }
-    if(!proUser&&uses>=FREE_USES_LIMIT){ setShowPaywall(true); trackEvent('paywall_shown',{task_type:taskType}); return; }
+    if(!proUser&&uses>=FREE_USES_LIMIT){ 
+      if(!session){ setShowAuth(true); trackEvent('signup_prompt_shown',{task_type:taskType}); }
+      else{ setShowPaywall(true); trackEvent('paywall_shown',{task_type:taskType}); }
+      return; 
+    }
     setError(""); setLoading(true); setResult(null); clearLastResult();
     try{
       const messageContent=taskType==="task1academic"&&image
@@ -1536,7 +1563,7 @@ export default function IELTSBot(){
           </div>
           <div className="nav-right" style={{display:"flex",alignItems:"center",gap:12}}>
             <span style={{fontSize:13,color:proUser?T.green:usesLeft<=0?T.red:T.textMuted,fontWeight:600,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-              {proUser?"✓ Pro — Unlimited":session?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"2 free analyses"}
+              {proUser?"✓ Pro — Unlimited":session?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"1 free analysis"}
             </span>
             <div style={{width:1,height:20,background:T.border}}/>
             {["en","ar"].map(l=>(
@@ -1664,7 +1691,16 @@ export default function IELTSBot(){
                   style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</p></Card>}
-              {!proUser&&usesLeft===1&&(
+              {!proUser&&usesLeft===1&&!session&&(
+                <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center"}}>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ This is your free analysis. </span>
+                  <button onClick={()=>setShowAuth(true)} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign up for 1 more</button>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}> or </span>
+                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>upgrade to Pro</button>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}> for unlimited access.</span>
+                </Card>
+              )}
+              {!proUser&&usesLeft===1&&session&&(
                 <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center"}}>
                   <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Last free analysis! </span>
                   <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro</button>
@@ -1673,7 +1709,7 @@ export default function IELTSBot(){
               )}
               <button ref={analyzeRef} onClick={analyze} disabled={loading}
                 style={{background:loading?T.bgGray:T.primary,border:"none",borderRadius:4,color:loading?T.textMuted:"#fff",fontSize:15,fontWeight:700,padding:"14px 32px",cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"background 0.15s",display:"flex",alignItems:"center",gap:10,justifyContent:"center",letterSpacing:"0.01em"}}>
-                {loading?"⏳ Examining...":!proUser&&usesLeft<=0?"🔓 Upgrade to Continue":`Analyze ${TASK_TYPES[taskType].label} →`}
+                {loading?"⏳ Examining...":!proUser&&usesLeft<=0?(session?"🔓 Upgrade to Continue":"🔓 Sign Up for 1 More Free"):`Analyze ${TASK_TYPES[taskType].label} →`}
               </button>
 
               {/* Language Selector */}
@@ -1873,7 +1909,7 @@ export default function IELTSBot(){
         {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="grammar"&&<GrammarChecker/>}
+        {mainView==="grammar"&&<GrammarChecker isPro={proUser}/>}
         {mainView==="contact"&&<ContactPage/>}
         </div>
       </div>
