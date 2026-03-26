@@ -1875,7 +1875,16 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       )}
 
       {/* Content area */}
-      <div style={{ opacity: timeExpired && !isPro ? 0.4 : 1, pointerEvents: timeExpired && !isPro ? "none" : "auto" }}>
+      <div style={{ opacity: timeExpired && !isPro ? 0.4 : 1, pointerEvents: timeExpired && !isPro ? "none" : "auto", filter: !isPro && paused && !timeExpired ? "blur(4px)" : "none", transition: "filter 0.3s ease", userSelect: !isPro && paused && !timeExpired ? "none" : "auto", position: "relative" }}>
+        {!isPro && paused && !timeExpired && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+            <div style={{ background: "rgba(255,255,255,0.85)", borderRadius: 12, padding: "16px 28px", textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.12)", backdropFilter: "blur(2px)" }}>
+              <div style={{ fontSize: 28, marginBottom: 6 }}>⏸</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: T.text, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Timer paused</div>
+              <div style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", marginTop: 2 }}>Press Play to resume</div>
+            </div>
+          </div>
+        )}
         {activeExTab === "grammar" && <GrammarExercisesInner isPro={isPro} canAnswer={canAnswer} onUpgrade={onUpgrade} />}
         {activeExTab === "paraphrase" && <ParaphraseExercises canAnswer={canAnswer} />}
         {activeExTab === "linking" && <LinkingWordsQuiz canAnswer={canAnswer} />}
@@ -2616,7 +2625,7 @@ export default function IELTSBot(){
               <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{switchView("practice");trackEvent("nav_click",{page:"practice"});}}/>
               <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label="✏️ Grammar" active={mainView==="grammar"} onClick={()=>{switchView("grammar");trackEvent("nav_click",{page:"grammar"});}}/>
+              <MainTab label="✏️ Grammar & Spelling" active={mainView==="grammar"} onClick={()=>{switchView("grammar");trackEvent("nav_click",{page:"grammar"});}}/>
               <MainTab label="🏋️ Exercises" active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
               <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
@@ -3067,7 +3076,7 @@ export default function IELTSBot(){
                 {view:"practice",icon:"🖊️",label:"Practice Mode"},
                 {view:"progress",icon:"📈",label:"Progress Tracker"},
                 {view:"toolkit",icon:"📚",label:"IELTS Toolkit"},
-                {view:"grammar",icon:"✏️",label:"Grammar Checker"},
+                {view:"grammar",icon:"✏️",label:"Grammar & Spelling"},
                 {view:"exercises",icon:"🏋️",label:"Exercises"},
                 {view:"contact",icon:"✉️",label:"Contact Us"},
               ].map(item=>(
