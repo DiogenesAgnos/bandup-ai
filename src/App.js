@@ -1206,9 +1206,11 @@ const GrammarChecker = ({isPro}) => {
           🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — 1 free analysis, no sign-up needed.
         </p>
       </Card>
-
-      {/* Grammar Exercises */}
-      <GrammarExercises isPro={isPro}/>
+      <Card style={{ marginTop: 16, background: T.amberBg, border: `1px solid ${T.amberBorder}` }}>
+        <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          🏋️ Looking to practise grammar, paraphrasing, linking words, and more? Head over to the <strong>Exercises</strong> tab — 100+ questions with a 30-minute free session timer.
+        </p>
+      </Card>
     </div>
   );
 };
@@ -1451,7 +1453,7 @@ const saveExerciseTimer = (remaining) => {
   try { localStorage.setItem(EXERCISE_TIMER_KEY, JSON.stringify({ remaining })); } catch {}
 };
 
-const GrammarExercises = ({isPro}) => {
+const GrammarExercises = ({isPro, onUpgrade}) => {
   const [openCat, setOpenCat] = useState(null);
   const [answers, setAnswers] = useState({});
   const [showExplanation, setShowExplanation] = useState({});
@@ -1527,38 +1529,47 @@ const GrammarExercises = ({isPro}) => {
         </p>
       </div>
 
-      {/* Timer bar */}
+      {/* Sticky Timer bar */}
       {!isPro && (
-        <Card style={{ marginBottom: 16, background: timeExpired ? T.redBg : T.amberBg, border: `1px solid ${timeExpired ? T.redBorder : T.amberBorder}` }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 24, fontWeight: 900, color: timeLeft < 300 ? T.red : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
-                {formatTime(timeLeft)}
-              </span>
-              <span style={{ fontSize: 12, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
-                {timeExpired ? "Time's up! Upgrade to Pro for unlimited practice." : paused ? "Timer paused — click Play to start" : "Timer running"}
-              </span>
+        <div style={{ position: "sticky", top: 64, zIndex: 100, marginBottom: 16 }}>
+          <div style={{ background: timeExpired ? T.redBg : paused ? T.amberBg : T.greenBg, border: `1px solid ${timeExpired ? T.redBorder : paused ? T.amberBorder : T.greenBorder}`, borderRadius: 10, padding: "10px 16px", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 22, fontWeight: 900, color: timeLeft < 300 ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", minWidth: 52 }}>
+                  {formatTime(timeLeft)}
+                </span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: timeExpired ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.3 }}>
+                    {timeExpired ? "Time's up — upgrade to continue practising" : paused ? "⏸ Timer paused — press Play to begin" : "▶ Timer running — exercises unlocked"}
+                  </div>
+                  {!timeExpired && (
+                    <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", marginTop: 1 }}>
+                      Free plan: 30 minutes of practice time · Pause anytime and pick up where you left off · Go Pro for unlimited access
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                {!timeExpired && (
+                  <button onClick={paused ? startTimer : pauseTimer}
+                    style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    {paused ? "▶ Play" : "⏸ Pause"}
+                  </button>
+                )}
+                {timeExpired && (
+                  <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    🔓 Upgrade to Pro
+                  </button>
+                )}
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              {!timeExpired && (
-                <button onClick={paused ? startTimer : pauseTimer}
-                  style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
-                  {paused ? "▶ Play" : "⏸ Pause"}
-                </button>
-              )}
-              {timeExpired && (
-                <button onClick={() => {}} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
-                  🔓 Upgrade to Pro
-                </button>
-              )}
-            </div>
+            {!timeExpired && (
+              <div style={{ marginTop: 8, background: "rgba(0,0,0,0.08)", borderRadius: 4, height: 4 }}>
+                <div style={{ width: `${(timeLeft / EXERCISE_TIMER_LIMIT) * 100}%`, background: timeLeft < 300 ? T.red : paused ? T.amber : T.green, borderRadius: 4, height: 4, transition: "width 1s linear" }}/>
+              </div>
+            )}
           </div>
-          {!timeExpired && (
-            <div style={{ marginTop: 8, background: "rgba(0,0,0,0.1)", borderRadius: 4, height: 4 }}>
-              <div style={{ width: `${(timeLeft / EXERCISE_TIMER_LIMIT) * 100}%`, background: timeLeft < 300 ? T.red : T.amber, borderRadius: 4, height: 4, transition: "width 1s linear" }}/>
-            </div>
-          )}
-        </Card>
+        </div>
       )}
 
       {/* Overall score */}
@@ -1648,6 +1659,612 @@ const GrammarExercises = ({isPro}) => {
           );
         })}
       </div>
+    </div>
+  );
+};
+
+// ── Paraphrasing Exercises ───────────────────
+const PARAPHRASE_EXERCISES = [
+  { original: "Many people believe that governments should spend more money on education.", options: ["A lot of people think governments need to pay for education more.", "It is widely held that public authorities ought to allocate greater funding to the education sector.", "Governments should invest in education because many people want this."], correct: 1, explanation: "'It is widely held that' is formal passive. 'Public authorities' upgrades 'governments'. 'Allocate greater funding' replaces 'spend more money'." },
+  { original: "Climate change is a serious problem that affects the whole world.", options: ["Global warming is a big issue everywhere on Earth.", "Climate change is dangerous for everyone around the world.", "Climate change represents a critical global challenge with far-reaching consequences for all nations."], correct: 2, explanation: "'Represents a critical global challenge' is more academic than 'is a serious problem'. 'Far-reaching consequences' is IELTS-level vocabulary. 'All nations' replaces 'whole world'." },
+  { original: "Young people nowadays spend too much time on social media.", options: ["In contemporary society, a significant proportion of young people devote an excessive amount of time to social media platforms.", "Kids these days use social media too often.", "Social media is used too much by today's youth."], correct: 0, explanation: "'In contemporary society' replaces 'nowadays'. 'Devote an excessive amount of time to' is more formal than 'spend too much time on'. 'Social media platforms' is more precise." },
+  { original: "It is important for students to learn foreign languages.", options: ["Students need to study languages that are foreign to them.", "The acquisition of foreign languages is of considerable importance for learners.", "Learning foreign languages is a thing students should do."], correct: 1, explanation: "'Acquisition of foreign languages' nominalises the verb phrase. 'Of considerable importance' is formal. 'Learners' is more academic than 'students'." },
+  { original: "More and more people are choosing to work from home.", options: ["A growing number of individuals are opting to work remotely, a trend that has gained considerable momentum in recent years.", "Lots of people now prefer working at home instead of the office.", "Working from home is becoming popular with many people today."], correct: 0, explanation: "'A growing number of individuals' replaces 'more and more people'. 'Opting to work remotely' is more formal. Adding context about the trend shows Task Achievement awareness." },
+  { original: "The government should do something to reduce crime in cities.", options: ["The authorities ought to implement targeted measures to curb criminal activity in urban areas.", "Something must be done by governments about city crime.", "The government needs to stop crime happening in cities."], correct: 0, explanation: "'The authorities ought to implement measures' uses passive construction and formal verb. 'Curb criminal activity' replaces 'reduce crime'. 'Urban areas' is more academic than 'cities'." },
+  { original: "Technology has changed the way people communicate with each other.", options: ["Technology has made communication between people very different.", "Technological advancements have fundamentally transformed interpersonal communication.", "People now communicate differently because of technology."], correct: 1, explanation: "'Technological advancements' is a better noun phrase. 'Fundamentally transformed' is stronger than 'changed'. 'Interpersonal communication' is academic and precise." },
+  { original: "Some countries have a problem with obesity because people eat too much unhealthy food.", options: ["Several nations face an escalating obesity crisis, attributable in part to the widespread consumption of nutritionally poor diets.", "Some places have fat people because of bad food habits.", "Obesity is a problem in certain countries where unhealthy food is eaten."], correct: 0, explanation: "'Escalating obesity crisis' shows problem awareness. 'Attributable in part to' is formal causative language. 'Nutritionally poor diets' replaces 'unhealthy food'." },
+];
+
+// ── Linking Words Quiz ────────────────────────
+const LINKING_QUIZ = [
+  { sentence: "Crime rates are rising. ___, governments must take urgent action.", options: ["Therefore","However","Moreover"], correct: 0, explanation: "'Therefore' shows cause and effect — rising crime causes the need for action. 'However' shows contrast. 'Moreover' adds information." },
+  { sentence: "Exercise improves physical health. ___, it boosts mental wellbeing.", options: ["Nevertheless","Furthermore","Although"], correct: 1, explanation: "'Furthermore' adds a related point. 'Nevertheless' shows contrast despite obstacles. 'Although' introduces a concession." },
+  { sentence: "Some argue that technology isolates people. ___, others believe it strengthens connections.", options: ["Consequently","On the other hand","For instance"], correct: 1, explanation: "'On the other hand' introduces an opposing view — perfect for discuss both views tasks." },
+  { sentence: "Many students fail to meet the word count. ___, their Task Achievement score is capped at Band 5.", options: ["As a result","In addition","Whereas"], correct: 0, explanation: "'As a result' signals a consequence. Writing under 250 words directly results in a lower score." },
+  { sentence: "Finland has one of the best education systems in the world. ___, class sizes are small and teachers are highly trained.", options: ["In contrast","For example","Despite this"], correct: 1, explanation: "'For example' introduces a specific supporting detail — exactly what IELTS examiners want." },
+  { sentence: "The proposal has some advantages. ___, there are significant drawbacks that must be considered.", options: ["Therefore","Admittedly","Nevertheless"], correct: 2, explanation: "'Nevertheless' concedes a point but pivots to contrast. It signals a balanced argument — key for high-band writing." },
+  { sentence: "Urban populations are growing rapidly. ___, rural areas are experiencing a decline in residents.", options: ["In contrast","Furthermore","As a result"], correct: 0, explanation: "'In contrast' is used to compare two opposite trends — common in Task 1 Academic and Task 2." },
+  { sentence: "___ the benefits of online learning, many students still prefer face-to-face teaching.", options: ["Despite","Because of","Due to the fact that"], correct: 0, explanation: "'Despite' is followed by a noun or gerund — 'Despite the benefits'. Never 'Despite of'. 'Although' would work instead if followed by a clause." },
+  { sentence: "Governments should invest in public transport. ___, they should incentivise the use of bicycles.", options: ["In addition","However","On the other hand"], correct: 0, explanation: "'In addition' adds another recommendation of the same type. 'However' and 'On the other hand' would introduce a contrasting idea, which doesn't fit here." },
+  { sentence: "The data shows a steady increase between 2010 and 2015. ___, figures declined sharply from 2015 to 2020.", options: ["Moreover","Subsequently","Therefore"], correct: 1, explanation: "'Subsequently' means 'after that' — ideal for Task 1 Academic trend descriptions. 'Moreover' adds rather than sequences. 'Therefore' shows cause." },
+];
+
+// ── Vocabulary Upgrade Exercises ─────────────
+const VOCAB_EXERCISES = [
+  { weak: "a lot of people", options: ["many individual humans", "a significant proportion of the population", "lots of human beings"], correct: 1, tip: "IELTS tip: 'A significant proportion of' or 'a considerable number of' — never 'a lot of' in academic writing." },
+  { weak: "good for society", options: ["very nice for communities", "beneficial for the wider community", "helpful to social groups"], correct: 1, tip: "'Beneficial for' is the key academic upgrade. Also try: 'advantageous', 'conducive to social wellbeing'." },
+  { weak: "went up a lot", options: ["rose significantly", "went up very much", "increased in a big way"], correct: 0, tip: "'Rose significantly' — use trend verbs (rose, surged, climbed) + adverbs (significantly, sharply, steadily) in Task 1." },
+  { weak: "bad for the environment", options: ["not good for nature", "detrimental to the natural environment", "harmful to our Earth"], correct: 1, tip: "'Detrimental to' is a high-band collocation. Also: 'damaging to ecological systems', 'harmful to biodiversity'." },
+  { weak: "the government should do something", options: ["authorities ought to implement targeted measures", "the government needs to act", "officials have to do things"], correct: 0, tip: "'Implement targeted measures' is specific and academic. Never write 'do something' in IELTS — it signals vague thinking." },
+  { weak: "nowadays", options: ["in today's world", "in contemporary society", "currently in this day and age"], correct: 1, tip: "'In contemporary society' or 'In the modern era' — 'Nowadays' is an IELTS cliché that lowers your Lexical Resource score." },
+  { weak: "important", options: ["crucial / paramount / indispensable", "really needed and significant", "very necessary indeed"], correct: 0, tip: "Upgrade ladder: important → significant → crucial → paramount → indispensable. Each step raises your band." },
+  { weak: "rise in crime", options: ["escalation in criminal activity", "going up of lawbreaking", "increase in bad behaviour"], correct: 0, tip: "'Escalation in criminal activity' uses nominalisation — a key IELTS skill. Also: 'surge in offences', 'proliferation of antisocial behaviour'." },
+];
+
+// ── Error Correction Passages ─────────────────
+const ERROR_PASSAGES = [
+  {
+    title: "Urban Development",
+    text: "In many countries, the number of people who lives in cities have risen dramatically over the past few decades. This phenomena has led to a variety of social and environmental challenges. Governments must to address these issues if they want reduce urban poverty. Furthermore, the lack of affordable accommodation are a major concern for low-income families.",
+    errors: [
+      { wrong: "who lives", right: "who live", explanation: "Relative clause 'who live' agrees with 'people' (plural), not 'number'." },
+      { wrong: "have risen", right: "has risen", explanation: "'The number of people' = singular. 'The number HAS risen.'" },
+      { wrong: "This phenomena", right: "This phenomenon", explanation: "'Phenomena' is the plural form. The singular is 'phenomenon'." },
+      { wrong: "must to address", right: "must address", explanation: "Modal verbs (must, should, can, will) are NEVER followed by 'to'. 'Must address.'" },
+      { wrong: "want reduce", right: "want to reduce", explanation: "'Want' takes infinitive: 'want TO reduce'." },
+      { wrong: "accommodation are", right: "accommodation is", explanation: "'Accommodation' is uncountable — always singular. 'Accommodation IS a major concern.'" },
+    ]
+  },
+  {
+    title: "Education & Technology",
+    text: "Technology have transformed the way students learn in recently years. Many researchers argues that digital tools are more effective than the traditional teaching methods. Despite of the high cost, most schools have invest in new equipment. Moreover, student who use technology regular tend to perform more better in assessments.",
+    errors: [
+      { wrong: "Technology have", right: "Technology has", explanation: "'Technology' is uncountable — takes singular verb. 'Technology HAS transformed.'" },
+      { wrong: "in recently years", right: "in recent years", explanation: "'Recent' is an adjective modifying 'years', not an adverb. 'In RECENT years.'" },
+      { wrong: "researchers argues", right: "researchers argue", explanation: "Third person plural: 'researchers ARGUE' — no 's'." },
+      { wrong: "Despite of", right: "Despite", explanation: "'Despite' is NEVER followed by 'of'. 'Despite the high cost.' Use 'In spite of' if you want a preposition." },
+      { wrong: "have invest", right: "have invested", explanation: "Present perfect requires past participle: 'HAVE INVESTED'." },
+      { wrong: "student who", right: "students who", explanation: "'Students' should be plural to match the general statement." },
+      { wrong: "use technology regular", right: "use technology regularly", explanation: "Adverb needed to modify the verb 'use'. 'Use technology REGULARLY.'" },
+      { wrong: "more better", right: "better", explanation: "Never double comparatives. 'Better' is already comparative. 'More better' is always wrong." },
+    ]
+  },
+];
+
+// ── Band Score Self-Check Quiz ────────────────
+const BAND_QUIZ = [
+  { q: "Do you consistently write over 250 words for Task 2?", yes: 0.5, no: 0, tip: "Under 250 words = Task Achievement capped at Band 5. This is one of the most common mistakes." },
+  { q: "Do you paraphrase the question in your introduction (no copying)?", yes: 0.5, no: 0, tip: "Copying the question is penalised under Lexical Resource. Always rephrase." },
+  { q: "Do you write a clear overview / thesis statement in your introduction?", yes: 0.5, no: 0, tip: "Examiners look for a clear position or overview from the first paragraph." },
+  { q: "Do you use a variety of linking words (not just 'however' and 'furthermore')?", yes: 0.5, no: 0, tip: "Repeating the same connectors lowers Coherence & Cohesion. Vary them." },
+  { q: "Do you support your points with specific examples or evidence?", yes: 0.5, no: 0, tip: "Generic statements without examples rarely score above Band 6 for Task Achievement." },
+  { q: "Do you avoid informal language (a lot of, kids, things, stuff)?", yes: 0.5, no: 0, tip: "Informal language directly penalises Lexical Resource — one of the four scoring criteria." },
+  { q: "Do you use a mix of simple AND complex sentences?", yes: 0.5, no: 0, tip: "All-simple sentences = Band 5 GRA. All-complex sentences with errors = Band 6. Balance is key." },
+  { q: "Do you avoid contractions (don't → do not, can't → cannot)?", yes: 0.5, no: 0, tip: "Contractions are informal. Never use them in IELTS Academic writing." },
+  { q: "Do you have a conclusion that restates your position clearly?", yes: 0.5, no: 0, tip: "A missing or weak conclusion costs Task Achievement marks — it's 25% of your score." },
+  { q: "Do you check your work for spelling and punctuation errors?", yes: 0.5, no: 0, tip: "Spelling and punctuation errors reduce Lexical Resource and Grammatical Range scores." },
+];
+
+// ── ExercisesHub ──────────────────────────────
+const ExercisesHub = ({isPro, onUpgrade}) => {
+  const [activeExTab, setActiveExTab] = useState("grammar");
+  const [timeLeft, setTimeLeft] = useState(()=> isPro ? Infinity : getExerciseTimer());
+  const [paused, setPaused] = useState(true);
+  const timerRef = useRef(null);
+
+  const startTimer = useCallback(() => {
+    if(isPro) return;
+    setPaused(false);
+    if(timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        const next = prev - 1;
+        if(next <= 0) { clearInterval(timerRef.current); setPaused(true); saveExerciseTimer(0); return 0; }
+        saveExerciseTimer(next);
+        return next;
+      });
+    }, 1000);
+  }, [isPro]);
+
+  const pauseTimer = useCallback(() => {
+    if(timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+    setPaused(true);
+    if(!isPro) saveExerciseTimer(timeLeft);
+  }, [isPro, timeLeft]);
+
+  useEffect(() => { return () => { if(timerRef.current) clearInterval(timerRef.current); }; }, []);
+
+  const formatTime = (s) => {
+    if(s === Infinity) return "∞";
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec < 10 ? "0" : ""}${sec}`;
+  };
+
+  const canAnswer = isPro || (!paused && timeLeft > 0);
+  const timeExpired = !isPro && timeLeft <= 0;
+
+  const TABS = [
+    { key:"grammar", icon:"📐", label:"Grammar Drills" },
+    { key:"paraphrase", icon:"🔄", label:"Paraphrasing" },
+    { key:"linking", icon:"🔗", label:"Linking Words" },
+    { key:"vocab", icon:"📖", label:"Vocabulary Upgrade" },
+    { key:"errors", icon:"🔍", label:"Error Correction" },
+    { key:"bandcheck", icon:"🎯", label:"Band Self-Check" },
+  ];
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: 24, padding: "8px 0 0" }}>
+        <div style={{ fontSize: 32, marginBottom: 8 }}>🏋️</div>
+        <h2 style={{ fontFamily: "Georgia,serif", color: T.text, fontSize: 26, margin: "0 0 8px", fontWeight: 700 }}>Practice Exercises</h2>
+        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: 0, maxWidth: 540, marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
+          Sharpen your IELTS writing skills with targeted drills — grammar, paraphrasing, linking words, vocabulary upgrades, and more. All exercises are fully static with instant feedback.
+        </p>
+      </div>
+
+      {/* Sticky Timer */}
+      {!isPro && (
+        <div style={{ position: "sticky", top: 64, zIndex: 100, marginBottom: 16 }}>
+          <div style={{ background: timeExpired ? T.redBg : paused ? T.amberBg : T.greenBg, border: `1px solid ${timeExpired ? T.redBorder : paused ? T.amberBorder : T.greenBorder}`, borderRadius: 10, padding: "10px 16px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 24, fontWeight: 900, color: timeLeft < 300 ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", minWidth: 54, flexShrink: 0 }}>
+                  {formatTime(timeLeft)}
+                </span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: timeExpired ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.3 }}>
+                    {timeExpired ? "⏰ Session expired — upgrade to Pro to continue" : paused ? "⏸ Timer paused — press Play to begin your session" : "▶ Session active — exercises unlocked"}
+                  </div>
+                  {!timeExpired && (
+                    <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", marginTop: 2 }}>
+                      Free plan: 30 minutes total · Pause at any time and resume later · Pro members get unlimited access
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                {!timeExpired && (
+                  <button onClick={paused ? startTimer : pauseTimer}
+                    style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    {paused ? "▶ Play" : "⏸ Pause"}
+                  </button>
+                )}
+                {timeExpired && (
+                  <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    🔓 Upgrade to Pro
+                  </button>
+                )}
+              </div>
+            </div>
+            {!timeExpired && (
+              <div style={{ marginTop: 8, background: "rgba(0,0,0,0.08)", borderRadius: 4, height: 5 }}>
+                <div style={{ width: `${(timeLeft / EXERCISE_TIMER_LIMIT) * 100}%`, background: timeLeft < 300 ? T.red : paused ? T.amber : T.green, borderRadius: 4, height: 5, transition: "width 1s linear" }}/>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {isPro && (
+        <div style={{ marginBottom: 16, background: T.greenBg, border: `1px solid ${T.greenBorder}`, borderRadius: 10, padding: "10px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 20 }}>✅</span>
+          <span style={{ fontSize: 13, color: T.green, fontWeight: 700, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Pro — Unlimited exercise access. No timer restrictions.</span>
+        </div>
+      )}
+
+      {/* Exercise type tabs */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
+        {TABS.map(t => (
+          <button key={t.key} onClick={() => setActiveExTab(t.key)}
+            style={{ background: activeExTab === t.key ? T.primaryLight : T.bgGray, border: `1px solid ${activeExTab === t.key ? T.primaryBorder : T.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: activeExTab === t.key ? 700 : 400, color: activeExTab === t.key ? T.primary : T.textMid, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", display: "flex", alignItems: "center", gap: 5 }}>
+            <span>{t.icon}</span>{t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Expired overlay message */}
+      {timeExpired && !isPro && (
+        <Card style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, textAlign: "center", padding: "28px 24px", marginBottom: 16 }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>⏰</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 8 }}>Your free 30-minute session has ended</div>
+          <p style={{ color: T.textMid, fontSize: 13, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: "0 0 16px", lineHeight: 1.6 }}>Upgrade to Pro for unlimited practice time — all exercise types, all categories, no restrictions.</p>
+          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🔓 Upgrade to Pro — $19/mo</button>
+        </Card>
+      )}
+
+      {/* Content area */}
+      <div style={{ opacity: timeExpired && !isPro ? 0.4 : 1, pointerEvents: timeExpired && !isPro ? "none" : "auto" }}>
+        {activeExTab === "grammar" && <GrammarExercisesInner isPro={isPro} canAnswer={canAnswer} onUpgrade={onUpgrade} />}
+        {activeExTab === "paraphrase" && <ParaphraseExercises canAnswer={canAnswer} />}
+        {activeExTab === "linking" && <LinkingWordsQuiz canAnswer={canAnswer} />}
+        {activeExTab === "vocab" && <VocabUpgradeExercises canAnswer={canAnswer} />}
+        {activeExTab === "errors" && <ErrorCorrectionExercises canAnswer={canAnswer} />}
+        {activeExTab === "bandcheck" && <BandSelfCheck />}
+      </div>
+    </div>
+  );
+};
+
+// ── GrammarExercisesInner (shared logic, used in ExercisesHub) ──
+const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade}) => {
+  const [openCat, setOpenCat] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [showExplanation, setShowExplanation] = useState({});
+  const totalQ = GRAMMAR_EXERCISES.reduce((sum,c)=>sum+c.exercises.length,0);
+  const totalAnswered = Object.keys(answers).length;
+  const totalCorrect = Object.entries(answers).filter(([key,val])=>{const [ci,ei]=key.split("-").map(Number);return val===GRAMMAR_EXERCISES[ci].exercises[ei].correct;}).length;
+  const getCatScore = (catIdx) => {
+    const cat = GRAMMAR_EXERCISES[catIdx];
+    let correct = 0, attempted = 0;
+    cat.exercises.forEach((_, exIdx) => { const key = `${catIdx}-${exIdx}`; if(answers[key]!==undefined){attempted++;if(answers[key]===cat.exercises[exIdx].correct)correct++;} });
+    return { correct, attempted, total: cat.exercises.length };
+  };
+  const handleAnswer = (catIdx, exIdx, optIdx) => {
+    if(!canAnswer) return;
+    const key = `${catIdx}-${exIdx}`;
+    if(answers[key]!==undefined) return;
+    setAnswers(prev=>({...prev,[key]:optIdx}));
+    setShowExplanation(prev=>({...prev,[key]:true}));
+  };
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 4 }}>
+          <strong>14 categories · {totalQ} questions</strong> covering Subject-Verb Agreement, Articles, Tenses, Prepositions, Passives, Conditionals, Relative Clauses, and more.
+        </div>
+        {totalAnswered > 0 && (
+          <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 14px", display: "inline-block" }}>
+            <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+              Score: <strong style={{ color: T.text }}>{totalCorrect}</strong>/{totalAnswered} answered
+              <span style={{ color: totalCorrect/totalAnswered >= 0.8 ? T.green : totalCorrect/totalAnswered >= 0.6 ? T.amber : T.red, marginLeft: 8, fontWeight: 700 }}>({Math.round(totalCorrect/totalAnswered*100)}%)</span>
+            </span>
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {GRAMMAR_EXERCISES.map((cat, catIdx) => {
+          const score = getCatScore(catIdx);
+          const isOpen = openCat === catIdx;
+          return (
+            <div key={catIdx}>
+              <div onClick={() => setOpenCat(isOpen ? null : catIdx)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: "pointer", transition: "all 0.15s" }}>
+                <span style={{ fontSize: 20 }}>{cat.icon}</span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.category}</span>
+                {score.attempted > 0 && (
+                  <span style={{ background: score.correct === score.attempted ? T.greenBg : T.amberBg, border: `1px solid ${score.correct === score.attempted ? T.greenBorder : T.amberBorder}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: score.correct === score.attempted ? T.green : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    {score.correct}/{score.attempted}
+                  </span>
+                )}
+                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.exercises.length}q</span>
+                <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
+              </div>
+              {isOpen && (
+                <div style={{ border: `1px solid ${cat.color}40`, borderTop: "none", borderRadius: "0 0 10px 10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16, background: `${cat.color}05` }}>
+                  {!canAnswer && !isPro && (
+                    <Card style={{ background: T.amberBg, border: `1px solid ${T.amberBorder}`, textAlign: "center" }}>
+                      <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>⏸ Timer paused — click <strong>Play</strong> above to start answering.</p>
+                    </Card>
+                  )}
+                  {cat.exercises.map((ex, exIdx) => {
+                    const key = `${catIdx}-${exIdx}`;
+                    const answered = answers[key] !== undefined;
+                    const isCorrect = answered && answers[key] === ex.correct;
+                    return (
+                      <div key={exIdx} style={{ background: T.bg, border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}`, borderRadius: 10, padding: "14px 16px" }}>
+                        <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 10 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{exIdx+1}</span>
+                          {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
+                        </div>
+                        <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{ex.sentence}</p>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          {ex.options.map((opt, optIdx) => {
+                            let bg = T.bgGray, border = T.border, color = T.text;
+                            if(answered){ if(optIdx===ex.correct){bg=T.greenBg;border=T.greenBorder;color=T.green;}else if(optIdx===answers[key]&&!isCorrect){bg=T.redBg;border=T.redBorder;color=T.red;}else{bg=T.bgGray;color=T.textMuted;} }
+                            return (
+                              <button key={optIdx} onClick={() => handleAnswer(catIdx, exIdx, optIdx)} disabled={answered||!canAnswer}
+                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", opacity: answered&&optIdx!==ex.correct&&optIdx!==answers[key]?0.5:1 }}>
+                                {opt}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {showExplanation[key] && (
+                          <div style={{ marginTop: 10, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
+                            <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {ex.explanation}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ── Paraphrase Exercises Component ────────────
+const ParaphraseExercises = ({canAnswer}) => {
+  const [answers, setAnswers] = useState({});
+  const [shown, setShown] = useState({});
+  return (
+    <div>
+      <Card style={{ background: T.blueBg, border: `1px solid ${T.blueBorder}`, marginBottom: 16 }}>
+        <p style={{ color: T.blue, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          🔄 <strong>Paraphrasing</strong> — A core IELTS skill. For each sentence, choose the best academic paraphrase. Look for formal vocabulary, appropriate structure, and precise meaning.
+        </p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {PARAPHRASE_EXERCISES.map((item, i) => {
+          const answered = answers[i] !== undefined;
+          const isCorrect = answered && answers[i] === item.correct;
+          return (
+            <Card key={i} style={{ border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}` }}>
+              <div style={{ marginBottom: 12 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1} — Original sentence</span>
+                <div style={{ background: T.bgGray, borderRadius: 8, padding: "10px 14px", marginTop: 6, border: `1px solid ${T.border}` }}>
+                  <p style={{ color: T.text, fontSize: 14, margin: 0, fontFamily: "Georgia,serif", fontStyle: "italic" }}>{item.original}</p>
+                </div>
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 8 }}>Which option is the best academic paraphrase?</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {item.options.map((opt, optIdx) => {
+                  let bg = T.bgGray, border = T.border, color = T.text;
+                  if(answered){ if(optIdx===item.correct){bg=T.greenBg;border=T.greenBorder;color=T.green;}else if(optIdx===answers[i]&&!isCorrect){bg=T.redBg;border=T.redBorder;color=T.red;}else{color=T.textMuted;} }
+                  return (
+                    <button key={optIdx} onClick={() => { if(!canAnswer||answered) return; setAnswers(p=>({...p,[i]:optIdx})); setShown(p=>({...p,[i]:true})); }} disabled={answered||!canAnswer}
+                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", textAlign: "left", lineHeight: 1.5, transition: "all 0.15s" }}>
+                      <strong style={{ marginRight: 6 }}>{String.fromCharCode(65+optIdx)}.</strong>{opt}
+                    </button>
+                  );
+                })}
+              </div>
+              {shown[i] && (
+                <div style={{ marginTop: 12, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {item.explanation}</p>
+                </div>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ── Linking Words Quiz Component ──────────────
+const LinkingWordsQuiz = ({canAnswer}) => {
+  const [answers, setAnswers] = useState({});
+  const [shown, setShown] = useState({});
+  return (
+    <div>
+      <Card style={{ background: T.purpleBg, border: `1px solid ${T.purpleBorder}`, marginBottom: 16 }}>
+        <p style={{ color: T.purple, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          🔗 <strong>Linking Words Quiz</strong> — Fill in the blank with the correct linking word. Tests your understanding of cohesion, contrast, cause-effect, and sequencing — all tested in IELTS Coherence & Cohesion.
+        </p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {LINKING_QUIZ.map((item, i) => {
+          const answered = answers[i] !== undefined;
+          const isCorrect = answered && answers[i] === item.correct;
+          const parts = item.sentence.split("___");
+          return (
+            <Card key={i} style={{ border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}` }}>
+              <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1}</span>
+                {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui", marginLeft: 4 }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
+              </div>
+              <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.7, fontFamily: "Georgia,serif" }}>
+                {parts[0]}<span style={{ background: answered ? (isCorrect ? "#dcfce7" : "#fee2e2") : T.primaryLight, padding: "1px 10px", borderRadius: 4, fontWeight: 700, color: answered ? (isCorrect ? T.green : T.red) : T.primary, fontStyle: "normal", minWidth: 80, display: "inline-block", textAlign: "center" }}>
+                  {answered ? item.options[item.correct] : "___"}
+                </span>{parts[1]}
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {item.options.map((opt, optIdx) => {
+                  let bg = T.bgGray, border = T.border, color = T.text;
+                  if(answered){ if(optIdx===item.correct){bg=T.greenBg;border=T.greenBorder;color=T.green;}else if(optIdx===answers[i]&&!isCorrect){bg=T.redBg;border=T.redBorder;color=T.red;}else{color=T.textMuted;} }
+                  return (
+                    <button key={optIdx} onClick={() => { if(!canAnswer||answered) return; setAnswers(p=>({...p,[i]:optIdx})); setShown(p=>({...p,[i]:true})); }} disabled={answered||!canAnswer}
+                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s" }}>
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+              {shown[i] && (
+                <div style={{ marginTop: 10, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {item.explanation}</p>
+                </div>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ── Vocabulary Upgrade Component ──────────────
+const VocabUpgradeExercises = ({canAnswer}) => {
+  const [answers, setAnswers] = useState({});
+  const [shown, setShown] = useState({});
+  return (
+    <div>
+      <Card style={{ background: "#f0fdf4", border: `1px solid ${T.greenBorder}`, marginBottom: 16 }}>
+        <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          📖 <strong>Vocabulary Upgrade</strong> — Each question shows a weak phrase. Pick the best academic replacement. These upgrades directly raise your Lexical Resource band score.
+        </p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {VOCAB_EXERCISES.map((item, i) => {
+          const answered = answers[i] !== undefined;
+          const isCorrect = answered && answers[i] === item.correct;
+          return (
+            <Card key={i} style={{ border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}` }}>
+              <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1}</span>
+                <span style={{ background: "#fee2e2", borderRadius: 6, padding: "3px 12px", fontSize: 13, color: "#991b1b", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>✗ "{item.weak}"</span>
+                <span style={{ color: T.textMuted, fontSize: 13 }}>→ choose best upgrade</span>
+                {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {item.options.map((opt, optIdx) => {
+                  let bg = T.bgGray, border = T.border, color = T.text;
+                  if(answered){ if(optIdx===item.correct){bg="#dcfce7";border=T.greenBorder;color="#166534";}else if(optIdx===answers[i]&&!isCorrect){bg="#fee2e2";border=T.redBorder;color="#991b1b";}else{color=T.textMuted;} }
+                  return (
+                    <button key={optIdx} onClick={() => { if(!canAnswer||answered) return; setAnswers(p=>({...p,[i]:optIdx})); setShown(p=>({...p,[i]:true})); }} disabled={answered||!canAnswer}
+                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", textAlign: "left", transition: "all 0.15s" }}>
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+              {shown[i] && (
+                <div style={{ marginTop: 10, background: isCorrect ? "#f0fdf4" : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🎓 {item.tip}</p>
+                </div>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ── Error Correction Component ─────────────────
+const ErrorCorrectionExercises = ({canAnswer}) => {
+  const [revealed, setRevealed] = useState({});
+  const [showAll, setShowAll] = useState({});
+  return (
+    <div>
+      <Card style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, marginBottom: 16 }}>
+        <p style={{ color: T.red, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          🔍 <strong>Error Correction</strong> — Read each passage carefully and find all the mistakes. Click "Reveal Errors" to see every error highlighted with explanations. Trains the same skill examiners use when marking your essay.
+        </p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {ERROR_PASSAGES.map((passage, pi) => (
+          <Card key={pi} style={{ border: `1px solid ${T.border}` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+              <div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", textTransform: "uppercase", letterSpacing: "0.08em" }}>Passage {pi+1}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: T.text, fontFamily: "'Source Sans Pro','Inter',system-ui", marginLeft: 8 }}>{passage.title}</span>
+                <span style={{ fontSize: 11, color: T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui", marginLeft: 8 }}>({passage.errors.length} errors hidden)</span>
+              </div>
+              <button onClick={() => { if(!canAnswer) return; setShowAll(p=>({...p,[pi]:!p[pi]})); }}
+                disabled={!canAnswer}
+                style={{ background: showAll[pi] ? T.amberBg : T.primary, color: showAll[pi] ? T.amber : "white", border: `1px solid ${showAll[pi] ? T.amberBorder : T.primary}`, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: canAnswer?"pointer":"default", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                {showAll[pi] ? "Hide Errors" : "Reveal Errors"}
+              </button>
+            </div>
+            <div style={{ background: T.bgGray, borderRadius: 8, padding: "14px 16px", border: `1px solid ${T.border}`, marginBottom: 12 }}>
+              <p style={{ color: T.text, fontSize: 14, margin: 0, lineHeight: 1.9, fontFamily: "Georgia,serif" }}>
+                {showAll[pi] ? (() => {
+                  let text = passage.text;
+                  const parts = [];
+                  let remaining = text;
+                  let idx = 0;
+                  passage.errors.forEach((err, ei) => {
+                    const pos = remaining.indexOf(err.wrong);
+                    if(pos === -1) return;
+                    if(pos > 0) parts.push(<span key={`n${idx++}`}>{remaining.slice(0, pos)}</span>);
+                    parts.push(
+                      <span key={`e${idx++}`} style={{ background: "#fee2e2", borderBottom: "2px solid #dc2626", borderRadius: 3, padding: "0 2px", color: "#991b1b", fontWeight: 700 }} title={`✗ → ${err.right}`}>{err.wrong}</span>
+                    );
+                    remaining = remaining.slice(pos + err.wrong.length);
+                  });
+                  if(remaining) parts.push(<span key={`n${idx++}`}>{remaining}</span>);
+                  return parts;
+                })() : passage.text}
+              </p>
+            </div>
+            {showAll[pi] && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.red, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Errors Found ({passage.errors.length})</div>
+                {passage.errors.map((err, ei) => (
+                  <div key={ei} style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, borderRadius: 8, padding: "10px 14px", display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
+                    <span style={{ background: "#fee2e2", borderRadius: 6, padding: "3px 10px", fontSize: 13, color: "#991b1b", fontFamily: "'Source Sans Pro','Inter',system-ui", flexShrink: 0 }}>✗ "{err.wrong}"</span>
+                    <span style={{ color: T.textMuted, fontSize: 14, flexShrink: 0 }}>→</span>
+                    <span style={{ background: "#dcfce7", borderRadius: 6, padding: "3px 10px", fontSize: 13, color: "#166534", fontFamily: "'Source Sans Pro','Inter',system-ui", flexShrink: 0 }}>✓ "{err.right}"</span>
+                    <span style={{ color: T.textMid, fontSize: 12, fontFamily: "'Source Sans Pro','Inter',system-ui", flex: 1, minWidth: 200 }}>💡 {err.explanation}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ── Band Self-Check Component ─────────────────
+const BandSelfCheck = () => {
+  const [answers, setAnswers] = useState({});
+  const allAnswered = Object.keys(answers).length === BAND_QUIZ.length;
+  const score = Object.entries(answers).reduce((sum,[i,val])=> sum + (val==="yes" ? BAND_QUIZ[i].yes : BAND_QUIZ[i].no), 0);
+  const estimatedBand = Math.min(8.0, 4.5 + score * 2);
+  const roundedBand = Math.round(estimatedBand * 2) / 2;
+  return (
+    <div>
+      <Card style={{ background: T.primaryLight, border: `1px solid ${T.primaryBorder}`, marginBottom: 16 }}>
+        <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.6 }}>
+          🎯 <strong>Band Score Self-Check</strong> — Answer 10 honest questions about your current writing habits. You'll get an estimated band range based on your answers, plus targeted advice on what to fix. No timer needed — answer honestly!
+        </p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {BAND_QUIZ.map((item, i) => {
+          const answered = answers[i] !== undefined;
+          return (
+            <Card key={i} style={{ border: `1px solid ${answered ? T.greenBorder : T.border}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1} </span>
+                  <span style={{ fontSize: 14, color: T.text, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.5 }}>{item.q}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                  {["yes","no"].map(val => {
+                    const active = answers[i] === val;
+                    return (
+                      <button key={val} onClick={() => setAnswers(p=>({...p,[i]:val}))}
+                        style={{ background: active ? (val==="yes" ? T.greenBg : T.redBg) : T.bgGray, border: `1.5px solid ${active ? (val==="yes" ? T.greenBorder : T.redBorder) : T.border}`, borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, color: active ? (val==="yes" ? T.green : T.red) : T.textMid, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", textTransform: "capitalize" }}>
+                        {val === "yes" ? "✓ Yes" : "✗ No"}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              {answered && answers[i] === "no" && (
+                <div style={{ marginTop: 10, background: T.amberBg, border: `1px solid ${T.amberBorder}`, borderRadius: 8, padding: "8px 14px" }}>
+                  <p style={{ color: T.amber, fontSize: 12, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.5 }}>💡 {item.tip}</p>
+                </div>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+      {allAnswered && (
+        <Card style={{ marginTop: 20, background: `linear-gradient(135deg, ${T.primary} 0%, #003a99 100%)`, border: "none", textAlign: "center", padding: "32px 24px" }}>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Your Estimated Band</div>
+          <div style={{ fontSize: 72, fontWeight: 900, color: "white", lineHeight: 1, fontFamily: "Georgia,serif", marginBottom: 8 }}>{roundedBand}</div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 16, lineHeight: 1.6 }}>
+            {roundedBand >= 7.5 ? "Excellent foundation — you're applying most key techniques. Focus on advanced vocabulary and complex structures to reach Band 8+." :
+             roundedBand >= 6.5 ? "Good progress — you're following core principles but there are clear gaps. Target the areas where you answered 'No' above." :
+             roundedBand >= 5.5 ? "Developing — several fundamentals need attention. Work through the 'No' answers above systematically." :
+             "Foundation stage — focus on the basics first: word count, paraphrasing, linking words, and avoiding informal language."}
+          </div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", fontFamily: "'Source Sans Pro','Inter',system-ui", fontStyle: "italic" }}>
+            This is a self-assessed estimate based on your reported habits. For a precise band score, use the Essay Analyzer above.
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
@@ -1824,7 +2441,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
 );
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar"};
+const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
 
@@ -1899,7 +2516,7 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
+  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
   const switchView=(view)=>{ 
     setMainView(view); 
     const path = VIEW_TO_PATH[view] || "/";
@@ -2000,6 +2617,7 @@ export default function IELTSBot(){
               <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
               <MainTab label="✏️ Grammar" active={mainView==="grammar"} onClick={()=>{switchView("grammar");trackEvent("nav_click",{page:"grammar"});}}/>
+              <MainTab label="🏋️ Exercises" active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
               <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
           </div>
@@ -2008,9 +2626,6 @@ export default function IELTSBot(){
               {proUser?"✓ Pro — Unlimited":session?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"1 free analysis"}
             </span>
             <div style={{width:1,height:20,background:T.border}}/>
-            {["en","ar"].map(l=>(
-              <button key={l} onClick={()=>switchLang(l)} style={{background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:4,padding:"5px 12px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"all 0.15s"}}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
-            ))}
             {session?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
                 <span style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
@@ -2352,6 +2967,7 @@ export default function IELTSBot(){
         {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="grammar"&&<GrammarChecker isPro={proUser}/>}
+        {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="contact"&&<ContactPage/>}
         </div>
       </div>
@@ -2452,6 +3068,7 @@ export default function IELTSBot(){
                 {view:"progress",icon:"📈",label:"Progress Tracker"},
                 {view:"toolkit",icon:"📚",label:"IELTS Toolkit"},
                 {view:"grammar",icon:"✏️",label:"Grammar Checker"},
+                {view:"exercises",icon:"🏋️",label:"Exercises"},
                 {view:"contact",icon:"✉️",label:"Contact Us"},
               ].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
