@@ -717,12 +717,13 @@ const PaywallModal=({onClose,onSuccess,session})=>{
     setCodeErr("");
     if(!codeEmail.trim()){setCodeErr("Please enter your email address.");return;}
     if(!codeVal.trim()){setCodeErr("Please enter your activation code.");return;}
-    if(verifyActivationCode(codeEmail,codeVal)){
-      setUserPro(codeEmail.toLowerCase().trim());
+    const normalizedEmail = codeEmail.toLowerCase().trim();
+    if(verifyActivationCode(normalizedEmail, codeVal)){
+      setUserPro(normalizedEmail);
       setCodeSuccess(true);
-      setTimeout(()=>{onSuccess();},1800);
+      setTimeout(()=>{ onSuccess(normalizedEmail); }, 1600);
     }else{
-      setCodeErr("Invalid code. Make sure you're using the exact email address you registered with and the code we sent you.");
+      setCodeErr("Invalid code. Double-check your email is exactly the one you gave us, and that the code is entered correctly (e.g. EFOOL-XXXX-XXXX).");
     }
   };
 
@@ -733,16 +734,21 @@ const PaywallModal=({onClose,onSuccess,session})=>{
   );
 
   return(
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
-      <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,padding:"32px 28px",maxWidth:460,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
-        <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",color:T.text,fontSize:18,cursor:"pointer",width:40,height:40,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,zIndex:10}}>✕</button>
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,maxWidth:460,width:"100%",position:"relative",boxShadow:T.shadowLg,display:"flex",flexDirection:"column",maxHeight:"90vh"}}>
 
-        {/* Header */}
-        <div style={{textAlign:"center",marginBottom:20}}>
-          <div style={{fontSize:32,marginBottom:6}}>🎓</div>
-          <h2 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:22,margin:"0 0 6px"}}>Unlock Pro Access</h2>
-          <p style={{color:T.textMid,fontSize:13,lineHeight:1.5,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Unlimited analyses, full toolkit, and all exercises.</p>
+        {/* Sticky header — X always visible */}
+        <div style={{flexShrink:0,padding:"20px 28px 0",position:"relative"}}>
+          <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",color:T.text,fontSize:18,cursor:"pointer",width:40,height:40,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,zIndex:10}}>✕</button>
+          <div style={{textAlign:"center",paddingBottom:16}}>
+            <div style={{fontSize:32,marginBottom:6}}>🎓</div>
+            <h2 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:22,margin:"0 0 6px"}}>Unlock Pro Access</h2>
+            <p style={{color:T.textMid,fontSize:13,lineHeight:1.5,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Unlimited analyses, full toolkit, and all exercises.</p>
+          </div>
         </div>
+
+        {/* Scrollable body */}
+        <div style={{overflowY:"auto",padding:"0 28px 28px",flex:1}}>
 
         {/* Features list */}
         <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"12px 16px",marginBottom:20}}>
@@ -825,8 +831,11 @@ const PaywallModal=({onClose,onSuccess,session})=>{
         {/* ── Enter Code Tab ── */}
         {tab==="code"&&(
           <div>
-            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:14,lineHeight:1.6}}>
+            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10,lineHeight:1.6}}>
               Already paid via CLIQ and received your activation code? Enter it below to unlock Pro instantly.
+            </div>
+            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 14px",marginBottom:14,fontSize:12,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6}}>
+              💡 <strong>Using a new device?</strong> Register or sign in with the same email you used when paying, then enter your code here. Your Pro status activates on any device this way.
             </div>
             {codeSuccess?(
               <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"20px",textAlign:"center"}}>
@@ -855,6 +864,7 @@ const PaywallModal=({onClose,onSuccess,session})=>{
             )}
           </div>
         )}
+        </div>{/* end scrollable body */}
       </div>
     </div>
   );
@@ -2759,13 +2769,14 @@ export default function IELTSBot(){
   const [menuOpen,setMenuOpen]=useState(false);
   const analyzeRef=useRef(null);
 
-  const proUser = session ? getUserPro(session.email) : false;
+  const [proUser, setProUser] = useState(()=> { const s = getSession(); return s ? getUserPro(s.email) : false; });
   const usesLeft = FREE_USES_LIMIT - uses;
 
   const handleAuthSuccess=(sess)=>{
     setSession(sess);
     saveSession(sess);
     setUses(getStoredUses(sess.email));
+    setProUser(getUserPro(sess.email));
     setShowAuth(false);
     setShowPaywall(false);
   };
@@ -2775,6 +2786,7 @@ export default function IELTSBot(){
     setSession(null);
     setUses(0);
     setResult(null);
+    setProUser(false);
     setMenuOpen(false);
     switchView("analyze");
   };
@@ -2831,7 +2843,13 @@ export default function IELTSBot(){
   const wordCount=countWords(essay);
   const sampleWordCount=result?.sampleEssay?countWords(result.sampleEssay):0;
 
-  const handleProSuccess=()=>{ if(session){ setUserPro(session.email); setShowPaywall(false); trackEvent('upgrade_to_pro'); } };
+  const handleProSuccess=(activatedEmail)=>{
+    if(activatedEmail) setUserPro(activatedEmail);
+    else if(session) setUserPro(session.email);
+    setProUser(true);
+    setShowPaywall(false);
+    trackEvent('upgrade_to_pro');
+  };
   const handleImageUpload=(e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=(ev)=>{ setImage(ev.target.result.split(",")[1]); setImagePreview(ev.target.result); }; reader.readAsDataURL(file); };
 
   const extractTextFromImage = async (file, target) => {
