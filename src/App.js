@@ -1,6 +1,19 @@
 import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 
 const STRIPE_CONFIGURED = false;
+
+// 25002500 Activation Code System 250025002500250025002500250025002500250025002500250025002500250025002500250025002500250025002500
+const _ACS = "EF-Efool2026-JO-secret";
+const generateActivationCode = (email) => {
+  const input = (email||"").toLowerCase().trim() + _ACS;
+  let h = 5381;
+  for(let i=0;i<input.length;i++){ h=((h<<5)+h)^input.charCodeAt(i); h=h>>>0; }
+  const b = h.toString(36).toUpperCase().padStart(8,"0").slice(0,8);
+  return `EFOOL-${b.slice(0,4)}-${b.slice(4,8)}`;
+};
+const verifyActivationCode = (email, code) =>
+  generateActivationCode(email) === (code||"").trim().toUpperCase();
+const ADMIN_PASS_HASH = "RUZhZG1pbjIwMjYh";
 const FREE_USES_LIMIT = 1;
 const STORAGE_KEY = "bandup_uses";
 const HISTORY_KEY = "bandup_history";
@@ -673,34 +686,180 @@ const AuthModal=({onClose,onSuccess})=>{
 };
 
 // ── Paywall ───────────────────────────────────
-const PaywallModal=({onClose,onSuccess})=>(
-  <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
-    <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,padding:"40px 32px",maxWidth:440,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
-      <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",color:T.text,fontSize:18,cursor:"pointer",width:40,height:40,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,zIndex:10}}>✕</button>
-      <div style={{textAlign:"center",marginBottom:24}}>
-        <div style={{fontSize:36,marginBottom:8}}>🎓</div>
-        <div style={{display:"inline-block",background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:100,padding:"5px 16px",fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Free analyses used up</div>
-        <h2 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:24,marginBottom:8}}>Unlock Unlimited Access</h2>
-        <p style={{color:T.textMid,fontSize:14,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Full IELTS Writing coverage — Task 1 & 2, Academic & General Training.</p>
+const PaywallModal=({onClose,onSuccess,session})=>{
+  const [tab,setTab]=useState("cliq"); // "cliq" | "international" | "code"
+  const [cliqForm,setCliqForm]=useState({name:"",email:session?.email||"",mobile:""});
+  const [cliqStatus,setCliqStatus]=useState(null); // null | "sending" | "sent" | "error"
+  const [codeEmail,setCodeEmail]=useState(session?.email||"");
+  const [codeVal,setCodeVal]=useState("");
+  const [codeErr,setCodeErr]=useState("");
+  const [codeSuccess,setCodeSuccess]=useState(false);
+
+  const FEATURES=["Unlimited essay analyses — Task 1 & 2","Complete mistake & spelling detection","Inline annotated essay corrections","Band Booster + vocabulary upgrades","Full IELTS Toolkit (templates, model essays)","Practice Mode with live AI coaching","Unlimited Grammar & Spelling Checker","Progress tracker","Unlimited exercises — all categories"];
+
+  const submitCliq=async()=>{
+    if(!cliqForm.name.trim()||!cliqForm.email.trim()||!cliqForm.mobile.trim()){setCliqStatus("error");return;}
+    setCliqStatus("sending");
+    try{
+      await window.emailjs.send("service_9es76g1","template_jrd4i4n",{
+        from_name:"CLIQ PRO REQUEST: "+cliqForm.name.trim(),
+        from_email:cliqForm.email.trim(),
+        country:cliqForm.mobile.trim(),
+        age_group:"CLIQ Payment",
+        message:`New CLIQ Pro upgrade request:\n\nName: ${cliqForm.name.trim()}\nEmail: ${cliqForm.email.trim()}\nMobile: ${cliqForm.mobile.trim()}\nAmount: 17 JOD\nCLIQ Alias: Efool2026\n\nPlease verify payment and send activation code via WhatsApp.`,
+        to_email:"diogenes.agnos@gmail.com"
+      });
+      setCliqStatus("sent");
+    }catch(e){console.error("EmailJS error",e);setCliqStatus("error");}
+  };
+
+  const applyCode=()=>{
+    setCodeErr("");
+    if(!codeEmail.trim()){setCodeErr("Please enter your email address.");return;}
+    if(!codeVal.trim()){setCodeErr("Please enter your activation code.");return;}
+    if(verifyActivationCode(codeEmail,codeVal)){
+      setUserPro(codeEmail.toLowerCase().trim());
+      setCodeSuccess(true);
+      setTimeout(()=>{onSuccess();},1800);
+    }else{
+      setCodeErr("Invalid code. Make sure you're using the exact email address you registered with and the code we sent you.");
+    }
+  };
+
+  const tabBtn=(key,icon,label)=>(
+    <button onClick={()=>setTab(key)} style={{flex:1,padding:"9px 6px",background:tab===key?T.primaryLight:"transparent",border:`1px solid ${tab===key?T.primaryBorder:T.border}`,borderRadius:8,fontSize:12,fontWeight:tab===key?700:400,color:tab===key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+      <span style={{fontSize:16}}>{icon}</span>{label}
+    </button>
+  );
+
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
+      <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,padding:"32px 28px",maxWidth:460,width:"100%",position:"relative",boxShadow:T.shadowLg}}>
+        <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",color:T.text,fontSize:18,cursor:"pointer",width:40,height:40,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,zIndex:10}}>✕</button>
+
+        {/* Header */}
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <div style={{fontSize:32,marginBottom:6}}>🎓</div>
+          <h2 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:22,margin:"0 0 6px"}}>Unlock Pro Access</h2>
+          <p style={{color:T.textMid,fontSize:13,lineHeight:1.5,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Unlimited analyses, full toolkit, and all exercises.</p>
+        </div>
+
+        {/* Features list */}
+        <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"12px 16px",marginBottom:20}}>
+          <div style={{display:"flex",flexWrap:"wrap",gap:"4px 0"}}>
+            {FEATURES.map((f,i)=>(
+              <div key={i} style={{width:"100%",display:"flex",gap:8,fontSize:12,color:T.primary,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                <span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab switcher */}
+        <div style={{display:"flex",gap:6,marginBottom:20}}>
+          {tabBtn("cliq","🏦","CLIQ · Jordan")}
+          {tabBtn("international","💳","International")}
+          {tabBtn("code","🔑","Enter Code")}
+        </div>
+
+        {/* ── CLIQ Tab ── */}
+        {tab==="cliq"&&(
+          <div>
+            <div style={{background:"#f0fdf4",border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px",marginBottom:16,textAlign:"center"}}>
+              <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>🇯🇴 Pay via CLIQ — Available Now</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>17 <span style={{fontSize:20,fontWeight:700}}>JOD</span></div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>One-time monthly payment · Cancel anytime</div>
+            </div>
+            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:16}}>
+              <div style={{fontSize:13,fontWeight:700,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>📲 How to pay:</div>
+              <ol style={{margin:0,paddingLeft:18,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8}}>
+                <li>Open your banking app → CliQ → Send Money</li>
+                <li>Send <strong>17 JOD</strong> to CliQ alias: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:14}}>Efool2026</strong></li>
+                <li>Fill the form below and submit</li>
+                <li>We'll WhatsApp your activation code within a few hours</li>
+              </ol>
+            </div>
+            {cliqStatus==="sent"?(
+              <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"18px",textAlign:"center"}}>
+                <div style={{fontSize:28,marginBottom:8}}>✅</div>
+                <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Request received!</div>
+                <p style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 8px",lineHeight:1.5}}>We'll verify your payment and WhatsApp your activation code to <strong>{cliqForm.mobile}</strong> within a few hours.</p>
+                <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Once you receive the code, click <strong>"Enter Code"</strong> tab above.</p>
+              </div>
+            ):(
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                {[{field:"name",label:"Full Name",placeholder:"Your full name",type:"text"},{field:"email",label:"Email Address",placeholder:"The email you signed up with",type:"email"},{field:"mobile",label:"Mobile Number (for WhatsApp)",placeholder:"e.g. 0791234567",type:"tel"}].map(({field,label,placeholder,type})=>(
+                  <div key={field}>
+                    <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</label>
+                    <input type={type} value={cliqForm[field]} onChange={e=>setCliqForm(p=>({...p,[field]:e.target.value}))} placeholder={placeholder}
+                      style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"}}/>
+                  </div>
+                ))}
+                {cliqStatus==="error"&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Please fill in all fields, or check your connection and try again.</div>}
+                <button onClick={submitCliq} disabled={cliqStatus==="sending"}
+                  style={{background:cliqStatus==="sending"?T.bgGray:T.green,color:cliqStatus==="sending"?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:cliqStatus==="sending"?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  {cliqStatus==="sending"?"⏳ Submitting...":"✅ I've Paid — Submit Request"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── International Tab ── */}
+        {tab==="international"&&(
+          <div style={{textAlign:"center"}}>
+            <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",marginBottom:16}}>
+              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$25 <span style={{fontSize:16,color:T.textMuted,fontWeight:400}}>/ month</span></div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Cancel anytime · Powered by Paddle</div>
+            </div>
+            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"14px",marginBottom:16}}>
+              <div style={{fontSize:13,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>🔒 Online card payment is coming very soon.</div>
+              <p style={{fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"6px 0 0",lineHeight:1.5}}>We're finalising our payment processor. In the meantime, users inside Jordan can pay via CLIQ.</p>
+            </div>
+            <button disabled style={{width:"100%",background:"#94a3b8",color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"not-allowed",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+              💳 Pay $25/month — Coming Soon
+            </button>
+          </div>
+        )}
+
+        {/* ── Enter Code Tab ── */}
+        {tab==="code"&&(
+          <div>
+            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:14,lineHeight:1.6}}>
+              Already paid via CLIQ and received your activation code? Enter it below to unlock Pro instantly.
+            </div>
+            {codeSuccess?(
+              <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"20px",textAlign:"center"}}>
+                <div style={{fontSize:32,marginBottom:8}}>🎉</div>
+                <div style={{fontSize:15,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Pro activated! Welcome aboard.</div>
+              </div>
+            ):(
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                <div>
+                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Email Address</label>
+                  <input type="email" value={codeEmail} onChange={e=>setCodeEmail(e.target.value)} placeholder="The email you signed up with"
+                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"}}/>
+                </div>
+                <div>
+                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Activation Code</label>
+                  <input type="text" value={codeVal} onChange={e=>setCodeVal(e.target.value)} placeholder="EFOOL-XXXX-XXXX"
+                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box",letterSpacing:"0.05em"}}
+                    onKeyDown={e=>e.key==="Enter"&&applyCode()}/>
+                </div>
+                {codeErr&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ {codeErr}</div>}
+                <button onClick={applyCode}
+                  style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  🔓 Activate Pro
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      <div style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:12,padding:"16px",marginBottom:20,textAlign:"center"}}>
-        <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>19<sub style={{fontSize:14,color:T.textMuted}}>/month</sub></div>
-        <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Cancel anytime · No hidden fees</div>
-      </div>
-      <ul style={{listStyle:"none",padding:0,display:"flex",flexDirection:"column",gap:8,marginBottom:22}}>
-        {["Unlimited analyses — Task 1 & 2, Academic & General","Complete mistake detection — spelling, grammar & punctuation","Inline essay annotations with correction bubbles","Progress tracker — see your improvement over time","Band Booster + Vocabulary upgrades from YOUR essay","Full IELTS Toolkit (Grammar, Templates, Pet Peeves)","Practice Mode with live coaching + inline corrections","Unlimited Grammar & Spell Checker","Graph image upload for Task 1 Academic","Unlimited Band 8+ model responses"].map((f,i)=>(
-          <li key={i} style={{display:"flex",gap:10,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
-        ))}
-      </ul>
-      <button onClick={()=>{ if(STRIPE_CONFIGURED){ onSuccess(); } }}
-        disabled={!STRIPE_CONFIGURED}
-        style={{width:"100%",background:STRIPE_CONFIGURED?T.primary:"#94a3b8",color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:4,border:"none",cursor:STRIPE_CONFIGURED?"pointer":"not-allowed",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:STRIPE_CONFIGURED?T.shadowMd:"none"}}>
-        {STRIPE_CONFIGURED?"🔓 Start Pro — $19/month":"🔒 Payments Coming Soon"}
-      </button>
-      {!STRIPE_CONFIGURED&&<p style={{textAlign:"center",color:T.amber,fontSize:12,marginTop:10,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>⚠️ Payment processing is being set up. Check back soon!</p>}
     </div>
-  </div>
-);
+  );
+};
+
 
 // ── Progress Tracker ──────────────────────────
 const ProgressTracker=({onUpgrade,isPro,email})=>{
@@ -818,7 +977,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
         <div style={{fontSize:36}}>🔒</div>
         <div style={{textAlign:"center"}}>
           <div style={{color:T.text,fontWeight:700,fontSize:15,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Pro Feature</div>
-          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro — $19/mo</button>
+          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro — $25/mo</button>
         </div>
       </div>
     </div>
@@ -1870,7 +2029,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
           <div style={{ fontSize: 32, marginBottom: 8 }}>⏰</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 8 }}>Your free 30-minute session has ended</div>
           <p style={{ color: T.textMid, fontSize: 13, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: "0 0 16px", lineHeight: 1.6 }}>Upgrade to Pro for unlimited practice time — all exercise types, all categories, no restrictions.</p>
-          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🔓 Upgrade to Pro — $19/mo</button>
+          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🔓 Upgrade to Pro — $25/mo</button>
         </Card>
       )}
 
@@ -2278,6 +2437,126 @@ const BandSelfCheck = () => {
   );
 };
 
+// ── Admin Page ────────────────────────────────
+const AdminPage = ({onBack}) => {
+  const [unlocked, setUnlocked] = useState(false);
+  const [passInput, setPassInput] = useState("");
+  const [passErr, setPassErr] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+  const [generatedCode, setGeneratedCode] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [manualEmail, setManualEmail] = useState("");
+  const [manualStatus, setManualStatus] = useState(null);
+
+  const tryUnlock = () => {
+    if(btoa(passInput) === ADMIN_PASS_HASH){ setUnlocked(true); setPassErr(""); }
+    else { setPassErr("Incorrect password."); }
+  };
+
+  const generate = () => {
+    if(!emailInput.trim()) return;
+    setGeneratedCode(generateActivationCode(emailInput.trim()));
+    setCopied(false);
+  };
+
+  const copyCode = () => {
+    try{ navigator.clipboard.writeText(generatedCode); setCopied(true); setTimeout(()=>setCopied(false),2000); }catch{}
+  };
+
+  const activateManually = () => {
+    if(!manualEmail.trim()) return;
+    setUserPro(manualEmail.trim());
+    setManualStatus(manualEmail.trim());
+  };
+
+  const inp = {width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
+
+  if(!unlocked) return (
+    <div style={{maxWidth:400,margin:"60px auto",padding:"0 24px"}}>
+      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"0 0 20px",display:"flex",alignItems:"center",gap:6}}>← Back</button>
+      <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"36px 28px",boxShadow:T.shadowMd,textAlign:"center"}}>
+        <div style={{fontSize:40,marginBottom:12}}>🔐</div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 20px"}}>Admin Access</h2>
+        <input type="password" value={passInput} onChange={e=>setPassInput(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&tryUnlock()}
+          placeholder="Admin password"
+          style={{...inp,marginBottom:10}}/>
+        {passErr&&<div style={{color:T.red,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10}}>{passErr}</div>}
+        <button onClick={tryUnlock}
+          style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+          Unlock →
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{maxWidth:540,margin:"0 auto",padding:"24px 24px 80px"}}>
+      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"0 0 20px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
+      <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"10px 16px",marginBottom:24,display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:16}}>✅</span>
+        <span style={{fontSize:13,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Admin panel unlocked · englishfool.com/admin</span>
+      </div>
+
+      {/* Code Generator */}
+      <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"24px",boxShadow:T.shadow,marginBottom:20}}>
+        <h3 style={{fontFamily:"Georgia,serif",fontSize:18,color:T.text,margin:"0 0 6px"}}>🔑 Activation Code Generator</h3>
+        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 16px",lineHeight:1.5}}>
+          Enter the customer's email exactly as they registered. The code only works for that specific email.
+        </p>
+        <div style={{display:"flex",gap:8,marginBottom:12}}>
+          <input type="email" value={emailInput} onChange={e=>setEmailInput(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&generate()}
+            placeholder="customer@email.com" style={{...inp,flex:1}}/>
+          <button onClick={generate}
+            style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
+            Generate
+          </button>
+        </div>
+        {generatedCode&&(
+          <>
+            <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:10}}>
+              <div>
+                <div style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4,textTransform:"uppercase",letterSpacing:"0.06em"}}>Code for {emailInput.trim()}</div>
+                <div style={{fontFamily:"monospace",fontSize:22,fontWeight:900,color:T.primary,letterSpacing:"0.08em"}}>{generatedCode}</div>
+              </div>
+              <button onClick={copyCode}
+                style={{background:copied?T.greenBg:T.bg,border:`1px solid ${copied?T.greenBorder:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:copied?T.green:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
+                {copied?"✓ Copied!":"Copy"}
+              </button>
+            </div>
+            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 14px",fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6}}>
+              💬 <strong>WhatsApp template:</strong><br/>
+              <span style={{fontStyle:"italic"}}>"Hi! Your Englishfool Pro code is: <strong style={{color:T.primary}}>{generatedCode}</strong> — Go to englishfool.com → Upgrade to Pro → Enter Code tab → type your email + this code. Enjoy! 🎓"</span>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Manual Pro Activation */}
+      <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"24px",boxShadow:T.shadow}}>
+        <h3 style={{fontFamily:"Georgia,serif",fontSize:18,color:T.text,margin:"0 0 6px"}}>⚡ Manual Pro Activation</h3>
+        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 16px",lineHeight:1.5}}>
+          Use this if you're activating Pro for a customer in person or on the same device.
+        </p>
+        <div style={{display:"flex",gap:8}}>
+          <input type="email" value={manualEmail} onChange={e=>setManualEmail(e.target.value)}
+            placeholder="customer@email.com" style={{...inp,flex:1}}/>
+          <button onClick={activateManually}
+            style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
+            Activate
+          </button>
+        </div>
+        {manualStatus&&(
+          <div style={{marginTop:12,background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+            ✅ Pro activated for {manualStatus}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ── Analytics Helper ─────────────────────────
 const GA_ID = "G-9JN8WF1R0M";
 const trackEvent = (eventName, params={}) => {
@@ -2367,7 +2646,7 @@ const TermsPage = ({onBack}) => (
   <PolicyPage title="Terms of Service" onBack={onBack}>
     <Section title="1. Acceptance of Terms"><p style={{margin:"0 0 12px"}}>By accessing or using Englishfool ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. Englishfool is operated by Ahmad Sartawi ("we", "us", "our").</p></Section>
     <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>Englishfool is a smart IELTS Writing examination tool that provides automated band score assessment based on official IELTS band descriptors, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
-    <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $19 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p><p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings or by contacting Paddle directly. Cancellation takes effect at the end of the current billing period.</p><p style={{margin:"0 0 12px"}}>New subscribers are entitled to a full refund within 14 days of their initial purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
+    <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $25 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p><p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings or by contacting Paddle directly. Cancellation takes effect at the end of the current billing period.</p><p style={{margin:"0 0 12px"}}>New subscribers are entitled to a full refund within 14 days of their initial purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
     <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use Englishfool only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy our systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
     <Section title="5. Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>Englishfool uses advanced technology to provide IELTS writing feedback. While we strive for accuracy, scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
     <Section title="6. Intellectual Property"><p style={{margin:"0 0 12px"}}>All content, design, software, and materials on Englishfool are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p></Section>
@@ -2417,7 +2696,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
       <div style={{background:"#fefdf8",border:`2px solid ${T.primary}`,borderRadius:12,padding:"28px 24px",textAlign:"center",position:"relative",boxShadow:T.shadowMd}}>
         <div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:T.primary,color:"white",borderRadius:20,padding:"3px 16px",fontSize:11,fontWeight:700,letterSpacing:"0.05em"}}>MOST POPULAR</div>
         <div style={{fontSize:13,fontWeight:700,color:T.primary,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:12}}>Pro Plan</div>
-        <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:4}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>19</div>
+        <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:4}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>25</div>
         <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>per month · cancel anytime</div>
         <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
           {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live coaching","Unlimited Grammar & Spell Checker","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
@@ -2428,7 +2707,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
           <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ You're on Pro — Unlimited Access</div>
         ):(
           <button onClick={onUpgrade} style={{width:"100%",background:STRIPE_CONFIGURED?T.primary:"#94a3b8",color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:STRIPE_CONFIGURED?"pointer":"not-allowed",boxShadow:STRIPE_CONFIGURED?T.shadowMd:"none"}}>
-            {STRIPE_CONFIGURED?"Start Pro — $19/month":"🔒 Payments Coming Soon"}
+            {STRIPE_CONFIGURED?"Start Pro — $25/month":"🔒 Payments Coming Soon"}
           </button>
         )}
       </div>
@@ -2450,7 +2729,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
 );
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises"};
+const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
 
@@ -2525,7 +2804,7 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
+  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",admin:"Admin — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
   const switchView=(view)=>{ 
     setMainView(view); 
     const path = VIEW_TO_PATH[view] || "/";
@@ -2608,7 +2887,7 @@ export default function IELTSBot(){
 
   return (
     <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
-      {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess}/>}
+      {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess} session={session}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
 
 
@@ -2985,7 +3264,8 @@ export default function IELTSBot(){
       {mainView==="terms"&&<TermsPage onBack={()=>switchView("analyze")}/>}
       {mainView==="privacy"&&<PrivacyPage onBack={()=>switchView("analyze")}/>}
       {mainView==="refund"&&<RefundPage onBack={()=>switchView("analyze")}/>}
-      {mainView==="pricing"&&<PricingPage onBack={()=>switchView("analyze")} onUpgrade={()=>setShowPaywall(true)} isPro={proUser}/>}
+      {mainView==="pricing"&&<PricingPage onBack={()=>switchView("analyze")} onUpgrade={()=>setShowPaywall(true)} isPro={proUser}/> }
+      {mainView==="admin"&&<AdminPage onBack={()=>switchView("analyze")}/>}
 
       {/* FOOTER */}
       <div style={{background:"#1c1d1f",borderTop:"1px solid #333",padding:"32px 24px",marginTop:40}}>
@@ -3117,7 +3397,7 @@ export default function IELTSBot(){
                   width:"100%",background:T.primary,color:"white",border:"none",
                   borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,
                   cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"
-                }}>🔓 Upgrade to Pro — $19/mo</button>
+                }}>🔓 Upgrade to Pro — $25/mo</button>
               </div>
             )}
             {proUser&&(
