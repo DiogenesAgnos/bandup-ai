@@ -32,6 +32,8 @@
     { "source": "/progress", "destination": "/" },
     { "source": "/toolkit", "destination": "/" },
     { "source": "/contact", "destination": "/" },
-    { "source": "/grammar", "destination": "/" }
+    { "source": "/grammar", "destination": "/" },
+    { "source": "/exercises", "destination": "/" },
+    { "source": "/admin", "destination": "/" }
   ]
 }
