@@ -1,102 +1,43 @@
 import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+// ── Supabase client (anon key is safe to expose) ──────────────
+const supabase = createClient(
+  process.env.REACT_APP_SUPABASE_URL || "",
+  process.env.REACT_APP_SUPABASE_ANON_KEY || ""
+);
+
+// Helper: Supabase user → simple session shape the rest of the app uses
+const toSession = (user) => user ? {
+  email: user.email,
+  name: user.user_metadata?.name || user.email?.split("@")[0] || "User"
+} : null;
+
+// Helper: fetch Pro status from Supabase profiles table
+const fetchProStatus = async (email) => {
+  if (!email) return false;
+  try {
+    const { data } = await supabase
+      .from("profiles")
+      .select("is_pro")
+      .eq("email", email.toLowerCase().trim())
+      .single();
+    return data?.is_pro || false;
+  } catch { return false; }
+};
 
 const STRIPE_CONFIGURED = false;
-
-// 25002500 Activation Code System 250025002500250025002500250025002500250025002500250025002500250025002500250025002500250025002500
-const _ACS = "EF-Efool2026-JO-secret";
-const generateActivationCode = (email) => {
-  const input = (email||"").toLowerCase().trim() + _ACS;
-  let h = 5381;
-  for(let i=0;i<input.length;i++){ h=((h<<5)+h)^input.charCodeAt(i); h=h>>>0; }
-  const b = h.toString(36).toUpperCase().padStart(8,"0").slice(0,8);
-  return `EFOOL-${b.slice(0,4)}-${b.slice(4,8)}`;
-};
-const verifyActivationCode = (email, code) =>
-  generateActivationCode(email) === (code||"").trim().toUpperCase();
-const ADMIN_PASS_HASH = "RUZhZG1pbjIwMjYh";
+const ADMIN_KEY = process.env.REACT_APP_ADMIN_KEY || "EFadmin2026!";
 const FREE_USES_LIMIT = 1;
 const STORAGE_KEY = "bandup_uses";
 const HISTORY_KEY = "bandup_history";
 const API_URL = "/api/analyze";
-const USERS_KEY = "bandup_users";
-const SESSION_KEY = "bandup_session";
 const LAST_RESULT_KEY = "bandup_last_result";
-const CODE_PRO_KEY = "ef_code_pro_email"; // persists code-activated pro across refreshes
-const getCodeProEmail = () => { try{ return localStorage.getItem(CODE_PRO_KEY)||""; }catch{ return ""; } };
-const saveCodeProEmail = (email) => { try{ localStorage.setItem(CODE_PRO_KEY, email); }catch{} };
-const clearCodeProEmail = () => { try{ localStorage.removeItem(CODE_PRO_KEY); }catch{} };
 
-// ── Auth helpers ──────────────────────────────
+// ── Local storage helpers (only for non-auth data) ────────────
 const saveLastResult = (data) => { try{ localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(data)); }catch{} };
 const getLastResult = () => { try{ return JSON.parse(localStorage.getItem(LAST_RESULT_KEY)||"null"); }catch{ return null; } };
 const clearLastResult = () => { try{ localStorage.removeItem(LAST_RESULT_KEY); }catch{} };
-const saveUsers = (u) => { try{ localStorage.setItem(USERS_KEY,JSON.stringify(u)); }catch{} };
-const getUsers = () => { try{ return JSON.parse(localStorage.getItem(USERS_KEY)||"{}"); }catch{ return {}; } };
-const getSession = () => { try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||"null"); }catch{ return null; } };
-const saveSession = (s) => { try{ localStorage.setItem(SESSION_KEY,JSON.stringify(s)); }catch{} };
-const clearSession = () => { try{ localStorage.removeItem(SESSION_KEY); }catch{} };
-
-const hashPass = (p) => { try{ return btoa(encodeURIComponent(p+'-bandup-salt').replace(/%([0-9A-F]{2})/g,(_,p1)=>String.fromCharCode(parseInt(p1,16)))); }catch(e){ return btoa(p+'-bandup-salt'); } };
-
-const authRegister = (email, password, name) => {
-  const users = getUsers();
-  const key = email.toLowerCase().trim();
-  if(users[key]) return { error: "An account with this email already exists." };
-  users[key] = { name, email:key, password:hashPass(password), pro:false, createdAt:Date.now() };
-  saveUsers(users);
-  const session = { email:key, name };
-  saveSession(session);
-  return { session };
-};
-
-const authLogin = (email, password) => {
-  const users = getUsers();
-  const key = email.toLowerCase().trim();
-  if(!users[key]) return { error: "No account found with this email." };
-  if(users[key].password !== hashPass(password)) return { error: "Incorrect password." };
-  const session = { email:key, name:users[key].name };
-  saveSession(session);
-  return { session };
-};
-
-// Pending pro activations — survives even if no account exists yet on this device
-const PRO_KEYS_KEY = "ef_pro_activated";
-const getProActivated = () => { try{ return JSON.parse(localStorage.getItem(PRO_KEYS_KEY)||"[]"); }catch{ return []; } };
-const addProActivated = (email) => { try{ const k=email.toLowerCase().trim(); const a=getProActivated(); if(!a.includes(k)){ a.push(k); localStorage.setItem(PRO_KEYS_KEY,JSON.stringify(a)); } }catch{} };
-
-const getUserPro = (email) => {
-  if(!email) return false;
-  const key = email.toLowerCase().trim();
-  // Check users store first, then pending activation store
-  const users = getUsers();
-  if(users[key]?.pro) return true;
-  return getProActivated().includes(key);
-};
-
-const setUserPro = (email) => {
-  const key = email.toLowerCase().trim();
-  // Store in pending activation list (works without an account)
-  addProActivated(key);
-  // Also update user record if it exists
-  const users = getUsers();
-  if(users[key]){ users[key].pro = true; saveUsers(users); }
-};
-
-// Seed admin account as pro
-try{(()=>{
-  const users = getUsers();
-  // Pre-computed hash — password is NOT stored in source code
-  const ADMIN_HASH = "QmFuZFVwQWRtaW4yMDI1IS1iYW5kdXAtc2FsdA==";
-  users["diogenes.agnos@gmail.com"] = { 
-    name:"Ahmad", 
-    email:"diogenes.agnos@gmail.com", 
-    password:ADMIN_HASH, 
-    pro:true, 
-    createdAt:users["diogenes.agnos@gmail.com"]?.createdAt||Date.now() 
-  };
-  saveUsers(users);
-  try{ localStorage.removeItem("bandup_pro"); }catch{}
-})();}catch(e){}
 
 const T = {
   primary:      "#0056d2",
@@ -591,44 +532,51 @@ const AuthModal=({onClose,onSuccess})=>{
   const [success,setSuccess]=useState("");
   const [loading,setLoading]=useState(false);
 
-  const handle=()=>{
+  const handle=async()=>{
     setError(""); setSuccess(""); setLoading(true);
-    // Use setTimeout to let React render the loading state first
-    setTimeout(()=>{
-      try{
-        if(mode==="forgot"){
-          if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
-          setError("Password reset is not yet available. Please use the Contact form on our website for help accessing your account.");
-          setLoading(false);
-          return;
-        }
-        if(mode==="login"){
-          if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
-          if(!password.trim()){ setError("Please enter your password."); setLoading(false); return; }
-          const res=authLogin(email,password);
-          if(res.error){ setError(res.error); setLoading(false); return; }
-          if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
-          else{ try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
-          setLoading(false);
-          onSuccess(res.session);
-          return;
-        }
-        if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
-        if(!email.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())){ setError("Please enter a valid email address."); setLoading(false); return; }
-        if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
-        const res=authRegister(email,password,name);
-        if(res.error){ setError(res.error); setLoading(false); return; }
-        if(rememberMe){ try{ localStorage.setItem("bandup_saved_email",email.toLowerCase().trim()); }catch{} }
-        // Notify admin of new signup
-        try{ if(window.emailjs) window.emailjs.send("service_9es76g1","template_jrd4i4n",{from_name:"NEW SIGNUP: "+name.trim(),from_email:email.toLowerCase().trim(),country:"",age_group:"",message:"New user registered on Englishfool.\n\nName: "+name.trim()+"\nEmail: "+email.toLowerCase().trim()+"\nDate: "+new Date().toLocaleString("en-GB",{dateStyle:"full",timeStyle:"short"}),to_email:"diogenes.agnos@gmail.com"}); }catch(e){ console.error("Signup notification failed",e); }
+    try{
+      // ── Forgot password ──
+      if(mode==="forgot"){
+        if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: window.location.origin + "/reset-password"
+        });
+        if(error){ setError(error.message); setLoading(false); return; }
+        setSuccess("Password reset email sent! Check your inbox.");
         setLoading(false);
-        onSuccess(res.session);
-      }catch(e){
-        console.error("Auth error:", e);
-        setError("Error: " + e.message);
-        setLoading(false);
+        return;
       }
-    }, 300);
+      // ── Login ──
+      if(mode==="login"){
+        if(!email.trim()){ setError("Please enter your email address."); setLoading(false); return; }
+        if(!password.trim()){ setError("Please enter your password."); setLoading(false); return; }
+        const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if(error){ setError(error.message); setLoading(false); return; }
+        if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
+        else{ try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
+        setLoading(false);
+        onSuccess(toSession(data.user));
+        return;
+      }
+      // ── Register ──
+      if(!name.trim()){ setError("Please enter your name."); setLoading(false); return; }
+      if(!email.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())){ setError("Please enter a valid email address."); setLoading(false); return; }
+      if(password.length<6){ setError("Password must be at least 6 characters."); setLoading(false); return; }
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(), password,
+        options: { data: { name: name.trim() } }
+      });
+      if(error){ setError(error.message); setLoading(false); return; }
+      if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
+      setLoading(false);
+      // Supabase may require email confirmation — handle both cases
+      if(data.session){ onSuccess(toSession(data.user)); }
+      else{ setSuccess("Account created! Check your email to confirm, then sign in."); }
+    }catch(e){
+      console.error("Auth error:", e);
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
   };
 
   const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
@@ -716,29 +664,46 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
     if(!cliqForm.name.trim()||!cliqForm.email.trim()||!cliqForm.mobile.trim()){setCliqStatus("error");return;}
     setCliqStatus("sending");
     try{
-      await window.emailjs.send("service_9es76g1","template_jrd4i4n",{
-        from_name:"CLIQ PRO REQUEST: "+cliqForm.name.trim(),
-        from_email:cliqForm.email.trim(),
-        country:cliqForm.mobile.trim(),
-        age_group:"CLIQ Payment",
-        message:`New CLIQ Pro upgrade request:\n\nName: ${cliqForm.name.trim()}\nEmail: ${cliqForm.email.trim()}\nMobile: ${cliqForm.mobile.trim()}\nAmount: 17 JOD\nCLIQ Alias: Efool2026\n\nPlease verify payment and send activation code via WhatsApp.`,
-        to_email:"diogenes.agnos@gmail.com"
+      // Save to Supabase via API
+      await fetch("/api/cliq/request",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name:cliqForm.name.trim(),email:cliqForm.email.trim(),mobile:cliqForm.mobile.trim()})
       });
+      // Also send email notification via EmailJS (backup)
+      try{
+        if(window.emailjs) await window.emailjs.send("service_9es76g1","template_jrd4i4n",{
+          from_name:"CLIQ PRO REQUEST: "+cliqForm.name.trim(),
+          from_email:cliqForm.email.trim(),
+          country:cliqForm.mobile.trim(),
+          age_group:"CLIQ Payment",
+          message:`New CLIQ Pro upgrade request:\n\nName: ${cliqForm.name.trim()}\nEmail: ${cliqForm.email.trim()}\nMobile: ${cliqForm.mobile.trim()}\nAmount: 17 JOD\nCLIQ Alias: Efool2026`,
+          to_email:"diogenes.agnos@gmail.com"
+        });
+      }catch(emailErr){ console.warn("EmailJS failed (non-critical):",emailErr); }
       setCliqStatus("sent");
-    }catch(e){console.error("EmailJS error",e);setCliqStatus("error");}
+    }catch(e){console.error("CLIQ request error",e);setCliqStatus("error");}
   };
 
-  const applyCode=()=>{
+  const [codeLoading, setCodeLoading] = useState(false);
+  const applyCode=async()=>{
     setCodeErr("");
     if(!codeEmail.trim()){setCodeErr("Please enter your email address.");return;}
     if(!codeVal.trim()){setCodeErr("Please enter your activation code.");return;}
-    const normalizedEmail = codeEmail.toLowerCase().trim();
-    if(verifyActivationCode(normalizedEmail, codeVal)){
-      setUserPro(normalizedEmail);
+    setCodeLoading(true);
+    try{
+      const res = await fetch("/api/pro/activate", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ email: codeEmail.trim(), code: codeVal.trim() })
+      });
+      const data = await res.json();
+      if(!res.ok){ setCodeErr(data.error || "Invalid code."); setCodeLoading(false); return; }
       setCodeSuccess(true);
-      setTimeout(()=>{ onSuccess(normalizedEmail); }, 1600);
-    }else{
-      setCodeErr("Invalid code. Double-check your email is exactly the one you gave us, and that the code is entered correctly (e.g. EFOOL-XXXX-XXXX).");
+      setTimeout(()=>{ onSuccess(codeEmail.toLowerCase().trim()); }, 1600);
+    }catch(e){
+      setCodeErr("Something went wrong. Please try again.");
+      setCodeLoading(false);
     }
   };
 
@@ -871,9 +836,9 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
                     onKeyDown={e=>e.key==="Enter"&&applyCode()}/>
                 </div>
                 {codeErr&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ {codeErr}</div>}
-                <button onClick={applyCode}
-                  style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-                  🔓 Activate Pro
+                <button onClick={applyCode} disabled={codeLoading}
+                  style={{background:codeLoading?T.bgGray:T.primary,color:codeLoading?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:codeLoading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  {codeLoading?"⏳ Verifying...":"🔓 Activate Pro"}
                 </button>
               </div>
             )}
@@ -2467,34 +2432,45 @@ const AdminPage = ({onBack}) => {
   const [unlocked, setUnlocked] = useState(false);
   const [passInput, setPassInput] = useState("");
   const [passErr, setPassErr] = useState("");
-  const [emailInput, setEmailInput] = useState("");
-  const [generatedCode, setGeneratedCode] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [manualEmail, setManualEmail] = useState("");
-  const [manualStatus, setManualStatus] = useState(null);
-
-  const tryUnlock = () => {
-    if(btoa(passInput) === ADMIN_PASS_HASH){ setUnlocked(true); setPassErr(""); }
-    else { setPassErr("Incorrect password."); }
-  };
-
-  const generate = () => {
-    if(!emailInput.trim()) return;
-    setGeneratedCode(generateActivationCode(emailInput.trim()));
-    setCopied(false);
-  };
-
-  const copyCode = () => {
-    try{ navigator.clipboard.writeText(generatedCode); setCopied(true); setTimeout(()=>setCopied(false),2000); }catch{}
-  };
-
-  const activateManually = () => {
-    if(!manualEmail.trim()) return;
-    setUserPro(manualEmail.trim());
-    setManualStatus(manualEmail.trim());
-  };
+  const [adminData, setAdminData] = useState(null);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [confirming, setConfirming] = useState(null);
+  const [confirmResult, setConfirmResult] = useState({});
+  const [copied, setCopied] = useState(null);
 
   const inp = {width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
+
+  const tryUnlock = async () => {
+    if(passInput !== ADMIN_KEY){ setPassErr("Incorrect password."); return; }
+    setUnlocked(true); setPassErr(""); setAdminLoading(true);
+    try{
+      const res = await fetch("/api/admin/users", { headers:{"x-admin-key": passInput} });
+      const data = await res.json();
+      setAdminData(data);
+    }catch(e){ console.error(e); }
+    setAdminLoading(false);
+  };
+
+  const confirmPayment = async (payment) => {
+    setConfirming(payment.id);
+    try{
+      const res = await fetch("/api/admin/confirm", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-admin-key": ADMIN_KEY},
+        body: JSON.stringify({ paymentId: payment.id, email: payment.email })
+      });
+      const data = await res.json();
+      setConfirmResult(prev=>({...prev, [payment.id]: data}));
+      // Refresh data
+      const refresh = await fetch("/api/admin/users", { headers:{"x-admin-key": ADMIN_KEY} });
+      setAdminData(await refresh.json());
+    }catch(e){ console.error(e); }
+    setConfirming(null);
+  };
+
+  const copyText = (text, key) => {
+    try{ navigator.clipboard.writeText(text); setCopied(key); setTimeout(()=>setCopied(null),2000); }catch{}
+  };
 
   if(!unlocked) return (
     <div style={{maxWidth:400,margin:"60px auto",padding:"0 24px"}}>
@@ -2504,9 +2480,8 @@ const AdminPage = ({onBack}) => {
         <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 20px"}}>Admin Access</h2>
         <input type="password" value={passInput} onChange={e=>setPassInput(e.target.value)}
           onKeyDown={e=>e.key==="Enter"&&tryUnlock()}
-          placeholder="Admin password"
-          style={{...inp,marginBottom:10}}/>
-        {passErr&&<div style={{color:T.red,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10}}>{passErr}</div>}
+          placeholder="Admin password" style={{...inp,marginBottom:10}}/>
+        {passErr&&<div style={{color:T.red,fontSize:13,marginBottom:10}}>{passErr}</div>}
         <button onClick={tryUnlock}
           style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
           Unlock →
@@ -2516,68 +2491,76 @@ const AdminPage = ({onBack}) => {
   );
 
   return (
-    <div style={{maxWidth:540,margin:"0 auto",padding:"24px 24px 80px"}}>
-      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"0 0 20px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
-      <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"10px 16px",marginBottom:24,display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:16}}>✅</span>
-        <span style={{fontSize:13,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Admin panel unlocked · englishfool.com/admin</span>
-      </div>
+    <div style={{maxWidth:740,margin:"0 auto",padding:"24px 20px 80px"}}>
+      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
 
-      {/* Code Generator */}
-      <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"24px",boxShadow:T.shadow,marginBottom:20}}>
-        <h3 style={{fontFamily:"Georgia,serif",fontSize:18,color:T.text,margin:"0 0 6px"}}>🔑 Activation Code Generator</h3>
-        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 16px",lineHeight:1.5}}>
-          Enter the customer's email exactly as they registered. The code only works for that specific email.
-        </p>
-        <div style={{display:"flex",gap:8,marginBottom:12}}>
-          <input type="email" value={emailInput} onChange={e=>setEmailInput(e.target.value)}
-            onKeyDown={e=>e.key==="Enter"&&generate()}
-            placeholder="customer@email.com" style={{...inp,flex:1}}/>
-          <button onClick={generate}
-            style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
-            Generate
-          </button>
-        </div>
-        {generatedCode&&(
-          <>
-            <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:10}}>
-              <div>
-                <div style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4,textTransform:"uppercase",letterSpacing:"0.06em"}}>Code for {emailInput.trim()}</div>
-                <div style={{fontFamily:"monospace",fontSize:22,fontWeight:900,color:T.primary,letterSpacing:"0.08em"}}>{generatedCode}</div>
+      {adminLoading&&<div style={{textAlign:"center",padding:"40px",color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⏳ Loading dashboard...</div>}
+
+      {adminData&&(
+        <>
+          {/* Stats */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:20}}>
+            {[["👥 Total Users",adminData.stats?.totalUsers,T.text],["⭐ Pro Users",adminData.stats?.proUsers,T.green],["⏳ Pending",adminData.stats?.pendingPayments,T.amber]].map(([label,val,color])=>(
+              <div key={label} style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",textAlign:"center",boxShadow:T.shadow}}>
+                <div style={{fontSize:28,fontWeight:900,color,fontFamily:"Georgia,serif"}}>{val||0}</div>
+                <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{label}</div>
               </div>
-              <button onClick={copyCode}
-                style={{background:copied?T.greenBg:T.bg,border:`1px solid ${copied?T.greenBorder:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:copied?T.green:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
-                {copied?"✓ Copied!":"Copy"}
-              </button>
-            </div>
-            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 14px",fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6}}>
-              💬 <strong>WhatsApp template:</strong><br/>
-              <span style={{fontStyle:"italic"}}>"Hi! Your Englishfool Pro code is: <strong style={{color:T.primary}}>{generatedCode}</strong> — Go to englishfool.com → Upgrade to Pro → Enter Code tab → type your email + this code. Enjoy! 🎓"</span>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Manual Pro Activation */}
-      <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"24px",boxShadow:T.shadow}}>
-        <h3 style={{fontFamily:"Georgia,serif",fontSize:18,color:T.text,margin:"0 0 6px"}}>⚡ Manual Pro Activation</h3>
-        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 16px",lineHeight:1.5}}>
-          Use this if you're activating Pro for a customer in person or on the same device.
-        </p>
-        <div style={{display:"flex",gap:8}}>
-          <input type="email" value={manualEmail} onChange={e=>setManualEmail(e.target.value)}
-            placeholder="customer@email.com" style={{...inp,flex:1}}/>
-          <button onClick={activateManually}
-            style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
-            Activate
-          </button>
-        </div>
-        {manualStatus&&(
-          <div style={{marginTop:12,background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-            ✅ Pro activated for {manualStatus}
+            ))}
           </div>
-        )}
-      </div>
+
+          {/* Pending CLIQ Payments */}
+          {adminData.payments?.filter(p=>p.status==="pending").length > 0 && (
+            <div style={{background:T.bg,border:`2px solid ${T.amberBorder}`,borderRadius:12,padding:"20px",marginBottom:20,boxShadow:T.shadow}}>
+              <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.amber,margin:"0 0 14px"}}>⏳ Pending CLIQ Payments ({adminData.payments.filter(p=>p.status==="pending").length})</h3>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                {adminData.payments.filter(p=>p.status==="pending").map(p=>(
+                  <div key={p.id} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"14px 16px"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
+                      <div>
+                        <div style={{fontWeight:700,color:T.text,fontSize:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{p.name}</div>
+                        <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{p.email} · 📱 {p.mobile}</div>
+                        <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:2}}>{p.amount} {p.currency} · {new Date(p.created_at).toLocaleString("en-GB")}</div>
+                      </div>
+                      <button onClick={()=>confirmPayment(p)} disabled={confirming===p.id}
+                        style={{background:confirming===p.id?T.bgGray:T.green,color:confirming===p.id?T.textMuted:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:confirming===p.id?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
+                        {confirming===p.id?"⏳ Confirming...":"✓ Confirm Payment"}
+                      </button>
+                    </div>
+                    {confirmResult[p.id]&&(
+                      <div style={{marginTop:10,background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px"}}>
+                        <div style={{fontSize:12,color:T.green,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>✅ Payment confirmed! Send this WhatsApp:</div>
+                        <div style={{fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,fontStyle:"italic"}}>"{confirmResult[p.id].whatsappMessage}"</div>
+                        <button onClick={()=>copyText(confirmResult[p.id].whatsappMessage, p.id)}
+                          style={{marginTop:8,background:copied===p.id?T.greenBg:T.primaryLight,border:`1px solid ${copied===p.id?T.greenBorder:T.primaryBorder}`,borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:700,color:copied===p.id?T.green:T.primary,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                          {copied===p.id?"✓ Copied!":"Copy WhatsApp Message"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* All Users */}
+          <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",boxShadow:T.shadow}}>
+            <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px"}}>👥 All Users ({adminData.profiles?.length||0})</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              {adminData.profiles?.map(p=>(
+                <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:p.is_pro?T.greenBg:T.bgGray,borderRadius:8,border:`1px solid ${p.is_pro?T.greenBorder:T.border}`}}>
+                  <span style={{fontSize:16}}>{p.is_pro?"⭐":"👤"}</span>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13,fontWeight:600,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{p.name||"—"}</div>
+                    <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.email}</div>
+                  </div>
+                  <span style={{fontSize:11,fontWeight:700,color:p.is_pro?T.green:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>{p.is_pro?"PRO":"Free"}</span>
+                  <span style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>{new Date(p.created_at).toLocaleDateString("en-GB")}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -2780,38 +2763,51 @@ export default function IELTSBot(){
   const [showPaywall,setShowPaywall]=useState(false);
   const [paywallTab,setPaywallTab]=useState("cliq");
   const [showAuth,setShowAuth]=useState(false);
-  const [session,setSession]=useState(()=>getSession());
-  const [uses,setUses]=useState(()=>getStoredUses(getSession()?.email));
+  const [session,setSession]=useState(null);
+  const [uses,setUses]=useState(0);
   const [lang,setLang]=useState("en");
   const [menuOpen,setMenuOpen]=useState(false);
   const analyzeRef=useRef(null);
-
-  const [proUser, setProUser] = useState(()=>{
-    const s = getSession();
-    if(s && getUserPro(s.email)) return true;
-    // Check code-activated pro (persists without a session)
-    const codeEmail = getCodeProEmail();
-    if(codeEmail && getUserPro(codeEmail)) return true;
-    return false;
-  });
+  const [proUser, setProUser] = useState(false);
   const usesLeft = FREE_USES_LIMIT - uses;
+
+  // ── Supabase auth listener — runs on mount ────────────────
+  useEffect(()=>{
+    // Restore session from Supabase (works across devices and refreshes)
+    supabase.auth.getSession().then(({ data:{ session:sbSess } })=>{
+      if(sbSess?.user){
+        const sess = toSession(sbSess.user);
+        setSession(sess);
+        setUses(getStoredUses(sess.email));
+        fetchProStatus(sess.email).then(setProUser);
+      }
+    });
+    // Listen for login/logout events
+    const { data:{ subscription } } = supabase.auth.onAuthStateChange((_event, sbSess)=>{
+      if(sbSess?.user){
+        const sess = toSession(sbSess.user);
+        setSession(sess);
+        setUses(getStoredUses(sess.email));
+        fetchProStatus(sess.email).then(setProUser);
+      } else {
+        setSession(null);
+        setProUser(false);
+        setUses(0);
+      }
+    });
+    return ()=> subscription.unsubscribe();
+  },[]);
 
   const handleAuthSuccess=(sess)=>{
     setSession(sess);
-    saveSession(sess);
     setUses(getStoredUses(sess.email));
-    // Check both user record AND pending activation list (so code-first users get Pro on login)
-    const isPro = getUserPro(sess.email);
-    setProUser(isPro);
-    // If pending activation exists, make sure it's also written to user record
-    if(isPro) setUserPro(sess.email);
+    fetchProStatus(sess.email).then(setProUser);
     setShowAuth(false);
     setShowPaywall(false);
   };
 
-  const handleSignOut=()=>{
-    clearSession();
-    clearCodeProEmail();
+  const handleSignOut=async()=>{
+    await supabase.auth.signOut();
     setSession(null);
     setUses(0);
     setResult(null);
@@ -2880,12 +2876,10 @@ export default function IELTSBot(){
   const sampleWordCount=result?.sampleEssay?countWords(result.sampleEssay):0;
 
   const handleProSuccess=(activatedEmail)=>{
-    const emailToActivate = activatedEmail || session?.email;
-    if(emailToActivate){
-      setUserPro(emailToActivate);
-      saveCodeProEmail(emailToActivate); // persists across refreshes even without session
-    }
-    setProUser(true);
+    // Re-fetch Pro status from Supabase to confirm server-side activation
+    const emailToCheck = activatedEmail || session?.email;
+    if(emailToCheck) fetchProStatus(emailToCheck).then(setProUser);
+    else setProUser(true); // fallback
     setShowPaywall(false);
     trackEvent('upgrade_to_pro');
   };
