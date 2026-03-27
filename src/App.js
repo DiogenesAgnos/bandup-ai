@@ -2770,6 +2770,7 @@ export default function IELTSBot(){
   const [essayImage,setEssayImage]=useState(null);
   const [processingTopicImg,setProcessingTopicImg]=useState(false);
   const [processingEssayImg,setProcessingEssayImg]=useState(false);
+  const fileRef=useRef();
   const topicImgRef=useRef();
   const essayImgRef=useRef();
   const [loading,setLoading]=useState(false);
