@@ -2909,10 +2909,12 @@ export default function IELTSBot(){
               <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
           </div>
-          <div className="nav-right" style={{display:"flex",alignItems:"center",gap:12}}>
-            <span style={{fontSize:13,color:proUser?T.green:usesLeft<=0?T.red:T.textMuted,fontWeight:600,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-              {proUser?"✓ Pro — Unlimited":session?`${usesLeft} free ${usesLeft===1?"use":"uses"} left`:"1 free analysis"}
-            </span>
+          <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
+            {proUser?(
+              <span style={{fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Pro — Unlimited</span>
+            ):(
+              <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)",letterSpacing:"0.01em"}}>🔓 Upgrade to Pro</button>
+            )}
             <div style={{width:1,height:20,background:T.border}}/>
             {session?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -2920,9 +2922,8 @@ export default function IELTSBot(){
                 <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign Out</button>
               </div>
             ):(
-              <button onClick={()=>setShowAuth(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In →</button>
+              <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In →</button>
             )}
-            {session&&!proUser&&(<button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro →</button>)}
           </div>
         </div>
       </div>
@@ -2944,7 +2945,17 @@ export default function IELTSBot(){
             <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap"}}>
               <button onClick={()=>switchView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
               <button onClick={()=>switchView("practice")} style={{background:"transparent",color:T.primary,border:`2px solid ${T.primary}`,borderRadius:4,padding:"11px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Try Practice Mode</button>
+              {!proUser&&(
+                <button onClick={()=>setShowPaywall(true)} style={{background:"#f59e0b",color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(245,158,11,0.4)"}}>🔓 Upgrade to Pro</button>
+              )}
             </div>
+            {!proUser&&(
+              <div style={{marginTop:10,display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🇯🇴 Jordan users: pay</span>
+                <span style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:T.primary,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>17 JOD via CLIQ</span>
+                <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.primary,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline",padding:0}}>Learn more →</button>
+              </div>
+            )}
           </div>
           <div className="hero-image" style={{flex:"0 0 45%",position:"relative",overflow:"hidden",minHeight:320}}>
             <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=85&auto=format&fit=crop" alt="Student studying for IELTS" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top"}}/>
@@ -2964,6 +2975,26 @@ export default function IELTSBot(){
           ))}
         </div>
       </div>
+
+      {/* UPGRADE BANNER — shown to non-Pro users only */}
+      {!proUser&&(
+        <div style={{background:"linear-gradient(135deg,#0a1628 0%,#0056d2 100%)",padding:"14px 24px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
+            <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
+              <span style={{fontSize:13,color:"rgba(255,255,255,0.95)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
+                🎓 Unlimited analyses · Full toolkit · Practice Mode · All exercises
+              </span>
+              <span style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"2px 12px",fontSize:12,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
+                🇯🇴 Pay via CLIQ — 17 JOD/month
+              </span>
+            </div>
+            <button onClick={()=>setShowPaywall(true)}
+              style={{background:"white",color:T.primary,border:"none",borderRadius:6,padding:"9px 22px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0,boxShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>
+              🔓 Upgrade to Pro →
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* CONTENT AREA */}
       <div className="content-outer" style={{maxWidth:1200,margin:"24px auto 80px",padding:"0 24px"}}>
@@ -3392,12 +3423,17 @@ export default function IELTSBot(){
             </div>
             {/* Upgrade button at bottom of menu */}
             {!proUser&&(
-              <div style={{padding:"0 20px"}}>
+              <div style={{padding:"0 20px",display:"flex",flexDirection:"column",gap:8}}>
                 <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
-                  width:"100%",background:T.primary,color:"white",border:"none",
+                  width:"100%",background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",
                   borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,
-                  cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"
+                  cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)"
                 }}>🔓 Upgrade to Pro — $25/mo</button>
+                <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
+                  width:"100%",background:"#f0fdf4",color:T.green,border:`1px solid ${T.greenBorder}`,
+                  borderRadius:8,padding:"10px",fontSize:13,fontWeight:700,
+                  cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"
+                }}>🇯🇴 Jordan: Pay 17 JOD via CLIQ</button>
               </div>
             )}
             {proUser&&(
