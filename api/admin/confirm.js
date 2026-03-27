@@ -1,4 +1,4 @@
-// api/admin/confirm.js
+// api/admin/confirm.js 
 // Confirms a CLIQ payment and activates Pro for the user.
 // If user already registered → updates profile to Pro directly.
 // If user hasn't registered yet → stores activation so Pro kicks in when they sign up.
