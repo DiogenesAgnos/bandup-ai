@@ -55,16 +55,27 @@ const authLogin = (email, password) => {
   return { session };
 };
 
+// Pending pro activations — survives even if no account exists yet on this device
+const PRO_KEYS_KEY = "ef_pro_activated";
+const getProActivated = () => { try{ return JSON.parse(localStorage.getItem(PRO_KEYS_KEY)||"[]"); }catch{ return []; } };
+const addProActivated = (email) => { try{ const k=email.toLowerCase().trim(); const a=getProActivated(); if(!a.includes(k)){ a.push(k); localStorage.setItem(PRO_KEYS_KEY,JSON.stringify(a)); } }catch{} };
+
 const getUserPro = (email) => {
   if(!email) return false;
+  const key = email.toLowerCase().trim();
+  // Check users store first, then pending activation store
   const users = getUsers();
-  return users[email.toLowerCase().trim()]?.pro || false;
+  if(users[key]?.pro) return true;
+  return getProActivated().includes(key);
 };
 
 const setUserPro = (email) => {
-  const users = getUsers();
   const key = email.toLowerCase().trim();
-  if(users[key]) { users[key].pro = true; saveUsers(users); }
+  // Store in pending activation list (works without an account)
+  addProActivated(key);
+  // Also update user record if it exists
+  const users = getUsers();
+  if(users[key]){ users[key].pro = true; saveUsers(users); }
 };
 
 // Seed admin account as pro
@@ -686,8 +697,8 @@ const AuthModal=({onClose,onSuccess})=>{
 };
 
 // ── Paywall ───────────────────────────────────
-const PaywallModal=({onClose,onSuccess,session})=>{
-  const [tab,setTab]=useState("cliq"); // "cliq" | "international" | "code"
+const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
+  const [tab,setTab]=useState(initialTab); // "cliq" | "international" | "code"
   const [cliqForm,setCliqForm]=useState({name:"",email:session?.email||"",mobile:""});
   const [cliqStatus,setCliqStatus]=useState(null); // null | "sending" | "sent" | "error"
   const [codeEmail,setCodeEmail]=useState(session?.email||"");
@@ -2762,6 +2773,7 @@ export default function IELTSBot(){
   const [error,setError]=useState("");
   const [activeTab,setActiveTab]=useState(()=>getLastResult()?.result?"annotated":"scores");
   const [showPaywall,setShowPaywall]=useState(false);
+  const [paywallTab,setPaywallTab]=useState("cliq");
   const [showAuth,setShowAuth]=useState(false);
   const [session,setSession]=useState(()=>getSession());
   const [uses,setUses]=useState(()=>getStoredUses(getSession()?.email));
@@ -2776,7 +2788,11 @@ export default function IELTSBot(){
     setSession(sess);
     saveSession(sess);
     setUses(getStoredUses(sess.email));
-    setProUser(getUserPro(sess.email));
+    // Check both user record AND pending activation list (so code-first users get Pro on login)
+    const isPro = getUserPro(sess.email);
+    setProUser(isPro);
+    // If pending activation exists, make sure it's also written to user record
+    if(isPro) setUserPro(sess.email);
     setShowAuth(false);
     setShowPaywall(false);
   };
@@ -2905,7 +2921,7 @@ export default function IELTSBot(){
 
   return (
     <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
-      {showPaywall&&<PaywallModal onClose={()=>setShowPaywall(false)} onSuccess={handleProSuccess} session={session}/>}
+      {showPaywall&&<PaywallModal onClose={()=>{setShowPaywall(false);setPaywallTab("cliq");}} onSuccess={handleProSuccess} session={session} initialTab={paywallTab}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
 
 
@@ -2940,7 +2956,10 @@ export default function IELTSBot(){
                 <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign Out</button>
               </div>
             ):(
-              <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In →</button>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <button onClick={()=>{ setPaywallTab("code"); setShowPaywall(true); }} style={{background:"transparent",color:T.textMuted,border:"none",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline",padding:0,whiteSpace:"nowrap"}}>Have a code?</button>
+                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In →</button>
+              </div>
             )}
           </div>
         </div>
