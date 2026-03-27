@@ -2737,7 +2737,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
 );
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises"}; // /admin intentionally excluded from routing
+const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
 
@@ -2844,13 +2844,6 @@ export default function IELTSBot(){
   const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",admin:"Admin — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
   const switchView=(view)=>{ 
     setMainView(view); 
-    if(view === "admin"){
-      // Don't push admin to browser history — use replaceState so back button skips it
-      window.history.replaceState({view:"admin"}, "", "/admin");
-      document.title = PAGE_TITLES["admin"] || "Englishfool";
-      window.scrollTo({top:0,behavior:'smooth'});
-      return;
-    }
     const path = VIEW_TO_PATH[view] || "/";
     if(window.location.pathname !== path) window.history.pushState({view}, "", path);
     document.title = PAGE_TITLES[view] || "Englishfool";
