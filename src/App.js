@@ -21,6 +21,10 @@ const API_URL = "/api/analyze";
 const USERS_KEY = "bandup_users";
 const SESSION_KEY = "bandup_session";
 const LAST_RESULT_KEY = "bandup_last_result";
+const CODE_PRO_KEY = "ef_code_pro_email"; // persists code-activated pro across refreshes
+const getCodeProEmail = () => { try{ return localStorage.getItem(CODE_PRO_KEY)||""; }catch{ return ""; } };
+const saveCodeProEmail = (email) => { try{ localStorage.setItem(CODE_PRO_KEY, email); }catch{} };
+const clearCodeProEmail = () => { try{ localStorage.removeItem(CODE_PRO_KEY); }catch{} };
 
 // ── Auth helpers ──────────────────────────────
 const saveLastResult = (data) => { try{ localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(data)); }catch{} };
@@ -739,17 +743,17 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
   };
 
   const tabBtn=(key,icon,label)=>(
-    <button onClick={()=>setTab(key)} style={{flex:1,padding:"9px 6px",background:tab===key?T.primaryLight:"transparent",border:`1px solid ${tab===key?T.primaryBorder:T.border}`,borderRadius:8,fontSize:12,fontWeight:tab===key?700:400,color:tab===key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-      <span style={{fontSize:16}}>{icon}</span>{label}
+    <button onClick={()=>setTab(key)} style={{flex:1,minWidth:0,padding:"8px 4px",background:tab===key?T.primaryLight:"transparent",border:`1px solid ${tab===key?T.primaryBorder:T.border}`,borderRadius:8,fontSize:11,fontWeight:tab===key?700:400,color:tab===key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2,lineHeight:1.2,textAlign:"center",wordBreak:"break-word"}}>
+      <span style={{fontSize:18}}>{icon}</span><span style={{display:"block"}}>{label}</span>
     </button>
   );
 
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-      <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,maxWidth:460,width:"100%",position:"relative",boxShadow:T.shadowLg,display:"flex",flexDirection:"column",maxHeight:"90vh"}}>
+      <div style={{background:"#fefdf8",border:`1px solid ${T.border}`,borderRadius:20,maxWidth:460,width:"100%",position:"relative",boxShadow:T.shadowLg,display:"flex",flexDirection:"column",maxHeight:"92vh",overflowY:"hidden"}}>
 
         {/* Sticky header — X always visible */}
-        <div style={{flexShrink:0,padding:"20px 28px 0",position:"relative"}}>
+        <div style={{flexShrink:0,padding:"16px 20px 0",position:"relative"}}>
           <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",color:T.text,fontSize:18,cursor:"pointer",width:40,height:40,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,zIndex:10}}>✕</button>
           <div style={{textAlign:"center",paddingBottom:16}}>
             <div style={{fontSize:32,marginBottom:6}}>🎓</div>
@@ -759,7 +763,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
         </div>
 
         {/* Scrollable body */}
-        <div style={{overflowY:"auto",padding:"0 28px 28px",flex:1}}>
+        <div style={{overflowY:"auto",padding:"0 20px 24px",flex:1}}>
 
         {/* Features list */}
         <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"12px 16px",marginBottom:20}}>
@@ -774,7 +778,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
 
         {/* Tab switcher */}
         <div style={{display:"flex",gap:6,marginBottom:20}}>
-          {tabBtn("cliq","🏦","CLIQ · Jordan")}
+          {tabBtn("cliq","🏦","CLIQ 🇯🇴")}
           {tabBtn("international","💳","International")}
           {tabBtn("code","🔑","Enter Code")}
         </div>
@@ -2750,7 +2754,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
 );
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin"};
+const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises"}; // /admin intentionally excluded from routing
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
 
@@ -2781,7 +2785,14 @@ export default function IELTSBot(){
   const [menuOpen,setMenuOpen]=useState(false);
   const analyzeRef=useRef(null);
 
-  const [proUser, setProUser] = useState(()=> { const s = getSession(); return s ? getUserPro(s.email) : false; });
+  const [proUser, setProUser] = useState(()=>{
+    const s = getSession();
+    if(s && getUserPro(s.email)) return true;
+    // Check code-activated pro (persists without a session)
+    const codeEmail = getCodeProEmail();
+    if(codeEmail && getUserPro(codeEmail)) return true;
+    return false;
+  });
   const usesLeft = FREE_USES_LIMIT - uses;
 
   const handleAuthSuccess=(sess)=>{
@@ -2799,6 +2810,7 @@ export default function IELTSBot(){
 
   const handleSignOut=()=>{
     clearSession();
+    clearCodeProEmail();
     setSession(null);
     setUses(0);
     setResult(null);
@@ -2835,6 +2847,13 @@ export default function IELTSBot(){
   const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",admin:"Admin — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
   const switchView=(view)=>{ 
     setMainView(view); 
+    if(view === "admin"){
+      // Don't push admin to browser history — use replaceState so back button skips it
+      window.history.replaceState({view:"admin"}, "", "/admin");
+      document.title = PAGE_TITLES["admin"] || "Englishfool";
+      window.scrollTo({top:0,behavior:'smooth'});
+      return;
+    }
     const path = VIEW_TO_PATH[view] || "/";
     if(window.location.pathname !== path) window.history.pushState({view}, "", path);
     document.title = PAGE_TITLES[view] || "Englishfool";
@@ -2860,8 +2879,11 @@ export default function IELTSBot(){
   const sampleWordCount=result?.sampleEssay?countWords(result.sampleEssay):0;
 
   const handleProSuccess=(activatedEmail)=>{
-    if(activatedEmail) setUserPro(activatedEmail);
-    else if(session) setUserPro(session.email);
+    const emailToActivate = activatedEmail || session?.email;
+    if(emailToActivate){
+      setUserPro(emailToActivate);
+      saveCodeProEmail(emailToActivate); // persists across refreshes even without session
+    }
     setProUser(true);
     setShowPaywall(false);
     trackEvent('upgrade_to_pro');
@@ -3333,7 +3355,7 @@ export default function IELTSBot(){
       {mainView==="privacy"&&<PrivacyPage onBack={()=>switchView("analyze")}/>}
       {mainView==="refund"&&<RefundPage onBack={()=>switchView("analyze")}/>}
       {mainView==="pricing"&&<PricingPage onBack={()=>switchView("analyze")} onUpgrade={()=>setShowPaywall(true)} isPro={proUser}/> }
-      {mainView==="admin"&&<AdminPage onBack={()=>switchView("analyze")}/>}
+      {mainView==="admin"&&<AdminPage onBack={()=>{ setMainView("analyze"); window.history.replaceState({view:"analyze"},""," /"); }}/>}
 
       {/* FOOTER */}
       <div style={{background:"#1c1d1f",borderTop:"1px solid #333",padding:"32px 24px",marginTop:40}}>
