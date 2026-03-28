@@ -2435,8 +2435,9 @@ const AdminPage = ({onBack}) => {
   const [adminData, setAdminData] = useState(null);
   const [adminLoading, setAdminLoading] = useState(false);
   const [confirming, setConfirming] = useState(null);
-  const [confirmResult, setConfirmResult] = useState({});
+  const [lastConfirmed, setLastConfirmed] = useState(null);
   const [copied, setCopied] = useState(null);
+  const [confirmError, setConfirmError] = useState(null);
 
   const inp = {width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
 
@@ -2453,6 +2454,7 @@ const AdminPage = ({onBack}) => {
 
   const confirmPayment = async (payment) => {
     setConfirming(payment.id);
+    setConfirmError(null);
     try{
       const res = await fetch("/api/admin/confirm", {
         method:"POST",
@@ -2460,11 +2462,14 @@ const AdminPage = ({onBack}) => {
         body: JSON.stringify({ paymentId: payment.id, email: payment.email })
       });
       const data = await res.json();
-      setConfirmResult(prev=>({...prev, [payment.id]: data}));
-      // Refresh data
+      if(data.success){
+        setLastConfirmed({ ...data, paymentName: payment.name, paymentEmail: payment.email, paymentMobile: payment.mobile });
+      } else {
+        setConfirmError(data.error || "Something went wrong");
+      }
       const refresh = await fetch("/api/admin/users", { headers:{"x-admin-key": ADMIN_KEY} });
       setAdminData(await refresh.json());
-    }catch(e){ console.error(e); }
+    }catch(e){ console.error(e); setConfirmError(e.message); }
     setConfirming(null);
   };
 
@@ -2496,6 +2501,43 @@ const AdminPage = ({onBack}) => {
 
       {adminLoading&&<div style={{textAlign:"center",padding:"40px",color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⏳ Loading dashboard...</div>}
 
+      {/* SUCCESS BANNER — stays visible after confirming */}
+      {lastConfirmed&&(
+        <div style={{background:T.greenBg,border:`2px solid ${T.greenBorder}`,borderRadius:12,padding:"20px",marginBottom:20,boxShadow:T.shadow,position:"relative"}}>
+          <button onClick={()=>setLastConfirmed(null)} style={{position:"absolute",top:10,right:12,background:"none",border:"none",fontSize:18,color:T.textMuted,cursor:"pointer",lineHeight:1}}>✕</button>
+          <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.green,margin:"0 0 10px"}}>✅ Payment Confirmed — {lastConfirmed.paymentName}</h3>
+          <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>
+            {lastConfirmed.paymentEmail} · 📱 {lastConfirmed.paymentMobile}
+          </div>
+          {lastConfirmed.accountCreated&&(
+            <div style={{background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 14px",marginBottom:10}}>
+              <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>🆕 Account created with credentials:</div>
+              <div style={{fontSize:14,fontFamily:"monospace",color:T.text,lineHeight:1.8}}>
+                📧 {lastConfirmed.paymentEmail}<br/>
+                🔑 {lastConfirmed.tempPassword}
+              </div>
+            </div>
+          )}
+          <div style={{background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 14px",marginBottom:10}}>
+            <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>💬 WhatsApp message to send:</div>
+            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{lastConfirmed.whatsappMessage}</div>
+          </div>
+          <button onClick={()=>copyText(lastConfirmed.whatsappMessage,"confirmed")}
+            style={{background:copied==="confirmed"?T.greenBg:T.primaryLight,border:`1px solid ${copied==="confirmed"?T.greenBorder:T.primaryBorder}`,borderRadius:8,padding:"8px 18px",fontSize:13,fontWeight:700,color:copied==="confirmed"?T.green:T.primary,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+            {copied==="confirmed"?"✓ Copied!":"📋 Copy WhatsApp Message"}
+          </button>
+        </div>
+      )}
+
+      {/* Error banner */}
+      {confirmError&&(
+        <div style={{background:T.redBg,border:`2px solid ${T.redBorder}`,borderRadius:12,padding:"16px 20px",marginBottom:20,position:"relative"}}>
+          <button onClick={()=>setConfirmError(null)} style={{position:"absolute",top:8,right:12,background:"none",border:"none",fontSize:18,color:T.textMuted,cursor:"pointer"}}>✕</button>
+          <div style={{fontSize:14,color:T.red,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>❌ Confirmation failed</div>
+          <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{confirmError}</div>
+        </div>
+      )}
+
       {adminData&&(
         <>
           {/* Stats */}
@@ -2523,19 +2565,9 @@ const AdminPage = ({onBack}) => {
                       </div>
                       <button onClick={()=>confirmPayment(p)} disabled={confirming===p.id}
                         style={{background:confirming===p.id?T.bgGray:T.green,color:confirming===p.id?T.textMuted:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:confirming===p.id?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
-                        {confirming===p.id?"⏳ Confirming...":"✓ Confirm Payment"}
+                        {confirming===p.id?"⏳ Creating account...":"✓ Confirm Payment"}
                       </button>
                     </div>
-                    {confirmResult[p.id]&&(
-                      <div style={{marginTop:10,background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px"}}>
-                        <div style={{fontSize:12,color:T.green,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>✅ Payment confirmed! Send this WhatsApp:</div>
-                        <div style={{fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,fontStyle:"italic"}}>"{confirmResult[p.id].whatsappMessage}"</div>
-                        <button onClick={()=>copyText(confirmResult[p.id].whatsappMessage, p.id)}
-                          style={{marginTop:8,background:copied===p.id?T.greenBg:T.primaryLight,border:`1px solid ${copied===p.id?T.greenBorder:T.primaryBorder}`,borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:700,color:copied===p.id?T.green:T.primary,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-                          {copied===p.id?"✓ Copied!":"Copy WhatsApp Message"}
-                        </button>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
