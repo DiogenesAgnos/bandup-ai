@@ -3,15 +3,15 @@
 // 1. Marks payment as confirmed
 // 2. Creates a real Supabase Auth account (if user hasn't registered yet)
 // 3. Activates Pro on their profile
-// 4. Returns credentials so Ahmad can WhatsApp them
+// 4. Logs everything to activations table (backup record)
+// 5. Returns credentials so Ahmad can WhatsApp them
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY   // service key can create users
+  process.env.SUPABASE_SERVICE_KEY
 );
 
-// Generate a simple temporary password like "EF-a3f7k2"
 const generateTempPassword = () => {
   const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
   let pwd = '';
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     .eq('id', paymentId);
   if (payErr) console.error('Payment confirm error:', payErr);
 
-  // 3. Check if user already exists in auth
+  // 3. Check if user already exists
   const { data: existingProfile } = await supabase.from('profiles')
     .select('id, email')
     .eq('email', normalizedEmail)
@@ -69,12 +69,12 @@ export default async function handler(req, res) {
   let accountCreated = false;
 
   if (!existingProfile) {
-    // User hasn't registered yet → create their account
+    // User hasn't registered → create their account
     tempPassword = generateTempPassword();
     const { data: newUser, error: authErr } = await supabase.auth.admin.createUser({
       email: normalizedEmail,
       password: tempPassword,
-      email_confirm: true,           // skip email verification
+      email_confirm: true,
       user_metadata: { name: payment?.name || normalizedEmail.split('@')[0] }
     });
 
@@ -86,27 +86,39 @@ export default async function handler(req, res) {
       });
     }
     accountCreated = true;
-
-    // Wait a moment for the trigger to create the profile
+    // Wait for trigger to create profile
     await new Promise(r => setTimeout(r, 1000));
   }
 
-  // 4. Activate Pro on the profile
+  // 4. Activate Pro
   const { error: proErr } = await supabase.from('profiles')
     .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
     .eq('email', normalizedEmail);
   if (proErr) console.error('Pro activation error:', proErr);
 
-  // 5. Generate activation code (backup method)
+  // 5. Generate activation code (backup)
   const code = generateCode(normalizedEmail);
 
-  // 6. Build WhatsApp message
+  // 6. Save record to activations table (your backup log)
+  try {
+    await supabase.from('activations').insert({
+      email: normalizedEmail,
+      name: payment?.name || null,
+      mobile: payment?.mobile || null,
+      temp_password: tempPassword,
+      payment_id: paymentId,
+      is_pro: true,
+      activated_at: new Date().toISOString()
+    });
+  } catch (e) { console.error('Activation log error:', e); }
+
+  // 7. Build WhatsApp message
   let whatsappMessage;
   if (accountCreated) {
     whatsappMessage = `Hi ${payment?.name || ''}! Your Englishfool Pro account is ready 🎓\n\n` +
       `📧 Email: ${normalizedEmail}\n🔑 Password: ${tempPassword}\n\n` +
       `Go to englishfool.com → click Sign In → use these credentials.\n` +
-      `Please change your password after signing in.\n\nEnjoy unlimited access!`;
+      `You can change your password after signing in from the menu.\n\nEnjoy unlimited access!`;
   } else {
     whatsappMessage = `Hi ${payment?.name || ''}! Your Englishfool Pro has been activated 🎓\n\n` +
       `Just sign in at englishfool.com with ${normalizedEmail} and enjoy unlimited access!`;
