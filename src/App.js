@@ -648,6 +648,58 @@ const AuthModal=({onClose,onSuccess})=>{
   );
 };
 
+// ── Change Password Modal ────────────────────
+const ChangePasswordModal=({onClose})=>{
+  const [newPass,setNewPass]=useState("");
+  const [confirmPass,setConfirmPass]=useState("");
+  const [showPass,setShowPass]=useState(false);
+  const [error,setError]=useState("");
+  const [success,setSuccess]=useState("");
+  const [loading,setLoading]=useState(false);
+
+  const handleChange=async()=>{
+    setError(""); setSuccess("");
+    if(!newPass.trim()){ setError("Please enter a new password."); return; }
+    if(newPass.length<6){ setError("Password must be at least 6 characters."); return; }
+    if(newPass!==confirmPass){ setError("Passwords don't match."); return; }
+    setLoading(true);
+    try{
+      const { error } = await supabase.auth.updateUser({ password: newPass });
+      if(error){ setError(error.message); setLoading(false); return; }
+      setSuccess("Password changed successfully!");
+      setTimeout(()=>onClose(),2000);
+    }catch(e){ setError("Something went wrong."); }
+    setLoading(false);
+  };
+
+  const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
+
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div style={{background:"white",borderRadius:20,padding:"36px 28px",maxWidth:400,width:"100%",position:"relative",boxShadow:"0 20px 60px rgba(0,0,0,0.2)"}}>
+        <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f3f3f3",border:"none",fontSize:16,cursor:"pointer",width:36,height:36,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,color:T.text}}>✕</button>
+        <div style={{textAlign:"center",marginBottom:24}}>
+          <div style={{fontSize:32,marginBottom:8}}>🔑</div>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 4px"}}>Change Password</h2>
+          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Enter your new password below</p>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          <div style={{position:"relative"}}>
+            <input value={newPass} onChange={e=>setNewPass(e.target.value)} placeholder="New password (min 6 characters)" type={showPass?"text":"password"} style={{...inp,paddingRight:48}}/>
+            <button type="button" onClick={()=>setShowPass(!showPass)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16,color:T.textMuted,padding:4}}>{showPass?"🙈":"👁️"}</button>
+          </div>
+          <input value={confirmPass} onChange={e=>setConfirmPass(e.target.value)} placeholder="Confirm new password" type={showPass?"text":"password"} style={inp} onKeyDown={e=>e.key==="Enter"&&handleChange()}/>
+          {error&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</div>}
+          {success&&<div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{success}</div>}
+          <button onClick={handleChange} disabled={loading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",opacity:loading?0.7:1}}>
+            {loading?"⏳ Updating...":"Update Password →"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ── Paywall ───────────────────────────────────
 const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
   const [tab,setTab]=useState(initialTab); // "cliq" | "international" | "code"
@@ -2795,6 +2847,7 @@ export default function IELTSBot(){
   const [showPaywall,setShowPaywall]=useState(false);
   const [paywallTab,setPaywallTab]=useState("cliq");
   const [showAuth,setShowAuth]=useState(false);
+  const [showChangePassword,setShowChangePassword]=useState(false);
   const [session,setSession]=useState(null);
   const [uses,setUses]=useState(0);
   const [lang,setLang]=useState("en");
@@ -2965,6 +3018,7 @@ export default function IELTSBot(){
     <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>{setShowPaywall(false);setPaywallTab("cliq");}} onSuccess={handleProSuccess} session={session} initialTab={paywallTab}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
+      {showChangePassword&&<ChangePasswordModal onClose={()=>setShowChangePassword(false)}/>}
 
 
 
@@ -2995,6 +3049,7 @@ export default function IELTSBot(){
             {session?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
                 <span style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
+                <button onClick={()=>setShowChangePassword(true)} style={{background:"transparent",border:"none",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline",padding:0}}>🔑</button>
                 <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign Out</button>
               </div>
             ):(
@@ -3522,9 +3577,14 @@ export default function IELTSBot(){
             )}
             <div style={{padding:"12px 20px 0"}}>
               {session?(
-                <button onClick={handleSignOut} style={{width:"100%",background:"#f3f3f3",border:`1px solid ${T.border}`,borderRadius:8,padding:"12px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-                  🚪 Sign Out ({session.email})
-                </button>
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  <button onClick={()=>{setShowChangePassword(true);setMenuOpen(false);}} style={{width:"100%",background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    🔑 Change Password
+                  </button>
+                  <button onClick={handleSignOut} style={{width:"100%",background:"#f3f3f3",border:`1px solid ${T.border}`,borderRadius:8,padding:"12px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    🚪 Sign Out ({session.email})
+                  </button>
+                </div>
               ):(
                 <button onClick={()=>{setShowAuth(true);setMenuOpen(false);}} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In / Register →</button>
               )}
