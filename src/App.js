@@ -2490,6 +2490,9 @@ const AdminPage = ({onBack}) => {
   const [lastConfirmed, setLastConfirmed] = useState(null);
   const [copied, setCopied] = useState(null);
   const [confirmError, setConfirmError] = useState(null);
+  const [manualEmail, setManualEmail] = useState("");
+  const [manualLoading, setManualLoading] = useState(false);
+  const [manualResult, setManualResult] = useState(null);
 
   const inp = {width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
 
@@ -2527,6 +2530,28 @@ const AdminPage = ({onBack}) => {
 
   const copyText = (text, key) => {
     try{ navigator.clipboard.writeText(text); setCopied(key); setTimeout(()=>setCopied(null),2000); }catch{}
+  };
+
+  const activatePro = async () => {
+    if(!manualEmail.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(manualEmail.trim())){ setConfirmError("Enter a valid email."); return; }
+    setManualLoading(true); setManualResult(null); setConfirmError(null);
+    try{
+      const res = await fetch("/api/admin/activate", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-admin-key": ADMIN_KEY},
+        body: JSON.stringify({ email: manualEmail.trim() })
+      });
+      const data = await res.json();
+      if(data.success){
+        setManualResult(data);
+        setManualEmail("");
+        const refresh = await fetch("/api/admin/users", { headers:{"x-admin-key": ADMIN_KEY} });
+        setAdminData(await refresh.json());
+      } else {
+        setConfirmError(data.error || "Activation failed");
+      }
+    }catch(e){ setConfirmError(e.message); }
+    setManualLoading(false);
   };
 
   if(!unlocked) return (
@@ -2625,6 +2650,52 @@ const AdminPage = ({onBack}) => {
               </div>
             </div>
           )}
+
+          {/* Manual Pro Activation */}
+          <div style={{background:T.bg,border:`2px solid ${T.primaryBorder}`,borderRadius:12,padding:"20px",marginBottom:20,boxShadow:T.shadow}}>
+            <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.primary,margin:"0 0 6px"}}>⚡ Activate Pro for Any Email</h3>
+            <p style={{color:T.textMuted,fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 14px",lineHeight:1.5}}>
+              If user already has an account → upgrades to Pro instantly.<br/>
+              If user doesn't have an account → creates one with a temp password you can send them.
+            </p>
+            <div style={{display:"flex",gap:8}}>
+              <input type="email" value={manualEmail} onChange={e=>setManualEmail(e.target.value)}
+                onKeyDown={e=>e.key==="Enter"&&activatePro()}
+                placeholder="user@email.com" style={{...inp,flex:1}}/>
+              <button onClick={activatePro} disabled={manualLoading}
+                style={{background:manualLoading?T.bgGray:T.primary,color:manualLoading?T.textMuted:"white",border:"none",borderRadius:8,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:manualLoading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
+                {manualLoading?"⏳ Activating...":"⚡ Activate Pro"}
+              </button>
+            </div>
+            {manualResult&&(
+              <div style={{marginTop:14,background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px"}}>
+                <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:8}}>
+                  ✅ {manualResult.accountCreated?"Account created & Pro activated":"Pro activated for existing user"}
+                </div>
+                {manualResult.accountCreated&&(
+                  <div style={{background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",marginBottom:10}}>
+                    <div style={{fontSize:13,fontFamily:"monospace",color:T.text,lineHeight:1.8}}>
+                      📧 {manualResult.email}<br/>🔑 {manualResult.tempPassword}
+                    </div>
+                  </div>
+                )}
+                <div style={{background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",marginBottom:10}}>
+                  <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>💬 WhatsApp message:</div>
+                  <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{manualResult.whatsappMessage}</div>
+                </div>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>copyText(manualResult.whatsappMessage,"manual")}
+                    style={{background:copied==="manual"?T.greenBg:T.primaryLight,border:`1px solid ${copied==="manual"?T.greenBorder:T.primaryBorder}`,borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:700,color:copied==="manual"?T.green:T.primary,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    {copied==="manual"?"✓ Copied!":"📋 Copy Message"}
+                  </button>
+                  <button onClick={()=>setManualResult(null)}
+                    style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* All Users */}
           <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",boxShadow:T.shadow}}>
