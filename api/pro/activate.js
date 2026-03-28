@@ -1,81 +1,123 @@
-// api/pro/activate.js
-// Verifies activation code SERVER-SIDE (salt is never exposed to the browser)
-// and sets is_pro = true in Supabase.
-
+// api/admin/activate.js
+// Manual Pro activation — works for both existing and new users.
+// If user has an account → upgrades to Pro.
+// If user doesn't → creates account with temp password, then upgrades.
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY // service key — full DB access, server-only
+  process.env.SUPABASE_SERVICE_KEY
 );
 
-// Same algorithm as before but now the salt lives ONLY in Vercel env vars
-const generateCode = (email) => {
-  const SALT = process.env.ACTIVATION_SALT || 'EF-Efool2026-JO-secret';
-  const input = email.toLowerCase().trim() + SALT;
-  let h = 5381;
-  for (let i = 0; i < input.length; i++) {
-    h = ((h << 5) + h) ^ input.charCodeAt(i);
-    h = h >>> 0;
-  }
-  const b = h.toString(36).toUpperCase().padStart(8, '0').slice(0, 8);
-  return `EFOOL-${b.slice(0, 4)}-${b.slice(4, 8)}`;
+const generateTempPassword = () => {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+  let pwd = '';
+  for (let i = 0; i < 6; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+  return 'EF-' + pwd;
 };
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-key');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { email, code } = req.body || {};
-  if (!email || !code) return res.status(400).json({ error: 'Email and code are required.' });
+  const adminKey = req.headers['x-admin-key'];
+  if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
+  const { email } = req.body || {};
+  if (!email) return res.status(400).json({ error: 'Email required' });
   const normalizedEmail = email.toLowerCase().trim();
-  const expected = generateCode(normalizedEmail);
 
-  if (code.trim().toUpperCase() !== expected) {
-    return res.status(401).json({
-      error: 'Invalid code. Make sure you are using the exact email you registered with, and the code is entered correctly (e.g. EFOOL-XXXX-XXXX).'
-    });
-  }
-
-  // Check user exists in profiles
-  const { data: profile, error: profileErr } = await supabase
-    .from('profiles')
-    .select('id, is_pro')
+  // Check if user already has a profile
+  const { data: existingProfile } = await supabase.from('profiles')
+    .select('id, email, name, is_pro')
     .eq('email', normalizedEmail)
-    .single();
+    .maybeSingle();
 
-  if (profileErr || !profile) {
-    return res.status(404).json({
-      error: 'No account found with this email. Please register first, then enter your code.'
+  let tempPassword = null;
+  let accountCreated = false;
+  let userName = normalizedEmail.split('@')[0];
+
+  if (existingProfile) {
+    // User exists → just upgrade to Pro
+    userName = existingProfile.name || userName;
+
+    if (existingProfile.is_pro) {
+      return res.status(200).json({
+        success: true,
+        accountCreated: false,
+        email: normalizedEmail,
+        alreadyPro: true,
+        whatsappMessage: `Hi ${userName}! Your Englishfool account (${normalizedEmail}) is already Pro. Sign in at englishfool.com to enjoy unlimited access! 🎓`
+      });
+    }
+
+    const { error: proErr } = await supabase.from('profiles')
+      .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
+      .eq('email', normalizedEmail);
+    if (proErr) {
+      return res.status(500).json({ success: false, error: 'Failed to activate: ' + proErr.message });
+    }
+  } else {
+    // User doesn't exist → create account
+    tempPassword = generateTempPassword();
+    const { error: authErr } = await supabase.auth.admin.createUser({
+      email: normalizedEmail,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: { name: userName }
     });
+
+    if (authErr) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create account: ' + authErr.message
+      });
+    }
+    accountCreated = true;
+
+    // Wait for trigger to create profile
+    await new Promise(r => setTimeout(r, 1500));
+
+    // Activate Pro
+    const { error: proErr } = await supabase.from('profiles')
+      .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
+      .eq('email', normalizedEmail);
+    if (proErr) console.error('Pro activation error:', proErr);
   }
 
-  if (profile.is_pro) {
-    return res.status(200).json({ success: true, alreadyPro: true });
+  // Log to activations table
+  try {
+    await supabase.from('activations').insert({
+      email: normalizedEmail,
+      name: userName,
+      temp_password: tempPassword,
+      is_pro: true,
+      activated_at: new Date().toISOString()
+    });
+  } catch (e) { console.error('Activation log error:', e); }
+
+  // Build WhatsApp message
+  let whatsappMessage;
+  if (accountCreated) {
+    whatsappMessage = `Hi! Your Englishfool Pro account is ready 🎓\n\n` +
+      `📧 Email: ${normalizedEmail}\n🔑 Password: ${tempPassword}\n\n` +
+      `Go to englishfool.com → click Sign In → use these credentials.\n` +
+      `You can change your password after signing in from the menu.\n\nEnjoy unlimited access!`;
+  } else {
+    whatsappMessage = `Hi ${userName}! Your Englishfool Pro has been activated 🎓\n\n` +
+      `Just sign in at englishfool.com with ${normalizedEmail} and enjoy unlimited access!`;
   }
 
-  // Activate Pro
-  const { error: updateErr } = await supabase
-    .from('profiles')
-    .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
-    .eq('id', profile.id);
-
-  if (updateErr) {
-    console.error('Pro update error:', updateErr);
-    return res.status(500).json({ error: 'Activation failed. Please try again.' });
-  }
-
-  // Log activation for sharing detection
-  await supabase.from('activations').insert({
+  return res.status(200).json({
+    success: true,
+    accountCreated,
     email: normalizedEmail,
-    user_agent: req.headers['user-agent'] || '',
-    ip_hint: req.headers['x-forwarded-for'] || req.socket?.remoteAddress || ''
+    tempPassword,
+    whatsappMessage
   });
-
-  return res.status(200).json({ success: true });
 }
