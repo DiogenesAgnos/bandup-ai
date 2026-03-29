@@ -2720,6 +2720,631 @@ const AdminPage = ({onBack}) => {
   );
 };
 
+// ── IELTS Speaking Page ──────────────────────
+const SPEAKING_PART1 = [
+  {topic:"Hometown",questions:[
+    {q:"Where is your hometown?",a:"My hometown is Amman, the capital of Jordan. It's a bustling city built on several hills, with a fascinating mix of ancient ruins and modern developments. I've lived there most of my life and I'm quite attached to it."},
+    {q:"What do you like about your hometown?",a:"What I appreciate most is the warmth of the people — there's a real sense of community. I also love the food scene; you can find incredible traditional dishes like mansaf and falafel on practically every street. The city has a unique character that blends tradition with modernity."},
+    {q:"Is there anything you would like to change about your hometown?",a:"I'd definitely improve the public transport system. Currently, most people rely heavily on private cars, which leads to terrible traffic congestion during rush hour. A proper metro or tram network would make a huge difference to daily life."}
+  ]},
+  {topic:"Work & Studies",questions:[
+    {q:"Do you work or study?",a:"I currently work in the education sector. I've been involved in coordinating English language examinations for the past few years. It's quite rewarding because I get to help students achieve their academic goals through proper certification."},
+    {q:"What do you enjoy about your work?",a:"I particularly enjoy the problem-solving aspect. Every day brings different challenges, whether it's resolving logistical issues or finding creative solutions to help students. The variety keeps things interesting and I rarely feel bored."},
+    {q:"Would you like to change your job in the future?",a:"I'm actually considering transitioning into business development. I feel my experience has given me strong interpersonal and analytical skills that would transfer well. Ideally, I'd like to combine my education background with commercial strategy."}
+  ]},
+  {topic:"Technology",questions:[
+    {q:"How often do you use your phone?",a:"Honestly, I use it constantly throughout the day — probably more than I should. It's essentially my connection to work emails, social media, news, and messaging apps. I'd estimate I spend at least four or five hours on it daily."},
+    {q:"Do you think people spend too much time on technology?",a:"Absolutely. I think there's a growing dependency on screens that's quite concerning. People scroll through social media instead of having real conversations. That said, technology also enables incredible things like remote work and instant access to education."},
+    {q:"What technology do you find most useful?",a:"I'd say translation apps and AI tools have been game-changers for me. They help me communicate across language barriers and automate repetitive tasks. GPS navigation is another one — I genuinely don't know how people managed without it."}
+  ]},
+  {topic:"Food & Cooking",questions:[
+    {q:"Do you enjoy cooking?",a:"Yes, I do actually. I find it quite therapeutic after a long day at work. I particularly enjoy experimenting with different cuisines — I've recently been trying my hand at Asian dishes, which require techniques quite different from Middle Eastern cooking."},
+    {q:"What kind of food do you usually eat?",a:"My diet is fairly typical for the region — lots of rice, grilled meats, fresh salads, and olive oil. I try to incorporate vegetables into most meals, though I have a weakness for street food like shawarma and falafel sandwiches."},
+    {q:"Have your eating habits changed over the years?",a:"Definitely. When I was younger, I ate whatever was convenient without thinking about nutrition. Now I'm much more conscious about what I consume. I've reduced my sugar intake significantly and try to avoid processed foods where possible."}
+  ]},
+  {topic:"Environment",questions:[
+    {q:"Are you interested in protecting the environment?",a:"Yes, increasingly so. I've become much more aware of environmental issues in recent years, partly through media coverage and partly through visible changes in my own city. I try to reduce waste and conserve water, though I know I could do more."},
+    {q:"What environmental problems are common in your country?",a:"Water scarcity is probably the most pressing issue. Jordan is one of the most water-scarce countries in the world. Air pollution from traffic and industrial activity is another growing concern, particularly in urban areas like Amman and Zarqa."},
+    {q:"Do you think individuals can make a difference to the environment?",a:"I believe individual actions matter collectively. If millions of people make small changes — reducing plastic use, conserving energy, choosing public transport — the cumulative impact is significant. However, systemic change through government policy is equally essential."}
+  ]},
+  {topic:"Social Media",questions:[
+    {q:"Which social media platforms do you use?",a:"I mainly use Instagram for browsing content and WhatsApp for daily communication. I also check Facebook occasionally, though less than I used to. For professional networking, I sometimes browse LinkedIn to stay updated on industry trends."},
+    {q:"Do you think social media has more advantages or disadvantages?",a:"It's a double-edged sword, honestly. The advantages include instant communication, access to global news, and networking opportunities. But the disadvantages — misinformation, addiction, and the negative impact on mental health — are equally significant."},
+    {q:"How has social media changed the way people communicate?",a:"It's fundamentally transformed communication. People now prefer sending voice messages over making phone calls, and group chats have replaced many face-to-face social gatherings. While it's made staying in touch easier, I think the quality of interactions has somewhat diminished."}
+  ]}
+];
+
+const SPEAKING_PART2 = [
+  {topic:"Describe a book that left a lasting impression on you",
+   cue:"You should say:\n• what the book is about\n• when and why you read it\n• what you learned from it\nAnd explain why it left a lasting impression.",
+   model:"I'd like to talk about a book called 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari. I first came across it about three years ago when a colleague recommended it during a casual conversation at work.\n\nThe book essentially traces the entire history of our species, from the earliest humans in East Africa to the present day. What makes it remarkable is how Harari connects seemingly unrelated events and ideas — agriculture, religion, capitalism, and science — into a single coherent narrative about human progress.\n\nI read it over the course of about two weeks, mostly during my commute and before bed. What struck me most was the chapter on the Agricultural Revolution, which Harari controversially calls 'history's biggest fraud.' He argues that farming actually made life harder for most humans, not easier, which completely challenged my assumptions.\n\nThe reason this book left such a lasting impression is that it fundamentally changed how I think about civilization. Before reading it, I took so many aspects of modern life for granted — money, nations, human rights. Harari showed me that these are all shared fictions that humans collectively agreed to believe in. That perspective shift has stayed with me ever since and influenced how I understand current events and social structures."},
+  {topic:"Describe a memorable trip you have taken",
+   cue:"You should say:\n• where you went\n• who you went with\n• what you did there\nAnd explain why it was memorable.",
+   model:"I'd like to describe a trip I took to Istanbul, Turkey, about two years ago with a group of close friends. It was a five-day trip that we'd been planning for months, and it exceeded all our expectations.\n\nWe stayed in the Sultanahmet district, which is the historical heart of the city. During our time there, we visited iconic landmarks like the Blue Mosque, Hagia Sophia, and the Grand Bazaar. The architecture was absolutely breathtaking — I remember standing inside Hagia Sophia and being completely overwhelmed by the sheer scale and beauty of the dome.\n\nWhat made the trip particularly special was the food. Turkish cuisine is phenomenal — we ate our way through kebabs, baklava, and fresh fish by the Bosphorus. One evening, we took a boat cruise along the strait at sunset, and watching the sun go down behind the silhouette of minarets and modern skyscrapers was truly magical.\n\nThe reason this trip is so memorable is that it was the first time our friend group had travelled internationally together. There's something about sharing those 'wow' moments with people you care about that amplifies the experience. We still talk about that trip regularly, and it strengthened our friendships in a way that ordinary daily life simply can't."},
+  {topic:"Describe a person who has influenced you",
+   cue:"You should say:\n• who this person is\n• how you know them\n• what they have done\nAnd explain why they influenced you.",
+   model:"The person who has influenced me most profoundly is my high school English teacher, Mr. Khalil. I first met him when I was around fifteen years old, and he taught me for three consecutive years until I graduated.\n\nWhat set Mr. Khalil apart from other teachers was his genuine passion for the English language and his unconventional teaching methods. Rather than simply following the textbook, he would bring in newspaper articles, song lyrics, and even stand-up comedy clips to make lessons engaging. He believed that language should be lived, not just memorised.\n\nOne thing he did that really impacted me was starting a debating club after school hours. He would stay late voluntarily, giving up his free time to help students like me build confidence in public speaking. Through those sessions, I went from being someone who dreaded speaking in front of others to actually enjoying it.\n\nThe reason he influenced me so significantly is that he showed me the power of effective communication. He taught me that being able to express your ideas clearly in English opens doors that would otherwise remain firmly shut. That lesson has guided many of my career decisions since, including my current work in the education sector. I genuinely believe that without his encouragement, my life trajectory would have been quite different."},
+  {topic:"Describe a goal you want to achieve in the future",
+   cue:"You should say:\n• what the goal is\n• when you hope to achieve it\n• what steps you need to take\nAnd explain why this goal is important to you.",
+   model:"A goal I'm determined to achieve within the next two years is launching my own online education platform that helps Arabic-speaking students prepare for English proficiency exams like IELTS.\n\nThe idea has been brewing in my mind for quite some time, largely because I've seen firsthand how many students in the region struggle with test preparation. Many either can't afford expensive courses or don't have access to quality resources in their area.\n\nTo achieve this, I need to take several concrete steps. First, I need to develop the platform itself — the website, the content, and the AI-powered tools that would give students personalised feedback. Second, I need to create a sustainable business model, probably a freemium approach where basic features are free but advanced ones require a subscription. Finally, I need to market it effectively, particularly through social media channels that are popular in the Arab world.\n\nThis goal is important to me because I genuinely believe that education should be accessible regardless of your location or financial situation. Growing up in Jordan, I saw talented students whose potential was limited simply because they couldn't access the right resources. If my platform can bridge that gap even slightly, I'll consider it a success worth pursuing."},
+  {topic:"Describe a useful skill you learned recently",
+   cue:"You should say:\n• what the skill is\n• how you learned it\n• how long it took to learn\nAnd explain why it is useful.",
+   model:"A skill I've recently picked up is basic web development — specifically, building websites using React and JavaScript. I started learning about six months ago, primarily through online tutorials and by working hands-on with actual projects.\n\nThe learning process was challenging but rewarding. I began with the fundamentals of HTML and CSS, which took about a month to feel comfortable with. Then I moved on to JavaScript, which was significantly more complex — understanding concepts like functions, arrays, and asynchronous programming required genuine effort and many late nights of trial and error.\n\nWhat motivated me to learn this skill was a specific need: I wanted to build an educational tool but couldn't afford to hire a professional developer. So I decided to teach myself. The process involved watching YouTube tutorials, reading documentation, and most importantly, building things and breaking them repeatedly until I understood how they worked.\n\nThis skill has been incredibly useful because it's given me a form of creative independence. Instead of waiting for someone else to build what I envision, I can prototype ideas myself. It's also improved my problem-solving abilities and logical thinking in ways that benefit me beyond just coding. I'd strongly recommend anyone in today's digital age to learn at least the basics of programming."},
+  {topic:"Describe a place in your country that you would recommend to visitors",
+   cue:"You should say:\n• where it is\n• what people can see and do there\n• how to get there\nAnd explain why you would recommend it.",
+   model:"I would wholeheartedly recommend Petra to anyone visiting Jordan. It's located in the southern part of the country, about three hours by car from Amman, and it's genuinely one of the most awe-inspiring places I've ever visited.\n\nPetra is an ancient Nabataean city carved directly into rose-red cliff faces over two thousand years ago. The most famous structure is the Treasury, or Al-Khazneh, which most people recognise from Indiana Jones films. But there's so much more beyond that — monasteries, royal tombs, a Roman-style theatre, and kilometres of carved facades stretching through narrow canyons called the Siq.\n\nVisitors can explore on foot, or hire a local guide for a more informative experience. There are also options to ride horses or camels through certain sections. I'd recommend dedicating at least two full days, as there's far too much to see in a single day trip. The best time to visit is during spring or autumn when the weather is mild.\n\nThe reason I'd recommend Petra above all other places in Jordan is that it offers a genuinely unique experience that you simply cannot replicate anywhere else in the world. Standing in front of the Treasury at sunrise, watching the light gradually illuminate the carved stone, is a moment of pure wonder. It's a UNESCO World Heritage Site and one of the New Seven Wonders of the World for very good reason."}
+];
+
+const SPEAKING_PART3 = [
+  {topic:"Books & Reading (related to Part 2: Book)",questions:[
+    {q:"Do you think young people read less than previous generations?",a:"There's definitely been a shift in reading habits. Young people today consume enormous amounts of text through social media and online articles, but sustained reading of books has declined. I think the issue isn't that they read less overall — it's that they read differently, in shorter bursts rather than extended sessions."},
+    {q:"How has technology changed the way people read?",a:"Technology has transformed reading fundamentally. E-readers and audiobooks have made literature more accessible, which is positive. However, the constant notifications and multitasking culture mean people's attention spans have shortened considerably. Many struggle to sit with a book for an hour without checking their phone."},
+    {q:"Should governments do more to encourage reading?",a:"Absolutely. Public libraries should be better funded and modernised, and reading programmes in schools should be prioritised. In many developing countries, access to quality books remains limited. Government initiatives like free digital libraries or subsidised book fairs could make a real difference in fostering a reading culture."}
+  ]},
+  {topic:"Travel & Tourism (related to Part 2: Trip)",questions:[
+    {q:"What are the benefits of international travel?",a:"International travel broadens your perspective enormously. It exposes you to different cultures, cuisines, and ways of thinking that challenge your assumptions. It also develops practical skills like adaptability, communication, and independence. There's something about navigating an unfamiliar country that builds confidence in ways that staying home simply cannot."},
+    {q:"Do you think tourism can harm local communities?",a:"It certainly can, yes. Over-tourism can drive up property prices, displacing local residents. It can also lead to environmental degradation and the commodification of culture, where traditions are performed for tourists rather than practised authentically. However, with responsible planning and regulation, tourism can be a powerful economic driver without these negative effects."},
+    {q:"How might travel change in the future?",a:"I think we'll see a significant shift towards sustainable and experiential travel. Travellers are increasingly conscious of their carbon footprint, so eco-tourism and slow travel will likely grow. Virtual reality might also play a role, allowing people to explore destinations remotely, though I doubt it will ever replace the real thing entirely."}
+  ]},
+  {topic:"Education & Learning (related to Part 2: Person who influenced you)",questions:[
+    {q:"What qualities make a good teacher?",a:"Beyond subject knowledge, I think the most important quality is genuine enthusiasm. Students can immediately sense whether a teacher truly cares about their subject and their students' progress. Patience, creativity in explaining difficult concepts, and the ability to adapt to different learning styles are equally crucial."},
+    {q:"Is the education system in your country effective?",a:"It has strengths and weaknesses. The emphasis on academic achievement produces students with strong foundational knowledge, particularly in mathematics and sciences. However, the system is heavily exam-focused, which can stifle creativity and critical thinking. There's also insufficient attention given to practical skills like financial literacy, coding, and public speaking."},
+    {q:"How has education changed compared to 50 years ago?",a:"The transformation has been dramatic. Technology has made information universally accessible, whereas fifty years ago, knowledge was largely confined to classrooms and libraries. Teaching methods have also evolved from pure lecture-based instruction to more interactive, student-centred approaches. However, the fundamental goal remains the same — preparing young people for productive, fulfilling lives."}
+  ]},
+  {topic:"Technology & Society (related to Part 2: Useful skill)",questions:[
+    {q:"Do you think AI will replace human workers?",a:"AI will certainly replace some jobs, particularly those involving repetitive, routine tasks. However, I believe it will also create entirely new roles that we can't even imagine yet. The key challenge is ensuring that workers who are displaced have access to retraining programmes. Jobs requiring creativity, emotional intelligence, and complex problem-solving will remain firmly human."},
+    {q:"Should children learn programming in school?",a:"I strongly believe they should. Programming teaches logical thinking and problem-solving, which are valuable regardless of whether someone pursues a tech career. In today's digital world, understanding how technology works gives you a significant advantage. It should be introduced alongside traditional subjects like mathematics and science."},
+    {q:"What are the dangers of relying too heavily on technology?",a:"The most concerning danger is the erosion of fundamental human skills — handwriting, mental arithmetic, navigation without GPS, even face-to-face social interaction. There's also the cybersecurity risk: as our lives become increasingly digital, we become more vulnerable to hacking, data breaches, and identity theft. A balanced approach is essential."}
+  ]},
+  {topic:"Environment & Sustainability (related to Part 2: Place in your country)",questions:[
+    {q:"Who should take more responsibility for protecting the environment — individuals or governments?",a:"Both have crucial roles, but I believe governments bear the greater responsibility. They have the power to implement policies, regulate industries, and invest in renewable energy infrastructure. Individual actions matter, but they're insufficient without systemic change. You can't recycle your way out of climate change if corporations continue polluting unchecked."},
+    {q:"What environmental issues will future generations face?",a:"Water scarcity will likely become the defining challenge. As populations grow and climate patterns shift, access to clean water will become increasingly contested. Rising sea levels threatening coastal cities, biodiversity loss, and extreme weather events are other major concerns. Future generations will need innovative solutions that we should be developing right now."},
+    {q:"How can tourism become more environmentally friendly?",a:"Several approaches would help. Airlines need to transition to sustainable fuels, hotels should implement strict energy and water conservation practices, and tourists themselves should be educated about minimising their environmental footprint. Supporting local businesses rather than international chains also keeps economic benefits within the community while reducing the supply chain's carbon impact."}
+  ]}
+];
+
+const SPEAKING_VOCABULARY = [
+  {category:"Expressing Opinions",words:["In my view / From my perspective","I firmly believe that...","I'm inclined to think that...","As far as I'm concerned...","I'd argue that...","To my mind...","I'm of the opinion that...","It seems to me that..."]},
+  {category:"Agreeing & Disagreeing",words:["I couldn't agree more","That's precisely my point","I see where you're coming from, but...","I'm not entirely convinced that...","With all due respect, I disagree","That's a fair point, however...","I take your point, but on the other hand..."]},
+  {category:"Giving Examples",words:["A case in point is...","For instance / For example","To illustrate this point...","Take X, for example","This is evident in...","A prime example of this is...","One notable illustration is..."]},
+  {category:"Comparing & Contrasting",words:["In contrast to / Unlike...","Similarly / Likewise / By the same token","On the other hand / Conversely","Whereas / While","Having said that...","Compared to / In comparison with","The main difference lies in..."]},
+  {category:"Cause & Effect",words:["This has led to / resulted in...","As a consequence / As a result","The primary reason for this is...","This stems from / is rooted in...","One contributing factor is...","This has had a profound impact on...","Due to / Owing to / On account of..."]},
+  {category:"Hedging & Softening",words:["It's generally considered that...","There's a tendency to...","This isn't necessarily the case","It depends on the circumstances","To some extent / To a certain degree","This is somewhat debatable","It's worth noting that..."]},
+  {category:"Time & Frequency",words:["On a regular/daily basis","From time to time / Every now and then","Throughout my childhood/career","Over the past few years","In recent times / Nowadays","Back in the day / In the old days","For the foreseeable future"]},
+  {category:"Describing Trends",words:["There's been a noticeable shift towards...","X has become increasingly popular","There's a growing tendency to...","X is on the rise / on the decline","X has undergone significant changes","The trend seems to be moving towards...","This phenomenon is becoming more widespread"]}
+];
+
+const SPEAKING_TIPS = [
+  {title:"Extend your answers naturally",desc:"Never give one-word answers. Aim for 3-4 sentences in Part 1. Use the formula: Direct answer → Reason → Example or Detail. This shows the examiner your ability to speak at length."},
+  {title:"Don't memorise scripts",desc:"Examiners are trained to detect memorised answers and will penalise you. Instead, practise talking about topics using your own words and experiences. Natural hesitations are perfectly acceptable."},
+  {title:"Use a range of tenses",desc:"Demonstrate your grammatical range by naturally incorporating past, present, and future tenses. For example: 'I used to... but now I... and in the future I plan to...'"},
+  {title:"Self-correct confidently",desc:"If you make a mistake, correct yourself naturally: 'I went to — sorry, I mean I have been to...' This actually shows the examiner you have good language awareness."},
+  {title:"Don't be afraid of Part 2 preparation time",desc:"Use the full 1 minute to make notes. Jot down key points for each bullet on the card. Don't write full sentences — just trigger words that will remind you what to say."},
+  {title:"Part 3 is a discussion, not an interrogation",desc:"Treat Part 3 like a conversation. Give developed answers with examples. It's fine to say 'That's an interesting question, let me think about that...' before responding."},
+  {title:"Pronunciation matters more than accent",desc:"You won't be penalised for having any accent. Focus on clear pronunciation, proper word stress, and natural intonation patterns. Practise problematic sounds specific to your first language."},
+  {title:"Ask for clarification if needed",desc:"It's perfectly acceptable to say 'Could you rephrase that?' or 'Do you mean...?' This is better than guessing and answering a different question entirely."}
+];
+
+const SPEAKING_MISTAKES = [
+  {mistake:"Giving very short answers",fix:"Part 1: 3-4 sentences. Part 2: fill the full 2 minutes. Part 3: develop your answers with reasons and examples."},
+  {mistake:"Speaking too fast or too slowly",fix:"Aim for a natural, conversational pace. If you speak too fast, you'll make more errors. Too slow suggests limited fluency."},
+  {mistake:"Overusing 'I think'",fix:"Vary your opinion phrases: 'In my view,' 'I'd say,' 'From my experience,' 'As far as I'm concerned,' 'Personally speaking.'"},
+  {mistake:"Not answering the question directly",fix:"Start with a direct response, then expand. Don't go off on tangents before addressing what was actually asked."},
+  {mistake:"Using informal language exclusively",fix:"Show range by mixing formal and informal register: 'That totally depends' → 'That largely depends on the circumstances.'"},
+  {mistake:"Panicking when you don't know a word",fix:"Paraphrase! Describe the concept: 'I can't think of the exact word, but it's like a...' This demonstrates communicative competence."},
+  {mistake:"Repeating the question in your answer",fix:"Paraphrase instead: Q: 'Do you like reading?' → 'Yes, I'm quite an avid reader' NOT 'Yes, I like reading.'"},
+  {mistake:"Not using linking words",fix:"Connect ideas with: 'However,' 'Moreover,' 'In addition,' 'On the other hand,' 'Having said that.' This improves coherence scores."}
+];
+
+const SPEAKING_VIDEOS = [
+  {title:"IELTS Speaking Part 1 — Practice with IDP",url:"https://www.youtube.com/embed/VIDEO_PLACEHOLDER_1",desc:"Official IDP practice video showing Part 1 interview format and strategies."},
+  {title:"IELTS Speaking Part 2 — Long Turn Practice",url:"https://www.youtube.com/embed/VIDEO_PLACEHOLDER_2",desc:"See how to prepare and deliver a 2-minute talk on a cue card topic."},
+  {title:"IELTS Speaking Part 3 — Discussion Practice",url:"https://www.youtube.com/embed/VIDEO_PLACEHOLDER_3",desc:"Practice the two-way discussion format with abstract questions."},
+  {title:"Band 9 IELTS Speaking — Full Test Example",url:"https://www.youtube.com/embed/V7oM7wG5Czg",desc:"Watch a complete IELTS Speaking test scored at Band 9 with examiner commentary."},
+  {title:"Band 6 vs Band 8 — What's the Difference?",url:"https://www.youtube.com/embed/0zuMPRGnmkY",desc:"See the key differences between a Band 6 and Band 8 speaking performance."},
+  {title:"Common Speaking Mistakes to Avoid",url:"https://www.youtube.com/embed/cRD6Fv3aAJY",desc:"Learn the most frequent mistakes that cost candidates marks in the speaking test."}
+];
+
+const SpeakingPage = ({isPro, onUpgrade}) => {
+  const [tab, setTab] = useState("examples");
+  const [expandedP1, setExpandedP1] = useState(null);
+  const [expandedP2, setExpandedP2] = useState(null);
+  const [expandedP3, setExpandedP3] = useState(null);
+  const [showAnswer, setShowAnswer] = useState({});
+
+  const tabs = [
+    {id:"examples",label:"📝 Examples & Answers",free:true},
+    {id:"vocabulary",label:"📚 Vocabulary",free:false},
+    {id:"tips",label:"💡 Tips & Strategies",free:true},
+    {id:"mistakes",label:"⚠️ Common Mistakes",free:true},
+    {id:"videos",label:"🎬 Video Examples",free:true}
+  ];
+  const toggleAnswer = (key) => setShowAnswer(prev=>({...prev,[key]:!prev[key]}));
+  const sty = {fontFamily:"'Source Sans Pro','Inter',system-ui"};
+  const card = {background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",marginBottom:16,boxShadow:T.shadow};
+  const locked = (free) => !free && !isPro;
+
+  return (
+    <div style={{maxWidth:900,margin:"0 auto",padding:"24px 16px 60px"}}>
+      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px"}}>🗣️ IELTS Speaking</h1>
+      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}>Prepare for all three parts of the IELTS Speaking test with model answers, vocabulary, tips, and video examples.</p>
+
+      {/* Tab bar */}
+      <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:24,paddingBottom:4}} className="tab-row">
+        {tabs.map(t=>(
+          <button key={t.id} onClick={()=>{if(locked(t.free)){onUpgrade();}else{setTab(t.id);}}}
+            style={{background:tab===t.id?T.primaryLight:"white",border:`1px solid ${tab===t.id?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 16px",fontSize:13,fontWeight:tab===t.id?700:500,color:tab===t.id?T.primary:T.textMid,cursor:"pointer",...sty,whiteSpace:"nowrap",flexShrink:0}}>
+            {locked(t.free)?"🔒 ":""}{t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* EXAMPLES TAB */}
+      {tab==="examples"&&(
+        <div>
+          {/* Part 1 */}
+          <div style={card}>
+            <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 4px"}}>Part 1 — Introduction & Interview</h2>
+            <p style={{...sty,fontSize:13,color:T.textMuted,margin:"0 0 16px"}}>4-5 minutes · Personal questions on familiar topics · Answer in 3-4 sentences</p>
+            {SPEAKING_PART1.map((topic,i)=>(
+              <div key={i} style={{marginBottom:12}}>
+                <button onClick={()=>setExpandedP1(expandedP1===i?null:i)} style={{width:"100%",textAlign:"left",background:expandedP1===i?T.primaryLight:T.bgGray,border:`1px solid ${expandedP1===i?T.primaryBorder:T.border}`,borderRadius:8,padding:"12px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",...sty,fontSize:14,fontWeight:600,color:expandedP1===i?T.primary:T.text}}>
+                  {topic.topic} <span style={{fontSize:12}}>{expandedP1===i?"▼":"▶"}</span>
+                </button>
+                {expandedP1===i&&(
+                  <div style={{padding:"12px 16px",borderLeft:`3px solid ${T.primaryBorder}`}}>
+                    {topic.questions.map((qa,j)=>(
+                      <div key={j} style={{marginBottom:14}}>
+                        <div style={{...sty,fontSize:14,fontWeight:700,color:T.text,marginBottom:6}}>Q: {qa.q}</div>
+                        <button onClick={()=>toggleAnswer(`p1-${i}-${j}`)} style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:6,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.green,cursor:"pointer",...sty,marginBottom:6}}>
+                          {showAnswer[`p1-${i}-${j}`]?"Hide Model Answer":"Show Model Answer"}
+                        </button>
+                        {showAnswer[`p1-${i}-${j}`]&&(
+                          <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 14px",...sty,fontSize:13,color:T.textMid,lineHeight:1.7}}>{qa.a}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Part 2 */}
+          <div style={card}>
+            <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 4px"}}>Part 2 — Long Turn (Cue Card)</h2>
+            <p style={{...sty,fontSize:13,color:T.textMuted,margin:"0 0 16px"}}>3-4 minutes · 1 minute preparation + 2 minutes speaking · Talk about a specific topic</p>
+            {SPEAKING_PART2.slice(0, isPro?SPEAKING_PART2.length:3).map((item,i)=>(
+              <div key={i} style={{marginBottom:12}}>
+                <button onClick={()=>setExpandedP2(expandedP2===i?null:i)} style={{width:"100%",textAlign:"left",background:expandedP2===i?T.amberBg:T.bgGray,border:`1px solid ${expandedP2===i?T.amberBorder:T.border}`,borderRadius:8,padding:"12px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",...sty,fontSize:14,fontWeight:600,color:expandedP2===i?T.amber:T.text}}>
+                  {item.topic} <span style={{fontSize:12}}>{expandedP2===i?"▼":"▶"}</span>
+                </button>
+                {expandedP2===i&&(
+                  <div style={{padding:"14px 16px",borderLeft:`3px solid ${T.amberBorder}`}}>
+                    <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"14px",...sty,fontSize:13,color:T.textMid,lineHeight:1.7,whiteSpace:"pre-line",marginBottom:12}}>
+                      <strong style={{color:T.amber}}>📋 Cue Card:</strong><br/>{item.cue}
+                    </div>
+                    <button onClick={()=>toggleAnswer(`p2-${i}`)} style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:6,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.green,cursor:"pointer",...sty,marginBottom:6}}>
+                      {showAnswer[`p2-${i}`]?"Hide Model Answer":"Show Band 8+ Model Answer"}
+                    </button>
+                    {showAnswer[`p2-${i}`]&&(
+                      <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"14px",...sty,fontSize:13,color:T.textMid,lineHeight:1.7,whiteSpace:"pre-line"}}>{item.model}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+            {!isPro&&<div style={{textAlign:"center",padding:"12px",...sty,fontSize:13,color:T.amber,fontWeight:600}}>🔒 {SPEAKING_PART2.length-3} more cue cards available with Pro · <button onClick={onUpgrade} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",...sty,fontSize:13,textDecoration:"underline"}}>Upgrade</button></div>}
+          </div>
+
+          {/* Part 3 */}
+          <div style={card}>
+            <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 4px"}}>Part 3 — Two-Way Discussion</h2>
+            <p style={{...sty,fontSize:13,color:T.textMuted,margin:"0 0 16px"}}>4-5 minutes · Abstract questions related to Part 2 topic · Give developed, analytical answers</p>
+            {SPEAKING_PART3.slice(0, isPro?SPEAKING_PART3.length:2).map((set,i)=>(
+              <div key={i} style={{marginBottom:12}}>
+                <button onClick={()=>setExpandedP3(expandedP3===i?null:i)} style={{width:"100%",textAlign:"left",background:expandedP3===i?T.blueBg:T.bgGray,border:`1px solid ${expandedP3===i?T.blueBorder:T.border}`,borderRadius:8,padding:"12px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",...sty,fontSize:14,fontWeight:600,color:expandedP3===i?T.blue:T.text}}>
+                  {set.topic} <span style={{fontSize:12}}>{expandedP3===i?"▼":"▶"}</span>
+                </button>
+                {expandedP3===i&&(
+                  <div style={{padding:"12px 16px",borderLeft:`3px solid ${T.blueBorder}`}}>
+                    {set.questions.map((qa,j)=>(
+                      <div key={j} style={{marginBottom:14}}>
+                        <div style={{...sty,fontSize:14,fontWeight:700,color:T.text,marginBottom:6}}>Q: {qa.q}</div>
+                        <button onClick={()=>toggleAnswer(`p3-${i}-${j}`)} style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:6,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.green,cursor:"pointer",...sty,marginBottom:6}}>
+                          {showAnswer[`p3-${i}-${j}`]?"Hide":"Show Model Answer"}
+                        </button>
+                        {showAnswer[`p3-${i}-${j}`]&&(
+                          <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 14px",...sty,fontSize:13,color:T.textMid,lineHeight:1.7}}>{qa.a}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            {!isPro&&<div style={{textAlign:"center",padding:"12px",...sty,fontSize:13,color:T.amber,fontWeight:600}}>🔒 {SPEAKING_PART3.length-2} more discussion sets available with Pro · <button onClick={onUpgrade} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",...sty,fontSize:13,textDecoration:"underline"}}>Upgrade</button></div>}
+          </div>
+        </div>
+      )}
+
+      {/* VOCABULARY TAB */}
+      {tab==="vocabulary"&&isPro&&(
+        <div>
+          {SPEAKING_VOCABULARY.map((cat,i)=>(
+            <div key={i} style={card}>
+              <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.primary,margin:"0 0 12px"}}>{cat.category}</h3>
+              <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                {cat.words.map((w,j)=>(
+                  <span key={j} style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:6,padding:"6px 12px",...sty,fontSize:13,color:T.primary,fontWeight:500}}>{w}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* TIPS TAB */}
+      {tab==="tips"&&(
+        <div>
+          {SPEAKING_TIPS.map((tip,i)=>(
+            <div key={i} style={card}>
+              <h3 style={{fontFamily:"Georgia,serif",fontSize:16,color:T.text,margin:"0 0 6px"}}>{i+1}. {tip.title}</h3>
+              <p style={{...sty,fontSize:14,color:T.textMid,margin:0,lineHeight:1.6}}>{tip.desc}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* MISTAKES TAB */}
+      {tab==="mistakes"&&(
+        <div>
+          {SPEAKING_MISTAKES.map((m,i)=>(
+            <div key={i} style={{...card,display:"flex",gap:16,alignItems:"flex-start"}}>
+              <div style={{flexShrink:0,width:32,height:32,background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:900,color:T.red}}>{i+1}</div>
+              <div>
+                <div style={{...sty,fontSize:14,fontWeight:700,color:T.red,marginBottom:4}}>❌ {m.mistake}</div>
+                <div style={{...sty,fontSize:14,color:T.green,fontWeight:600}}>✅ {m.fix}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* VIDEOS TAB */}
+      {tab==="videos"&&(
+        <div>
+          <div style={{...card,background:T.amberBg,border:`1px solid ${T.amberBorder}`}}>
+            <p style={{...sty,fontSize:13,color:T.amber,margin:0}}>💡 Watch these videos to understand the speaking test format, see real examples, and learn from examiner feedback. Try answering the questions yourself before watching the model answers.</p>
+          </div>
+          {SPEAKING_VIDEOS.map((v,i)=>(
+            <div key={i} style={card}>
+              <h3 style={{fontFamily:"Georgia,serif",fontSize:16,color:T.text,margin:"0 0 6px"}}>{v.title}</h3>
+              <p style={{...sty,fontSize:13,color:T.textMuted,margin:"0 0 12px"}}>{v.desc}</p>
+              {v.url.includes("PLACEHOLDER")?(
+                <div style={{background:T.bgGray,borderRadius:8,padding:"40px 20px",textAlign:"center",...sty,fontSize:13,color:T.textMuted}}>🎬 Video coming soon — search "{v.title}" on YouTube for similar content</div>
+              ):(
+                <div style={{position:"relative",paddingBottom:"56.25%",height:0,borderRadius:8,overflow:"hidden"}}>
+                  <iframe src={v.url} title={v.title} style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}} allowFullScreen/>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── IELTS Reading Page ──────────────────────
+const READING_STRATEGIES = [
+  {type:"True / False / Not Given",strategy:"Read the statement carefully. Find the relevant section in the passage. TRUE = the passage confirms the statement. FALSE = the passage contradicts the statement. NOT GIVEN = the passage doesn't mention this information at all. Don't use your own knowledge — only what's in the text.",tip:"'Not Given' means the information simply isn't there. If you can't find it after 2 minutes, it's probably Not Given."},
+  {type:"Yes / No / Not Given",strategy:"Similar to T/F/NG but about the WRITER'S OPINIONS, not facts. YES = the writer agrees with the statement. NO = the writer disagrees. NOT GIVEN = the writer doesn't express an opinion on this. Look for opinion language: 'I believe', 'It is clear that', 'arguably', etc.",tip:"Pay close attention to who holds the opinion. The writer's view may differ from experts quoted in the passage."},
+  {type:"Multiple Choice",strategy:"Read the question and all options before searching the text. Eliminate obviously wrong answers first. The correct answer is usually a paraphrase of the text, not an exact quote. Be careful of options that are true but don't answer the specific question asked.",tip:"Questions follow the order of the text. If Q3 answer is in paragraph 4, Q4 will be in paragraph 4 or later."},
+  {type:"Matching Headings",strategy:"Read each paragraph and identify its MAIN IDEA (not just a detail). The heading should summarise the whole paragraph, not just one sentence. Cross out headings as you use them. Start with the easiest paragraphs first.",tip:"Beware of headings that match a detail in the paragraph rather than the main idea. Read the whole paragraph before choosing."},
+  {type:"Sentence Completion",strategy:"Identify keywords in the incomplete sentence. Scan the passage for those keywords or their synonyms. The answer must be grammatically correct when inserted. Follow word count limits exactly (e.g., 'NO MORE THAN TWO WORDS').",tip:"Copy words exactly as they appear in the passage. Don't change the form (e.g., don't change 'increased' to 'increasing')."},
+  {type:"Summary Completion",strategy:"Read the entire summary first to understand the topic. Identify the section of the passage it relates to. Fill in gaps using words from the passage or from a given list. Check grammar and word count limits.",tip:"If given a word list, eliminate options as you use them. If taking words from the passage, they must be exact."},
+  {type:"Matching Information",strategy:"Read all the statements first and underline keywords. Scan each paragraph for the information described. A paragraph can be used more than once (unless stated otherwise). Focus on finding specific details, examples, or explanations.",tip:"This is a scanning exercise. Don't read every word — look for specific information that matches the statements."},
+  {type:"Diagram / Flowchart / Table Completion",strategy:"Study the diagram/flowchart/table carefully first. Identify what type of information is missing (noun, verb, number). Find the relevant section of the passage. Answers usually come in order from the passage.",tip:"Look at what's already filled in to understand the pattern and what type of word is needed."}
+];
+
+const READING_TIME_TIPS = [
+  "Use the 15-20-25 rule: spend 15 minutes on Passage 1, 20 on Passage 2, and 25 on Passage 3 (it's the hardest).",
+  "Skim each passage for 2-3 minutes before looking at questions. Get the main idea of each paragraph.",
+  "Read questions FIRST for detail-oriented types (T/F/NG, sentence completion) so you know what to look for.",
+  "Read headings AFTER reading paragraphs for matching headings questions.",
+  "Never leave a blank — there's no penalty for wrong answers. Always guess if unsure.",
+  "If stuck on a question for more than 90 seconds, mark it and move on. Come back to it later.",
+  "Don't read every word. Skim for main ideas and scan for specific keywords.",
+  "Underline keywords in questions before searching the passage.",
+  "Answers for most question types follow the order of the passage.",
+  "Practice with a timer regularly. Time pressure is the #1 challenge in IELTS Reading."
+];
+
+const ACADEMIC_TESTS = [
+  {id:1,title:"The Science of Sleep",passages:[
+    {title:"The Architecture of Sleep",text:"Sleep, far from being a passive state of unconsciousness, is an active and highly structured neurological process that scientists are only now beginning to fully understand. Research over the past two decades has revealed that sleep consists of distinct stages, each serving unique biological functions essential for human health and cognitive performance.\n\nThe sleep cycle is divided into two main categories: non-rapid eye movement (NREM) sleep and rapid eye movement (REM) sleep. NREM sleep is further subdivided into three stages. Stage 1 is a transitional period lasting only a few minutes, during which the body begins to relax and brain activity starts to slow. Stage 2 represents a deeper level of sleep characterised by specific brain wave patterns known as sleep spindles and K-complexes. Stage 3, often called deep sleep or slow-wave sleep, is the most restorative phase, during which the body repairs tissues, strengthens the immune system, and consolidates memories.\n\nREM sleep typically occurs approximately 90 minutes after falling asleep and recurs in increasingly longer periods throughout the night. During REM sleep, the brain becomes remarkably active — in some respects more active than during waking hours. The eyes move rapidly beneath closed lids, breathing becomes irregular, and heart rate increases. Most vivid dreaming occurs during this stage. Paradoxically, the body's voluntary muscles become temporarily paralysed, a phenomenon called atonia, which prevents individuals from physically acting out their dreams.\n\nModern sleep research has established that adults typically require between seven and nine hours of sleep per night for optimal functioning. However, studies conducted by the University of California found that approximately one percent of the population carries a genetic mutation that allows them to function normally on just six hours of sleep. These so-called 'short sleepers' do not experience the cognitive impairments that affect most people who are sleep-deprived.\n\nThe consequences of chronic sleep deprivation extend far beyond simple tiredness. Research published in the journal Nature has demonstrated that even moderate sleep restriction — sleeping six hours instead of eight for two weeks — produces cognitive impairments equivalent to staying awake for 48 hours continuously. These impairments affect attention, working memory, and decision-making abilities, yet individuals who are chronically sleep-deprived often fail to recognise the extent of their own impairment.\n\nPerhaps most concerning is the relationship between sleep and long-term health. Epidemiological studies have consistently linked insufficient sleep to increased risk of cardiovascular disease, obesity, diabetes, and weakened immune function. Professor Matthew Walker of the University of California, Berkeley, whose research has been particularly influential in this field, has argued that sleep deprivation is now so widespread in industrialised societies that it constitutes a public health epidemic.",
+    questions:[
+      {type:"tfng",q:"Sleep is essentially a passive state where the body shuts down.",a:"FALSE"},
+      {type:"tfng",q:"NREM sleep consists of four distinct stages.",a:"FALSE"},
+      {type:"tfng",q:"Stage 3 sleep helps repair body tissues.",a:"TRUE"},
+      {type:"tfng",q:"REM sleep first occurs about an hour and a half after sleep onset.",a:"TRUE"},
+      {type:"tfng",q:"The brain is less active during REM sleep than during waking hours.",a:"FALSE"},
+      {type:"tfng",q:"Muscle paralysis during REM sleep is considered a protective mechanism.",a:"TRUE"},
+      {type:"tfng",q:"Most adults need exactly eight hours of sleep.",a:"FALSE"},
+      {type:"mc",q:"What did the University of California study find?",options:["All adults need 7-9 hours of sleep","About 1% of people can thrive on 6 hours due to genetics","Short sleepers experience mild cognitive issues","Sleep requirements decrease with age"],a:"About 1% of people can thrive on 6 hours due to genetics"},
+      {type:"mc",q:"According to the passage, sleeping six hours for two weeks has the same cognitive effect as:",options:["Missing one night of sleep","Staying awake for 24 hours","Staying awake for 48 hours","Sleeping only 4 hours per night"],a:"Staying awake for 48 hours"},
+      {type:"mc",q:"Professor Matthew Walker has described widespread sleep deprivation as:",options:["A minor inconvenience","A genetic adaptation","A public health epidemic","An unavoidable consequence of modern life"],a:"A public health epidemic"},
+      {type:"completion",q:"During REM sleep, the temporary paralysis of muscles is called ___.",a:"atonia"},
+      {type:"completion",q:"Stage 2 NREM sleep features brain patterns known as sleep spindles and ___.",a:"K-complexes"},
+      {type:"completion",q:"Chronic sleep deprivation has been linked to cardiovascular disease, obesity, diabetes, and weakened ___ function.",a:"immune"}
+    ]}
+  ]},
+  {id:2,title:"Urban Green Spaces",passages:[
+    {title:"The Value of Parks in Modern Cities",text:"As global urbanisation accelerates — with the United Nations projecting that 68% of the world's population will live in cities by 2050 — the role of green spaces in urban environments has become a subject of increasing scientific and political interest. Parks, gardens, urban forests, and even small patches of vegetation are now recognised not merely as aesthetic amenities but as critical infrastructure that delivers measurable benefits to public health, environmental quality, and social cohesion.\n\nResearch published in The Lancet demonstrated that residents living within 300 metres of green space showed significantly lower levels of cortisol, the body's primary stress hormone, compared to those without nearby access to nature. A large-scale study conducted across nine European cities found that people who spent at least 120 minutes per week in natural environments reported substantially better health and psychological wellbeing than those who did not, regardless of their socioeconomic status or pre-existing health conditions.\n\nThe environmental benefits of urban green spaces are equally compelling. Trees and vegetation act as natural air filters, absorbing pollutants including nitrogen dioxide, sulphur dioxide, and particulate matter. A single mature tree can absorb approximately 22 kilograms of carbon dioxide per year while releasing enough oxygen for two people. Furthermore, green spaces play a crucial role in managing urban stormwater. Permeable soil and plant root systems absorb rainfall that would otherwise overwhelm drainage systems, reducing flood risk in cities increasingly vulnerable to extreme weather events.\n\nThe concept of the 'urban heat island effect' — whereby cities are significantly warmer than surrounding rural areas due to heat-absorbing concrete and asphalt — can be substantially mitigated through strategic placement of green spaces. Research from the Technical University of Munich found that urban parks can reduce local temperatures by between 1 and 4 degrees Celsius, providing natural cooling that reduces energy consumption and protects vulnerable populations during heatwaves.\n\nSocially, urban parks serve as democratic spaces where people from different backgrounds interact. Unlike commercial venues that require spending money, parks are freely accessible, making them particularly important for lower-income communities. Studies have shown that well-maintained green spaces reduce crime rates in surrounding neighbourhoods, foster community engagement, and provide essential recreational opportunities for children whose homes lack private outdoor areas.\n\nDespite these well-documented benefits, urban green spaces face persistent threats from development pressure. In many rapidly growing cities, parks and gardens are being sacrificed to accommodate housing, commercial buildings, and transportation infrastructure. Singapore has emerged as a notable counterexample, implementing a comprehensive 'City in a Garden' strategy that has increased the city-state's green cover from 36% in the 1980s to nearly 50% today, demonstrating that urban density and abundant green space need not be mutually exclusive.",
+    questions:[
+      {type:"tfng",q:"By 2050, more than two-thirds of the world's population is expected to be urban.",a:"TRUE"},
+      {type:"tfng",q:"The Lancet study measured blood pressure levels near green spaces.",a:"FALSE"},
+      {type:"tfng",q:"Spending at least two hours weekly in nature improved wellbeing regardless of income.",a:"TRUE"},
+      {type:"tfng",q:"A mature tree produces enough oxygen for five people annually.",a:"FALSE"},
+      {type:"tfng",q:"Urban parks have been shown to lower local temperatures.",a:"TRUE"},
+      {type:"tfng",q:"Commercial venues are more socially inclusive than parks.",a:"FALSE"},
+      {type:"mc",q:"According to the passage, urban green spaces are now considered:",options:["Luxury amenities for wealthy neighbourhoods","Critical infrastructure with measurable benefits","Primarily recreational facilities","Obstacles to urban development"],a:"Critical infrastructure with measurable benefits"},
+      {type:"mc",q:"Singapore's green cover has changed from:",options:["50% to 36%","36% to nearly 50%","20% to 36%","50% to 68%"],a:"36% to nearly 50%"},
+      {type:"completion",q:"Trees absorb pollutants including nitrogen dioxide, sulphur dioxide, and ___ matter.",a:"particulate"},
+      {type:"completion",q:"The phenomenon where cities are warmer than rural areas is called the 'urban ___ island effect'.",a:"heat"},
+      {type:"completion",q:"Green spaces absorb rainfall through permeable soil and plant ___ systems.",a:"root"},
+      {type:"mc",q:"Well-maintained green spaces have been linked to:",options:["Higher property taxes","Reduced crime rates","Increased traffic congestion","Lower school attendance"],a:"Reduced crime rates"},
+      {type:"tfng",q:"Singapore's approach proves dense cities cannot have significant green space.",a:"FALSE"}
+    ]}
+  ]},
+  {id:3,title:"The Psychology of Decision Making",passages:[
+    {title:"Why We Choose What We Choose",text:"Every day, the average adult makes approximately 35,000 decisions, ranging from trivial choices about what to eat for breakfast to consequential ones affecting careers, relationships, and financial security. The field of behavioural economics, pioneered by psychologists Daniel Kahneman and Amos Tversky in the 1970s, has fundamentally challenged the classical economic assumption that humans are rational decision-makers who consistently act in their own best interest.\n\nKahneman's research, which earned him the Nobel Prize in Economics in 2002, identified two distinct systems of thinking that govern human decision-making. System 1 operates automatically and quickly, with little effort or sense of voluntary control. It is responsible for snap judgements, first impressions, and intuitive responses. System 2, by contrast, allocates attention to effortful mental activities, including complex calculations, logical reasoning, and careful analysis. While System 2 is more reliable, it is also considerably slower and requires significant cognitive resources, meaning people frequently default to System 1 even when complex decisions warrant more careful deliberation.\n\nOne of the most influential concepts to emerge from this research is 'loss aversion' — the finding that people experience the pain of losing something approximately twice as intensely as the pleasure of gaining something of equivalent value. This asymmetry explains a wide range of seemingly irrational behaviours. Investors hold onto losing stocks far too long, hoping to avoid realising a loss. Consumers are more motivated by the fear of missing a limited-time offer than by the prospect of a future discount of identical value.\n\nThe 'anchoring effect' represents another systematic bias in human judgement. When making estimates or decisions under uncertainty, people tend to rely heavily on the first piece of information they encounter — the 'anchor' — even when that information is arbitrary or irrelevant. In one famous experiment, participants who first saw a high random number subsequently estimated the percentage of African countries in the United Nations to be significantly higher than those who first saw a low random number. This effect has profound implications for salary negotiations, real estate pricing, and courtroom sentencing.\n\n'Choice overload,' a concept popularised by psychologist Barry Schwartz, describes the paradox that having more options often leads to worse decisions and less satisfaction. A landmark study by researchers Sheena Iyengar and Mark Lepper found that customers in a supermarket who were offered 24 varieties of jam were far less likely to make a purchase than those offered only 6 varieties. The abundance of options created decision paralysis, increased anxiety about making the wrong choice, and diminished post-decision satisfaction.\n\nUnderstanding these cognitive biases has practical applications far beyond academic interest. Governments worldwide have established behavioural insights teams — sometimes called 'nudge units' — that design policies leveraging these insights to encourage beneficial behaviours. By changing default options on pension enrolment forms, for instance, the UK government dramatically increased retirement savings rates without restricting individual choice. Such interventions demonstrate that small changes in how choices are presented can produce large shifts in human behaviour.",
+    questions:[
+      {type:"tfng",q:"Adults make roughly 35,000 decisions daily.",a:"TRUE"},
+      {type:"tfng",q:"Kahneman won the Nobel Prize in Psychology.",a:"FALSE"},
+      {type:"tfng",q:"System 1 thinking is slow and deliberate.",a:"FALSE"},
+      {type:"tfng",q:"People feel losses about twice as strongly as equivalent gains.",a:"TRUE"},
+      {type:"tfng",q:"The anchoring effect only works with relevant information.",a:"FALSE"},
+      {type:"mc",q:"The jam study demonstrated that:",options:["Customers prefer more variety","Too many options can reduce purchasing","6 types of jam is insufficient","Supermarkets should stock fewer products"],a:"Too many options can reduce purchasing"},
+      {type:"mc",q:"'Nudge units' in governments use behavioural insights to:",options:["Force citizens to make specific choices","Restrict consumer options","Encourage beneficial behaviours through choice design","Increase taxation on unhealthy products"],a:"Encourage beneficial behaviours through choice design"},
+      {type:"mc",q:"The UK government increased pension savings by:",options:["Making saving mandatory","Offering financial incentives","Changing default enrolment options","Raising the retirement age"],a:"Changing default enrolment options"},
+      {type:"completion",q:"System 2 thinking requires significant ___ resources.",a:"cognitive"},
+      {type:"completion",q:"The tendency to rely on the first information encountered is called the '___ effect'.",a:"anchoring"},
+      {type:"completion",q:"Choice overload was popularised by psychologist Barry ___.",a:"Schwartz"},
+      {type:"completion",q:"Loss aversion explains why investors hold onto ___ stocks too long.",a:"losing"},
+      {type:"tfng",q:"The jam study was conducted by Kahneman and Tversky.",a:"FALSE"}
+    ]}
+  ]}
+];
+
+const GT_TESTS = [
+  {id:1,title:"Workplace Safety Notice",text:"ALL STAFF — IMPORTANT SAFETY UPDATE\n\nFollowing last month's fire drill assessment, several areas requiring improvement have been identified. All employees must read and acknowledge this notice by Friday 15 March.\n\nFire Exits: The emergency exit on the second floor near the marketing department has been found to be partially blocked by storage boxes. This has been cleared, but staff are reminded that fire exits must remain unobstructed at all times. Any employee who notices items blocking fire exits should report this to the facilities team immediately via the intranet portal.\n\nEvacuation Procedure: During the drill, it took 7 minutes and 42 seconds for all staff to reach the designated assembly point in the main car park. The target time is 5 minutes. Department heads are responsible for ensuring their teams know the nearest exit route and assembly point location. A new evacuation plan has been posted in every office.\n\nFirst Aid: We currently have 8 certified first aiders across our 4 floors. Health and Safety regulations require a minimum of 1 first aider per 50 employees. With our current headcount of 340 staff, we need at least 7 first aiders, meaning we are compliant. However, 2 first aiders are due to retire in June, so we are seeking 4 new volunteers to undergo training. The company will cover all training costs. Interested staff should contact HR by 1 April.\n\nFire Wardens: Each floor requires 2 trained fire wardens. Floors 1 and 3 currently have 2 wardens each, but Floor 2 has only 1 and Floor 4 has none. Volunteers are urgently needed for Floors 2 and 4. Fire warden training takes one half-day and will be held on 20 March.\n\nEquipment Checks: All fire extinguishers were inspected last week and are within their service date. Smoke detectors on the third floor were found to have low batteries and have been replaced. Staff should test the smoke detector in their immediate workspace monthly by pressing the test button.",
+  questions:[
+    {type:"tfng",q:"The fire drill met the target evacuation time.",a:"FALSE"},
+    {type:"tfng",q:"The second floor fire exit was blocked by furniture.",a:"FALSE"},
+    {type:"tfng",q:"The company currently meets first aider requirements.",a:"TRUE"},
+    {type:"tfng",q:"Fire warden training lasts a full day.",a:"FALSE"},
+    {type:"tfng",q:"Smoke detectors on the third floor needed new batteries.",a:"TRUE"},
+    {type:"mc",q:"How many additional first aid volunteers does the company want?",options:["2","4","7","8"],a:"4"},
+    {type:"mc",q:"Which floors need fire warden volunteers?",options:["Floors 1 and 3","Floors 2 and 4","All floors","Floors 1 and 2"],a:"Floors 2 and 4"},
+    {type:"completion",q:"Staff should report blocked fire exits via the ___ portal.",a:"intranet"},
+    {type:"completion",q:"The assembly point is in the main ___ ___.",a:"car park"},
+    {type:"mc",q:"The deadline to volunteer for first aid training is:",options:["15 March","20 March","1 April","June"],a:"1 April"}
+  ]},
+  {id:2,title:"Tenant Information Guide",text:"GREENFIELD APARTMENTS — TENANT HANDBOOK (Extract)\n\nRent Payment: Rent is due on the 1st of each month and must be paid by bank transfer to the account details provided in your tenancy agreement. A late payment fee of £25 applies to any payment received after the 5th of the month. If you anticipate difficulty making a payment, contact the property management office before the due date to discuss options.\n\nMaintenance Requests: For non-urgent repairs (dripping taps, minor appliance faults, loose door handles), submit a request through the online resident portal. Requests are typically addressed within 5 working days. For urgent issues (burst pipes, gas leaks, electrical faults, heating failure in winter), call the 24-hour emergency line: 0800 555 7890. Do not attempt to carry out plumbing, electrical, or structural repairs yourself, as this may void your tenancy agreement.\n\nCommunal Areas: All residents share responsibility for keeping corridors, stairwells, and the laundry room clean and tidy. Bicycles must be stored in the designated ground-floor bike shed — not in corridors or stairwells. The communal garden on the roof terrace is open daily from 7am to 10pm. Barbecues and open flames are prohibited on the roof terrace due to fire regulations.\n\nNoise Policy: Normal household noise is expected during daytime hours (8am–10pm). Between 10pm and 8am, residents must keep noise to a minimum. Persistent noise complaints may result in a formal warning and, if unresolved, may constitute grounds for tenancy termination. If you wish to host a gathering, please inform your immediate neighbours in advance as a courtesy.\n\nPets: Small pets (cats, small dogs under 10kg, fish, caged birds) are permitted with prior written approval from the property management office. A refundable pet deposit of £200 is required. Pets must be kept on leads in all communal areas. Owners are responsible for cleaning up after their pets immediately. Exotic animals, reptiles, and any animal exceeding 10kg are not permitted.\n\nEnd of Tenancy: Tenants must provide a minimum of 2 months' written notice before vacating. The property must be returned in the same condition as at the start of the tenancy, allowing for reasonable wear and tear. A professional end-of-tenancy clean is recommended. Any damage beyond normal wear and tear will be deducted from the security deposit.",
+  questions:[
+    {type:"tfng",q:"Rent must be paid in cash at the management office.",a:"FALSE"},
+    {type:"tfng",q:"Late payments are charged after the 5th of each month.",a:"TRUE"},
+    {type:"tfng",q:"Residents can fix their own plumbing problems.",a:"FALSE"},
+    {type:"tfng",q:"The roof garden closes at midnight.",a:"FALSE"},
+    {type:"tfng",q:"Dogs weighing 15kg are allowed with approval.",a:"FALSE"},
+    {type:"mc",q:"Non-urgent repairs are usually completed within:",options:["24 hours","3 working days","5 working days","10 working days"],a:"5 working days"},
+    {type:"mc",q:"Where should bicycles be kept?",options:["In the corridor","On the roof terrace","In the ground-floor bike shed","In the tenant's apartment"],a:"In the ground-floor bike shed"},
+    {type:"completion",q:"The pet deposit amount is £___.",a:"200"},
+    {type:"completion",q:"Tenants must give at least ___ months' notice before leaving.",a:"2"},
+    {type:"mc",q:"Quiet hours are between:",options:["8am and 10pm","10pm and 6am","10pm and 8am","11pm and 7am"],a:"10pm and 8am"}
+  ]}
+];
+
+const ReadingPage = ({isPro, onUpgrade}) => {
+  const [tab, setTab] = useState("academic");
+  const [activeTest, setActiveTest] = useState(null);
+  const [showAnswers, setShowAnswers] = useState(false);
+  const [userAnswers, setUserAnswers] = useState({});
+
+  const tabs = [
+    {id:"academic",label:"📖 Academic Tests",free:true},
+    {id:"gt",label:"📄 General Training",free:true},
+    {id:"strategies",label:"🎯 Question Strategies",free:true},
+    {id:"timetips",label:"⏱️ Time Management",free:true}
+  ];
+  const sty = {fontFamily:"'Source Sans Pro','Inter',system-ui"};
+  const card = {background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",marginBottom:16,boxShadow:T.shadow};
+
+  const isTestLocked = (type, idx) => {
+    if(isPro) return false;
+    if(type==="academic") return idx > 0;
+    if(type==="gt") return idx > 0;
+    return false;
+  };
+
+  const renderQuestions = (questions, testKey) => (
+    <div style={{marginTop:20}}>
+      <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px"}}>Questions ({questions.length})</h3>
+      {questions.map((q,i)=>{
+        const key = `${testKey}-${i}`;
+        return (
+          <div key={i} style={{marginBottom:14,padding:"12px 14px",background:T.bgGray,borderRadius:8,border:`1px solid ${T.border}`}}>
+            <div style={{...sty,fontSize:13,fontWeight:700,color:T.primary,marginBottom:2,textTransform:"uppercase",letterSpacing:"0.05em"}}>{q.type==="tfng"?"True / False / Not Given":q.type==="mc"?"Multiple Choice":"Sentence Completion"}</div>
+            <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600}}>{i+1}. {q.q}</div>
+            {q.type==="tfng"&&(
+              <div style={{display:"flex",gap:6}}>
+                {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
+                  <button key={opt} onClick={()=>setUserAnswers(prev=>({...prev,[key]:opt}))}
+                    style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:"pointer",
+                      background:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
+                      border:`1px solid ${userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
+                      color:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+            {q.type==="mc"&&(
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {q.options.map((opt,oi)=>(
+                  <button key={oi} onClick={()=>setUserAnswers(prev=>({...prev,[key]:opt}))}
+                    style={{textAlign:"left",padding:"8px 12px",borderRadius:6,fontSize:13,...sty,cursor:"pointer",
+                      background:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
+                      border:`1px solid ${userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
+                      color:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
+                    {String.fromCharCode(65+oi)}. {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+            {q.type==="completion"&&(
+              <input value={userAnswers[key]||""} onChange={e=>setUserAnswers(prev=>({...prev,[key]:e.target.value}))}
+                placeholder="Type your answer..." style={{...sty,fontSize:14,padding:"8px 12px",border:`1px solid ${showAnswers?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBorder:T.redBorder):T.border}`,borderRadius:6,width:"100%",maxWidth:300,background:showAnswers?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBg:T.redBg):"white",boxSizing:"border-box"}}/>
+            )}
+            {showAnswers&&(
+              <div style={{marginTop:6,...sty,fontSize:12,fontWeight:700,color:T.green}}>✅ Correct answer: {q.a}</div>
+            )}
+          </div>
+        );
+      })}
+      <div style={{display:"flex",gap:10,marginTop:16}}>
+        <button onClick={()=>setShowAnswers(!showAnswers)}
+          style={{background:showAnswers?T.redBg:T.greenBg,border:`1px solid ${showAnswers?T.redBorder:T.greenBorder}`,borderRadius:8,padding:"10px 20px",fontSize:13,fontWeight:700,color:showAnswers?T.red:T.green,cursor:"pointer",...sty}}>
+          {showAnswers?"Hide Answers":"Check Answers"}
+        </button>
+        <button onClick={()=>{setUserAnswers({});setShowAnswers(false);}}
+          style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 20px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{maxWidth:900,margin:"0 auto",padding:"24px 16px 60px"}}>
+      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px"}}>📖 IELTS Reading</h1>
+      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}>Practice with full reading tests, learn strategies for every question type, and master time management.</p>
+
+      <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:24,paddingBottom:4}} className="tab-row">
+        {tabs.map(t=>(
+          <button key={t.id} onClick={()=>{setTab(t.id);setActiveTest(null);setShowAnswers(false);setUserAnswers({});}}
+            style={{background:tab===t.id?T.primaryLight:"white",border:`1px solid ${tab===t.id?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 16px",fontSize:13,fontWeight:tab===t.id?700:500,color:tab===t.id?T.primary:T.textMid,cursor:"pointer",...sty,whiteSpace:"nowrap",flexShrink:0}}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Academic Tests */}
+      {tab==="academic"&&!activeTest&&(
+        <div>
+          <div style={{...card,background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
+            <p style={{...sty,fontSize:13,color:T.blue,margin:0}}>📝 Academic Reading: 3 passages of increasing difficulty · 40 questions · 60 minutes · Topics from books, journals, and magazines on academic subjects.</p>
+          </div>
+          {ACADEMIC_TESTS.map((test,i)=>(
+            <div key={i} style={card}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 4px"}}>Test {test.id}: {test.title}</h3>
+                  <p style={{...sty,fontSize:13,color:T.textMuted,margin:0}}>{test.passages[0].questions.length} questions · {test.passages[0].title}</p>
+                </div>
+                {isTestLocked("academic",i)?(
+                  <button onClick={onUpgrade} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:T.amber,cursor:"pointer",...sty}}>🔒 Pro Only</button>
+                ):(
+                  <button onClick={()=>{setActiveTest({type:"academic",idx:i});setShowAnswers(false);setUserAnswers({});}} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Start Test →</button>
+                )}
+              </div>
+            </div>
+          ))}
+          {!isPro&&<p style={{...sty,fontSize:13,color:T.amber,textAlign:"center",fontWeight:600}}>🔒 Test 1 is free. Unlock all tests with Pro.</p>}
+        </div>
+      )}
+
+      {/* GT Tests */}
+      {tab==="gt"&&!activeTest&&(
+        <div>
+          <div style={{...card,background:T.greenBg,border:`1px solid ${T.greenBorder}`}}>
+            <p style={{...sty,fontSize:13,color:T.green,margin:0}}>📄 General Training Reading: Texts from everyday English — notices, advertisements, handbooks, manuals · Same question types as Academic but different text styles.</p>
+          </div>
+          {GT_TESTS.map((test,i)=>(
+            <div key={i} style={card}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 4px"}}>Test {test.id}: {test.title}</h3>
+                  <p style={{...sty,fontSize:13,color:T.textMuted,margin:0}}>{test.questions.length} questions</p>
+                </div>
+                {isTestLocked("gt",i)?(
+                  <button onClick={onUpgrade} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:T.amber,cursor:"pointer",...sty}}>🔒 Pro Only</button>
+                ):(
+                  <button onClick={()=>{setActiveTest({type:"gt",idx:i});setShowAnswers(false);setUserAnswers({});}} style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Start Test →</button>
+                )}
+              </div>
+            </div>
+          ))}
+          {!isPro&&<p style={{...sty,fontSize:13,color:T.amber,textAlign:"center",fontWeight:600}}>🔒 Test 1 is free. Unlock all tests with Pro.</p>}
+        </div>
+      )}
+
+      {/* Active Test View */}
+      {activeTest&&(
+        <div>
+          <button onClick={()=>{setActiveTest(null);setShowAnswers(false);setUserAnswers({});}} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",...sty,padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to tests</button>
+          {activeTest.type==="academic"&&(
+            <div style={card}>
+              <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>{ACADEMIC_TESTS[activeTest.idx].passages[0].title}</h2>
+              <div style={{background:T.bgGray,borderRadius:8,padding:"20px",marginBottom:16,lineHeight:1.8,...sty,fontSize:14,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto"}}>
+                {ACADEMIC_TESTS[activeTest.idx].passages[0].text}
+              </div>
+              {renderQuestions(ACADEMIC_TESTS[activeTest.idx].passages[0].questions, `ac-${activeTest.idx}`)}
+            </div>
+          )}
+          {activeTest.type==="gt"&&(
+            <div style={card}>
+              <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>{GT_TESTS[activeTest.idx].title}</h2>
+              <div style={{background:T.bgGray,borderRadius:8,padding:"20px",marginBottom:16,lineHeight:1.8,...sty,fontSize:14,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto"}}>
+                {GT_TESTS[activeTest.idx].text}
+              </div>
+              {renderQuestions(GT_TESTS[activeTest.idx].questions, `gt-${activeTest.idx}`)}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Strategies */}
+      {tab==="strategies"&&(
+        <div>
+          {READING_STRATEGIES.map((s,i)=>(
+            <div key={i} style={card}>
+              <h3 style={{fontFamily:"Georgia,serif",fontSize:16,color:T.primary,margin:"0 0 8px"}}>{s.type}</h3>
+              <p style={{...sty,fontSize:14,color:T.textMid,margin:"0 0 8px",lineHeight:1.6}}>{s.strategy}</p>
+              <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:6,padding:"8px 12px",...sty,fontSize:13,color:T.amber,fontWeight:600}}>💡 Tip: {s.tip}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Time Management */}
+      {tab==="timetips"&&(
+        <div style={card}>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>⏱️ Time Management for IELTS Reading</h2>
+          <p style={{...sty,fontSize:14,color:T.textMid,margin:"0 0 16px",lineHeight:1.6}}>You have 60 minutes for 40 questions across 3 passages. Time management is the single biggest factor separating Band 6 from Band 7+.</p>
+          {READING_TIME_TIPS.map((tip,i)=>(
+            <div key={i} style={{display:"flex",gap:12,marginBottom:12,alignItems:"flex-start"}}>
+              <div style={{flexShrink:0,width:28,height:28,background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:900,color:T.primary}}>{i+1}</div>
+              <p style={{...sty,fontSize:14,color:T.textMid,margin:0,lineHeight:1.6}}>{tip}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 // ── Analytics Helper ─────────────────────────
 const GA_ID = "G-9JN8WF1R0M";
 const trackEvent = (eventName, params={}) => {
@@ -2892,7 +3517,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
 );
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin"};
+const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
 
@@ -2997,7 +3622,7 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",admin:"Admin — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool"};
+  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",admin:"Admin — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool",speaking:"IELTS Speaking — Englishfool",reading:"IELTS Reading — Englishfool"};
   const switchView=(view)=>{ 
     setMainView(view); 
     const path = VIEW_TO_PATH[view] || "/";
@@ -3100,13 +3725,12 @@ export default function IELTSBot(){
             <Logo size={26}/>
             {/* Hamburger — mobile only */}
             <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:18,color:T.text}}>☰</button>
-            <div className="nav-tabs" style={{display:"flex",gap:4}}>
-              <MainTab label="🎓 Analyze" active={mainView==="analyze"} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label="🖊️ Practice" active={mainView==="practice"} onClick={()=>{switchView("practice");trackEvent("nav_click",{page:"practice"});}}/>
-              <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+            <div className="nav-tabs" style={{display:"flex",gap:4,alignItems:"center"}}>
+              <MainTab label="✍️ Writing" active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label="🗣️ Speaking" active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              <MainTab label="📖 Reading" active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
               <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label="✏️ Grammar & Spelling" active={mainView==="grammar"} onClick={()=>{switchView("grammar");trackEvent("nav_click",{page:"grammar"});}}/>
-              <MainTab label="🏋️ Exercises" active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
+              <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
           </div>
@@ -3132,6 +3756,17 @@ export default function IELTSBot(){
           </div>
         </div>
       </div>
+
+      {/* Writing Sub-Nav — shows on writing-related pages */}
+      {["analyze","practice","grammar","exercises"].includes(mainView)&&(
+        <div style={{background:T.bgGray,borderBottom:`1px solid ${T.border}`,padding:"0 24px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
+            {[{v:"analyze",l:"🎓 Analyze"},{v:"practice",l:"🖊️ Practice"},{v:"grammar",l:"✏️ Grammar & Spelling"},{v:"exercises",l:"🏋️ Exercises"}].map(t=>(
+              <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* HERO */}
       {!["terms","privacy","refund","pricing"].includes(mainView)&&(<>
@@ -3492,6 +4127,8 @@ export default function IELTSBot(){
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="grammar"&&<GrammarChecker isPro={proUser}/>}
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="contact"&&<ContactPage/>}
         </div>
       </div>
@@ -3578,7 +4215,7 @@ export default function IELTSBot(){
             </div>
             {/* Quick nav tabs at top of menu */}
             <div style={{display:"flex",gap:6,padding:"12px 16px",borderBottom:`1px solid ${T.border}`,flexWrap:"wrap"}}>
-              {[{view:"analyze",icon:"🎓",label:"Analyze"},{view:"practice",icon:"🖊️",label:"Practice"},{view:"progress",icon:"📈",label:"Progress"}].map(item=>(
+              {[{view:"analyze",icon:"✍️",label:"Writing"},{view:"speaking",icon:"🗣️",label:"Speaking"},{view:"reading",icon:"📖",label:"Reading"}].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
                   style={{flex:1,background:mainView===item.view?T.primaryLight:T.bgGray,border:`1px solid ${mainView===item.view?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px 4px",fontSize:11,fontWeight:700,color:mainView===item.view?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
                   <span>{item.icon}</span>{item.label}
@@ -3588,12 +4225,14 @@ export default function IELTSBot(){
             {/* Nav items */}
             <div style={{flex:1,overflowY:"auto",padding:"8px 0"}}>
               {[
-                {view:"analyze",icon:"🎓",label:"Analyze"},
-                {view:"practice",icon:"🖊️",label:"Practice Mode"},
-                {view:"progress",icon:"📈",label:"Progress Tracker"},
+                {view:"analyze",icon:"🎓",label:"Writing: Analyze"},
+                {view:"practice",icon:"🖊️",label:"Writing: Practice"},
+                {view:"grammar",icon:"✏️",label:"Writing: Grammar"},
+                {view:"exercises",icon:"🏋️",label:"Writing: Exercises"},
+                {view:"speaking",icon:"🗣️",label:"IELTS Speaking"},
+                {view:"reading",icon:"📖",label:"IELTS Reading"},
                 {view:"toolkit",icon:"📚",label:"IELTS Toolkit"},
-                {view:"grammar",icon:"✏️",label:"Grammar & Spelling"},
-                {view:"exercises",icon:"🏋️",label:"Exercises"},
+                {view:"progress",icon:"📈",label:"Progress Tracker"},
                 {view:"contact",icon:"✉️",label:"Contact Us"},
               ].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
