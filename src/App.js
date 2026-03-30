@@ -26,7 +26,9 @@ const fetchProStatus = async (email) => {
   } catch { return false; }
 };
 
-const STRIPE_CONFIGURED = false;
+const STRIPE_CONFIGURED = true;
+const PADDLE_TOKEN = "live_ec699d44651befed9506c7e7bd2";
+const PADDLE_PRICE_ID = "pri_01kmz7cbtkca44p95qp25jw59z";
 const ADMIN_KEY = process.env.REACT_APP_ADMIN_KEY || "EFadmin2026!";
 const FREE_USES_LIMIT = 1;
 const STORAGE_KEY = "bandup_uses";
@@ -850,13 +852,22 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
               <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$25 <span style={{fontSize:16,color:T.textMuted,fontWeight:400}}>/ month</span></div>
               <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Cancel anytime · Powered by Paddle</div>
             </div>
-            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"14px",marginBottom:16}}>
-              <div style={{fontSize:13,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>🔒 Online card payment is coming very soon.</div>
-              <p style={{fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"6px 0 0",lineHeight:1.5}}>We're finalising our payment processor. In the meantime, users inside Jordan can pay via CLIQ.</p>
-            </div>
-            <button disabled style={{width:"100%",background:"#94a3b8",color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"not-allowed",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-              💳 Pay $25/month — Coming Soon
+            <button onClick={()=>{
+              if(window.Paddle){
+                window.Paddle.Checkout.open({
+                  items:[{priceId:PADDLE_PRICE_ID,quantity:1}],
+                  customer: session?.email ? {email:session.email} : undefined,
+                  settings:{displayMode:"overlay",theme:"light",locale:"en",successUrl:window.location.origin+"?checkout=success"}
+                });
+              } else {
+                alert("Payment system is loading. Please try again in a moment.");
+              }
+            }} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadowMd}}>
+              💳 Subscribe — $25/month
             </button>
+            <p style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:10,lineHeight:1.5}}>
+              Secure payment via Paddle. Accepts Visa, Mastercard, PayPal, Apple Pay, Google Pay and more. Paddle is the Merchant of Record.
+            </p>
           </div>
         )}
 
@@ -3791,8 +3802,8 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
         {isPro?(
           <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ You're on Pro — Unlimited Access</div>
         ):(
-          <button onClick={onUpgrade} style={{width:"100%",background:STRIPE_CONFIGURED?T.primary:"#94a3b8",color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:STRIPE_CONFIGURED?"pointer":"not-allowed",boxShadow:STRIPE_CONFIGURED?T.shadowMd:"none"}}>
-            {STRIPE_CONFIGURED?"Start Pro — $25/month":"🔒 Payments Coming Soon"}
+          <button onClick={onUpgrade} style={{width:"100%",background:T.primary,color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:"pointer",boxShadow:T.shadowMd}}>
+            Start Pro — $25/month
           </button>
         )}
       </div>
@@ -3875,6 +3886,42 @@ export default function IELTSBot(){
     });
     return ()=> subscription.unsubscribe();
   },[]);
+
+  // ── Initialize Paddle.js ──
+  useEffect(()=>{
+    if(window.Paddle) return; // already loaded
+    const script = document.createElement("script");
+    script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
+    script.async = true;
+    script.onload = () => {
+      if(window.Paddle){
+        window.Paddle.Initialize({
+          token: PADDLE_TOKEN,
+          eventCallback: (ev) => {
+            if(ev.name === "checkout.completed"){
+              // Checkout succeeded — Pro will be activated by webhook
+              // But also try to activate immediately via client-side
+              const email = ev.data?.customer?.email || session?.email;
+              if(email){
+                fetch("/api/paddle/activate", {
+                  method:"POST",
+                  headers:{"Content-Type":"application/json"},
+                  body: JSON.stringify({email})
+                }).then(()=>{
+                  fetchProStatus(email).then(setProUser);
+                  setShowPaywall(false);
+                }).catch(console.error);
+              } else {
+                setProUser(true);
+                setShowPaywall(false);
+              }
+            }
+          }
+        });
+      }
+    };
+    document.head.appendChild(script);
+  },[session]);
 
   const handleAuthSuccess=(sess)=>{
     setSession(sess);
