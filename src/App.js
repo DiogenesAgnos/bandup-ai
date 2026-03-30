@@ -3445,49 +3445,63 @@ const ReadingPage = ({isPro, onUpgrade}) => {
     return {correct, total:allQ.length, band};
   };
 
-  const renderQ = (q, i) => {
+  const typeInstruction = (type) => {
+    if(type==="tfng") return "Do the following statements agree with the information given in the reading passage? Write TRUE if the statement agrees with the information, FALSE if the statement contradicts the information, or NOT GIVEN if there is no information on this.";
+    if(type==="mc") return "Choose the correct letter, A, B, C or D.";
+    if(type==="completion") return "Complete the sentences below. Choose NO MORE THAN TWO WORDS from the passage for each answer.";
+    return "";
+  };
+
+  const renderQ = (q, i, showTypeHeader) => {
     const key = q.key;
     return (
-      <div key={key} style={{marginBottom:14,padding:"12px 14px",background:T.bgGray,borderRadius:8,border:`1px solid ${T.border}`}}>
-        <div style={{...sty,fontSize:13,fontWeight:700,color:T.primary,marginBottom:2,textTransform:"uppercase",letterSpacing:"0.05em"}}>{q.type==="tfng"?"True / False / Not Given":q.type==="mc"?"Multiple Choice":"Sentence Completion"}</div>
-        <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600}}>{i+1}. {q.q}</div>
-        {q.type==="tfng"&&(
-          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-            {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
-              <button key={opt} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
-                style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:submitted?"default":"pointer",
-                  background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
-                  border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
-                  color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
-                {opt}
-              </button>
-            ))}
+      <div key={key}>
+        {showTypeHeader&&(
+          <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:8,padding:"12px 16px",marginBottom:10,marginTop:i>0?18:0}}>
+            <div style={{...sty,fontSize:13,fontWeight:700,color:T.primary,marginBottom:4,textTransform:"uppercase",letterSpacing:"0.05em"}}>{q.type==="tfng"?"True / False / Not Given":q.type==="mc"?"Multiple Choice":"Sentence Completion"}</div>
+            <div style={{...sty,fontSize:12,color:T.textMid,lineHeight:1.5,fontStyle:"italic"}}>{typeInstruction(q.type)}</div>
           </div>
         )}
-        {q.type==="mc"&&(
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
-            {q.options.map((opt,oi)=>(
-              <button key={oi} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
-                style={{textAlign:"left",padding:"8px 12px",borderRadius:6,fontSize:13,...sty,cursor:submitted?"default":"pointer",
-                  background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
-                  border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
-                  color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
-                {String.fromCharCode(65+oi)}. {opt}
-              </button>
-            ))}
-          </div>
-        )}
-        {q.type==="completion"&&(
-          <input value={userAnswers[key]||""} onChange={e=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:e.target.value}));}}
-            placeholder="Type your answer..." readOnly={submitted}
-            style={{...sty,fontSize:14,padding:"8px 12px",border:`1px solid ${submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBorder:T.redBorder):T.border}`,borderRadius:6,width:"100%",maxWidth:300,background:submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBg:T.redBg):"white",boxSizing:"border-box"}}/>
-        )}
-        {submitted&&(
-          <div style={{marginTop:8}}>
-            <div style={{...sty,fontSize:12,fontWeight:700,color:T.green,marginBottom:2}}>✅ Answer: {q.a}</div>
-            {q.exp&&<div style={{...sty,fontSize:12,color:T.textMuted,fontStyle:"italic"}}>{q.exp}</div>}
-          </div>
-        )}
+        <div style={{marginBottom:14,padding:"12px 14px",background:T.bgGray,borderRadius:8,border:`1px solid ${T.border}`}}>
+          <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600}}>{i+1}. {q.q}</div>
+          {q.type==="tfng"&&(
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+              {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
+                <button key={opt} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
+                  style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:submitted?"default":"pointer",
+                    background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
+                    border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
+                    color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+          {q.type==="mc"&&(
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              {q.options.map((opt,oi)=>(
+                <button key={oi} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
+                  style={{textAlign:"left",padding:"8px 12px",borderRadius:6,fontSize:13,...sty,cursor:submitted?"default":"pointer",
+                    background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
+                    border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
+                    color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
+                  {String.fromCharCode(65+oi)}. {opt}
+                </button>
+              ))}
+            </div>
+          )}
+          {q.type==="completion"&&(
+            <input value={userAnswers[key]||""} onChange={e=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:e.target.value}));}}
+              placeholder="Type your answer..." readOnly={submitted}
+              style={{...sty,fontSize:14,padding:"8px 12px",border:`1px solid ${submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBorder:T.redBorder):T.border}`,borderRadius:6,width:"100%",maxWidth:300,background:submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBg:T.redBg):"white",boxSizing:"border-box"}}/>
+          )}
+          {submitted&&(
+            <div style={{marginTop:8}}>
+              <div style={{...sty,fontSize:12,fontWeight:700,color:T.green,marginBottom:2}}>✅ Answer: {q.a}</div>
+              {q.exp&&<div style={{...sty,fontSize:12,color:T.textMuted,fontStyle:"italic"}}>{q.exp}</div>}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -3552,7 +3566,11 @@ const ReadingPage = ({isPro, onUpgrade}) => {
             {psg.text}
           </div>
           <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px"}}>Questions {globalOffset+1}–{globalOffset+psgQuestions.length}</h3>
-          {psgQuestions.map((q,qi)=>renderQ(q,globalOffset+qi))}
+          {psgQuestions.map((q,qi)=>{
+            const prevType = qi>0?psgQuestions[qi-1].type:null;
+            const showHeader = q.type!==prevType;
+            return renderQ(q,globalOffset+qi,showHeader);
+          })}
         </div>
 
         {/* Navigation + Submit */}
