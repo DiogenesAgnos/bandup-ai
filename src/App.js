@@ -3428,6 +3428,28 @@ const ReadingPage = ({isPro, onUpgrade}) => {
   const [showAnswers, setShowAnswers] = useState(false);
   const [userAnswers, setUserAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [finalTime, setFinalTime] = useState(null);
+
+  // Timer effect
+  useEffect(()=>{
+    if(!timerRunning) return;
+    const interval = setInterval(()=>setTimerSeconds(s=>s+1),1000);
+    return ()=>clearInterval(interval);
+  },[timerRunning]);
+
+  // Start timer when test opens
+  useEffect(()=>{
+    if(activeTest && !submitted){ setTimerSeconds(0); setTimerRunning(true); setFinalTime(null); }
+    else { setTimerRunning(false); }
+  },[activeTest, submitted]);
+
+  const formatTime = (s) => {
+    const m = Math.floor(s/60); const sec = s%60;
+    return `${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+  };
+  const timerColor = timerSeconds<3600 ? (timerSeconds>3300?T.amber:T.green) : T.red;
 
   const tabs = [
     {id:"academic",label:"📖 Academic Tests ("+AC_TESTS.length+")"},
@@ -3551,7 +3573,24 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 
     return (
       <div>
-        <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});}} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",...sty,padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to tests</button>
+        <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});setTimerRunning(false);}} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",...sty,padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to tests</button>
+
+        {/* Sticky Timer Bar */}
+        {!submitted&&(
+          <div style={{position:"sticky",top:64,zIndex:100,background:"white",border:`1px solid ${timerSeconds>3300?T.amberBorder:T.border}`,borderRadius:10,padding:"8px 16px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",boxShadow:T.shadow}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontSize:20}}>⏱️</span>
+              <div>
+                <div style={{...sty,fontSize:22,fontWeight:900,color:timerColor,fontFamily:"monospace",letterSpacing:"0.05em"}}>{formatTime(timerSeconds)}</div>
+                <div style={{...sty,fontSize:11,color:T.textMuted}}>Target: 60:00</div>
+              </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              {timerSeconds>=3600&&<span style={{...sty,fontSize:12,fontWeight:700,color:T.red}}>⚠️ Over time!</span>}
+              <div style={{...sty,fontSize:12,color:T.textMid}}>Passage {activePsg+1} of {test.passages.length}</div>
+            </div>
+          </div>
+        )}
 
         {/* Score banner */}
         {submitted&&(
@@ -3559,6 +3598,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
             <div style={{fontSize:48,fontWeight:900,color:T.green,fontFamily:"Georgia,serif"}}>{calcScore(test,activeTest.type).band}</div>
             <div style={{...sty,fontSize:16,fontWeight:700,color:T.green}}>Estimated Band Score</div>
             <div style={{...sty,fontSize:14,color:T.textMid,marginTop:4}}>{calcScore(test,activeTest.type).correct} / {calcScore(test,activeTest.type).total} correct answers</div>
+            {finalTime&&<div style={{...sty,fontSize:14,color:finalTime<=3600?T.green:T.red,marginTop:6,fontWeight:700}}>⏱️ Time taken: {formatTime(finalTime)} {finalTime<=3600?"✅ Within time limit":"⚠️ Over the 60-minute limit"}</div>}
           </div>
         )}
 
@@ -3592,13 +3632,13 @@ const ReadingPage = ({isPro, onUpgrade}) => {
           </div>
           {!submitted?(
             activePsg===test.passages.length-1?(
-              <button onClick={()=>{setSubmitted(true);setActivePsg(0);window.scrollTo({top:0,behavior:'smooth'});}}
+              <button onClick={()=>{setFinalTime(timerSeconds);setSubmitted(true);setTimerRunning(false);setActivePsg(0);window.scrollTo({top:0,behavior:'smooth'});}}
                 style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
                 📝 Submit Test & See Score
               </button>
             ):null
           ):(
-            <button onClick={()=>{setUserAnswers({});setSubmitted(false);setActivePsg(0);}}
+            <button onClick={()=>{setUserAnswers({});setSubmitted(false);setActivePsg(0);setTimerSeconds(0);setTimerRunning(true);setFinalTime(null);}}
               style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>
               🔄 Retake Test
             </button>
