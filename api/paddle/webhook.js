@@ -1,8 +1,6 @@
 // api/paddle/webhook.js
-// Paddle calls this URL when a payment succeeds — auto-activates Pro.
-// Set this URL in Paddle Dashboard → Notifications → Add Endpoint:
-//   https://englishfool.com/api/paddle/webhook
-
+// Paddle webhook handler — called by Paddle when subscription events occur.
+// Handles: subscription.created, subscription.activated, subscription.canceled
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -11,64 +9,103 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Paddle-Signature');
+  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  // In production, you should verify the Paddle-Signature header.
+  // For now, we process the event directly.
+  const event = req.body;
+  if (!event || !event.event_type) {
+    return res.status(400).json({ error: 'Invalid webhook payload' });
+  }
+
+  const eventType = event.event_type;
+  const data = event.data;
+  console.log(`Paddle webhook: ${eventType}`, JSON.stringify(data?.customer_id || ''));
+
   try {
-    const event = req.body;
-    console.log('Paddle webhook event:', event?.event_type);
-
-    // Handle successful payment or subscription activation
-    const ACTIVATE_EVENTS = [
-      'subscription.activated',
-      'subscription.updated',
-      'transaction.completed'
-    ];
-
-    if (ACTIVATE_EVENTS.includes(event?.event_type)) {
-      const email = event?.data?.customer?.email;
-      const subscriptionId = event?.data?.id;
-      const amount = event?.data?.details?.totals?.total;
-
-      if (!email) {
-        console.error('No email in Paddle webhook:', event);
-        return res.status(200).json({ received: true, warning: 'No email found' });
-      }
-
-      const normalizedEmail = email.toLowerCase().trim();
-
-      // Activate Pro
-      await supabase.from('profiles')
-        .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
-        .eq('email', normalizedEmail);
-
-      // Log payment
-      await supabase.from('payments').insert({
-        email: normalizedEmail,
-        amount: amount ? parseFloat(amount) / 100 : 25,
-        currency: 'USD',
-        method: 'paddle',
-        status: 'confirmed',
-        paddle_subscription_id: subscriptionId || null
-      });
-
-      console.log('Pro activated for:', normalizedEmail);
+    // Extract customer email from the event
+    let email = null;
+    if (data?.customer?.email) {
+      email = data.customer.email.toLowerCase().trim();
+    } else if (data?.custom_data?.email) {
+      email = data.custom_data.email.toLowerCase().trim();
     }
 
-    // Handle subscription cancellation
-    if (event?.event_type === 'subscription.canceled') {
-      const email = event?.data?.customer?.email;
-      if (email) {
+    if (!email) {
+      console.log('No email found in webhook payload');
+      return res.status(200).json({ received: true, note: 'No email found' });
+    }
+
+    // Handle subscription created/activated — activate Pro
+    if (['subscription.created', 'subscription.activated', 'subscription.updated'].includes(eventType)) {
+      const status = data?.status;
+      if (status === 'active' || status === 'trialing') {
+        // Activate Pro
+        const { data: profile } = await supabase.from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (profile) {
+          await supabase.from('profiles')
+            .update({
+              is_pro: true,
+              pro_activated_at: new Date().toISOString()
+            })
+            .eq('email', email);
+          console.log(`Pro activated for ${email}`);
+        } else {
+          // Store for later activation when user registers
+          await supabase.from('activations').upsert({
+            email,
+            is_pro: true,
+            activated_at: new Date().toISOString()
+          }, { onConflict: 'email' }).catch(() => {});
+          console.log(`Activation stored for ${email} (not yet registered)`);
+        }
+      }
+    }
+
+    // Handle subscription canceled/paused — deactivate Pro
+    if (['subscription.canceled', 'subscription.past_due'].includes(eventType)) {
+      const { data: profile } = await supabase.from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (profile) {
         await supabase.from('profiles')
           .update({ is_pro: false })
-          .eq('email', email.toLowerCase().trim());
-        console.log('Pro deactivated for:', email);
+          .eq('email', email);
+        console.log(`Pro deactivated for ${email}`);
       }
     }
 
-    return res.status(200).json({ received: true });
+    // Handle transaction completed (one-time backup)
+    if (eventType === 'transaction.completed') {
+      const { data: profile } = await supabase.from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (profile) {
+        await supabase.from('profiles')
+          .update({
+            is_pro: true,
+            pro_activated_at: new Date().toISOString()
+          })
+          .eq('email', email);
+      }
+    }
+
   } catch (err) {
-    console.error('Paddle webhook error:', err);
-    // Always return 200 so Paddle doesn't retry
-    return res.status(200).json({ received: true, error: err.message });
+    console.error('Webhook processing error:', err);
   }
+
+  // Always return 200 so Paddle doesn't retry
+  return res.status(200).json({ received: true });
 }
