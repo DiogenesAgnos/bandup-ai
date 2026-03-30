@@ -2836,15 +2836,6 @@ const SPEAKING_MISTAKES = [
   {mistake:"Not using linking words",fix:"Connect ideas with: 'However,' 'Moreover,' 'In addition,' 'On the other hand,' 'Having said that.' This improves coherence scores."}
 ];
 
-const SPEAKING_VIDEOS = [
-  {title:"IELTS Speaking Part 1 — Practice with IDP",url:"https://www.youtube.com/embed/VIDEO_PLACEHOLDER_1",desc:"Official IDP practice video showing Part 1 interview format and strategies."},
-  {title:"IELTS Speaking Part 2 — Long Turn Practice",url:"https://www.youtube.com/embed/VIDEO_PLACEHOLDER_2",desc:"See how to prepare and deliver a 2-minute talk on a cue card topic."},
-  {title:"IELTS Speaking Part 3 — Discussion Practice",url:"https://www.youtube.com/embed/VIDEO_PLACEHOLDER_3",desc:"Practice the two-way discussion format with abstract questions."},
-  {title:"Band 9 IELTS Speaking — Full Test Example",url:"https://www.youtube.com/embed/V7oM7wG5Czg",desc:"Watch a complete IELTS Speaking test scored at Band 9 with examiner commentary."},
-  {title:"Band 6 vs Band 8 — What's the Difference?",url:"https://www.youtube.com/embed/0zuMPRGnmkY",desc:"See the key differences between a Band 6 and Band 8 speaking performance."},
-  {title:"Common Speaking Mistakes to Avoid",url:"https://www.youtube.com/embed/cRD6Fv3aAJY",desc:"Learn the most frequent mistakes that cost candidates marks in the speaking test."}
-];
-
 const SpeakingPage = ({isPro, onUpgrade}) => {
   const [tab, setTab] = useState("examples");
   const [expandedP1, setExpandedP1] = useState(null);
@@ -2856,8 +2847,7 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
     {id:"examples",label:"📝 Examples & Answers",free:true},
     {id:"vocabulary",label:"📚 Vocabulary",free:false},
     {id:"tips",label:"💡 Tips & Strategies",free:true},
-    {id:"mistakes",label:"⚠️ Common Mistakes",free:true},
-    {id:"videos",label:"🎬 Video Examples",free:true}
+    {id:"mistakes",label:"⚠️ Common Mistakes",free:true}
   ];
   const toggleAnswer = (key) => setShowAnswer(prev=>({...prev,[key]:!prev[key]}));
   const sty = {fontFamily:"'Source Sans Pro','Inter',system-ui"};
@@ -3012,328 +3002,617 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
       )}
 
       {/* VIDEOS TAB */}
-      {tab==="videos"&&(
-        <div>
-          <div style={{...card,background:T.amberBg,border:`1px solid ${T.amberBorder}`}}>
-            <p style={{...sty,fontSize:13,color:T.amber,margin:0}}>💡 Watch these videos to understand the speaking test format, see real examples, and learn from examiner feedback. Try answering the questions yourself before watching the model answers.</p>
-          </div>
-          {SPEAKING_VIDEOS.map((v,i)=>(
-            <div key={i} style={card}>
-              <h3 style={{fontFamily:"Georgia,serif",fontSize:16,color:T.text,margin:"0 0 6px"}}>{v.title}</h3>
-              <p style={{...sty,fontSize:13,color:T.textMuted,margin:"0 0 12px"}}>{v.desc}</p>
-              {v.url.includes("PLACEHOLDER")?(
-                <div style={{background:T.bgGray,borderRadius:8,padding:"40px 20px",textAlign:"center",...sty,fontSize:13,color:T.textMuted}}>🎬 Video coming soon — search "{v.title}" on YouTube for similar content</div>
-              ):(
-                <div style={{position:"relative",paddingBottom:"56.25%",height:0,borderRadius:8,overflow:"hidden"}}>
-                  <iframe src={v.url} title={v.title} style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}} allowFullScreen/>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
 
 // ── IELTS Reading Page ──────────────────────
+const BAND_SCORE_AC = (correct) => {
+  if(correct>=39) return 9.0; if(correct>=37) return 8.5; if(correct>=35) return 8.0;
+  if(correct>=33) return 7.5; if(correct>=30) return 7.0; if(correct>=27) return 6.5;
+  if(correct>=23) return 6.0; if(correct>=19) return 5.5; if(correct>=15) return 5.0;
+  if(correct>=13) return 4.5; if(correct>=10) return 4.0; if(correct>=6) return 3.5;
+  return 3.0;
+};
+const BAND_SCORE_GT = (correct) => {
+  if(correct>=40) return 9.0; if(correct>=39) return 8.5; if(correct>=37) return 8.0;
+  if(correct>=36) return 7.5; if(correct>=34) return 7.0; if(correct>=32) return 6.5;
+  if(correct>=30) return 6.0; if(correct>=27) return 5.5; if(correct>=23) return 5.0;
+  if(correct>=19) return 4.5; if(correct>=15) return 4.0; return 3.5;
+};
+
 const READING_STRATEGIES = [
-  {type:"True / False / Not Given",strategy:"Read the statement carefully. Find the relevant section in the passage. TRUE = the passage confirms the statement. FALSE = the passage contradicts the statement. NOT GIVEN = the passage doesn't mention this information at all. Don't use your own knowledge — only what's in the text.",tip:"'Not Given' means the information simply isn't there. If you can't find it after 2 minutes, it's probably Not Given."},
-  {type:"Yes / No / Not Given",strategy:"Similar to T/F/NG but about the WRITER'S OPINIONS, not facts. YES = the writer agrees with the statement. NO = the writer disagrees. NOT GIVEN = the writer doesn't express an opinion on this. Look for opinion language: 'I believe', 'It is clear that', 'arguably', etc.",tip:"Pay close attention to who holds the opinion. The writer's view may differ from experts quoted in the passage."},
-  {type:"Multiple Choice",strategy:"Read the question and all options before searching the text. Eliminate obviously wrong answers first. The correct answer is usually a paraphrase of the text, not an exact quote. Be careful of options that are true but don't answer the specific question asked.",tip:"Questions follow the order of the text. If Q3 answer is in paragraph 4, Q4 will be in paragraph 4 or later."},
-  {type:"Matching Headings",strategy:"Read each paragraph and identify its MAIN IDEA (not just a detail). The heading should summarise the whole paragraph, not just one sentence. Cross out headings as you use them. Start with the easiest paragraphs first.",tip:"Beware of headings that match a detail in the paragraph rather than the main idea. Read the whole paragraph before choosing."},
-  {type:"Sentence Completion",strategy:"Identify keywords in the incomplete sentence. Scan the passage for those keywords or their synonyms. The answer must be grammatically correct when inserted. Follow word count limits exactly (e.g., 'NO MORE THAN TWO WORDS').",tip:"Copy words exactly as they appear in the passage. Don't change the form (e.g., don't change 'increased' to 'increasing')."},
-  {type:"Summary Completion",strategy:"Read the entire summary first to understand the topic. Identify the section of the passage it relates to. Fill in gaps using words from the passage or from a given list. Check grammar and word count limits.",tip:"If given a word list, eliminate options as you use them. If taking words from the passage, they must be exact."},
-  {type:"Matching Information",strategy:"Read all the statements first and underline keywords. Scan each paragraph for the information described. A paragraph can be used more than once (unless stated otherwise). Focus on finding specific details, examples, or explanations.",tip:"This is a scanning exercise. Don't read every word — look for specific information that matches the statements."},
-  {type:"Diagram / Flowchart / Table Completion",strategy:"Study the diagram/flowchart/table carefully first. Identify what type of information is missing (noun, verb, number). Find the relevant section of the passage. Answers usually come in order from the passage.",tip:"Look at what's already filled in to understand the pattern and what type of word is needed."}
+  {type:"True / False / Not Given",strategy:"Read the statement carefully. Find the relevant section in the passage. TRUE = the passage confirms it. FALSE = the passage contradicts it. NOT GIVEN = the passage doesn't mention this at all. Only use information from the text.",tip:"'Not Given' means the information simply isn't there. If you can't find it after 2 minutes, it's probably Not Given."},
+  {type:"Yes / No / Not Given",strategy:"About the WRITER'S OPINIONS, not facts. YES = the writer agrees. NO = the writer disagrees. NOT GIVEN = the writer doesn't express an opinion. Look for opinion language: 'I believe', 'arguably', etc.",tip:"The writer's view may differ from experts quoted in the passage."},
+  {type:"Multiple Choice",strategy:"Read the question and all options before searching the text. Eliminate wrong answers first. The correct answer is usually a paraphrase, not an exact quote.",tip:"Questions follow the order of the text."},
+  {type:"Matching Headings",strategy:"Read each paragraph and identify its MAIN IDEA. The heading should summarise the whole paragraph. Cross out headings as you use them.",tip:"Beware of headings that match a detail rather than the main idea."},
+  {type:"Sentence Completion",strategy:"Identify keywords in the incomplete sentence. Scan for those keywords or synonyms. Follow word count limits exactly.",tip:"Copy words exactly as they appear in the passage."},
+  {type:"Summary Completion",strategy:"Read the entire summary first. Identify the relevant passage section. Fill gaps using exact words from the passage or from a given list.",tip:"If given a word list, eliminate options as you use them."},
+  {type:"Matching Information",strategy:"Read all statements first and underline keywords. Scan each paragraph for matching information. A paragraph can be used more than once.",tip:"This is a scanning exercise — look for specific details."},
+  {type:"Diagram / Flowchart / Table",strategy:"Study the diagram carefully first. Identify what type of information is missing. Answers usually come in order from the passage.",tip:"Look at what's already filled in to understand the pattern."}
 ];
 
 const READING_TIME_TIPS = [
-  "Use the 15-20-25 rule: spend 15 minutes on Passage 1, 20 on Passage 2, and 25 on Passage 3 (it's the hardest).",
-  "Skim each passage for 2-3 minutes before looking at questions. Get the main idea of each paragraph.",
-  "Read questions FIRST for detail-oriented types (T/F/NG, sentence completion) so you know what to look for.",
-  "Read headings AFTER reading paragraphs for matching headings questions.",
-  "Never leave a blank — there's no penalty for wrong answers. Always guess if unsure.",
-  "If stuck on a question for more than 90 seconds, mark it and move on. Come back to it later.",
-  "Don't read every word. Skim for main ideas and scan for specific keywords.",
+  "Use the 15-20-25 rule: spend 15 minutes on Passage 1, 20 on Passage 2, and 25 on Passage 3.",
+  "Skim each passage for 2-3 minutes before looking at questions.",
+  "Read questions FIRST for T/F/NG and sentence completion so you know what to look for.",
+  "Never leave a blank — there's no penalty for wrong answers.",
+  "If stuck for more than 90 seconds, mark it and move on.",
+  "Don't read every word. Skim for main ideas and scan for keywords.",
   "Underline keywords in questions before searching the passage.",
   "Answers for most question types follow the order of the passage.",
-  "Practice with a timer regularly. Time pressure is the #1 challenge in IELTS Reading."
+  "Practice with a timer regularly — time pressure is the #1 challenge.",
+  "Transfer answers carefully — many marks are lost through careless transfer."
 ];
 
-const ACADEMIC_TESTS = [
-  {id:1,title:"The Science of Sleep",passages:[
-    {title:"The Architecture of Sleep",text:"Sleep, far from being a passive state of unconsciousness, is an active and highly structured neurological process that scientists are only now beginning to fully understand. Research over the past two decades has revealed that sleep consists of distinct stages, each serving unique biological functions essential for human health and cognitive performance.\n\nThe sleep cycle is divided into two main categories: non-rapid eye movement (NREM) sleep and rapid eye movement (REM) sleep. NREM sleep is further subdivided into three stages. Stage 1 is a transitional period lasting only a few minutes, during which the body begins to relax and brain activity starts to slow. Stage 2 represents a deeper level of sleep characterised by specific brain wave patterns known as sleep spindles and K-complexes. Stage 3, often called deep sleep or slow-wave sleep, is the most restorative phase, during which the body repairs tissues, strengthens the immune system, and consolidates memories.\n\nREM sleep typically occurs approximately 90 minutes after falling asleep and recurs in increasingly longer periods throughout the night. During REM sleep, the brain becomes remarkably active — in some respects more active than during waking hours. The eyes move rapidly beneath closed lids, breathing becomes irregular, and heart rate increases. Most vivid dreaming occurs during this stage. Paradoxically, the body's voluntary muscles become temporarily paralysed, a phenomenon called atonia, which prevents individuals from physically acting out their dreams.\n\nModern sleep research has established that adults typically require between seven and nine hours of sleep per night for optimal functioning. However, studies conducted by the University of California found that approximately one percent of the population carries a genetic mutation that allows them to function normally on just six hours of sleep. These so-called 'short sleepers' do not experience the cognitive impairments that affect most people who are sleep-deprived.\n\nThe consequences of chronic sleep deprivation extend far beyond simple tiredness. Research published in the journal Nature has demonstrated that even moderate sleep restriction — sleeping six hours instead of eight for two weeks — produces cognitive impairments equivalent to staying awake for 48 hours continuously. These impairments affect attention, working memory, and decision-making abilities, yet individuals who are chronically sleep-deprived often fail to recognise the extent of their own impairment.\n\nPerhaps most concerning is the relationship between sleep and long-term health. Epidemiological studies have consistently linked insufficient sleep to increased risk of cardiovascular disease, obesity, diabetes, and weakened immune function. Professor Matthew Walker of the University of California, Berkeley, whose research has been particularly influential in this field, has argued that sleep deprivation is now so widespread in industrialised societies that it constitutes a public health epidemic.",
-    questions:[
-      {type:"tfng",q:"Sleep is essentially a passive state where the body shuts down.",a:"FALSE"},
-      {type:"tfng",q:"NREM sleep consists of four distinct stages.",a:"FALSE"},
-      {type:"tfng",q:"Stage 3 sleep helps repair body tissues.",a:"TRUE"},
-      {type:"tfng",q:"REM sleep first occurs about an hour and a half after sleep onset.",a:"TRUE"},
-      {type:"tfng",q:"The brain is less active during REM sleep than during waking hours.",a:"FALSE"},
-      {type:"tfng",q:"Muscle paralysis during REM sleep is considered a protective mechanism.",a:"TRUE"},
-      {type:"tfng",q:"Most adults need exactly eight hours of sleep.",a:"FALSE"},
-      {type:"mc",q:"What did the University of California study find?",options:["All adults need 7-9 hours of sleep","About 1% of people can thrive on 6 hours due to genetics","Short sleepers experience mild cognitive issues","Sleep requirements decrease with age"],a:"About 1% of people can thrive on 6 hours due to genetics"},
-      {type:"mc",q:"According to the passage, sleeping six hours for two weeks has the same cognitive effect as:",options:["Missing one night of sleep","Staying awake for 24 hours","Staying awake for 48 hours","Sleeping only 4 hours per night"],a:"Staying awake for 48 hours"},
-      {type:"mc",q:"Professor Matthew Walker has described widespread sleep deprivation as:",options:["A minor inconvenience","A genetic adaptation","A public health epidemic","An unavoidable consequence of modern life"],a:"A public health epidemic"},
-      {type:"completion",q:"During REM sleep, the temporary paralysis of muscles is called ___.",a:"atonia"},
-      {type:"completion",q:"Stage 2 NREM sleep features brain patterns known as sleep spindles and ___.",a:"K-complexes"},
-      {type:"completion",q:"Chronic sleep deprivation has been linked to cardiovascular disease, obesity, diabetes, and weakened ___ function.",a:"immune"}
+const AC_TESTS = [
+  {id:1,title:"Science & Society",passages:[
+    {title:"The Architecture of Sleep",text:"Sleep, far from being a passive state, is an active neurological process that scientists are only now beginning to fully understand. Research over the past two decades has revealed that sleep consists of distinct stages, each serving unique biological functions.\n\nThe sleep cycle is divided into non-rapid eye movement (NREM) and rapid eye movement (REM) sleep. NREM has three stages. Stage 1 is a transitional period lasting a few minutes. Stage 2 features specific brain wave patterns known as sleep spindles and K-complexes. Stage 3, called deep sleep or slow-wave sleep, is the most restorative phase, during which the body repairs tissues, strengthens the immune system, and consolidates memories.\n\nREM sleep occurs approximately 90 minutes after falling asleep and recurs in increasingly longer periods throughout the night. The brain becomes remarkably active during REM — in some respects more active than during waking hours. The eyes move rapidly beneath closed lids, and most vivid dreaming occurs. The body's voluntary muscles become temporarily paralysed, a phenomenon called atonia, preventing individuals from acting out dreams.\n\nModern research has established that adults require between seven and nine hours for optimal functioning. However, the University of California found that approximately one percent of the population carries a genetic mutation allowing them to function normally on just six hours — so-called 'short sleepers' who don't experience the cognitive impairments affecting most sleep-deprived people.\n\nThe consequences of chronic sleep deprivation extend far beyond tiredness. Research in Nature demonstrated that sleeping six hours instead of eight for two weeks produces cognitive impairments equivalent to staying awake for 48 hours continuously. These impairments affect attention, working memory, and decision-making, yet chronically sleep-deprived individuals often fail to recognise the extent of their own impairment.\n\nThe relationship between sleep and long-term health is perhaps most concerning. Epidemiological studies have linked insufficient sleep to cardiovascular disease, obesity, diabetes, and weakened immune function. Professor Matthew Walker of UC Berkeley has argued that sleep deprivation is now so widespread in industrialised societies that it constitutes a public health epidemic.",
+     questions:[
+      {type:"tfng",q:"Sleep is essentially a passive state where the body shuts down.",a:"FALSE",exp:"The passage states sleep is 'an active neurological process', contradicting 'passive state'."},
+      {type:"tfng",q:"NREM sleep consists of four distinct stages.",a:"FALSE",exp:"The passage says 'NREM has three stages', not four."},
+      {type:"tfng",q:"Stage 3 sleep helps repair body tissues.",a:"TRUE",exp:"The passage directly states Stage 3 is when 'the body repairs tissues'."},
+      {type:"tfng",q:"REM sleep first occurs about an hour and a half after sleep onset.",a:"TRUE",exp:"The passage says 'approximately 90 minutes after falling asleep', which is 1.5 hours."},
+      {type:"tfng",q:"The brain is less active during REM sleep than during waking hours.",a:"FALSE",exp:"The passage says the brain is 'more active than during waking hours' during REM."},
+      {type:"tfng",q:"Most adults need exactly eight hours of sleep.",a:"FALSE",exp:"The passage says 'between seven and nine hours', not exactly eight."},
+      {type:"mc",q:"What did the University of California study find?",options:["All adults need 7-9 hours","About 1% can thrive on 6 hours due to genetics","Short sleepers have mild cognitive issues","Sleep requirements decrease with age"],a:"About 1% can thrive on 6 hours due to genetics",exp:"The passage states 'approximately one percent carries a genetic mutation allowing them to function on six hours'."},
+      {type:"mc",q:"Sleeping six hours for two weeks equals the cognitive effect of:",options:["Missing one night of sleep","Staying awake for 24 hours","Staying awake for 48 hours","Sleeping 4 hours per night"],a:"Staying awake for 48 hours",exp:"The passage explicitly states 'equivalent to staying awake for 48 hours continuously'."},
+      {type:"completion",q:"The temporary paralysis of muscles during REM is called ___.",a:"atonia",exp:"The passage names this phenomenon 'atonia'."},
+      {type:"completion",q:"Stage 2 NREM sleep features sleep spindles and ___.",a:"K-complexes",exp:"The passage lists 'sleep spindles and K-complexes' as Stage 2 features."},
+      {type:"mc",q:"Professor Walker describes widespread sleep deprivation as:",options:["A minor inconvenience","A genetic adaptation","A public health epidemic","An unavoidable consequence"],a:"A public health epidemic",exp:"The passage quotes Walker arguing it 'constitutes a public health epidemic'."},
+      {type:"completion",q:"Chronic sleep deprivation has been linked to cardiovascular disease, obesity, diabetes, and weakened ___ function.",a:"immune",exp:"The passage lists 'weakened immune function' among the health consequences."},
+      {type:"tfng",q:"People who are chronically sleep-deprived always recognise their own impairment.",a:"FALSE",exp:"The passage says they 'often fail to recognise the extent of their own impairment'."}
+    ]},
+    {title:"Urban Green Spaces and Public Health",text:"As global urbanisation accelerates — with the UN projecting that 68% of the world's population will live in cities by 2050 — the role of green spaces in urban environments has become a subject of increasing scientific interest. Parks, gardens, and urban forests are now recognised as critical infrastructure delivering measurable benefits to public health, environmental quality, and social cohesion.\n\nResearch published in The Lancet demonstrated that residents living within 300 metres of green space showed significantly lower levels of cortisol, the body's primary stress hormone. A study across nine European cities found that people spending at least 120 minutes per week in natural environments reported substantially better health and psychological wellbeing, regardless of socioeconomic status.\n\nThe environmental benefits are equally compelling. Trees act as natural air filters, absorbing pollutants including nitrogen dioxide and particulate matter. A single mature tree absorbs approximately 22 kilograms of carbon dioxide per year while releasing enough oxygen for two people. Green spaces also play a crucial role in managing urban stormwater through permeable soil and plant root systems.\n\nThe 'urban heat island effect' — whereby cities are significantly warmer than surrounding rural areas — can be substantially mitigated through strategic green space placement. Research from the Technical University of Munich found that urban parks can reduce local temperatures by 1 to 4 degrees Celsius.\n\nSocially, urban parks serve as democratic spaces where people from different backgrounds interact. Unlike commercial venues, parks are freely accessible, making them particularly important for lower-income communities. Studies have shown that well-maintained green spaces reduce crime rates, foster community engagement, and provide essential recreational opportunities for children.\n\nDespite these benefits, urban green spaces face persistent threats from development pressure. Singapore has emerged as a notable counterexample, implementing a 'City in a Garden' strategy that increased green cover from 36% in the 1980s to nearly 50% today, demonstrating that urban density and abundant green space need not be mutually exclusive.",
+     questions:[
+      {type:"tfng",q:"By 2050, more than two-thirds of people will be urban.",a:"TRUE",exp:"68% is more than two-thirds (66.7%)."},
+      {type:"tfng",q:"The Lancet study measured blood pressure near green spaces.",a:"FALSE",exp:"The study measured cortisol levels, not blood pressure."},
+      {type:"tfng",q:"Spending 2 hours weekly in nature improved wellbeing regardless of income.",a:"TRUE",exp:"The passage states benefits occurred 'regardless of socioeconomic status'."},
+      {type:"tfng",q:"A mature tree produces enough oxygen for five people annually.",a:"FALSE",exp:"The passage says 'enough oxygen for two people', not five."},
+      {type:"mc",q:"Urban green spaces are now considered:",options:["Luxury amenities","Critical infrastructure with measurable benefits","Primarily recreational","Obstacles to development"],a:"Critical infrastructure with measurable benefits",exp:"The passage describes them as 'critical infrastructure delivering measurable benefits'."},
+      {type:"mc",q:"Singapore's green cover changed from:",options:["50% to 36%","36% to nearly 50%","20% to 36%","50% to 68%"],a:"36% to nearly 50%",exp:"The passage states 'from 36% in the 1980s to nearly 50% today'."},
+      {type:"completion",q:"Trees absorb pollutants including nitrogen dioxide and ___ matter.",a:"particulate",exp:"The passage lists 'particulate matter' among absorbed pollutants."},
+      {type:"completion",q:"The phenomenon where cities are warmer than rural areas is the 'urban ___ island effect'.",a:"heat",exp:"The passage names it the 'urban heat island effect'."},
+      {type:"mc",q:"Well-maintained green spaces have been linked to:",options:["Higher property taxes","Reduced crime rates","Increased traffic","Lower attendance"],a:"Reduced crime rates",exp:"The passage states green spaces 'reduce crime rates'."},
+      {type:"tfng",q:"Commercial venues are more socially inclusive than parks.",a:"FALSE",exp:"Parks are 'freely accessible' unlike commercial venues that require spending money."},
+      {type:"completion",q:"Green spaces manage stormwater through permeable soil and plant ___ systems.",a:"root",exp:"The passage mentions 'plant root systems' for stormwater management."},
+      {type:"mc",q:"Urban parks reduce local temperatures by:",options:["5-10 degrees","1-4 degrees Celsius","Less than 1 degree","More than 10 degrees"],a:"1-4 degrees Celsius",exp:"The Munich study found parks 'reduce local temperatures by 1 to 4 degrees Celsius'."},
+      {type:"tfng",q:"Singapore's approach proves dense cities cannot have green space.",a:"FALSE",exp:"Singapore demonstrates the opposite: 'density and abundant green space need not be mutually exclusive'."}
+    ]},
+    {title:"The Psychology of Decision Making",text:"Every day, the average adult makes approximately 35,000 decisions. The field of behavioural economics, pioneered by Daniel Kahneman and Amos Tversky in the 1970s, has fundamentally challenged the assumption that humans are rational decision-makers.\n\nKahneman's research, which earned him the Nobel Prize in Economics in 2002, identified two systems of thinking. System 1 operates automatically and quickly, responsible for snap judgements and intuitive responses. System 2 allocates attention to effortful activities including complex calculations and logical reasoning. While System 2 is more reliable, it's slower and requires significant cognitive resources, meaning people frequently default to System 1.\n\n'Loss aversion' is one of the most influential concepts — people experience the pain of losing something approximately twice as intensely as the pleasure of gaining something equivalent. This explains why investors hold losing stocks too long and consumers are motivated more by fear of missing offers than by equivalent future discounts.\n\nThe 'anchoring effect' shows that people rely heavily on the first information they encounter when making estimates. In one experiment, participants who saw a high random number subsequently estimated higher values for unrelated questions than those who saw a low number. This affects salary negotiations, real estate pricing, and courtroom sentencing.\n\n'Choice overload,' popularised by Barry Schwartz, describes the paradox that more options often lead to worse decisions. Researchers Sheena Iyengar and Mark Lepper found that customers offered 24 varieties of jam were far less likely to purchase than those offered 6. The abundance created decision paralysis and diminished satisfaction.\n\nGovernments worldwide have established 'nudge units' leveraging these insights. By changing default options on pension enrolment forms, the UK government dramatically increased retirement savings rates without restricting individual choice — demonstrating that small changes in how choices are presented can produce large shifts in behaviour.",
+     questions:[
+      {type:"tfng",q:"Adults make roughly 35,000 decisions daily.",a:"TRUE",exp:"The opening sentence states 'approximately 35,000 decisions'."},
+      {type:"tfng",q:"Kahneman won the Nobel Prize in Psychology.",a:"FALSE",exp:"He won 'the Nobel Prize in Economics', not Psychology."},
+      {type:"tfng",q:"System 1 thinking is slow and deliberate.",a:"FALSE",exp:"System 1 'operates automatically and quickly'. System 2 is the slow one."},
+      {type:"tfng",q:"People feel losses about twice as strongly as equivalent gains.",a:"TRUE",exp:"The passage states 'approximately twice as intensely'."},
+      {type:"mc",q:"The jam study demonstrated that:",options:["Customers prefer variety","Too many options can reduce purchasing","6 types is insufficient","Stores should stock fewer products"],a:"Too many options can reduce purchasing",exp:"Customers offered 24 varieties 'were far less likely to purchase than those offered 6'."},
+      {type:"mc",q:"'Nudge units' use behavioural insights to:",options:["Force specific choices","Restrict options","Encourage beneficial behaviours through choice design","Increase taxation"],a:"Encourage beneficial behaviours through choice design",exp:"They leverage insights to encourage behaviour without restricting choice."},
+      {type:"mc",q:"The UK increased pension savings by:",options:["Making saving mandatory","Offering incentives","Changing default enrolment options","Raising retirement age"],a:"Changing default enrolment options",exp:"The passage says 'changing default options on pension enrolment forms'."},
+      {type:"completion",q:"System 2 thinking requires significant ___ resources.",a:"cognitive",exp:"The passage states it 'requires significant cognitive resources'."},
+      {type:"completion",q:"The tendency to rely on first information is the '___ effect'.",a:"anchoring",exp:"The passage names it the 'anchoring effect'."},
+      {type:"completion",q:"Choice overload was popularised by Barry ___.",a:"Schwartz",exp:"The passage names 'Barry Schwartz'."},
+      {type:"completion",q:"Loss aversion explains why investors hold ___ stocks too long.",a:"losing",exp:"The passage states 'investors hold losing stocks too long'."},
+      {type:"tfng",q:"The anchoring effect only works with relevant information.",a:"FALSE",exp:"It works even with 'a high random number' — arbitrary and irrelevant information."},
+      {type:"tfng",q:"The jam study was conducted by Kahneman and Tversky.",a:"FALSE",exp:"It was conducted by 'Sheena Iyengar and Mark Lepper', not Kahneman and Tversky."},
+      {type:"mc",q:"According to the passage, System 1 is responsible for:",options:["Complex calculations","Logical reasoning","Snap judgements and intuitive responses","Careful analysis"],a:"Snap judgements and intuitive responses",exp:"System 1 is described as 'responsible for snap judgements and intuitive responses'."}
     ]}
   ]},
-  {id:2,title:"Urban Green Spaces",passages:[
-    {title:"The Value of Parks in Modern Cities",text:"As global urbanisation accelerates — with the United Nations projecting that 68% of the world's population will live in cities by 2050 — the role of green spaces in urban environments has become a subject of increasing scientific and political interest. Parks, gardens, urban forests, and even small patches of vegetation are now recognised not merely as aesthetic amenities but as critical infrastructure that delivers measurable benefits to public health, environmental quality, and social cohesion.\n\nResearch published in The Lancet demonstrated that residents living within 300 metres of green space showed significantly lower levels of cortisol, the body's primary stress hormone, compared to those without nearby access to nature. A large-scale study conducted across nine European cities found that people who spent at least 120 minutes per week in natural environments reported substantially better health and psychological wellbeing than those who did not, regardless of their socioeconomic status or pre-existing health conditions.\n\nThe environmental benefits of urban green spaces are equally compelling. Trees and vegetation act as natural air filters, absorbing pollutants including nitrogen dioxide, sulphur dioxide, and particulate matter. A single mature tree can absorb approximately 22 kilograms of carbon dioxide per year while releasing enough oxygen for two people. Furthermore, green spaces play a crucial role in managing urban stormwater. Permeable soil and plant root systems absorb rainfall that would otherwise overwhelm drainage systems, reducing flood risk in cities increasingly vulnerable to extreme weather events.\n\nThe concept of the 'urban heat island effect' — whereby cities are significantly warmer than surrounding rural areas due to heat-absorbing concrete and asphalt — can be substantially mitigated through strategic placement of green spaces. Research from the Technical University of Munich found that urban parks can reduce local temperatures by between 1 and 4 degrees Celsius, providing natural cooling that reduces energy consumption and protects vulnerable populations during heatwaves.\n\nSocially, urban parks serve as democratic spaces where people from different backgrounds interact. Unlike commercial venues that require spending money, parks are freely accessible, making them particularly important for lower-income communities. Studies have shown that well-maintained green spaces reduce crime rates in surrounding neighbourhoods, foster community engagement, and provide essential recreational opportunities for children whose homes lack private outdoor areas.\n\nDespite these well-documented benefits, urban green spaces face persistent threats from development pressure. In many rapidly growing cities, parks and gardens are being sacrificed to accommodate housing, commercial buildings, and transportation infrastructure. Singapore has emerged as a notable counterexample, implementing a comprehensive 'City in a Garden' strategy that has increased the city-state's green cover from 36% in the 1980s to nearly 50% today, demonstrating that urban density and abundant green space need not be mutually exclusive.",
-    questions:[
-      {type:"tfng",q:"By 2050, more than two-thirds of the world's population is expected to be urban.",a:"TRUE"},
-      {type:"tfng",q:"The Lancet study measured blood pressure levels near green spaces.",a:"FALSE"},
-      {type:"tfng",q:"Spending at least two hours weekly in nature improved wellbeing regardless of income.",a:"TRUE"},
-      {type:"tfng",q:"A mature tree produces enough oxygen for five people annually.",a:"FALSE"},
-      {type:"tfng",q:"Urban parks have been shown to lower local temperatures.",a:"TRUE"},
-      {type:"tfng",q:"Commercial venues are more socially inclusive than parks.",a:"FALSE"},
-      {type:"mc",q:"According to the passage, urban green spaces are now considered:",options:["Luxury amenities for wealthy neighbourhoods","Critical infrastructure with measurable benefits","Primarily recreational facilities","Obstacles to urban development"],a:"Critical infrastructure with measurable benefits"},
-      {type:"mc",q:"Singapore's green cover has changed from:",options:["50% to 36%","36% to nearly 50%","20% to 36%","50% to 68%"],a:"36% to nearly 50%"},
-      {type:"completion",q:"Trees absorb pollutants including nitrogen dioxide, sulphur dioxide, and ___ matter.",a:"particulate"},
-      {type:"completion",q:"The phenomenon where cities are warmer than rural areas is called the 'urban ___ island effect'.",a:"heat"},
-      {type:"completion",q:"Green spaces absorb rainfall through permeable soil and plant ___ systems.",a:"root"},
-      {type:"mc",q:"Well-maintained green spaces have been linked to:",options:["Higher property taxes","Reduced crime rates","Increased traffic congestion","Lower school attendance"],a:"Reduced crime rates"},
-      {type:"tfng",q:"Singapore's approach proves dense cities cannot have significant green space.",a:"FALSE"}
+  {id:2,title:"Language & Culture",passages:[
+    {title:"The Death of Languages",text:"Of the approximately 7,000 languages currently spoken worldwide, linguists estimate that nearly half will become extinct by the end of this century. A language is considered endangered when children no longer learn it as their first language, and dead when its last native speaker passes away. The rate of language death has accelerated dramatically in recent decades, with one language disappearing approximately every two weeks.\n\nThe causes of language death are complex and interrelated. Economic globalisation has created powerful incentives for speakers of minority languages to adopt dominant languages — primarily English, Mandarin, Spanish, and Arabic — that provide access to education, employment, and international commerce. Urbanisation compounds this effect, as young people migrate to cities where minority languages carry no practical value. Government policies have historically played a devastating role; throughout the 20th century, many nations actively suppressed indigenous languages through education systems that punished children for speaking anything other than the national language.\n\nThe consequences of language loss extend far beyond the disappearance of words and grammar. Each language encodes unique knowledge about the natural world — medicinal plants, animal behaviour, ecological relationships — accumulated over thousands of years. The Inuit language, for example, contains dozens of words distinguishing different types of snow, reflecting observational precision that cannot be replicated in translation. When a language dies, this irreplaceable knowledge dies with it.\n\nFurthermore, linguistic diversity appears to correlate with biological diversity. Research published in the Proceedings of the National Academy of Sciences found that regions with the highest concentration of endemic species also tend to have the greatest diversity of languages. This suggests that the conditions supporting biological diversity — geographic isolation, varied ecosystems — simultaneously foster linguistic diversity.\n\nEfforts to revive endangered languages have produced some remarkable successes. Hebrew was essentially a dead language used only in religious texts before being revived as the everyday language of Israel in the early 20th century. Welsh, once in serious decline, has seen a significant resurgence through Welsh-medium education, with the number of Welsh speakers increasing for the first time in over a century. New Zealand's Maori language has similarly benefited from immersion schooling programmes.\n\nTechnology is increasingly playing a role in language preservation. Digital archives, mobile apps, and social media platforms allow speakers of endangered languages to create and share content, reaching diaspora communities that might otherwise lose connection with their linguistic heritage. However, linguists caution that technology alone cannot save a language — survival ultimately depends on whether communities choose to transmit it to their children.",
+     questions:[
+      {type:"tfng",q:"About half of the world's languages may disappear within 100 years.",a:"TRUE",exp:"'Nearly half will become extinct by the end of this century'."},
+      {type:"tfng",q:"A language dies when fewer than 100 people speak it.",a:"NOT GIVEN",exp:"The passage defines death as when 'its last native speaker passes away', not a specific number."},
+      {type:"tfng",q:"One language disappears roughly every fortnight.",a:"TRUE",exp:"'One language disappearing approximately every two weeks' — a fortnight is two weeks."},
+      {type:"tfng",q:"Economic globalisation has encouraged minority language speakers to learn dominant languages.",a:"TRUE",exp:"Globalisation 'created powerful incentives for speakers of minority languages to adopt dominant languages'."},
+      {type:"mc",q:"Government policies in the 20th century often:",options:["Encouraged multilingualism","Actively suppressed indigenous languages","Funded minority language education","Had no effect on language survival"],a:"Actively suppressed indigenous languages",exp:"Governments 'actively suppressed indigenous languages through education systems'."},
+      {type:"mc",q:"The Inuit language example illustrates that:",options:["All languages have equal vocabulary","Languages encode unique environmental knowledge","Snow vocabulary is universal","Translation always preserves meaning"],a:"Languages encode unique environmental knowledge",exp:"The Inuit example shows 'observational precision that cannot be replicated in translation'."},
+      {type:"tfng",q:"Regions with many endemic species tend to have fewer languages.",a:"FALSE",exp:"These regions 'tend to have the greatest diversity of languages', not fewer."},
+      {type:"mc",q:"Hebrew was revived from:",options:["A minority spoken language","A language used only in religious texts","A widely spoken language","A trading language"],a:"A language used only in religious texts",exp:"Hebrew was 'essentially a dead language used only in religious texts'."},
+      {type:"completion",q:"Welsh speakers increased for the first time in over a ___.",a:"century",exp:"'The number of Welsh speakers increasing for the first time in over a century'."},
+      {type:"completion",q:"New Zealand's Maori language benefited from ___ schooling programmes.",a:"immersion",exp:"The passage mentions 'immersion schooling programmes'."},
+      {type:"tfng",q:"Technology alone can save endangered languages.",a:"FALSE",exp:"Linguists 'caution that technology alone cannot save a language'."},
+      {type:"completion",q:"Language survival depends on whether communities transmit it to their ___.",a:"children",exp:"Survival 'depends on whether communities choose to transmit it to their children'."},
+      {type:"mc",q:"The main causes of language death include all EXCEPT:",options:["Economic globalisation","Urbanisation","Government suppression","Increased literacy rates"],a:"Increased literacy rates",exp:"Literacy rates are not mentioned as a cause of language death."}
+    ]},
+    {title:"The Rise of Artificial Intelligence in Education",text:"Artificial intelligence is transforming education at every level, from primary schools to universities and corporate training programmes. AI-powered tutoring systems can now adapt in real time to individual students' strengths and weaknesses, providing personalised instruction that was previously available only through expensive one-to-one human tutoring.\n\nOne of the most significant developments has been the emergence of intelligent tutoring systems (ITS). Research conducted at Carnegie Mellon University found that students using AI tutors achieved learning outcomes comparable to those receiving human tutoring, and significantly better than those in traditional classroom settings. The AI systems accomplished this by continuously analysing student responses, identifying misconceptions, and adjusting the difficulty and focus of subsequent questions accordingly.\n\nAutomated essay scoring represents another area where AI has made substantial inroads. Systems developed by organisations including Educational Testing Service (ETS) can evaluate written work for grammar, coherence, argument structure, and vocabulary range. Studies comparing AI scores with human examiner scores have found correlation rates exceeding 0.90, suggesting remarkable consistency. However, critics argue that current AI systems struggle to evaluate creativity, nuanced argumentation, and the genuine quality of ideas — focusing instead on surface-level linguistic features.\n\nThe integration of AI in education raises significant equity concerns. Students in well-funded schools and affluent families have greater access to sophisticated AI learning tools, potentially widening the achievement gap rather than narrowing it. A report by UNESCO warned that without deliberate policy intervention, AI in education could 'reinforce existing inequalities along economic, social, and cultural lines.'\n\nTeachers' roles are evolving rather than being eliminated. Most education experts reject the notion that AI will replace teachers entirely. Instead, they envision a model where AI handles routine tasks — grading, progress tracking, content delivery — while teachers focus on mentoring, creative instruction, and the social-emotional aspects of education that AI cannot replicate. A survey by McKinsey found that 72% of teachers who had used AI tools reported that the technology saved them significant time on administrative tasks.\n\nLooking ahead, the development of generative AI models presents both opportunities and challenges. These systems can create customised learning materials, generate practice questions, and provide instant feedback. However, concerns about academic integrity have intensified, as students can use the same technology to generate essays and complete assignments without genuine learning taking place.",
+     questions:[
+      {type:"tfng",q:"AI tutoring systems can adapt to individual students in real time.",a:"TRUE",exp:"The passage states AI systems 'adapt in real time to individual students' strengths and weaknesses'."},
+      {type:"tfng",q:"Carnegie Mellon found AI tutoring was worse than human tutoring.",a:"FALSE",exp:"Students achieved 'outcomes comparable to those receiving human tutoring'."},
+      {type:"mc",q:"Automated essay scoring systems evaluate all EXCEPT:",options:["Grammar","Coherence","Vocabulary range","Emotional depth"],a:"Emotional depth",exp:"The passage lists grammar, coherence, argument structure, and vocabulary — not emotional depth."},
+      {type:"tfng",q:"AI essay scoring correlates with human scoring at over 90%.",a:"TRUE",exp:"'Correlation rates exceeding 0.90'."},
+      {type:"mc",q:"Critics of AI essay scoring argue these systems cannot evaluate:",options:["Grammar accuracy","Spelling errors","Creativity and nuanced argumentation","Word count"],a:"Creativity and nuanced argumentation",exp:"Critics say systems 'struggle to evaluate creativity, nuanced argumentation, and genuine quality of ideas'."},
+      {type:"tfng",q:"UNESCO believes AI will automatically reduce educational inequality.",a:"FALSE",exp:"UNESCO warned AI could 'reinforce existing inequalities' without policy intervention."},
+      {type:"mc",q:"According to McKinsey, what percentage of teachers found AI saved time?",options:["52%","62%","72%","82%"],a:"72%",exp:"'72% of teachers who had used AI tools reported significant time savings'."},
+      {type:"completion",q:"AI is expected to handle grading, progress tracking, and content ___.",a:"delivery",exp:"AI handles 'grading, progress tracking, content delivery'."},
+      {type:"completion",q:"Teachers will focus more on mentoring and the ___-emotional aspects of education.",a:"social",exp:"Teachers focus on 'social-emotional aspects of education'."},
+      {type:"tfng",q:"Most experts believe AI will completely replace teachers.",a:"FALSE",exp:"'Most education experts reject the notion that AI will replace teachers entirely'."},
+      {type:"mc",q:"Generative AI raises concerns about:",options:["Teacher unemployment","Academic integrity","Hardware costs","Internet access"],a:"Academic integrity",exp:"'Concerns about academic integrity have intensified' with generative AI."},
+      {type:"completion",q:"ITS works by analysing responses, identifying ___, and adjusting difficulty.",a:"misconceptions",exp:"AI tutors work by 'identifying misconceptions'."},
+      {type:"tfng",q:"AI learning tools are equally accessible to all students.",a:"FALSE",exp:"Students in 'well-funded schools and affluent families have greater access'."}
+    ]},
+    {title:"The Ocean's Twilight Zone",text:"Between 200 and 1,000 metres below the ocean surface lies a vast realm known as the mesopelagic zone, or 'twilight zone.' Despite containing an estimated 10 billion tonnes of fish — more than the total catch of all the world's fisheries combined — this enormous ecosystem remains one of the least understood environments on Earth.\n\nThe twilight zone receives barely enough sunlight for photosynthesis, creating a dim world where organisms have evolved remarkable adaptations. Bioluminescence — the ability to produce light through chemical reactions — is nearly universal among twilight zone creatures. Some species use light to attract prey, others to communicate with potential mates, and still others to camouflage themselves against the faint light filtering from above through a process called counter-illumination.\n\nPerhaps the most extraordinary phenomenon in the twilight zone is the daily vertical migration, considered the largest animal migration on Earth. Each evening, billions of organisms — fish, squid, crustaceans, and jellyfish — ascend hundreds of metres to feed in the nutrient-rich surface waters under cover of darkness. Before dawn, they descend again to the relative safety of the deep. This migration moves an estimated 10 gigatons of carbon from the surface to the deep ocean annually, playing a significant but poorly quantified role in regulating atmospheric carbon dioxide levels.\n\nScientists are only now beginning to understand the twilight zone's importance to global climate regulation. The 'biological carbon pump' operates as organisms consume carbon-rich food at the surface and transport it to depth through their migrations, faecal matter, and eventual death. Without this mechanism, atmospheric CO2 levels could be 50% higher than they currently are, with catastrophic consequences for climate stability.\n\nCommercial interest in the twilight zone is growing, driven by the search for new protein sources to feed expanding human populations. Several nations have begun developing technologies to harvest mesopelagic fish at industrial scale. Marine biologists have expressed alarm at these developments, warning that the ecosystem is far too poorly understood to sustain commercial exploitation. The organisms of the twilight zone grow slowly and reproduce infrequently, making them extremely vulnerable to overfishing.\n\nThe challenges of studying this environment are formidable. Traditional nets are ineffective because many twilight zone organisms can detect and avoid them. New technologies including autonomous underwater vehicles, acoustic sensors, and environmental DNA sampling are beginning to reveal the true extent of life in this hidden realm, but comprehensive surveys remain years away.",
+     questions:[
+      {type:"tfng",q:"The mesopelagic zone lies between 200 and 1,000 metres deep.",a:"TRUE",exp:"The passage states 'between 200 and 1,000 metres below the ocean surface'."},
+      {type:"tfng",q:"The twilight zone contains about 10 billion tonnes of fish.",a:"TRUE",exp:"'An estimated 10 billion tonnes of fish'."},
+      {type:"mc",q:"Bioluminescence in the twilight zone is:",options:["Extremely rare","Found in a few species","Nearly universal","Only in fish"],a:"Nearly universal",exp:"Bioluminescence is described as 'nearly universal among twilight zone creatures'."},
+      {type:"completion",q:"Some species camouflage against faint light through ___-illumination.",a:"counter",exp:"The passage names the process 'counter-illumination'."},
+      {type:"mc",q:"The daily vertical migration is considered:",options:["A minor event","The largest animal migration on Earth","Limited to fish only","A monthly occurrence"],a:"The largest animal migration on Earth",exp:"It is described as 'the largest animal migration on Earth'."},
+      {type:"tfng",q:"The vertical migration happens weekly.",a:"FALSE",exp:"It is a 'daily vertical migration', not weekly."},
+      {type:"completion",q:"The migration moves about 10 gigatons of ___ annually.",a:"carbon",exp:"'10 gigatons of carbon from the surface to the deep ocean annually'."},
+      {type:"mc",q:"Without the biological carbon pump, CO2 levels could be:",options:["10% higher","25% higher","50% higher","100% higher"],a:"50% higher",exp:"'Atmospheric CO2 levels could be 50% higher'."},
+      {type:"tfng",q:"Twilight zone organisms reproduce quickly.",a:"FALSE",exp:"They 'grow slowly and reproduce infrequently'."},
+      {type:"mc",q:"Traditional nets fail in the twilight zone because:",options:["They are too heavy","Organisms can detect and avoid them","The water pressure is too high","Currents are too strong"],a:"Organisms can detect and avoid them",exp:"'Many twilight zone organisms can detect and avoid them'."},
+      {type:"completion",q:"New technologies for studying the zone include autonomous underwater vehicles, acoustic sensors, and environmental ___ sampling.",a:"DNA",exp:"The passage mentions 'environmental DNA sampling'."},
+      {type:"tfng",q:"Comprehensive surveys of the twilight zone have been completed.",a:"FALSE",exp:"'Comprehensive surveys remain years away'."},
+      {type:"completion",q:"Marine biologists warn the ecosystem cannot sustain commercial ___.",a:"exploitation",exp:"They warn against 'commercial exploitation'."},
+      {type:"mc",q:"Interest in harvesting twilight zone fish is driven by:",options:["Scientific curiosity","The search for new protein sources","Environmental regulation","Tourism"],a:"The search for new protein sources",exp:"Driven by 'the search for new protein sources to feed expanding human populations'."}
     ]}
   ]},
-  {id:3,title:"The Psychology of Decision Making",passages:[
-    {title:"Why We Choose What We Choose",text:"Every day, the average adult makes approximately 35,000 decisions, ranging from trivial choices about what to eat for breakfast to consequential ones affecting careers, relationships, and financial security. The field of behavioural economics, pioneered by psychologists Daniel Kahneman and Amos Tversky in the 1970s, has fundamentally challenged the classical economic assumption that humans are rational decision-makers who consistently act in their own best interest.\n\nKahneman's research, which earned him the Nobel Prize in Economics in 2002, identified two distinct systems of thinking that govern human decision-making. System 1 operates automatically and quickly, with little effort or sense of voluntary control. It is responsible for snap judgements, first impressions, and intuitive responses. System 2, by contrast, allocates attention to effortful mental activities, including complex calculations, logical reasoning, and careful analysis. While System 2 is more reliable, it is also considerably slower and requires significant cognitive resources, meaning people frequently default to System 1 even when complex decisions warrant more careful deliberation.\n\nOne of the most influential concepts to emerge from this research is 'loss aversion' — the finding that people experience the pain of losing something approximately twice as intensely as the pleasure of gaining something of equivalent value. This asymmetry explains a wide range of seemingly irrational behaviours. Investors hold onto losing stocks far too long, hoping to avoid realising a loss. Consumers are more motivated by the fear of missing a limited-time offer than by the prospect of a future discount of identical value.\n\nThe 'anchoring effect' represents another systematic bias in human judgement. When making estimates or decisions under uncertainty, people tend to rely heavily on the first piece of information they encounter — the 'anchor' — even when that information is arbitrary or irrelevant. In one famous experiment, participants who first saw a high random number subsequently estimated the percentage of African countries in the United Nations to be significantly higher than those who first saw a low random number. This effect has profound implications for salary negotiations, real estate pricing, and courtroom sentencing.\n\n'Choice overload,' a concept popularised by psychologist Barry Schwartz, describes the paradox that having more options often leads to worse decisions and less satisfaction. A landmark study by researchers Sheena Iyengar and Mark Lepper found that customers in a supermarket who were offered 24 varieties of jam were far less likely to make a purchase than those offered only 6 varieties. The abundance of options created decision paralysis, increased anxiety about making the wrong choice, and diminished post-decision satisfaction.\n\nUnderstanding these cognitive biases has practical applications far beyond academic interest. Governments worldwide have established behavioural insights teams — sometimes called 'nudge units' — that design policies leveraging these insights to encourage beneficial behaviours. By changing default options on pension enrolment forms, for instance, the UK government dramatically increased retirement savings rates without restricting individual choice. Such interventions demonstrate that small changes in how choices are presented can produce large shifts in human behaviour.",
-    questions:[
-      {type:"tfng",q:"Adults make roughly 35,000 decisions daily.",a:"TRUE"},
-      {type:"tfng",q:"Kahneman won the Nobel Prize in Psychology.",a:"FALSE"},
-      {type:"tfng",q:"System 1 thinking is slow and deliberate.",a:"FALSE"},
-      {type:"tfng",q:"People feel losses about twice as strongly as equivalent gains.",a:"TRUE"},
-      {type:"tfng",q:"The anchoring effect only works with relevant information.",a:"FALSE"},
-      {type:"mc",q:"The jam study demonstrated that:",options:["Customers prefer more variety","Too many options can reduce purchasing","6 types of jam is insufficient","Supermarkets should stock fewer products"],a:"Too many options can reduce purchasing"},
-      {type:"mc",q:"'Nudge units' in governments use behavioural insights to:",options:["Force citizens to make specific choices","Restrict consumer options","Encourage beneficial behaviours through choice design","Increase taxation on unhealthy products"],a:"Encourage beneficial behaviours through choice design"},
-      {type:"mc",q:"The UK government increased pension savings by:",options:["Making saving mandatory","Offering financial incentives","Changing default enrolment options","Raising the retirement age"],a:"Changing default enrolment options"},
-      {type:"completion",q:"System 2 thinking requires significant ___ resources.",a:"cognitive"},
-      {type:"completion",q:"The tendency to rely on the first information encountered is called the '___ effect'.",a:"anchoring"},
-      {type:"completion",q:"Choice overload was popularised by psychologist Barry ___.",a:"Schwartz"},
-      {type:"completion",q:"Loss aversion explains why investors hold onto ___ stocks too long.",a:"losing"},
-      {type:"tfng",q:"The jam study was conducted by Kahneman and Tversky.",a:"FALSE"}
+  {id:3,title:"Technology & Innovation",passages:[
+    {title:"The History and Future of Antibiotics",text:"The discovery of penicillin by Alexander Fleming in 1928 is widely regarded as one of the most significant medical breakthroughs in history. Before antibiotics, even minor wounds could lead to fatal infections, and surgical procedures carried enormous risks. The widespread introduction of antibiotics in the 1940s transformed medicine, extending average life expectancy by an estimated eight years and saving hundreds of millions of lives.\n\nHowever, the golden age of antibiotic discovery was remarkably brief. Most classes of antibiotics in use today were discovered between 1940 and 1962. Since then, the pipeline of new antibiotics has slowed to a trickle, partly because pharmaceutical companies find these drugs less profitable than medications for chronic conditions. An antibiotic course lasts days or weeks, whereas treatments for diabetes, heart disease, or depression generate revenue for years.\n\nThe emergence of antibiotic-resistant bacteria represents one of the gravest threats to global public health. The World Health Organisation has warned that without urgent action, the world faces a 'post-antibiotic era' in which common infections could once again become lethal. Methicillin-resistant Staphylococcus aureus (MRSA) alone kills an estimated 20,000 people annually in the United States. Globally, antibiotic-resistant infections are responsible for approximately 1.27 million deaths per year.\n\nResistance develops through natural selection. When bacteria are exposed to antibiotics, most are killed, but a small number with genetic mutations allowing them to survive will reproduce and pass on their resistance genes. The overuse of antibiotics in human medicine — particularly for viral infections against which they are ineffective — and their extensive use in agriculture have dramatically accelerated this process.\n\nSeveral promising approaches are being explored to combat resistance. Bacteriophage therapy uses viruses that specifically target bacteria, a technique pioneered in the Soviet Union but largely ignored in the West until recently. CRISPR gene-editing technology offers the theoretical possibility of disabling resistance genes directly. Meanwhile, researchers are investigating antimicrobial peptides — naturally occurring molecules in the immune systems of many organisms — as a fundamentally new class of antibacterial agents.\n\nPrevention remains crucial. Simple measures such as proper handwashing, appropriate antibiotic prescribing, and reducing antibiotic use in livestock can significantly slow the development of resistance, buying time for new therapeutic approaches to be developed.",
+     questions:[
+      {type:"tfng",q:"Penicillin was discovered in 1928.",a:"TRUE",exp:"The passage states Fleming discovered penicillin 'in 1928'."},
+      {type:"tfng",q:"Antibiotics extended life expectancy by approximately eight years.",a:"TRUE",exp:"'Extending average life expectancy by an estimated eight years'."},
+      {type:"mc",q:"The golden age of antibiotic discovery lasted:",options:["From 1928 to 1962","From 1940 to 1962","From 1940 to 1980","From 1928 to 1980"],a:"From 1940 to 1962",exp:"'Most classes were discovered between 1940 and 1962'."},
+      {type:"mc",q:"Pharmaceutical companies find antibiotics less profitable because:",options:["They are cheap to make","Treatment courses are short","They are hard to develop","Patients don't need them"],a:"Treatment courses are short",exp:"'An antibiotic course lasts days or weeks' vs chronic treatments generating revenue for years."},
+      {type:"completion",q:"MRSA kills an estimated ___ people annually in the US.",a:"20,000",exp:"'MRSA alone kills an estimated 20,000 people annually'."},
+      {type:"tfng",q:"Antibiotic-resistant infections kill about 1.27 million people globally per year.",a:"TRUE",exp:"'Approximately 1.27 million deaths per year'."},
+      {type:"mc",q:"Resistance develops because:",options:["Bacteria become immune over time","Surviving bacteria with mutations reproduce","Antibiotics become weaker","Viruses create resistance"],a:"Surviving bacteria with mutations reproduce",exp:"Bacteria 'with genetic mutations allowing them to survive will reproduce'."},
+      {type:"tfng",q:"Antibiotics are effective against viral infections.",a:"FALSE",exp:"The passage says antibiotics are used for 'viral infections against which they are ineffective'."},
+      {type:"completion",q:"Bacteriophage therapy uses ___ that specifically target bacteria.",a:"viruses",exp:"'Uses viruses that specifically target bacteria'."},
+      {type:"mc",q:"Bacteriophage therapy was pioneered in:",options:["The United States","Western Europe","The Soviet Union","Japan"],a:"The Soviet Union",exp:"'A technique pioneered in the Soviet Union'."},
+      {type:"completion",q:"CRISPR could theoretically disable ___ genes directly.",a:"resistance",exp:"CRISPR offers 'disabling resistance genes directly'."},
+      {type:"completion",q:"Antimicrobial peptides are naturally occurring ___ in immune systems.",a:"molecules",exp:"'Naturally occurring molecules in the immune systems'."},
+      {type:"tfng",q:"Reducing antibiotic use in livestock can help slow resistance.",a:"TRUE",exp:"'Reducing antibiotic use in livestock can significantly slow the development of resistance'."}
+    ]},
+    {title:"Renewable Energy: Progress and Challenges",text:"The global transition to renewable energy has accelerated beyond the most optimistic projections made just a decade ago. In 2023, renewable sources accounted for over 30% of global electricity generation for the first time, with solar and wind power leading the expansion. The cost of solar photovoltaic panels has fallen by approximately 90% since 2010, making solar power cheaper than coal in most regions of the world.\n\nChina has emerged as the dominant force in renewable energy deployment, installing more solar capacity in a single year than the United States has accumulated in its entire history. The country manufactures approximately 80% of the world's solar panels, creating both economic advantages and supply chain concerns for other nations seeking energy independence.\n\nWind energy has experienced similarly dramatic growth. Offshore wind farms, once considered prohibitively expensive, have seen costs drop by nearly 60% over the past decade. Countries with extensive coastlines, including the United Kingdom, Denmark, and the Netherlands, have invested heavily in offshore wind, with turbines now reaching heights exceeding 260 metres — taller than most skyscrapers.\n\nDespite this progress, significant challenges remain. The intermittency of solar and wind power — the sun doesn't always shine and the wind doesn't always blow — creates a fundamental problem for grid stability. Energy storage technologies, particularly lithium-ion batteries, have improved substantially but remain expensive at the scale needed to power entire cities overnight or through calm weather periods.\n\nThe environmental footprint of renewable energy technology itself requires careful consideration. Solar panel manufacturing involves toxic chemicals and significant energy consumption. Wind turbines have been linked to bird and bat mortality, and the decommissioning of ageing equipment creates waste management challenges. Lithium mining for batteries has caused significant environmental damage in countries including Chile, Bolivia, and the Democratic Republic of Congo.\n\nNuclear energy occupies a controversial position in the transition debate. Advocates argue that nuclear power provides reliable, low-carbon baseload electricity that perfectly complements intermittent renewables. Opponents cite unresolved issues of radioactive waste storage, the risk of catastrophic accidents, and the high cost of new nuclear construction. France, which generates approximately 70% of its electricity from nuclear power, demonstrates both the potential and the ongoing controversies of this approach.",
+     questions:[
+      {type:"tfng",q:"Renewables exceeded 30% of global electricity generation in 2023.",a:"TRUE",exp:"'Renewable sources accounted for over 30% of global electricity generation' in 2023."},
+      {type:"completion",q:"Solar panel costs have fallen by approximately ___% since 2010.",a:"90",exp:"'Fallen by approximately 90% since 2010'."},
+      {type:"mc",q:"China manufactures roughly what percentage of global solar panels?",options:["50%","60%","70%","80%"],a:"80%",exp:"'China manufactures approximately 80% of the world's solar panels'."},
+      {type:"tfng",q:"Offshore wind costs have increased over the past decade.",a:"FALSE",exp:"Costs have 'dropped by nearly 60%'."},
+      {type:"completion",q:"Modern offshore wind turbines can exceed ___ metres in height.",a:"260",exp:"'Turbines now reaching heights exceeding 260 metres'."},
+      {type:"mc",q:"The main challenge with solar and wind power is:",options:["High costs","Intermittency","Noise pollution","Land requirements"],a:"Intermittency",exp:"'The intermittency of solar and wind power' is the fundamental problem described."},
+      {type:"tfng",q:"Lithium-ion battery storage is already cheap enough for city-scale use.",a:"FALSE",exp:"Batteries 'remain expensive at the scale needed to power entire cities'."},
+      {type:"mc",q:"Solar panel manufacturing involves:",options:["No environmental impact","Toxic chemicals and energy consumption","Only recyclable materials","Zero emissions"],a:"Toxic chemicals and energy consumption",exp:"Manufacturing 'involves toxic chemicals and significant energy consumption'."},
+      {type:"completion",q:"Wind turbines have been linked to ___ and bat mortality.",a:"bird",exp:"'Linked to bird and bat mortality'."},
+      {type:"tfng",q:"France generates about 70% of its electricity from nuclear power.",a:"TRUE",exp:"'France generates approximately 70% of its electricity from nuclear power'."},
+      {type:"mc",q:"Opponents of nuclear energy cite all EXCEPT:",options:["Radioactive waste","Accident risk","High construction costs","Low energy output"],a:"Low energy output",exp:"Low output is not mentioned; nuclear provides 'reliable baseload electricity'."},
+      {type:"completion",q:"Lithium mining has caused environmental damage in Chile, Bolivia, and the Democratic Republic of ___.",a:"Congo",exp:"The passage lists 'the Democratic Republic of Congo'."},
+      {type:"tfng",q:"Nuclear advocates say it complements intermittent renewables well.",a:"TRUE",exp:"'Nuclear power provides reliable, low-carbon baseload electricity that perfectly complements intermittent renewables'."},
+      {type:"tfng",q:"Denmark has invested heavily in offshore wind.",a:"TRUE",exp:"Denmark is listed among countries that 'have invested heavily in offshore wind'."}
+    ]},
+    {title:"The Neuroscience of Creativity",text:"Creativity has long been shrouded in mystique — the province of tortured artists and eccentric geniuses. Modern neuroscience, however, is revealing that creative thinking is a fundamental cognitive process accessible to everyone, governed by identifiable neural mechanisms rather than divine inspiration.\n\nBrain imaging studies have overturned the popular myth that creativity resides exclusively in the right hemisphere. Research by cognitive neuroscientist Roger Beaty at Penn State University has demonstrated that creative thinking involves dynamic interaction between three large-scale brain networks: the default mode network, activated during imagination and spontaneous thought; the executive control network, responsible for focused attention and evaluation; and the salience network, which mediates between the two, determining which ideas merit further attention.\n\nHighly creative individuals appear to have stronger connections between these three networks, allowing them to generate novel ideas while simultaneously evaluating their usefulness. This finding explains why creativity requires both the uninhibited flow of ideas and the disciplined judgement to select the best ones — a process psychologists call 'divergent' and 'convergent' thinking, respectively.\n\nEnvironmental factors significantly influence creative output. Research at the University of Chicago found that a moderate level of ambient noise — approximately 70 decibels, equivalent to a busy coffee shop — enhances creative thinking compared to both silence and loud noise. This may explain the common experience of generating ideas in cafes and public spaces rather than in quiet isolation.\n\nSleep plays a crucial role in creative problem-solving. Studies have shown that REM sleep, during which the brain consolidates memories and forms unexpected connections between distant concepts, significantly enhances creative insight. The chemist August Kekulé famously attributed his discovery of the benzene ring structure to a dream, and numerous artists and scientists have reported similar experiences of creative breakthroughs emerging from sleep.\n\nThe relationship between constraints and creativity presents a counterintuitive finding. While freedom might seem conducive to creativity, research consistently shows that moderate constraints — limited time, materials, or resources — actually stimulate more creative solutions than complete freedom. This 'constraint theory of creativity' suggests that boundaries force the mind to explore unconventional approaches it might otherwise overlook.",
+     questions:[
+      {type:"tfng",q:"Modern science shows creativity is limited to certain gifted individuals.",a:"FALSE",exp:"Creativity is 'a fundamental cognitive process accessible to everyone'."},
+      {type:"tfng",q:"Creativity resides exclusively in the right brain hemisphere.",a:"FALSE",exp:"Brain imaging studies have 'overturned' this popular myth."},
+      {type:"mc",q:"Creative thinking involves how many brain networks?",options:["One","Two","Three","Four"],a:"Three",exp:"Three networks: default mode, executive control, and salience."},
+      {type:"completion",q:"The salience network determines which ideas merit further ___.",a:"attention",exp:"The salience network determines 'which ideas merit further attention'."},
+      {type:"mc",q:"Highly creative people have:",options:["Larger brains","Stronger connections between brain networks","More neurons","Higher IQ scores"],a:"Stronger connections between brain networks",exp:"They 'have stronger connections between these three networks'."},
+      {type:"completion",q:"Generating many ideas freely is called '___ thinking'.",a:"divergent",exp:"The passage calls idea generation 'divergent thinking'."},
+      {type:"mc",q:"The optimal noise level for creativity is about:",options:["30 decibels","50 decibels","70 decibels","90 decibels"],a:"70 decibels",exp:"'Approximately 70 decibels, equivalent to a busy coffee shop'."},
+      {type:"tfng",q:"Complete silence is the best environment for creative thinking.",a:"FALSE",exp:"Moderate noise 'enhances creative thinking compared to both silence and loud noise'."},
+      {type:"completion",q:"REM sleep helps the brain form connections between ___ concepts.",a:"distant",exp:"REM sleep allows 'unexpected connections between distant concepts'."},
+      {type:"mc",q:"Kekulé discovered the benzene ring structure through:",options:["Years of experiments","A dream","A mathematical formula","A colleague's suggestion"],a:"A dream",exp:"He 'attributed his discovery to a dream'."},
+      {type:"tfng",q:"Complete freedom produces the most creative results.",a:"FALSE",exp:"'Moderate constraints actually stimulate more creative solutions than complete freedom'."},
+      {type:"completion",q:"The '___ theory of creativity' says boundaries encourage unconventional approaches.",a:"constraint",exp:"The passage names the 'constraint theory of creativity'."},
+      {type:"mc",q:"Roger Beaty's research was conducted at:",options:["Harvard","MIT","Penn State University","University of Chicago"],a:"Penn State University",exp:"'Cognitive neuroscientist Roger Beaty at Penn State University'."},
+      {type:"tfng",q:"The University of Chicago found that loud noise helps creativity.",a:"FALSE",exp:"Moderate noise helps, while loud noise does not — the benefit is 'compared to both silence and loud noise'."}
+    ]}
+  ]},
+  {id:4,title:"History & Environment",passages:[
+    {title:"The Silk Road: More Than Trade",text:"The Silk Road — a network of trade routes connecting East Asia with the Mediterranean world — has been romanticised as a single highway traversed by camel caravans laden with exotic goods. In reality, it was a complex web of interconnected paths spanning over 6,400 kilometres, through which not only silk and spices but also ideas, religions, technologies, and diseases travelled between civilisations for nearly two millennia.\n\nThe term 'Silk Road' was coined in 1877 by German geographer Ferdinand von Richthofen, though the routes themselves had been in use since at least the 2nd century BCE when the Chinese Han Dynasty opened diplomatic and commercial relations with Central Asian kingdoms. Silk was indeed a prized commodity — so valued in Rome that the Senate repeatedly attempted to ban its purchase to prevent the outflow of gold — but it was far from the only merchandise exchanged.\n\nThe cultural transmission along these routes was arguably more significant than the commercial exchange. Buddhism spread from India to China, Central Asia, and eventually Korea and Japan via Silk Road connections. Islam later travelled eastward along the same paths. Artistic styles blended in remarkable ways: Gandharan Buddhist sculpture, produced in modern-day Pakistan and Afghanistan, displays unmistakable Greek influence from Alexander the Great's campaigns.\n\nTechnological transfer was equally transformative. Papermaking, invented in China around 105 CE, reached the Islamic world by the 8th century and Europe by the 12th century, revolutionising the preservation and dissemination of knowledge. Gunpowder, the compass, and printing — China's 'Four Great Inventions' (alongside paper) — all reached Europe via Silk Road intermediaries, fundamentally altering the course of Western civilisation.\n\nThe Silk Road also served as a conduit for disease. The Black Death, which killed an estimated one-third of Europe's population between 1347 and 1353, is believed to have originated in Central Asia and travelled westward along trade routes. Earlier pandemics, including the Plague of Justinian in the 6th century, likely followed similar paths.\n\nToday, China's Belt and Road Initiative, launched in 2013, explicitly invokes the historical Silk Road to frame a massive infrastructure and investment programme spanning Asia, Africa, and Europe. Whether this modern iteration will produce the same richness of cultural and intellectual exchange as its predecessor remains to be seen.",
+     questions:[
+      {type:"tfng",q:"The Silk Road was a single highway.",a:"FALSE",exp:"It was 'a complex web of interconnected paths', not a single highway."},
+      {type:"completion",q:"The term 'Silk Road' was coined by Ferdinand von ___ in 1877.",a:"Richthofen",exp:"'German geographer Ferdinand von Richthofen'."},
+      {type:"tfng",q:"The routes had been used since at least the 2nd century BCE.",a:"TRUE",exp:"'In use since at least the 2nd century BCE'."},
+      {type:"mc",q:"The Roman Senate tried to ban silk purchases because:",options:["Silk was considered immoral","To prevent gold outflow","Silk caused allergies","Chinese trade was banned"],a:"To prevent gold outflow",exp:"'To prevent the outflow of gold'."},
+      {type:"mc",q:"Gandharan Buddhist sculpture shows influence from:",options:["Roman art","Persian art","Greek art","Indian art"],a:"Greek art",exp:"It 'displays unmistakable Greek influence from Alexander the Great's campaigns'."},
+      {type:"completion",q:"Papermaking was invented in China around ___ CE.",a:"105",exp:"'Invented in China around 105 CE'."},
+      {type:"tfng",q:"Paper reached Europe in the 8th century.",a:"FALSE",exp:"Paper reached the Islamic world by the 8th century but 'Europe by the 12th century'."},
+      {type:"mc",q:"The Black Death is believed to have originated in:",options:["Europe","Africa","Central Asia","East Asia"],a:"Central Asia",exp:"'Believed to have originated in Central Asia'."},
+      {type:"completion",q:"The Black Death killed an estimated one-___ of Europe's population.",a:"third",exp:"'One-third of Europe's population'."},
+      {type:"tfng",q:"China's Belt and Road Initiative was launched in 2013.",a:"TRUE",exp:"'Launched in 2013'."},
+      {type:"mc",q:"China's 'Four Great Inventions' include all EXCEPT:",options:["Paper","Gunpowder","The telescope","The compass"],a:"The telescope",exp:"The four are paper, gunpowder, compass, and printing — not the telescope."},
+      {type:"tfng",q:"Buddhism spread from China to India via the Silk Road.",a:"FALSE",exp:"Buddhism spread 'from India to China', not the other way."},
+      {type:"completion",q:"The cultural transmission along the Silk Road was arguably more significant than the ___ exchange.",a:"commercial",exp:"Cultural transmission was 'arguably more significant than the commercial exchange'."}
+    ]},
+    {title:"Coral Reefs Under Threat",text:"Coral reefs, often called the 'rainforests of the sea,' occupy less than 0.1% of the ocean floor yet support approximately 25% of all known marine species. These extraordinary ecosystems, built over thousands of years by tiny coral polyps depositing calcium carbonate skeletons, are now facing an existential crisis driven primarily by rising ocean temperatures.\n\nMass coral bleaching events have increased dramatically in frequency and severity since the 1980s. Bleaching occurs when ocean temperatures rise just 1-2 degrees Celsius above the normal summer maximum, causing corals to expel the symbiotic algae called zooxanthellae that provide them with up to 90% of their energy through photosynthesis. Without these algae, the coral turns white and, if conditions persist for several weeks, dies.\n\nThe Great Barrier Reef, the world's largest coral reef system stretching over 2,300 kilometres along Australia's northeast coast, has experienced five mass bleaching events since 2016. A study published in Current Biology found that the reef lost approximately 50% of its coral cover between 1995 and 2017. Scientists warn that if global temperatures rise by 2 degrees Celsius above pre-industrial levels — the upper limit set by the Paris Agreement — virtually all tropical coral reefs will be severely degraded.\n\nOcean acidification presents a second existential threat. As oceans absorb approximately 30% of human-produced carbon dioxide, seawater becomes more acidic. This reduces the concentration of carbonate ions that corals need to build their skeletons, effectively dissolving the structural foundation of reef ecosystems. Current projections suggest that ocean acidity will increase by 100-150% by 2100 under high-emission scenarios.\n\nThe economic consequences of reef degradation are substantial. Coral reefs provide ecosystem services valued at an estimated $375 billion annually, including coastal protection from storms, fisheries supporting over 500 million people, and tourism revenue. The Great Barrier Reef alone generates approximately $6.4 billion per year for the Australian economy and supports 64,000 jobs.\n\nReef restoration efforts are expanding but face enormous challenges of scale. Coral gardening — growing fragments in nurseries and transplanting them to degraded reefs — has shown promise but can only restore tiny fractions of what has been lost. Some scientists are experimenting with selectively breeding heat-resistant coral strains, essentially attempting to accelerate natural evolution to keep pace with climate change.",
+     questions:[
+      {type:"tfng",q:"Coral reefs cover about 0.1% of the ocean floor.",a:"TRUE",exp:"'Occupy less than 0.1% of the ocean floor'."},
+      {type:"completion",q:"Coral reefs support approximately ___% of all known marine species.",a:"25",exp:"'Support approximately 25% of all known marine species'."},
+      {type:"mc",q:"Bleaching occurs when temperatures rise above normal by:",options:["0.5 degrees","1-2 degrees Celsius","3-4 degrees","5+ degrees"],a:"1-2 degrees Celsius",exp:"'Just 1-2 degrees Celsius above the normal summer maximum'."},
+      {type:"completion",q:"Symbiotic algae called ___ provide corals with up to 90% of their energy.",a:"zooxanthellae",exp:"The passage names 'symbiotic algae called zooxanthellae'."},
+      {type:"tfng",q:"The Great Barrier Reef has experienced five bleaching events since 2016.",a:"TRUE",exp:"'Five mass bleaching events since 2016'."},
+      {type:"mc",q:"The Great Barrier Reef lost approximately what percentage of coral cover?",options:["25%","50%","75%","90%"],a:"50%",exp:"'Lost approximately 50% of its coral cover between 1995 and 2017'."},
+      {type:"completion",q:"Oceans absorb about ___% of human-produced CO2.",a:"30",exp:"'Oceans absorb approximately 30%'."},
+      {type:"mc",q:"Ocean acidity may increase by 2100 by:",options:["10-20%","50-75%","100-150%","200-300%"],a:"100-150%",exp:"'Acidity will increase by 100-150% by 2100'."},
+      {type:"tfng",q:"Coral reef ecosystem services are worth about $375 billion annually.",a:"TRUE",exp:"'Valued at an estimated $375 billion annually'."},
+      {type:"completion",q:"The Great Barrier Reef supports ___ jobs.",a:"64,000",exp:"'Supports 64,000 jobs'."},
+      {type:"mc",q:"Coral gardening involves:",options:["Feeding corals artificially","Growing fragments in nurseries and transplanting them","Removing damaged coral","Adding chemicals to water"],a:"Growing fragments in nurseries and transplanting them",exp:"'Growing fragments in nurseries and transplanting them to degraded reefs'."},
+      {type:"tfng",q:"Scientists are trying to breed heat-resistant coral strains.",a:"TRUE",exp:"'Selectively breeding heat-resistant coral strains'."},
+      {type:"completion",q:"The Great Barrier Reef stretches over ___ kilometres.",a:"2,300",exp:"'Stretching over 2,300 kilometres'."},
+      {type:"tfng",q:"Coral restoration can easily replace what has been lost.",a:"FALSE",exp:"It 'can only restore tiny fractions of what has been lost'."}
+    ]},
+    {title:"The Economics of Happiness",text:"For decades, economists measured national progress almost exclusively through Gross Domestic Product (GDP) — the total value of goods and services produced within a country. However, a growing body of research has challenged the assumption that economic growth automatically translates into improved wellbeing, prompting governments to explore alternative measures of national success.\n\nThe 'Easterlin Paradox,' proposed by economist Richard Easterlin in 1974, observed that within a country, wealthier individuals tend to be happier than poorer ones, yet average happiness levels do not increase as the country as a whole grows richer over time. This paradox has been partially explained by the concept of 'hedonic adaptation' — humans' tendency to quickly return to a baseline level of happiness after positive or negative changes in circumstances.\n\nResearch consistently shows that beyond a certain income threshold — estimated at approximately $75,000 per year in the United States by Nobel laureate Daniel Kahneman — additional income produces diminishing returns in day-to-day emotional wellbeing, though life satisfaction continues to rise with income. This distinction between emotional wellbeing and life evaluation has important policy implications.\n\nBhutan pioneered the concept of Gross National Happiness (GNH) in the 1970s, explicitly prioritising collective happiness over economic productivity. The GNH index measures nine domains including psychological wellbeing, health, education, governance, and ecological diversity. While critics argue that GNH is difficult to measure objectively and can mask genuine economic hardship, the concept has influenced policy discussions worldwide.\n\nThe United Nations World Happiness Report, published annually since 2012, ranks countries based on self-reported life satisfaction. Nordic countries — Finland, Denmark, Norway, and Iceland — consistently occupy the top positions. The report identifies six key factors explaining approximately 75% of the variation in happiness between countries: GDP per capita, social support, healthy life expectancy, freedom to make life choices, generosity, and perceptions of corruption.\n\nSeveral countries have begun integrating wellbeing metrics into policy-making. New Zealand's 'Wellbeing Budget,' introduced in 2019, allocates government spending based on measures including mental health, child poverty, and domestic violence rather than purely economic indicators. Scotland, Iceland, and Wales have formed the Wellbeing Economy Governments network, committed to prioritising wellbeing over GDP growth.",
+     questions:[
+      {type:"completion",q:"The Easterlin Paradox was proposed in ___.",a:"1974",exp:"'Proposed by economist Richard Easterlin in 1974'."},
+      {type:"mc",q:"Hedonic adaptation means:",options:["People always want more money","People return to baseline happiness after changes","Economic growth causes happiness","Wealth guarantees happiness"],a:"People return to baseline happiness after changes",exp:"'Tendency to quickly return to a baseline level of happiness'."},
+      {type:"completion",q:"Beyond approximately $___,000 per year, extra income has diminishing emotional returns.",a:"75",exp:"'Approximately $75,000 per year' is the threshold."},
+      {type:"tfng",q:"Bhutan introduced Gross National Happiness in the 1990s.",a:"FALSE",exp:"Bhutan 'pioneered the concept in the 1970s', not 1990s."},
+      {type:"mc",q:"The GNH index measures how many domains?",options:["Five","Seven","Nine","Twelve"],a:"Nine",exp:"'Nine domains including psychological wellbeing, health, education'."},
+      {type:"tfng",q:"The World Happiness Report has been published since 2012.",a:"TRUE",exp:"'Published annually since 2012'."},
+      {type:"mc",q:"Which countries consistently rank highest in happiness?",options:["Asian countries","Nordic countries","North American countries","South American countries"],a:"Nordic countries",exp:"'Finland, Denmark, Norway, and Iceland consistently occupy the top positions'."},
+      {type:"completion",q:"Six factors explain about ___% of happiness variation between countries.",a:"75",exp:"'Approximately 75% of the variation'."},
+      {type:"mc",q:"New Zealand's Wellbeing Budget was introduced in:",options:["2015","2017","2019","2021"],a:"2019",exp:"'Introduced in 2019'."},
+      {type:"tfng",q:"Scotland is part of the Wellbeing Economy Governments network.",a:"TRUE",exp:"'Scotland, Iceland, and Wales have formed the Wellbeing Economy Governments network'."},
+      {type:"completion",q:"Kahneman found the distinction between emotional wellbeing and life ___.",a:"evaluation",exp:"The passage discusses 'emotional wellbeing and life evaluation'."},
+      {type:"tfng",q:"All critics agree that GNH is a superior measure to GDP.",a:"FALSE",exp:"'Critics argue that GNH is difficult to measure objectively and can mask genuine economic hardship'."},
+      {type:"mc",q:"The six happiness factors include all EXCEPT:",options:["GDP per capita","Social support","Climate quality","Freedom to make life choices"],a:"Climate quality",exp:"Climate quality is not listed among the six factors."}
+    ]}
+  ]},
+  {id:5,title:"Health & Nature",passages:[
+    {title:"The Microbiome Revolution",text:"The human body hosts approximately 38 trillion microorganisms — bacteria, fungi, viruses, and other microscopic life forms — collectively known as the microbiome. This microbial community, weighing roughly 200 grams in total, contains an estimated 3.3 million unique genes, outnumbering human genes by approximately 150 to 1. Over the past two decades, advances in DNA sequencing technology have transformed our understanding of these invisible inhabitants from mere passengers to active participants in human health.\n\nThe gut microbiome, containing the greatest concentration and diversity of microbes, has received the most scientific attention. Research has established that gut bacteria play essential roles in digesting food, synthesising vitamins including K and B12, training the immune system, and protecting against pathogenic organisms. The composition of an individual's gut microbiome is influenced by numerous factors including mode of birth, breastfeeding, diet, antibiotic use, and environmental exposures.\n\nPerhaps the most surprising discovery has been the gut-brain axis — a bidirectional communication system linking the gut microbiome to the central nervous system. Studies in mice have demonstrated that altering gut bacteria can affect behaviour, anxiety levels, and even cognitive function. Human research, while still in its early stages, has found associations between certain gut bacteria profiles and conditions including depression, autism spectrum disorder, and Parkinson's disease.\n\nThe therapeutic potential of microbiome manipulation is generating enormous interest. Faecal microbiota transplantation (FMT), in which gut bacteria from a healthy donor are transferred to a patient, has proven remarkably effective for treating recurrent Clostridioides difficile infections, with cure rates exceeding 90%. Researchers are now investigating whether similar approaches could treat conditions ranging from inflammatory bowel disease to metabolic syndrome.\n\nThe probiotics industry has capitalised on growing public awareness of the microbiome, with global sales exceeding $60 billion annually. However, scientists caution that most commercial probiotic products have limited evidence supporting their health claims. The specific strains, dosages, and conditions under which probiotics might be beneficial remain poorly defined, and regulatory oversight varies significantly between countries.\n\nDiet appears to be the single most influential factor in shaping the gut microbiome. Research has consistently shown that plant-rich diets high in fibre promote microbial diversity, while Western diets high in processed food and sugar are associated with reduced diversity — a state linked to increased risk of obesity, diabetes, and autoimmune conditions.",
+     questions:[
+      {type:"tfng",q:"The human body hosts about 38 trillion microorganisms.",a:"TRUE",exp:"'Approximately 38 trillion microorganisms'."},
+      {type:"completion",q:"The microbiome contains roughly ___ million unique genes.",a:"3.3",exp:"'An estimated 3.3 million unique genes'."},
+      {type:"mc",q:"Microbial genes outnumber human genes by approximately:",options:["10 to 1","50 to 1","100 to 1","150 to 1"],a:"150 to 1",exp:"'Outnumbering human genes by approximately 150 to 1'."},
+      {type:"mc",q:"Gut bacteria help with all EXCEPT:",options:["Digesting food","Synthesising vitamins","Regulating body temperature","Training the immune system"],a:"Regulating body temperature",exp:"Temperature regulation is not mentioned among gut bacteria functions."},
+      {type:"completion",q:"The bidirectional link between gut and brain is called the gut-___ axis.",a:"brain",exp:"'The gut-brain axis'."},
+      {type:"tfng",q:"Human microbiome research has conclusively proven gut bacteria cause depression.",a:"FALSE",exp:"Human research 'has found associations' — correlations, not proven causation."},
+      {type:"mc",q:"FMT cure rates for C. difficile infections exceed:",options:["50%","70%","80%","90%"],a:"90%",exp:"'Cure rates exceeding 90%'."},
+      {type:"completion",q:"Global probiotic sales exceed $___ billion annually.",a:"60",exp:"'Global sales exceeding $60 billion annually'."},
+      {type:"tfng",q:"Most commercial probiotics have strong scientific evidence behind them.",a:"FALSE",exp:"'Most commercial probiotic products have limited evidence supporting their health claims'."},
+      {type:"mc",q:"The most influential factor in shaping the gut microbiome is:",options:["Exercise","Genetics","Diet","Sleep"],a:"Diet",exp:"'Diet appears to be the single most influential factor'."},
+      {type:"tfng",q:"Western diets high in processed food promote microbial diversity.",a:"FALSE",exp:"Western diets are 'associated with reduced diversity'."},
+      {type:"completion",q:"Plant-rich diets high in ___ promote microbial diversity.",a:"fibre",exp:"'Diets high in fibre promote microbial diversity'."},
+      {type:"completion",q:"An individual's microbiome is influenced by mode of birth, breastfeeding, diet, ___ use, and environment.",a:"antibiotic",exp:"'Antibiotic use' is listed among influencing factors."}
+    ]},
+    {title:"The Future of Water",text:"Freshwater represents just 2.5% of all water on Earth, and only 1% of that is readily accessible in rivers, lakes, and shallow aquifers. As global population approaches 10 billion by 2050 and climate change disrupts rainfall patterns, water scarcity is emerging as one of the defining challenges of the 21st century. The United Nations estimates that by 2025, 1.8 billion people will live in regions facing absolute water scarcity.\n\nAgriculture accounts for approximately 70% of global freshwater withdrawals, making it the single largest consumer. Inefficient irrigation methods — including flood irrigation, which can lose up to 50% of water to evaporation — remain widespread in developing countries. Drip irrigation technology, which delivers water directly to plant roots, can reduce agricultural water use by 30-70% while simultaneously increasing crop yields, yet adoption remains limited due to initial costs.\n\nUrban water infrastructure presents its own challenges. In many cities, ageing pipe networks lose 20-40% of treated water to leaks before it reaches consumers. London's Victorian-era water mains lose approximately one billion litres daily. Upgrading these systems requires enormous capital investment, but the cost of inaction — in terms of wasted treated water and the energy used to treat it — may be greater.\n\nDesalination — removing salt from seawater — has emerged as a critical water source for arid regions. The Middle East leads globally, with Saudi Arabia alone operating more than 30 desalination plants. Modern reverse osmosis technology has reduced the energy cost of desalination by approximately 80% since the 1970s. However, the process still requires significant energy, and the disposal of concentrated brine byproduct poses environmental challenges to marine ecosystems.\n\nWater recycling represents another promising approach. Singapore's NEWater programme purifies treated wastewater to drinking-water standards using advanced membrane filtration and ultraviolet disinfection. The programme now meets approximately 40% of Singapore's water demand. Namibia's capital, Windhoek, has been practising direct potable water recycling since 1968, demonstrating that the technology is both safe and viable.\n\nTransboundary water disputes are intensifying as scarcity increases. Major river systems including the Nile, Tigris-Euphrates, Jordan, and Mekong are shared by multiple nations with competing demands. The construction of dams and diversion projects by upstream nations has created diplomatic tensions and, in some cases, threats of military conflict. International water law remains underdeveloped compared to the scale of the challenge.",
+     questions:[
+      {type:"completion",q:"Only ___% of all water on Earth is freshwater.",a:"2.5",exp:"'Freshwater represents just 2.5% of all water on Earth'."},
+      {type:"mc",q:"By 2025, how many people will face absolute water scarcity?",options:["800 million","1.2 billion","1.8 billion","2.5 billion"],a:"1.8 billion",exp:"'1.8 billion people will live in regions facing absolute water scarcity'."},
+      {type:"completion",q:"Agriculture accounts for about ___% of global freshwater withdrawals.",a:"70",exp:"'Approximately 70% of global freshwater withdrawals'."},
+      {type:"mc",q:"Drip irrigation can reduce water use by:",options:["10-20%","20-30%","30-70%","80-90%"],a:"30-70%",exp:"'Reduce agricultural water use by 30-70%'."},
+      {type:"tfng",q:"London's water system loses about one billion litres daily.",a:"TRUE",exp:"'London's Victorian-era water mains lose approximately one billion litres daily'."},
+      {type:"completion",q:"Saudi Arabia operates more than ___ desalination plants.",a:"30",exp:"'More than 30 desalination plants'."},
+      {type:"mc",q:"Desalination energy costs have been reduced by:",options:["30%","50%","60%","80%"],a:"80%",exp:"'Reduced the energy cost by approximately 80% since the 1970s'."},
+      {type:"tfng",q:"Brine disposal from desalination has no environmental impact.",a:"FALSE",exp:"'Disposal of concentrated brine byproduct poses environmental challenges'."},
+      {type:"completion",q:"Singapore's NEWater meets approximately ___% of water demand.",a:"40",exp:"'Meets approximately 40% of Singapore's water demand'."},
+      {type:"mc",q:"Which city has practised water recycling since 1968?",options:["Singapore","Dubai","Windhoek","Cape Town"],a:"Windhoek",exp:"'Windhoek has been practising direct potable water recycling since 1968'."},
+      {type:"tfng",q:"International water law is well-developed for transboundary disputes.",a:"FALSE",exp:"'International water law remains underdeveloped'."},
+      {type:"completion",q:"Urban pipe networks can lose ___-40% of treated water to leaks.",a:"20",exp:"'Lose 20-40% of treated water to leaks'."},
+      {type:"mc",q:"Flood irrigation can lose up to what percentage of water?",options:["20%","30%","40%","50%"],a:"50%",exp:"'Can lose up to 50% of water to evaporation'."},
+      {type:"tfng",q:"The Jordan River is mentioned as a source of transboundary disputes.",a:"TRUE",exp:"The Jordan is listed among rivers 'shared by multiple nations with competing demands'."}
+    ]},
+    {title:"The Science of Memory",text:"Memory is not a single unified system but rather a collection of distinct processes, each governed by different neural mechanisms and serving different functions. Understanding these distinctions has been one of the most important advances in cognitive neuroscience over the past fifty years.\n\nShort-term memory, also known as working memory, holds information temporarily for immediate use — typically for 15 to 30 seconds without rehearsal. Its capacity is remarkably limited: psychologist George Miller's famous 1956 paper established that most people can hold approximately seven items in working memory simultaneously. More recent research suggests the true capacity may be even smaller — closer to four independent items — with the apparent ability to hold seven arising from chunking, the grouping of individual items into meaningful units.\n\nLong-term memory is subdivided into two major categories. Explicit (or declarative) memory involves conscious recollection and includes episodic memory — personal experiences anchored in time and place — and semantic memory — general knowledge about the world. Implicit memory operates below conscious awareness and includes procedural memory (how to ride a bicycle), classical conditioning, and priming effects.\n\nThe hippocampus plays a central role in converting short-term memories into long-term ones, a process called consolidation. The famous case of patient H.M., who had both hippocampi surgically removed to treat epilepsy in 1953, demonstrated this dramatically: H.M. could hold normal conversations and recall his distant past but was completely unable to form new long-term memories. He would meet his doctors anew each day, with no recollection of previous encounters.\n\nMemory is reconstructive rather than reproductive — we don't replay recordings but actively rebuild memories each time we recall them. This reconstruction process introduces the possibility of error. Psychologist Elizabeth Loftus has demonstrated through decades of research that memories can be easily distorted by suggestion, leading questions, and post-event information. Her work has had profound implications for the legal system, particularly regarding the reliability of eyewitness testimony.\n\nSleep is essential for memory consolidation. During slow-wave sleep, the hippocampus replays the day's experiences and transfers them to the neocortex for long-term storage. Studies have shown that students who sleep after learning new material retain significantly more information than those who remain awake for the same duration. Even brief naps of 20-30 minutes have been shown to improve memory performance.",
+     questions:[
+      {type:"tfng",q:"Memory is a single unified system in the brain.",a:"FALSE",exp:"Memory is 'a collection of distinct processes'."},
+      {type:"mc",q:"Working memory holds information for approximately:",options:["1-5 seconds","15-30 seconds","1-2 minutes","5-10 minutes"],a:"15-30 seconds",exp:"'15 to 30 seconds without rehearsal'."},
+      {type:"completion",q:"George Miller found working memory holds about ___ items.",a:"seven",exp:"'Approximately seven items'."},
+      {type:"mc",q:"More recent research suggests true working memory capacity is:",options:["About two items","About four items","About seven items","About ten items"],a:"About four items",exp:"'Closer to four independent items'."},
+      {type:"completion",q:"Grouping individual items into meaningful units is called ___.",a:"chunking",exp:"The passage names this process 'chunking'."},
+      {type:"mc",q:"Episodic memory involves:",options:["General knowledge","Personal experiences in time and place","Motor skills","Unconscious conditioning"],a:"Personal experiences in time and place",exp:"'Personal experiences anchored in time and place'."},
+      {type:"completion",q:"Converting short-term memories to long-term is called ___.",a:"consolidation",exp:"The passage names this process 'consolidation'."},
+      {type:"mc",q:"Patient H.M.'s surgery demonstrated that the hippocampus is crucial for:",options:["Speech production","Visual processing","Forming new long-term memories","Motor coordination"],a:"Forming new long-term memories",exp:"H.M. 'was completely unable to form new long-term memories'."},
+      {type:"tfng",q:"Memory works like replaying a recording.",a:"FALSE",exp:"Memory is 'reconstructive rather than reproductive — we don't replay recordings'."},
+      {type:"completion",q:"Elizabeth Loftus showed that memories can be distorted by suggestion and ___ questions.",a:"leading",exp:"'Distorted by suggestion, leading questions, and post-event information'."},
+      {type:"mc",q:"During slow-wave sleep, which brain region replays experiences?",options:["Neocortex","Amygdala","Hippocampus","Cerebellum"],a:"Hippocampus",exp:"'The hippocampus replays the day's experiences'."},
+      {type:"tfng",q:"Brief naps can improve memory performance.",a:"TRUE",exp:"'Even brief naps of 20-30 minutes have been shown to improve memory performance'."},
+      {type:"tfng",q:"Students who stay awake after learning retain more than those who sleep.",a:"FALSE",exp:"Students who sleep 'retain significantly more' than those who remain awake."}
     ]}
   ]}
 ];
 
-const GT_TESTS = [
-  {id:1,title:"Workplace Safety Notice",text:"ALL STAFF — IMPORTANT SAFETY UPDATE\n\nFollowing last month's fire drill assessment, several areas requiring improvement have been identified. All employees must read and acknowledge this notice by Friday 15 March.\n\nFire Exits: The emergency exit on the second floor near the marketing department has been found to be partially blocked by storage boxes. This has been cleared, but staff are reminded that fire exits must remain unobstructed at all times. Any employee who notices items blocking fire exits should report this to the facilities team immediately via the intranet portal.\n\nEvacuation Procedure: During the drill, it took 7 minutes and 42 seconds for all staff to reach the designated assembly point in the main car park. The target time is 5 minutes. Department heads are responsible for ensuring their teams know the nearest exit route and assembly point location. A new evacuation plan has been posted in every office.\n\nFirst Aid: We currently have 8 certified first aiders across our 4 floors. Health and Safety regulations require a minimum of 1 first aider per 50 employees. With our current headcount of 340 staff, we need at least 7 first aiders, meaning we are compliant. However, 2 first aiders are due to retire in June, so we are seeking 4 new volunteers to undergo training. The company will cover all training costs. Interested staff should contact HR by 1 April.\n\nFire Wardens: Each floor requires 2 trained fire wardens. Floors 1 and 3 currently have 2 wardens each, but Floor 2 has only 1 and Floor 4 has none. Volunteers are urgently needed for Floors 2 and 4. Fire warden training takes one half-day and will be held on 20 March.\n\nEquipment Checks: All fire extinguishers were inspected last week and are within their service date. Smoke detectors on the third floor were found to have low batteries and have been replaced. Staff should test the smoke detector in their immediate workspace monthly by pressing the test button.",
-  questions:[
-    {type:"tfng",q:"The fire drill met the target evacuation time.",a:"FALSE"},
-    {type:"tfng",q:"The second floor fire exit was blocked by furniture.",a:"FALSE"},
-    {type:"tfng",q:"The company currently meets first aider requirements.",a:"TRUE"},
-    {type:"tfng",q:"Fire warden training lasts a full day.",a:"FALSE"},
-    {type:"tfng",q:"Smoke detectors on the third floor needed new batteries.",a:"TRUE"},
-    {type:"mc",q:"How many additional first aid volunteers does the company want?",options:["2","4","7","8"],a:"4"},
-    {type:"mc",q:"Which floors need fire warden volunteers?",options:["Floors 1 and 3","Floors 2 and 4","All floors","Floors 1 and 2"],a:"Floors 2 and 4"},
-    {type:"completion",q:"Staff should report blocked fire exits via the ___ portal.",a:"intranet"},
-    {type:"completion",q:"The assembly point is in the main ___ ___.",a:"car park"},
-    {type:"mc",q:"The deadline to volunteer for first aid training is:",options:["15 March","20 March","1 April","June"],a:"1 April"}
+const GT_TESTS_DATA = [
+  {id:1,title:"Workplace & Community",passages:[
+    {title:"Workplace Safety Notice",text:"ALL STAFF — IMPORTANT SAFETY UPDATE\n\nFollowing last month's fire drill assessment, several areas requiring improvement have been identified. All employees must read and acknowledge this notice by Friday 15 March.\n\nFire Exits: The emergency exit on the second floor near marketing has been found partially blocked by storage boxes. This has been cleared, but fire exits must remain unobstructed at all times. Report any blockages to facilities via the intranet portal.\n\nEvacuation: During the drill, it took 7 minutes 42 seconds for all staff to reach the assembly point in the main car park. The target is 5 minutes. Department heads must ensure their teams know the nearest exit route.\n\nFirst Aid: We have 8 certified first aiders across 4 floors. Regulations require 1 per 50 employees. With 340 staff, we need at least 7 — we are compliant. However, 2 first aiders retire in June, so we seek 4 new volunteers. Training costs covered by the company. Contact HR by 1 April.\n\nFire Wardens: Each floor requires 2 wardens. Floors 1 and 3 have 2 each, Floor 2 has 1, Floor 4 has none. Volunteers urgently needed. Training: half-day on 20 March.\n\nEquipment: All extinguishers inspected and current. Third floor smoke detectors had low batteries — replaced. Staff should test their workspace detector monthly.",
+     questions:[
+      {type:"tfng",q:"The fire drill met the target evacuation time.",a:"FALSE",exp:"It took 7:42 but the target was 5 minutes."},
+      {type:"tfng",q:"The second floor exit was blocked by furniture.",a:"FALSE",exp:"It was blocked by 'storage boxes', not furniture."},
+      {type:"tfng",q:"The company currently meets first aider requirements.",a:"TRUE",exp:"'We are compliant' with 8 first aiders for 340 staff (need 7)."},
+      {type:"mc",q:"How many additional first aid volunteers are wanted?",options:["2","4","7","8"],a:"4",exp:"'We seek 4 new volunteers'."},
+      {type:"mc",q:"Which floors need fire warden volunteers?",options:["1 and 3","2 and 4","All floors","1 and 2"],a:"2 and 4",exp:"Floor 2 has only 1, Floor 4 has none."},
+      {type:"completion",q:"Staff should report blocked exits via the ___ portal.",a:"intranet",exp:"'Report any blockages to facilities via the intranet portal'."},
+      {type:"completion",q:"Fire warden training is a ___ on 20 March.",a:"half-day",exp:"'Training: half-day on 20 March'."},
+      {type:"mc",q:"The deadline for first aid volunteering is:",options:["15 March","20 March","1 April","June"],a:"1 April",exp:"'Contact HR by 1 April'."},
+      {type:"tfng",q:"Fire warden training takes a full day.",a:"FALSE",exp:"It's a 'half-day', not a full day."},
+      {type:"tfng",q:"Third floor smoke detectors needed new batteries.",a:"TRUE",exp:"'Third floor smoke detectors had low batteries — replaced'."},
+      {type:"completion",q:"The assembly point is in the main ___ ___.",a:"car park",exp:"'Assembly point in the main car park'."},
+      {type:"mc",q:"How many first aiders will retire in June?",options:["1","2","3","4"],a:"2",exp:"'2 first aiders retire in June'."},
+      {type:"tfng",q:"All fire extinguishers passed inspection.",a:"TRUE",exp:"'All extinguishers inspected and current'."}
+    ]},
+    {title:"Tenant Information Guide",text:"GREENFIELD APARTMENTS — TENANT HANDBOOK\n\nRent: Due on the 1st of each month by bank transfer. A £25 late fee applies after the 5th. Contact management before the due date if you anticipate difficulty.\n\nMaintenance: For non-urgent repairs (dripping taps, loose handles), use the online resident portal — addressed within 5 working days. For urgent issues (burst pipes, gas leaks, electrical faults, heating failure in winter), call 0800 555 7890 (24-hour). Do not attempt plumbing, electrical, or structural repairs yourself — this may void your tenancy.\n\nCommunal Areas: Keep corridors and stairwells clean. Bicycles go in the ground-floor bike shed only — not corridors. The roof terrace garden is open 7am-10pm daily. Barbecues and open flames are prohibited on the roof terrace.\n\nNoise: Normal household noise is acceptable 8am-10pm. Between 10pm and 8am, keep noise minimal. Persistent complaints may lead to formal warning or tenancy termination. Inform neighbours before hosting gatherings.\n\nPets: Small pets (cats, dogs under 10kg, fish, caged birds) permitted with written approval. £200 refundable pet deposit required. Pets on leads in all communal areas. Owners must clean up immediately. Exotic animals and animals over 10kg not permitted.\n\nEnd of Tenancy: Minimum 2 months' written notice. Property returned in original condition (allowing reasonable wear). Professional clean recommended. Damage beyond normal wear deducted from deposit.",
+     questions:[
+      {type:"tfng",q:"Rent must be paid in cash.",a:"FALSE",exp:"Rent is paid 'by bank transfer'."},
+      {type:"tfng",q:"Late fees apply after the 5th of each month.",a:"TRUE",exp:"'A £25 late fee applies after the 5th'."},
+      {type:"mc",q:"Non-urgent repairs are usually done within:",options:["24 hours","3 days","5 working days","10 days"],a:"5 working days",exp:"'Addressed within 5 working days'."},
+      {type:"tfng",q:"Residents can fix their own plumbing.",a:"FALSE",exp:"'Do not attempt plumbing repairs yourself'."},
+      {type:"completion",q:"Bicycles must be kept in the ground-floor ___ ___.",a:"bike shed",exp:"'Bicycles go in the ground-floor bike shed'."},
+      {type:"mc",q:"The roof garden closes at:",options:["8pm","9pm","10pm","midnight"],a:"10pm",exp:"'Open 7am-10pm daily'."},
+      {type:"tfng",q:"Dogs weighing 15kg are allowed with approval.",a:"FALSE",exp:"Only 'dogs under 10kg' are permitted."},
+      {type:"completion",q:"The pet deposit is £___.",a:"200",exp:"'£200 refundable pet deposit'."},
+      {type:"mc",q:"Quiet hours are:",options:["8am-10pm","10pm-6am","10pm-8am","11pm-7am"],a:"10pm-8am",exp:"'Between 10pm and 8am, keep noise minimal'."},
+      {type:"completion",q:"Tenants must give ___ months' written notice.",a:"2",exp:"'Minimum 2 months' written notice'."},
+      {type:"tfng",q:"Barbecues are allowed on the roof terrace.",a:"FALSE",exp:"'Barbecues and open flames are prohibited on the roof terrace'."},
+      {type:"mc",q:"The emergency maintenance line operates:",options:["9am-5pm","8am-8pm","24 hours","Weekdays only"],a:"24 hours",exp:"'Call 0800 555 7890 (24-hour)'."},
+      {type:"tfng",q:"A professional end-of-tenancy clean is mandatory.",a:"FALSE",exp:"It is 'recommended', not mandatory."}
+    ]},
+    {title:"Community Library Services",text:"WESTFIELD PUBLIC LIBRARY — SERVICES GUIDE\n\nMembership: Free for all residents of the Westfield borough. Bring proof of address (utility bill or council tax statement) and photo ID to register. Children under 16 must be registered by a parent or guardian. Membership cards are issued on the same day.\n\nBorrowing: Members may borrow up to 12 items at once. Standard loan period is 3 weeks for books and 1 week for DVDs and magazines. Renewals can be made online, by phone, or in person — up to 2 renewals per item unless another member has placed a reservation. Overdue fines: 20p per day per item for adults, 10p for children, capped at the replacement cost of the item.\n\nComputer Access: 15 public computers available on a first-come, first-served basis. Sessions are limited to 1 hour when others are waiting. Free Wi-Fi throughout the building — ask staff for the password. Printing: 10p per black-and-white page, 50p per colour page.\n\nEvents: Weekly story time for under-5s (Tuesdays, 10:30am). Monthly book club for adults (first Thursday of each month, 7pm). Free digital skills workshops for over-60s (Wednesdays, 2-4pm). Homework club for ages 8-16 (Thursdays, 3:30-5:30pm after school). All events are free but some require advance booking.\n\nRoom Hire: The meeting room (capacity 30) is available for community groups at £15 per hour. Non-profit organisations receive a 50% discount. Bookings must be made at least 48 hours in advance. The room includes a projector and whiteboard.\n\nAccessibility: The library is fully wheelchair accessible with a lift to all floors. Large-print and audiobook collections are available. Hearing loop installed at the main desk. Home delivery service available for members who are housebound — contact the library to arrange.",
+     questions:[
+      {type:"tfng",q:"Library membership costs £10 per year.",a:"FALSE",exp:"Membership is 'free for all residents'."},
+      {type:"mc",q:"To register, you need:",options:["Just photo ID","Proof of address and photo ID","A reference from another member","Only a utility bill"],a:"Proof of address and photo ID",exp:"'Bring proof of address and photo ID'."},
+      {type:"completion",q:"Members can borrow up to ___ items at once.",a:"12",exp:"'Up to 12 items at once'."},
+      {type:"mc",q:"The DVD loan period is:",options:["1 week","2 weeks","3 weeks","4 weeks"],a:"1 week",exp:"'1 week for DVDs and magazines'."},
+      {type:"tfng",q:"Items can be renewed unlimited times.",a:"FALSE",exp:"'Up to 2 renewals per item'."},
+      {type:"completion",q:"Adult overdue fines are ___p per day per item.",a:"20",exp:"'20p per day per item for adults'."},
+      {type:"mc",q:"Computer sessions are limited when:",options:["Always limited to 30 minutes","Others are waiting","After 5pm","Only on weekends"],a:"Others are waiting",exp:"'Limited to 1 hour when others are waiting'."},
+      {type:"completion",q:"Colour printing costs ___p per page.",a:"50",exp:"'50p per colour page'."},
+      {type:"mc",q:"Story time for under-5s is on:",options:["Mondays","Tuesdays","Wednesdays","Thursdays"],a:"Tuesdays",exp:"'Tuesdays, 10:30am'."},
+      {type:"tfng",q:"The meeting room holds up to 50 people.",a:"FALSE",exp:"'Capacity 30', not 50."},
+      {type:"mc",q:"Non-profit groups get what discount on room hire?",options:["25%","33%","50%","Free"],a:"50%",exp:"'Non-profit organisations receive a 50% discount'."},
+      {type:"completion",q:"Room bookings must be made at least ___ hours in advance.",a:"48",exp:"'At least 48 hours in advance'."},
+      {type:"tfng",q:"The library offers a home delivery service for housebound members.",a:"TRUE",exp:"'Home delivery service available for members who are housebound'."},
+      {type:"mc",q:"Digital skills workshops are for:",options:["Children","Teenagers","Over-60s","All ages"],a:"Over-60s",exp:"'Free digital skills workshops for over-60s'."}
+    ]}
   ]},
-  {id:2,title:"Tenant Information Guide",text:"GREENFIELD APARTMENTS — TENANT HANDBOOK (Extract)\n\nRent Payment: Rent is due on the 1st of each month and must be paid by bank transfer to the account details provided in your tenancy agreement. A late payment fee of £25 applies to any payment received after the 5th of the month. If you anticipate difficulty making a payment, contact the property management office before the due date to discuss options.\n\nMaintenance Requests: For non-urgent repairs (dripping taps, minor appliance faults, loose door handles), submit a request through the online resident portal. Requests are typically addressed within 5 working days. For urgent issues (burst pipes, gas leaks, electrical faults, heating failure in winter), call the 24-hour emergency line: 0800 555 7890. Do not attempt to carry out plumbing, electrical, or structural repairs yourself, as this may void your tenancy agreement.\n\nCommunal Areas: All residents share responsibility for keeping corridors, stairwells, and the laundry room clean and tidy. Bicycles must be stored in the designated ground-floor bike shed — not in corridors or stairwells. The communal garden on the roof terrace is open daily from 7am to 10pm. Barbecues and open flames are prohibited on the roof terrace due to fire regulations.\n\nNoise Policy: Normal household noise is expected during daytime hours (8am–10pm). Between 10pm and 8am, residents must keep noise to a minimum. Persistent noise complaints may result in a formal warning and, if unresolved, may constitute grounds for tenancy termination. If you wish to host a gathering, please inform your immediate neighbours in advance as a courtesy.\n\nPets: Small pets (cats, small dogs under 10kg, fish, caged birds) are permitted with prior written approval from the property management office. A refundable pet deposit of £200 is required. Pets must be kept on leads in all communal areas. Owners are responsible for cleaning up after their pets immediately. Exotic animals, reptiles, and any animal exceeding 10kg are not permitted.\n\nEnd of Tenancy: Tenants must provide a minimum of 2 months' written notice before vacating. The property must be returned in the same condition as at the start of the tenancy, allowing for reasonable wear and tear. A professional end-of-tenancy clean is recommended. Any damage beyond normal wear and tear will be deducted from the security deposit.",
-  questions:[
-    {type:"tfng",q:"Rent must be paid in cash at the management office.",a:"FALSE"},
-    {type:"tfng",q:"Late payments are charged after the 5th of each month.",a:"TRUE"},
-    {type:"tfng",q:"Residents can fix their own plumbing problems.",a:"FALSE"},
-    {type:"tfng",q:"The roof garden closes at midnight.",a:"FALSE"},
-    {type:"tfng",q:"Dogs weighing 15kg are allowed with approval.",a:"FALSE"},
-    {type:"mc",q:"Non-urgent repairs are usually completed within:",options:["24 hours","3 working days","5 working days","10 working days"],a:"5 working days"},
-    {type:"mc",q:"Where should bicycles be kept?",options:["In the corridor","On the roof terrace","In the ground-floor bike shed","In the tenant's apartment"],a:"In the ground-floor bike shed"},
-    {type:"completion",q:"The pet deposit amount is £___.",a:"200"},
-    {type:"completion",q:"Tenants must give at least ___ months' notice before leaving.",a:"2"},
-    {type:"mc",q:"Quiet hours are between:",options:["8am and 10pm","10pm and 6am","10pm and 8am","11pm and 7am"],a:"10pm and 8am"}
+  {id:2,title:"Travel & Services",passages:[
+    {title:"Airport Transfer Services",text:"SKYLINK AIRPORT TRANSFERS — TERMS AND CONDITIONS\n\nBooking: All transfers must be booked at least 24 hours in advance via our website or by calling 0345 600 8800. Same-day bookings are available subject to vehicle availability and attract a 25% surcharge. Group bookings of 6 or more passengers receive a 15% discount.\n\nVehicle Types: Standard saloon (up to 4 passengers, 2 large suitcases), Executive saloon (up to 4 passengers, 3 large suitcases, complimentary water), MPV/Minivan (up to 7 passengers, 7 large suitcases), Minibus (up to 16 passengers, 16 suitcases). Child seats available on request at no additional charge — specify when booking.\n\nPricing: Prices are fixed at the time of booking and include all tolls, congestion charges, and parking fees. No hidden extras. Payment by credit/debit card only — cash is not accepted. Full payment taken at time of booking. Prices do not include gratuities.\n\nPickup — Airport Arrivals: Drivers monitor your flight and adjust for early/late arrivals at no charge. Driver will wait in the arrivals hall with a name board for up to 45 minutes after your flight lands. After 45 minutes, a waiting charge of £10 per 30 minutes applies. If your flight is cancelled, contact us for a full refund or rebooking.\n\nPickup — Home/Hotel: Driver arrives 15 minutes before the scheduled pickup time. A 10-minute grace period is allowed, after which waiting charges of £10 per 30 minutes apply. If you are not contactable and do not appear within 30 minutes, the booking is cancelled and a 50% cancellation fee applies.\n\nCancellations: Free cancellation up to 12 hours before pickup. 50% charge for cancellations within 12 hours. No refund for no-shows. Amendments to booking details (time, location) are free if made more than 6 hours before pickup.",
+     questions:[
+      {type:"tfng",q:"Bookings must be made at least 48 hours in advance.",a:"FALSE",exp:"'At least 24 hours in advance', not 48."},
+      {type:"mc",q:"Same-day bookings have a surcharge of:",options:["10%","15%","20%","25%"],a:"25%",exp:"'Attract a 25% surcharge'."},
+      {type:"completion",q:"Groups of 6+ passengers get a ___% discount.",a:"15",exp:"'15% discount'."},
+      {type:"mc",q:"The MPV/Minivan holds up to:",options:["4 passengers","6 passengers","7 passengers","16 passengers"],a:"7 passengers",exp:"'Up to 7 passengers'."},
+      {type:"tfng",q:"Child seats cost extra.",a:"FALSE",exp:"'At no additional charge'."},
+      {type:"tfng",q:"Cash payments are accepted.",a:"FALSE",exp:"'Cash is not accepted'."},
+      {type:"completion",q:"At the airport, the driver waits up to ___ minutes after landing.",a:"45",exp:"'Up to 45 minutes after your flight lands'."},
+      {type:"mc",q:"Waiting charges at the airport are:",options:["£5 per 15 minutes","£10 per 30 minutes","£15 per hour","£20 per hour"],a:"£10 per 30 minutes",exp:"'£10 per 30 minutes'."},
+      {type:"tfng",q:"Cancelled flights receive a full refund.",a:"TRUE",exp:"'Contact us for a full refund or rebooking'."},
+      {type:"mc",q:"For home pickups, the driver arrives:",options:["On time","5 minutes early","10 minutes early","15 minutes early"],a:"15 minutes early",exp:"'Arrives 15 minutes before the scheduled pickup'."},
+      {type:"completion",q:"Free cancellation is available up to ___ hours before pickup.",a:"12",exp:"'Free cancellation up to 12 hours before pickup'."},
+      {type:"tfng",q:"No-shows receive a 50% refund.",a:"FALSE",exp:"'No refund for no-shows'."},
+      {type:"mc",q:"Free booking amendments must be made more than how many hours before?",options:["3 hours","6 hours","12 hours","24 hours"],a:"6 hours",exp:"'Free if made more than 6 hours before pickup'."},
+      {type:"tfng",q:"Prices include congestion charges and tolls.",a:"TRUE",exp:"'Include all tolls, congestion charges, and parking fees'."}
+    ]},
+    {title:"Gym Membership Guide",text:"PEAK FITNESS — MEMBERSHIP OPTIONS\n\nStandard: £35/month. Access to gym floor and cardio equipment, Monday-Friday 6am-9pm, weekends 8am-6pm. Free parking. No access to swimming pool or group classes.\n\nPremium: £55/month. Full 24/7 access to all facilities including swimming pool, sauna, and steam room. Unlimited group classes (yoga, spinning, HIIT, pilates). Free towel service. 2 free guest passes per month.\n\nStudent: £25/month (valid student ID required, verified annually). Same access as Standard but including 4 group classes per month. Available to full-time students aged 16-25 only.\n\nCorporate: From £30/month per employee (minimum 10 employees). Premium access for all enrolled staff. Quarterly health assessments included. Dedicated account manager.\n\nJoining Fee: £50 for all memberships — waived during January and September promotional periods.\n\nContract: Minimum 3-month commitment for Standard and Premium. Student memberships are month-to-month. Cancellation requires 30 days' written notice after the minimum period.\n\nPersonal Training: Available at £40 per hour or in packages of 10 sessions for £350. All trainers are Level 3 qualified. Initial fitness assessment (30 minutes) is complimentary for new members.\n\nFacilities: 120-station gym floor, 25-metre swimming pool, 2 group exercise studios, changing rooms with lockers (bring your own padlock), café serving healthy meals and protein shakes. Free Wi-Fi throughout.\n\nHealth & Safety: Members must complete an induction before using gym equipment for the first time. Under-16s must be accompanied by an adult at all times. No glass containers in the pool area. Appropriate sportswear and clean indoor trainers required.",
+     questions:[
+      {type:"mc",q:"Standard membership costs:",options:["£25/month","£30/month","£35/month","£55/month"],a:"£35/month",exp:"'Standard: £35/month'."},
+      {type:"tfng",q:"Standard members can use the swimming pool.",a:"FALSE",exp:"'No access to swimming pool or group classes'."},
+      {type:"mc",q:"Premium members get how many free guest passes monthly?",options:["1","2","4","Unlimited"],a:"2",exp:"'2 free guest passes per month'."},
+      {type:"completion",q:"Student membership is available for full-time students aged ___-25.",a:"16",exp:"'Aged 16-25 only'."},
+      {type:"tfng",q:"Corporate membership requires minimum 5 employees.",a:"FALSE",exp:"'Minimum 10 employees'."},
+      {type:"mc",q:"The joining fee is waived during:",options:["March and June","January and September","Summer months","Any promotional period"],a:"January and September",exp:"'Waived during January and September promotional periods'."},
+      {type:"completion",q:"The minimum contract is ___ months for Standard and Premium.",a:"3",exp:"'Minimum 3-month commitment'."},
+      {type:"mc",q:"A package of 10 personal training sessions costs:",options:["£300","£350","£400","£450"],a:"£350",exp:"'10 sessions for £350'."},
+      {type:"tfng",q:"The swimming pool is 50 metres long.",a:"FALSE",exp:"It's a '25-metre swimming pool'."},
+      {type:"completion",q:"Members must bring their own ___ for lockers.",a:"padlock",exp:"'Bring your own padlock'."},
+      {type:"tfng",q:"New members get a free initial fitness assessment.",a:"TRUE",exp:"'Initial fitness assessment is complimentary for new members'."},
+      {type:"mc",q:"Under-16s at the gym must be:",options:["Members","Accompanied by an adult","In a group class","Pre-registered"],a:"Accompanied by an adult",exp:"'Under-16s must be accompanied by an adult at all times'."},
+      {type:"tfng",q:"Student memberships require a 3-month commitment.",a:"FALSE",exp:"'Student memberships are month-to-month'."},
+      {type:"mc",q:"Cancellation requires:",options:["7 days notice","14 days notice","30 days written notice","60 days notice"],a:"30 days written notice",exp:"'30 days' written notice after the minimum period'."}
+    ]},
+    {title:"City Bus Network Information",text:"METRO CITY BUS — PASSENGER GUIDE\n\nRoutes: The Metro City Bus network operates 42 routes across the metropolitan area, covering all major suburbs, the city centre, hospitals, universities, and shopping districts. Route maps are available at all bus stops, on our website, and via the Metro Bus app.\n\nTimetable: Most routes operate from 5:30am to 11:30pm Monday to Saturday, and 7am to 10pm on Sundays and public holidays. Night buses (routes N1-N5) operate hourly from midnight to 5am on Friday and Saturday nights only, covering the five main corridors.\n\nFares: Single journey £2.50 (cash or contactless). Day pass £5.50 (unlimited journeys until midnight). Weekly pass £22. Monthly pass £78. Children aged 5-15 travel at half price. Under-5s travel free. Senior citizens (over 65) with a Metro Senior Card travel free on all services before 9:30am and after 3:30pm on weekdays, and all day on weekends.\n\nPayment: Contactless payment (card or phone) is accepted on all buses. Cash is accepted but exact change is required — drivers cannot give change. Passes can be purchased online, via the app, or at Metro ticket offices located at Central Station, Westgate Mall, and University Campus.\n\nAccessibility: All buses are low-floor vehicles with wheelchair ramps. Priority seating near the front is reserved for elderly passengers, pregnant women, and those with disabilities. Two wheelchair spaces are available on each bus. Audio announcements indicate the next stop on all routes.\n\nLost Property: Items found on buses are held at the Central Station lost property office for 30 days. To enquire, call 0345 600 9900 or visit in person (Monday-Friday, 9am-5pm). A £5 administration fee applies for returned items. Perishable items and any items posing a health risk are disposed of after 24 hours.",
+     questions:[
+      {type:"completion",q:"The network operates ___ routes.",a:"42",exp:"'42 routes across the metropolitan area'."},
+      {type:"mc",q:"Sunday services run from:",options:["5:30am to 11:30pm","7am to 10pm","6am to 11pm","8am to 9pm"],a:"7am to 10pm",exp:"'7am to 10pm on Sundays'."},
+      {type:"tfng",q:"Night buses run every night of the week.",a:"FALSE",exp:"'Friday and Saturday nights only'."},
+      {type:"mc",q:"A weekly pass costs:",options:["£15","£18","£22","£28"],a:"£22",exp:"'Weekly pass £22'."},
+      {type:"completion",q:"Children aged 5-15 pay ___ price.",a:"half",exp:"'Travel at half price'."},
+      {type:"tfng",q:"Under-5s must pay a reduced fare.",a:"FALSE",exp:"'Under-5s travel free'."},
+      {type:"mc",q:"Seniors travel free on weekdays:",options:["All day","Before 9:30am only","After 3:30pm only","Before 9:30am and after 3:30pm"],a:"Before 9:30am and after 3:30pm",exp:"'Free before 9:30am and after 3:30pm on weekdays'."},
+      {type:"tfng",q:"Bus drivers give change for cash payments.",a:"FALSE",exp:"'Exact change is required — drivers cannot give change'."},
+      {type:"mc",q:"Metro ticket offices are located at how many locations?",options:["1","2","3","4"],a:"3",exp:"Three locations: Central Station, Westgate Mall, University Campus."},
+      {type:"completion",q:"Lost items are held for ___ days.",a:"30",exp:"'Held for 30 days'."},
+      {type:"tfng",q:"There is no charge for collecting lost property.",a:"FALSE",exp:"'A £5 administration fee applies'."},
+      {type:"mc",q:"Perishable lost items are disposed of after:",options:["6 hours","12 hours","24 hours","48 hours"],a:"24 hours",exp:"'Disposed of after 24 hours'."},
+      {type:"completion",q:"Each bus has ___ wheelchair spaces.",a:"2",exp:"'Two wheelchair spaces on each bus'."}
+    ]}
   ]}
 ];
 
 const ReadingPage = ({isPro, onUpgrade}) => {
   const [tab, setTab] = useState("academic");
   const [activeTest, setActiveTest] = useState(null);
+  const [activePsg, setActivePsg] = useState(0);
   const [showAnswers, setShowAnswers] = useState(false);
   const [userAnswers, setUserAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
 
   const tabs = [
-    {id:"academic",label:"📖 Academic Tests",free:true},
-    {id:"gt",label:"📄 General Training",free:true},
-    {id:"strategies",label:"🎯 Question Strategies",free:true},
-    {id:"timetips",label:"⏱️ Time Management",free:true}
+    {id:"academic",label:"📖 Academic Tests ("+AC_TESTS.length+")"},
+    {id:"gt",label:"📄 General Training ("+GT_TESTS_DATA.length+")"},
+    {id:"strategies",label:"🎯 Question Strategies"},
+    {id:"timetips",label:"⏱️ Time Management"}
   ];
   const sty = {fontFamily:"'Source Sans Pro','Inter',system-ui"};
   const card = {background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",marginBottom:16,boxShadow:T.shadow};
+  const isLocked = (idx) => !isPro && idx > 0;
 
-  const isTestLocked = (type, idx) => {
-    if(isPro) return false;
-    if(type==="academic") return idx > 0;
-    if(type==="gt") return idx > 0;
-    return false;
+  const getAllQuestions = (test) => {
+    return test.passages.flatMap((p,pi)=>p.questions.map((q,qi)=>({...q,key:`${pi}-${qi}`,pIdx:pi})));
   };
 
-  const renderQuestions = (questions, testKey) => (
-    <div style={{marginTop:20}}>
-      <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px"}}>Questions ({questions.length})</h3>
-      {questions.map((q,i)=>{
-        const key = `${testKey}-${i}`;
-        return (
-          <div key={i} style={{marginBottom:14,padding:"12px 14px",background:T.bgGray,borderRadius:8,border:`1px solid ${T.border}`}}>
-            <div style={{...sty,fontSize:13,fontWeight:700,color:T.primary,marginBottom:2,textTransform:"uppercase",letterSpacing:"0.05em"}}>{q.type==="tfng"?"True / False / Not Given":q.type==="mc"?"Multiple Choice":"Sentence Completion"}</div>
-            <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600}}>{i+1}. {q.q}</div>
-            {q.type==="tfng"&&(
-              <div style={{display:"flex",gap:6}}>
-                {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
-                  <button key={opt} onClick={()=>setUserAnswers(prev=>({...prev,[key]:opt}))}
-                    style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:"pointer",
-                      background:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
-                      border:`1px solid ${userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
-                      color:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-            {q.type==="mc"&&(
-              <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                {q.options.map((opt,oi)=>(
-                  <button key={oi} onClick={()=>setUserAnswers(prev=>({...prev,[key]:opt}))}
-                    style={{textAlign:"left",padding:"8px 12px",borderRadius:6,fontSize:13,...sty,cursor:"pointer",
-                      background:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
-                      border:`1px solid ${userAnswers[key]===opt?(showAnswers?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
-                      color:userAnswers[key]===opt?(showAnswers?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
-                    {String.fromCharCode(65+oi)}. {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-            {q.type==="completion"&&(
-              <input value={userAnswers[key]||""} onChange={e=>setUserAnswers(prev=>({...prev,[key]:e.target.value}))}
-                placeholder="Type your answer..." style={{...sty,fontSize:14,padding:"8px 12px",border:`1px solid ${showAnswers?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBorder:T.redBorder):T.border}`,borderRadius:6,width:"100%",maxWidth:300,background:showAnswers?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBg:T.redBg):"white",boxSizing:"border-box"}}/>
-            )}
-            {showAnswers&&(
-              <div style={{marginTop:6,...sty,fontSize:12,fontWeight:700,color:T.green}}>✅ Correct answer: {q.a}</div>
+  const calcScore = (test, type) => {
+    const allQ = getAllQuestions(test);
+    let correct = 0;
+    allQ.forEach((q)=>{
+      const ua = userAnswers[q.key];
+      if(!ua) return;
+      if(q.type==="completion"){ if(ua.toLowerCase().trim()===q.a.toLowerCase()) correct++; }
+      else { if(ua===q.a) correct++; }
+    });
+    const band = type==="ac"?BAND_SCORE_AC(correct):BAND_SCORE_GT(correct);
+    return {correct, total:allQ.length, band};
+  };
+
+  const renderQ = (q, i) => {
+    const key = q.key;
+    return (
+      <div key={key} style={{marginBottom:14,padding:"12px 14px",background:T.bgGray,borderRadius:8,border:`1px solid ${T.border}`}}>
+        <div style={{...sty,fontSize:13,fontWeight:700,color:T.primary,marginBottom:2,textTransform:"uppercase",letterSpacing:"0.05em"}}>{q.type==="tfng"?"True / False / Not Given":q.type==="mc"?"Multiple Choice":"Sentence Completion"}</div>
+        <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600}}>{i+1}. {q.q}</div>
+        {q.type==="tfng"&&(
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
+              <button key={opt} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
+                style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:submitted?"default":"pointer",
+                  background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
+                  border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
+                  color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
+        {q.type==="mc"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {q.options.map((opt,oi)=>(
+              <button key={oi} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
+                style={{textAlign:"left",padding:"8px 12px",borderRadius:6,fontSize:13,...sty,cursor:submitted?"default":"pointer",
+                  background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
+                  border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
+                  color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
+                {String.fromCharCode(65+oi)}. {opt}
+              </button>
+            ))}
+          </div>
+        )}
+        {q.type==="completion"&&(
+          <input value={userAnswers[key]||""} onChange={e=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:e.target.value}));}}
+            placeholder="Type your answer..." readOnly={submitted}
+            style={{...sty,fontSize:14,padding:"8px 12px",border:`1px solid ${submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBorder:T.redBorder):T.border}`,borderRadius:6,width:"100%",maxWidth:300,background:submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBg:T.redBg):"white",boxSizing:"border-box"}}/>
+        )}
+        {submitted&&(
+          <div style={{marginTop:8}}>
+            <div style={{...sty,fontSize:12,fontWeight:700,color:T.green,marginBottom:2}}>✅ Answer: {q.a}</div>
+            {q.exp&&<div style={{...sty,fontSize:12,color:T.textMuted,fontStyle:"italic"}}>{q.exp}</div>}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderTestList = (tests, type) => (
+    <div>
+      <div style={{...card,background:type==="ac"?T.blueBg:T.greenBg,border:`1px solid ${type==="ac"?T.blueBorder:T.greenBorder}`}}>
+        <p style={{...sty,fontSize:13,color:type==="ac"?T.blue:T.green,margin:0}}>{type==="ac"?"📖 Academic Reading: 3 passages · 40 questions · 60 minutes. Band score calculated at the end.":"📄 General Training: 3 sections · 40 questions · 60 minutes. Band score calculated at the end."}</p>
+      </div>
+      {tests.map((test,i)=>(
+        <div key={i} style={card}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+            <div>
+              <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 4px"}}>Test {test.id}: {test.title}</h3>
+              <p style={{...sty,fontSize:13,color:T.textMuted,margin:0}}>{test.passages.length} passages · {test.passages.reduce((s,p)=>s+p.questions.length,0)} questions</p>
+            </div>
+            {isLocked(i)?(
+              <button onClick={onUpgrade} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:T.amber,cursor:"pointer",...sty}}>🔒 Pro Only</button>
+            ):(
+              <button onClick={()=>{setActiveTest({type,idx:i});setActivePsg(0);setShowAnswers(false);setSubmitted(false);setUserAnswers({});}} style={{background:type==="ac"?T.primary:T.green,color:"white",border:"none",borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Start Test →</button>
             )}
           </div>
-        );
-      })}
-      <div style={{display:"flex",gap:10,marginTop:16}}>
-        <button onClick={()=>setShowAnswers(!showAnswers)}
-          style={{background:showAnswers?T.redBg:T.greenBg,border:`1px solid ${showAnswers?T.redBorder:T.greenBorder}`,borderRadius:8,padding:"10px 20px",fontSize:13,fontWeight:700,color:showAnswers?T.red:T.green,cursor:"pointer",...sty}}>
-          {showAnswers?"Hide Answers":"Check Answers"}
-        </button>
-        <button onClick={()=>{setUserAnswers({});setShowAnswers(false);}}
-          style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 20px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>
-          Reset
-        </button>
-      </div>
+        </div>
+      ))}
+      {!isPro&&<p style={{...sty,fontSize:13,color:T.amber,textAlign:"center",fontWeight:600}}>🔒 Test 1 is free. Unlock all {tests.length} tests with Pro.</p>}
     </div>
   );
+
+  const renderActiveTest = () => {
+    const tests = activeTest.type==="ac"?AC_TESTS:GT_TESTS_DATA;
+    const test = tests[activeTest.idx];
+    const allQ = getAllQuestions(test);
+    const psg = test.passages[activePsg];
+    const psgQuestions = allQ.filter(q=>q.pIdx===activePsg);
+    const globalOffset = allQ.filter(q=>q.pIdx<activePsg).length;
+
+    return (
+      <div>
+        <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});}} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",...sty,padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to tests</button>
+
+        {/* Score banner */}
+        {submitted&&(
+          <div style={{background:T.greenBg,border:`2px solid ${T.greenBorder}`,borderRadius:12,padding:"20px",marginBottom:20,textAlign:"center"}}>
+            <div style={{fontSize:48,fontWeight:900,color:T.green,fontFamily:"Georgia,serif"}}>{calcScore(test,activeTest.type).band}</div>
+            <div style={{...sty,fontSize:16,fontWeight:700,color:T.green}}>Estimated Band Score</div>
+            <div style={{...sty,fontSize:14,color:T.textMid,marginTop:4}}>{calcScore(test,activeTest.type).correct} / {calcScore(test,activeTest.type).total} correct answers</div>
+          </div>
+        )}
+
+        {/* Passage tabs */}
+        <div style={{display:"flex",gap:8,marginBottom:16,overflowX:"auto"}} className="tab-row">
+          {test.passages.map((p,pi)=>(
+            <button key={pi} onClick={()=>setActivePsg(pi)} style={{background:activePsg===pi?T.primaryLight:"white",border:`1px solid ${activePsg===pi?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 16px",fontSize:13,fontWeight:activePsg===pi?700:500,color:activePsg===pi?T.primary:T.textMid,cursor:"pointer",...sty,whiteSpace:"nowrap",flexShrink:0}}>
+              Passage {pi+1}: {p.title.slice(0,25)}{p.title.length>25?"...":""}
+            </button>
+          ))}
+        </div>
+
+        <div style={card}>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>{psg.title}</h2>
+          <div style={{background:T.bgGray,borderRadius:8,padding:"20px",marginBottom:20,lineHeight:1.8,...sty,fontSize:14,color:T.textMid,whiteSpace:"pre-line",maxHeight:450,overflowY:"auto",border:`1px solid ${T.border}`}}>
+            {psg.text}
+          </div>
+          <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px"}}>Questions {globalOffset+1}–{globalOffset+psgQuestions.length}</h3>
+          {psgQuestions.map((q,qi)=>renderQ(q,globalOffset+qi))}
+        </div>
+
+        {/* Navigation + Submit */}
+        <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{display:"flex",gap:8}}>
+            {activePsg>0&&<button onClick={()=>setActivePsg(activePsg-1)} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>← Previous Passage</button>}
+            {activePsg<test.passages.length-1&&<button onClick={()=>setActivePsg(activePsg+1)} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Next Passage →</button>}
+          </div>
+          {!submitted?(
+            <button onClick={()=>{setSubmitted(true);setActivePsg(0);window.scrollTo({top:0,behavior:'smooth'});}}
+              style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+              📝 Submit Test & See Score
+            </button>
+          ):(
+            <button onClick={()=>{setUserAnswers({});setSubmitted(false);setActivePsg(0);}}
+              style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>
+              🔄 Retake Test
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{maxWidth:900,margin:"0 auto",padding:"24px 16px 60px"}}>
       <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px"}}>📖 IELTS Reading</h1>
-      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}>Practice with full reading tests, learn strategies for every question type, and master time management.</p>
+      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}>Full practice tests with scoring, answer keys with explanations, and strategies for every question type.</p>
 
-      <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:24,paddingBottom:4}} className="tab-row">
-        {tabs.map(t=>(
-          <button key={t.id} onClick={()=>{setTab(t.id);setActiveTest(null);setShowAnswers(false);setUserAnswers({});}}
-            style={{background:tab===t.id?T.primaryLight:"white",border:`1px solid ${tab===t.id?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 16px",fontSize:13,fontWeight:tab===t.id?700:500,color:tab===t.id?T.primary:T.textMid,cursor:"pointer",...sty,whiteSpace:"nowrap",flexShrink:0}}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Academic Tests */}
-      {tab==="academic"&&!activeTest&&(
-        <div>
-          <div style={{...card,background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-            <p style={{...sty,fontSize:13,color:T.blue,margin:0}}>📝 Academic Reading: 3 passages of increasing difficulty · 40 questions · 60 minutes · Topics from books, journals, and magazines on academic subjects.</p>
-          </div>
-          {ACADEMIC_TESTS.map((test,i)=>(
-            <div key={i} style={card}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div>
-                  <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 4px"}}>Test {test.id}: {test.title}</h3>
-                  <p style={{...sty,fontSize:13,color:T.textMuted,margin:0}}>{test.passages[0].questions.length} questions · {test.passages[0].title}</p>
-                </div>
-                {isTestLocked("academic",i)?(
-                  <button onClick={onUpgrade} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:T.amber,cursor:"pointer",...sty}}>🔒 Pro Only</button>
-                ):(
-                  <button onClick={()=>{setActiveTest({type:"academic",idx:i});setShowAnswers(false);setUserAnswers({});}} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Start Test →</button>
-                )}
-              </div>
-            </div>
+      {!activeTest&&(
+        <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:24,paddingBottom:4}} className="tab-row">
+          {tabs.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)}
+              style={{background:tab===t.id?T.primaryLight:"white",border:`1px solid ${tab===t.id?T.primaryBorder:T.border}`,borderRadius:8,padding:"10px 16px",fontSize:13,fontWeight:tab===t.id?700:500,color:tab===t.id?T.primary:T.textMid,cursor:"pointer",...sty,whiteSpace:"nowrap",flexShrink:0}}>
+              {t.label}
+            </button>
           ))}
-          {!isPro&&<p style={{...sty,fontSize:13,color:T.amber,textAlign:"center",fontWeight:600}}>🔒 Test 1 is free. Unlock all tests with Pro.</p>}
         </div>
       )}
 
-      {/* GT Tests */}
-      {tab==="gt"&&!activeTest&&(
-        <div>
-          <div style={{...card,background:T.greenBg,border:`1px solid ${T.greenBorder}`}}>
-            <p style={{...sty,fontSize:13,color:T.green,margin:0}}>📄 General Training Reading: Texts from everyday English — notices, advertisements, handbooks, manuals · Same question types as Academic but different text styles.</p>
-          </div>
-          {GT_TESTS.map((test,i)=>(
-            <div key={i} style={card}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div>
-                  <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 4px"}}>Test {test.id}: {test.title}</h3>
-                  <p style={{...sty,fontSize:13,color:T.textMuted,margin:0}}>{test.questions.length} questions</p>
-                </div>
-                {isTestLocked("gt",i)?(
-                  <button onClick={onUpgrade} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:T.amber,cursor:"pointer",...sty}}>🔒 Pro Only</button>
-                ):(
-                  <button onClick={()=>{setActiveTest({type:"gt",idx:i});setShowAnswers(false);setUserAnswers({});}} style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Start Test →</button>
-                )}
-              </div>
-            </div>
-          ))}
-          {!isPro&&<p style={{...sty,fontSize:13,color:T.amber,textAlign:"center",fontWeight:600}}>🔒 Test 1 is free. Unlock all tests with Pro.</p>}
-        </div>
-      )}
+      {!activeTest&&tab==="academic"&&renderTestList(AC_TESTS,"ac")}
+      {!activeTest&&tab==="gt"&&renderTestList(GT_TESTS_DATA,"gt")}
+      {activeTest&&renderActiveTest()}
 
-      {/* Active Test View */}
-      {activeTest&&(
-        <div>
-          <button onClick={()=>{setActiveTest(null);setShowAnswers(false);setUserAnswers({});}} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",...sty,padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to tests</button>
-          {activeTest.type==="academic"&&(
-            <div style={card}>
-              <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>{ACADEMIC_TESTS[activeTest.idx].passages[0].title}</h2>
-              <div style={{background:T.bgGray,borderRadius:8,padding:"20px",marginBottom:16,lineHeight:1.8,...sty,fontSize:14,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto"}}>
-                {ACADEMIC_TESTS[activeTest.idx].passages[0].text}
-              </div>
-              {renderQuestions(ACADEMIC_TESTS[activeTest.idx].passages[0].questions, `ac-${activeTest.idx}`)}
-            </div>
-          )}
-          {activeTest.type==="gt"&&(
-            <div style={card}>
-              <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>{GT_TESTS[activeTest.idx].title}</h2>
-              <div style={{background:T.bgGray,borderRadius:8,padding:"20px",marginBottom:16,lineHeight:1.8,...sty,fontSize:14,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto"}}>
-                {GT_TESTS[activeTest.idx].text}
-              </div>
-              {renderQuestions(GT_TESTS[activeTest.idx].questions, `gt-${activeTest.idx}`)}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Strategies */}
-      {tab==="strategies"&&(
+      {!activeTest&&tab==="strategies"&&(
         <div>
           {READING_STRATEGIES.map((s,i)=>(
             <div key={i} style={card}>
               <h3 style={{fontFamily:"Georgia,serif",fontSize:16,color:T.primary,margin:"0 0 8px"}}>{s.type}</h3>
               <p style={{...sty,fontSize:14,color:T.textMid,margin:"0 0 8px",lineHeight:1.6}}>{s.strategy}</p>
-              <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:6,padding:"8px 12px",...sty,fontSize:13,color:T.amber,fontWeight:600}}>💡 Tip: {s.tip}</div>
+              <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:6,padding:"8px 12px",...sty,fontSize:13,color:T.amber,fontWeight:600}}>💡 {s.tip}</div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Time Management */}
-      {tab==="timetips"&&(
+      {!activeTest&&tab==="timetips"&&(
         <div style={card}>
-          <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>⏱️ Time Management for IELTS Reading</h2>
-          <p style={{...sty,fontSize:14,color:T.textMid,margin:"0 0 16px",lineHeight:1.6}}>You have 60 minutes for 40 questions across 3 passages. Time management is the single biggest factor separating Band 6 from Band 7+.</p>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>⏱️ Time Management</h2>
+          <p style={{...sty,fontSize:14,color:T.textMid,margin:"0 0 16px",lineHeight:1.6}}>60 minutes for 40 questions across 3 passages. Time management is the biggest factor separating Band 6 from Band 7+.</p>
           {READING_TIME_TIPS.map((tip,i)=>(
             <div key={i} style={{display:"flex",gap:12,marginBottom:12,alignItems:"flex-start"}}>
               <div style={{flexShrink:0,width:28,height:28,background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:900,color:T.primary}}>{i+1}</div>
