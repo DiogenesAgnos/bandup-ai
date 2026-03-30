@@ -3591,10 +3591,12 @@ const ReadingPage = ({isPro, onUpgrade}) => {
             {activePsg<test.passages.length-1&&<button onClick={()=>setActivePsg(activePsg+1)} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Next Passage →</button>}
           </div>
           {!submitted?(
-            <button onClick={()=>{setSubmitted(true);setActivePsg(0);window.scrollTo({top:0,behavior:'smooth'});}}
-              style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
-              📝 Submit Test & See Score
-            </button>
+            activePsg===test.passages.length-1?(
+              <button onClick={()=>{setSubmitted(true);setActivePsg(0);window.scrollTo({top:0,behavior:'smooth'});}}
+                style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+                📝 Submit Test & See Score
+              </button>
+            ):null
           ):(
             <button onClick={()=>{setUserAnswers({});setSubmitted(false);setActivePsg(0);}}
               style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>
