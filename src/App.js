@@ -4193,14 +4193,13 @@ export default function IELTSBot(){
             <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap"}}>
               <button onClick={()=>switchView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
               <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,120,90,0.3)"}}>🎯 Try Sample Essay — Free</button>
+              {!proUser&&(
+                <button onClick={()=>setShowPaywall(true)} style={{background:"#f59e0b",color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(245,158,11,0.4)"}}>🔓 Upgrade to Pro</button>
+              )}
             </div>
             {/* Mobile disclaimer */}
             <div style={{marginTop:12,background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 14px",display:"none"}} className="mobile-disclaimer">
               <span style={{fontSize:12,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📱 For the best experience, use a laptop or desktop. The full analysis, corrections, and tools work best on a bigger screen.</span>
-            </div>
-              {!proUser&&(
-                <button onClick={()=>setShowPaywall(true)} style={{background:"#f59e0b",color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(245,158,11,0.4)"}}>🔓 Upgrade to Pro</button>
-              )}
             </div>
             {!proUser&&(
               <div style={{marginTop:10,display:"flex",alignItems:"center",gap:8}}>
