@@ -4182,14 +4182,36 @@ export default function IELTSBot(){
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"48px 40px 48px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(0,86,210,0.1)",border:"1px solid rgba(0,86,210,0.2)",borderRadius:4,padding:"4px 12px",marginBottom:18,alignSelf:"flex-start"}}>
-              <span style={{color:T.primary,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Smart IELTS Writing Examiner</span>
+              <span style={{color:T.primary,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Smart IELTS Examiner</span>
             </div>
-            <h1 style={{margin:"0 0 14px",fontSize:"clamp(26px,3.2vw,42px)",fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",color:"#1c1d1f",lineHeight:1.2,letterSpacing:"-0.3px"}}>
-              Write better.<br/>Score higher.<br/><span style={{color:T.primary}}>Get the IELTS band you deserve.</span>
+            <h1 style={{margin:"0 0 14px",fontSize:"clamp(22px,2.8vw,36px)",fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",color:"#1c1d1f",lineHeight:1.5,direction:"rtl",textAlign:"right"}}>
+              <span style={{color:T.primary}}>موقع متخصص في اختبار الايلتس يحتوي على:</span>
             </h1>
-            <p style={{color:T.textMuted,fontSize:16,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 24px",maxWidth:460}}>
-              Instant band scores · Complete mistake detection · Band 8+ model essays · Practice Mode with live coaching
-            </p>
+            <div style={{direction:"rtl",textAlign:"right",marginBottom:20}}>
+              <p style={{color:T.textMid,fontSize:15,lineHeight:1.8,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 16px"}}>
+                محلل مقالات مبني على ذكاء اصطناعي متقدم، تم تدريبه على مئات المقالات وفق معايير الايلتس الرسمية — يقيّم مقالتك بدقة مثل الممتحن الحقيقي.
+              </p>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {[
+                  "تحليل فوري مع درجة وفق معايير الايلتس الأربعة",
+                  "تحديد كل غلطة في مقالتك مع التصحيح والشرح",
+                  "ترقية مفردات مقالتك لمستوى الدرجة ٨",
+                  "نموذج إجابة عالية لنفس سؤالك",
+                  "أكثر من ١٢٠ تدريب على القواعد والكتابة",
+                  "تحضير كامل لامتحان المحادثة والقراءة",
+                  "مدقق قواعد وإملاء فوري",
+                  "تتبع تقدمك وتحسّن درجتك"
+                ].map((item,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:14,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    {item} <span style={{color:T.green,fontSize:16,flexShrink:0}}>✅</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:4}}>
+                <div style={{fontSize:13,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>💡 يتم تطوير هذا الموقع باستمرار ليصبح مصدراً شاملاً للتدريب على اللغة الانجليزية والاختبارات العالمية.</div>
+                <div style={{fontSize:14,color:T.primary,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>🔓 اشترك مرة واحدة — وصول مدى الحياة.</div>
+              </div>
+            </div>
             <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap"}}>
               <button onClick={()=>switchView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
               <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,120,90,0.3)"}}>🎯 Try Sample Essay — Free</button>
