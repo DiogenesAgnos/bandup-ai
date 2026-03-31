@@ -860,7 +860,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
         {tab==="international"&&(
           <div style={{textAlign:"center"}}>
             <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",marginBottom:16}}>
-              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$25 <span style={{fontSize:16,color:T.textMuted,fontWeight:400}}>/ month</span></div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$25 <span style={{fontSize:16,color:T.textMuted,fontWeight:400}}>one-time</span></div>
               <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>One-time payment · Powered by Paddle</div>
             </div>
             <button onClick={()=>{
