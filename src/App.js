@@ -819,7 +819,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
             <div style={{background:"#f0fdf4",border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px",marginBottom:16,textAlign:"center"}}>
               <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>🇯🇴 Pay via CLIQ — Available Now</div>
               <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>17 <span style={{fontSize:20,fontWeight:700}}>JOD</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>One-time monthly payment · Cancel anytime</div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>One-time payment · Lifetime access</div>
             </div>
             <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:16}}>
               <div style={{fontSize:13,fontWeight:700,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>📲 How to pay:</div>
@@ -861,7 +861,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
           <div style={{textAlign:"center"}}>
             <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",marginBottom:16}}>
               <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$25 <span style={{fontSize:16,color:T.textMuted,fontWeight:400}}>/ month</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Cancel anytime · Powered by Paddle</div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>One-time payment · Powered by Paddle</div>
             </div>
             <button onClick={()=>{
               if(window.Paddle){
@@ -874,7 +874,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
                 alert("Payment system is loading. Please try again in a moment.");
               }
             }} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadowMd}}>
-              💳 Subscribe — $25/month
+              💳 Buy Pro — $25
             </button>
             <p style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:10,lineHeight:1.5}}>
               Secure payment via Paddle. Accepts Visa, Mastercard, PayPal, Apple Pay, Google Pay and more. Paddle is the Merchant of Record.
@@ -1041,7 +1041,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
         <div style={{fontSize:36}}>🔒</div>
         <div style={{textAlign:"center"}}>
           <div style={{color:T.text,fontWeight:700,fontSize:15,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Pro Feature</div>
-          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro — $25/mo</button>
+          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro — $25</button>
         </div>
       </div>
     </div>
@@ -2093,7 +2093,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
           <div style={{ fontSize: 32, marginBottom: 8 }}>⏰</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 8 }}>Your free 30-minute session has ended</div>
           <p style={{ color: T.textMid, fontSize: 13, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: "0 0 16px", lineHeight: 1.6 }}>Upgrade to Pro for unlimited practice time — all exercise types, all categories, no restrictions.</p>
-          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🔓 Upgrade to Pro — $25/mo</button>
+          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🔓 Upgrade to Pro — $25</button>
         </Card>
       )}
 
@@ -3795,7 +3795,7 @@ const TermsPage = ({onBack}) => (
   <PolicyPage title="Terms of Service" onBack={onBack}>
     <Section title="1. Acceptance of Terms"><p style={{margin:"0 0 12px"}}>By accessing or using Englishfool ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. Englishfool is operated by Ahmad Sartawi ("we", "us", "our").</p></Section>
     <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>Englishfool is a smart IELTS Writing examination tool that provides automated band score assessment based on official IELTS band descriptors, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
-    <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro subscription at $25 USD per month. Subscription payments are processed securely by Paddle.com as our Merchant of Record. By subscribing, you authorize recurring monthly charges to your payment method.</p><p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time through your account settings or by contacting Paddle directly. Cancellation takes effect at the end of the current billing period.</p><p style={{margin:"0 0 12px"}}>New subscribers are entitled to a full refund within 14 days of their initial purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
+    <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro plan at $25 USD (one-time payment). Payments are processed securely by Paddle.com as our Merchant of Record.</p><p style={{margin:"0 0 12px"}}>Pro access is granted permanently after a one-time payment.</p><p style={{margin:"0 0 12px"}}>Buyers are entitled to a full refund within 14 days of purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
     <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use Englishfool only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy our systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
     <Section title="5. Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>Englishfool uses advanced technology to provide IELTS writing feedback. While we strive for accuracy, scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
     <Section title="6. Intellectual Property"><p style={{margin:"0 0 12px"}}>All content, design, software, and materials on Englishfool are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p></Section>
@@ -3808,7 +3808,7 @@ const TermsPage = ({onBack}) => (
 const PrivacyPage = ({onBack}) => (
   <PolicyPage title="Privacy Policy" onBack={onBack}>
     <Section title="1. Information We Collect"><p style={{margin:"0 0 12px"}}>We collect information you provide directly to us, including:</p><ul style={{margin:"0 0 12px",paddingLeft:20}}><li style={{marginBottom:6}}>Contact form submissions (name, email, country, age group, message)</li><li style={{marginBottom:6}}>Essay content submitted for analysis</li><li style={{marginBottom:6}}>Payment information (processed and stored by Paddle — we do not store card details)</li><li style={{marginBottom:6}}>Usage data collected via Google Analytics (anonymised)</li></ul></Section>
-    <Section title="2. How We Use Your Information"><p style={{margin:"0 0 12px"}}>We use the information we collect to: provide and improve the Service; process subscription payments; respond to your enquiries; send service-related communications; and analyse usage patterns to improve user experience.</p><p style={{margin:"0 0 12px"}}>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p></Section>
+    <Section title="2. How We Use Your Information"><p style={{margin:"0 0 12px"}}>We use the information we collect to: provide and improve the Service; process payments; respond to your enquiries; send service-related communications; and analyse usage patterns to improve user experience.</p><p style={{margin:"0 0 12px"}}>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p></Section>
     <Section title="3. Essay Data"><p style={{margin:"0 0 12px"}}>Essays you submit are processed securely by our technology partner for analysis. Essays are transmitted over encrypted connections and are not stored permanently on our servers. We do not use your essays to train any models.</p></Section>
     <Section title="4. Cookies and Analytics"><p style={{margin:"0 0 12px"}}>We use Google Analytics to collect anonymised data about how users interact with our Service. You can opt out of Google Analytics by installing the Google Analytics Opt-out Browser Add-on.</p></Section>
     <Section title="5. Data Security"><p style={{margin:"0 0 12px"}}>We implement appropriate technical and organisational measures to protect your personal data. All data is transmitted over HTTPS encryption.</p></Section>
@@ -3821,7 +3821,7 @@ const PrivacyPage = ({onBack}) => (
 const RefundPage = ({onBack}) => (
   <PolicyPage title="Refund Policy" onBack={onBack}>
     <Section title="1. Subscription Cancellation"><p style={{margin:"0 0 12px"}}>You may cancel your Englishfool Pro subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period.</p></Section>
-    <Section title="2. Refund Eligibility"><p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new Pro subscribers, in accordance with Paddle's Buyer Terms and applicable consumer protection regulations. If you are not satisfied within 14 days of your initial subscription, you are entitled to a full refund.</p><p style={{margin:"0 0 12px"}}>Refund requests made after 14 days will be assessed on a case-by-case basis. Refunds may be prorated based on usage during the subscription period.</p></Section>
+    <Section title="2. Refund Eligibility"><p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new Pro buyers, in accordance with Paddle's Buyer Terms and applicable consumer protection regulations. If you are not satisfied within 14 days of your initial purchase, you are entitled to a full refund.</p><p style={{margin:"0 0 12px"}}>Refund requests made after 14 days will be assessed on a case-by-case basis. Refunds are assessed based on usage.</p></Section>
     <Section title="3. How to Request a Refund"><p style={{margin:"0 0 12px"}}>To request a refund, you may either contact Paddle directly through your purchase confirmation email, or reach out via our <strong>Contact Us</strong> page with your registered email, date of purchase, and reason for refund. All refund requests are processed within 5–10 business days.</p></Section>
     <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries, please use our <strong>Contact Us</strong> page.</p></Section>
   </PolicyPage>
@@ -3846,7 +3846,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
         <div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:T.primary,color:"white",borderRadius:20,padding:"3px 16px",fontSize:11,fontWeight:700,letterSpacing:"0.05em"}}>MOST POPULAR</div>
         <div style={{fontSize:13,fontWeight:700,color:T.primary,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:12}}>Pro Plan</div>
         <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:4}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>25</div>
-        <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>per month · cancel anytime</div>
+        <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>one-time payment · lifetime access</div>
         <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
           {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live coaching","Unlimited Grammar & Spell Checker","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
             <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
@@ -3856,7 +3856,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
           <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ You're on Pro — Unlimited Access</div>
         ):(
           <button onClick={onUpgrade} style={{width:"100%",background:T.primary,color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:"pointer",boxShadow:T.shadowMd}}>
-            Start Pro — $25/month
+            Get Pro — $25 (one-time)
           </button>
         )}
       </div>
@@ -4237,7 +4237,7 @@ export default function IELTSBot(){
                 🎓 Unlimited analyses · Full toolkit · Practice Mode · All exercises
               </span>
               <span style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"2px 12px",fontSize:12,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
-                🇯🇴 Pay via CLIQ — 17 JOD/month
+                🇯🇴 Pay via CLIQ — 17 JOD
               </span>
             </div>
             <button onClick={()=>setShowPaywall(true)}
@@ -4697,7 +4697,7 @@ export default function IELTSBot(){
                   width:"100%",background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",
                   borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,
                   cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)"
-                }}>🔓 Upgrade to Pro — $25/mo</button>
+                }}>🔓 Upgrade to Pro — $25</button>
                 <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
                   width:"100%",background:"#f0fdf4",color:T.green,border:`1px solid ${T.greenBorder}`,
                   borderRadius:8,padding:"10px",fontSize:13,fontWeight:700,
