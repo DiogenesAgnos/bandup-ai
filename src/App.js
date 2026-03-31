@@ -4176,8 +4176,8 @@ export default function IELTSBot(){
         </div>
       )}
 
-      {/* HERO */}
-      {!["terms","privacy","refund","pricing"].includes(mainView)&&(<>
+      {/* HERO — only on main writing page */}
+      {mainView==="analyze"&&(<>
       <div style={{background:"#f0f4ff",position:"relative"}}>
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"48px 40px 48px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
@@ -4269,8 +4269,10 @@ export default function IELTSBot(){
           </div>
         </div>
       )}
+      </>)}
 
-      {/* CONTENT AREA */}
+      {/* CONTENT AREA — visible on all non-policy pages */}
+      {!["terms","privacy","refund","pricing"].includes(mainView)&&(
       <div className="content-outer" style={{maxWidth:1200,margin:"24px auto 80px",padding:"0 24px"}}>
         <div className="content-card" style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"32px",boxShadow:T.shadow}}>
 
@@ -4579,7 +4581,7 @@ export default function IELTSBot(){
         {mainView==="contact"&&<ContactPage/>}
         </div>
       </div>
-      </>)}
+      )}
 
       {mainView==="terms"&&<TermsPage onBack={()=>switchView("analyze")}/>}
       {mainView==="privacy"&&<PrivacyPage onBack={()=>switchView("analyze")}/>}
