@@ -108,6 +108,17 @@ const PRACTICE_QUESTIONS = {
   "Work":["Some people believe that it is better to work for a large company, while others prefer to work for a small company. Discuss both views and give your opinion.","Many people now work from home instead of going to the office. What are the advantages and disadvantages of this trend?","Some people argue that job satisfaction is more important than job security, while others believe the opposite. Discuss both views and give your opinion."]
 };
 
+const SAMPLE_ESSAY_TOPIC = "Some people believe that social media has a negative impact on society, while others think it has brought many benefits. Discuss both views and give your own opinion.";
+const SAMPLE_ESSAY_TEXT = `In todays world, social media has became a very important part of our lifes. Some people think that it has bad effects on society, while others believe it has many benifits. In this essay, I will discuss both sides and give my opinion.
+
+On the one hand, social media has many negative impacts. Firstly, people are spending too much time on their phones instead of talking to each other face to face. For example, in many familys, everyone is looking at their phone during dinner time and nobody is communicating. Secondly, social media can cause depression and anxiety, especially for young people who compare theirselves with others online. They see perfect pictures and feel bad about their own lifes.
+
+On the other hand, there are many advantages of social media. It helps people to stay connected with friends and family members who live in diffrent countries. For instance, I can easily talk to my cousin who lives in Canada through WhatsApp and Instagram. Moreover, social media is a good tool for businesses. Many small business owners use it to advertise their products and reaching more customers without paying alot of money.
+
+In my opinion, I think social media has both good and bad sides but the disadvantages are more than the advantages. People should try to reduce the time they spend on social media and focus on real life relationships. The goverments should also make laws to protect young people from the dangers of social media.
+
+In conclusion, although social media has some benifits, I believe the negative effects is more significant and we need to use it more carefully.`;
+
 const getSystemPrompt = (taskType, lang="en") => `You are an expert IELTS examiner with 20+ years of experience. You apply the official IELTS band descriptors with precision.
 
 ${taskType==="task2"?"Evaluating IELTS Task 2. Under 250 words = Task Achievement MAX Band 5.0.":taskType==="task1academic"?"Evaluating IELTS Task 1 Academic. Check: overview present? key trends identified? data accurately referenced? no personal opinion given?":"Evaluating IELTS Task 1 General letter. Check: all three bullet points addressed? correct register (formal/informal)? appropriate opening and closing?"}
@@ -3983,6 +3994,17 @@ export default function IELTSBot(){
     switchView("analyze");
   };
 
+  const trySampleEssay=()=>{
+    setTaskType("task2");
+    setTopic(SAMPLE_ESSAY_TOPIC);
+    setEssay(SAMPLE_ESSAY_TEXT);
+    setResult(null);
+    clearLastResult();
+    setError("");
+    switchView("analyze");
+    setTimeout(()=>{ if(analyzeRef.current) analyzeRef.current.scrollIntoView({behavior:"smooth",block:"center"}); },300);
+  };
+
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setError(newLang==="ar"?"تم تغيير اللغة. اضغط 'Analyze' مجدداً لرؤية التعليقات بالعربية.":"Language changed. Click 'Analyze' again to see feedback in English."); } };
 
   // Fix black screen: reload app if React crashes when returning from background
@@ -4170,7 +4192,12 @@ export default function IELTSBot(){
             </p>
             <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap"}}>
               <button onClick={()=>switchView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
-              <button onClick={()=>switchView("practice")} style={{background:"transparent",color:T.primary,border:`2px solid ${T.primary}`,borderRadius:4,padding:"11px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Try Practice Mode</button>
+              <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,120,90,0.3)"}}>🎯 Try Sample Essay — Free</button>
+            </div>
+            {/* Mobile disclaimer */}
+            <div style={{marginTop:12,background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 14px",display:"none"}} className="mobile-disclaimer">
+              <span style={{fontSize:12,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📱 For the best experience, use a laptop or desktop. The full analysis, corrections, and tools work best on a bigger screen.</span>
+            </div>
               {!proUser&&(
                 <button onClick={()=>setShowPaywall(true)} style={{background:"#f59e0b",color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(245,158,11,0.4)"}}>🔓 Upgrade to Pro</button>
               )}
@@ -4243,6 +4270,19 @@ export default function IELTSBot(){
                 ))}
               </div>
             </div>
+
+            {/* Quick-try sample */}
+            {!essay.trim()&&!result&&(
+              <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 18px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+                <div>
+                  <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎯 First time? See it in action!</div>
+                  <div style={{fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:2}}>Load a sample Band 6 essay and watch the AI analyze it — completely free.</div>
+                </div>
+                <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0,boxShadow:"0 2px 6px rgba(0,120,90,0.3)"}}>
+                  Load Sample Essay →
+                </button>
+              </div>
+            )}
 
             {taskType==="task1academic"&&(
               <div style={{marginBottom:16}}>
@@ -4725,6 +4765,7 @@ export default function IELTSBot(){
           .footer-top { flex-direction: column !important; gap: 12px !important; }
           .footer-links { flex-wrap: wrap !important; gap: 12px !important; }
           .mobile-hide { display: none !important; }
+          .mobile-disclaimer { display: block !important; }
           .upgrade-btn { display: none !important; }
           /* Sticky nav can cause scroll issues on Android - make relative on mobile */
           .sticky-nav { position: relative !important; top: auto !important; }
