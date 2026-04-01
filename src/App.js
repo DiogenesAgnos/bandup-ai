@@ -714,7 +714,7 @@ const ChangePasswordModal=({onClose})=>{
 };
 
 // ── Paywall ───────────────────────────────────
-const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
+const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
   const [tab,setTab]=useState(initialTab); // "cliq" | "international" | "code"
   const [cliqForm,setCliqForm]=useState({name:"",email:session?.email||"",mobile:""});
   const [cliqStatus,setCliqStatus]=useState(null); // null | "sending" | "sent" | "error"
@@ -810,46 +810,76 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
         <div style={{display:"flex",gap:6,marginBottom:20}}>
           {tabBtn("cliq","🏦","CLIQ 🇯🇴")}
           {tabBtn("international","💳","International")}
-          {tabBtn("code","🔑","Enter Code")}
         </div>
 
         {/* ── CLIQ Tab ── */}
         {tab==="cliq"&&(
           <div>
             <div style={{background:"#f0fdf4",border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px",marginBottom:16,textAlign:"center"}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>🇯🇴 Pay via CLIQ — Available Now</div>
-              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>10 <span style={{fontSize:20,fontWeight:700}}>JOD</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>One-time payment · Lifetime access</div>
+              <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>🇯🇴 دفع عن طريق كليك</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>10 <span style={{fontSize:20,fontWeight:700}}>دينار</span></div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>دفعة واحدة · وصول مدى الحياة</div>
             </div>
-            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:16}}>
-              <div style={{fontSize:13,fontWeight:700,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>📲 How to pay:</div>
-              <ol style={{margin:0,paddingLeft:18,fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.8}}>
-                <li>Open your banking app → CliQ → Send Money</li>
-                <li>Send <strong>10 JOD</strong> to CliQ alias: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:14}}>Efool2026</strong></li>
-                <li>Fill the form below and submit</li>
-                <li>We'll WhatsApp your activation code within a few hours</li>
-              </ol>
+
+            {/* Arabic steps */}
+            <div style={{direction:"rtl",textAlign:"right",marginBottom:16}}>
+              {/* Step 1 */}
+              <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:10}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                  <span style={{background:T.primary,color:"white",borderRadius:"50%",width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:900,flexShrink:0}}>١</span>
+                  <span style={{fontSize:14,fontWeight:700,color:T.primary,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>سجّل حساب بالإيميل وكلمة السر</span>
+                </div>
+                {session?(
+                  <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"8px 12px",fontSize:13,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>
+                    ✅ أنت مسجل بـ {session.email}
+                  </div>
+                ):(
+                  <button onClick={()=>{onClose();if(onRegister) setTimeout(onRegister,200);}} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",width:"100%"}}>
+                    📧 سجّل الآن
+                  </button>
+                )}
+              </div>
+
+              {/* Step 2 */}
+              <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:10}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                  <span style={{background:T.amber,color:"white",borderRadius:"50%",width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:900,flexShrink:0}}>٢</span>
+                  <span style={{fontSize:14,fontWeight:700,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>حوّل ١٠ دنانير عن طريق كليك</span>
+                </div>
+                <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>
+                  افتح تطبيق البنك ← كليك ← أرسل أموال<br/>
+                  أرسل <strong style={{color:T.text}}>١٠ دنانير</strong> إلى الاسم المستعار: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:15,direction:"ltr",display:"inline-block"}}>Efool2026</strong>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:16}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                  <span style={{background:T.green,color:"white",borderRadius:"50%",width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:900,flexShrink:0}}>٣</span>
+                  <span style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>بعد الدفع، عبّي النموذج وسيتم تفعيل حسابك</span>
+                </div>
+              </div>
             </div>
+
             {cliqStatus==="sent"?(
-              <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"18px",textAlign:"center"}}>
+              <div style={{background:T.greenBg,border:`2px solid ${T.greenBorder}`,borderRadius:10,padding:"18px",textAlign:"center",direction:"rtl"}}>
                 <div style={{fontSize:28,marginBottom:8}}>✅</div>
-                <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>Request received!</div>
-                <p style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:"0 0 8px",lineHeight:1.5}}>We'll verify your payment and WhatsApp your activation code to <strong>{cliqForm.mobile}</strong> within a few hours.</p>
-                <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0}}>Once you receive the code, click <strong>"Enter Code"</strong> tab above.</p>
+                <div style={{fontSize:15,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>تم استلام طلبك!</div>
+                <p style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0,lineHeight:1.6}}>سنتحقق من الدفع ونفعّل حسابك خلال ساعات قليلة. سنتواصل معك على الواتساب <strong>{cliqForm.mobile}</strong></p>
               </div>
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                {[{field:"name",label:"Full Name",placeholder:"Your full name",type:"text"},{field:"email",label:"Email Address",placeholder:"The email you signed up with",type:"email"},{field:"mobile",label:"Mobile Number (for WhatsApp)",placeholder:"e.g. 0791234567",type:"tel"}].map(({field,label,placeholder,type})=>(
+                {[{field:"name",label:"الاسم الكامل",placeholder:"اسمك الكامل",type:"text"},{field:"email",label:"البريد الإلكتروني",placeholder:"نفس الإيميل اللي سجلت فيه",type:"email"},{field:"mobile",label:"رقم الجوال (واتساب)",placeholder:"مثال: 0791234567",type:"tel"}].map(({field,label,placeholder,type})=>(
                   <div key={field}>
-                    <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{label}</label>
+                    <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl",textAlign:"right"}}>{label}</label>
                     <input type={type} value={cliqForm[field]} onChange={e=>setCliqForm(p=>({...p,[field]:e.target.value}))} placeholder={placeholder}
-                      style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box"}}/>
+                      style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box",direction:type==="tel"?"ltr":"rtl",textAlign:type==="tel"?"left":"right"}}/>
                   </div>
                 ))}
-                {cliqStatus==="error"&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ Please fill in all fields, or check your connection and try again.</div>}
+                {cliqStatus==="error"&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl",textAlign:"right"}}>⚠️ الرجاء تعبئة جميع الحقول</div>}
                 <button onClick={submitCliq} disabled={cliqStatus==="sending"}
-                  style={{background:cliqStatus==="sending"?T.bgGray:T.green,color:cliqStatus==="sending"?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:cliqStatus==="sending"?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
-                  {cliqStatus==="sending"?"⏳ Submitting...":"✅ I've Paid — Submit Request"}
+                  style={{background:cliqStatus==="sending"?T.bgGray:T.green,color:cliqStatus==="sending"?T.textMuted:"white",border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:cliqStatus==="sending"?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+                  {cliqStatus==="sending"?"⏳ جاري الإرسال...":"✅ دفعت — أرسل الطلب"}
                 </button>
               </div>
             )}
@@ -882,42 +912,6 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
           </div>
         )}
 
-        {/* ── Enter Code Tab ── */}
-        {tab==="code"&&(
-          <div>
-            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10,lineHeight:1.6}}>
-              Already paid via CLIQ and received your activation code? Enter it below to unlock Pro instantly.
-            </div>
-            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 14px",marginBottom:14,fontSize:12,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6}}>
-              💡 <strong>Using a new device?</strong> Register or sign in with the same email you used when paying, then enter your code here. Your Pro status activates on any device this way.
-            </div>
-            {codeSuccess?(
-              <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"20px",textAlign:"center"}}>
-                <div style={{fontSize:32,marginBottom:8}}>🎉</div>
-                <div style={{fontSize:15,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Pro activated! Welcome aboard.</div>
-              </div>
-            ):(
-              <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                <div>
-                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Your Email Address</label>
-                  <input type="email" value={codeEmail} onChange={e=>setCodeEmail(e.target.value)} placeholder="The email you signed up with"
-                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box"}}/>
-                </div>
-                <div>
-                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Activation Code</label>
-                  <input type="text" value={codeVal} onChange={e=>setCodeVal(e.target.value)} placeholder="EFOOL-XXXX-XXXX"
-                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box",letterSpacing:"0.05em"}}
-                    onKeyDown={e=>e.key==="Enter"&&applyCode()}/>
-                </div>
-                {codeErr&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ {codeErr}</div>}
-                <button onClick={applyCode} disabled={codeLoading}
-                  style={{background:codeLoading?T.bgGray:T.primary,color:codeLoading?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:codeLoading?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
-                  {codeLoading?"⏳ Verifying...":"🔓 Activate Pro"}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
         </div>{/* end scrollable body */}
       </div>
     </div>
@@ -4126,7 +4120,7 @@ export default function IELTSBot(){
 
   return (
     <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Cairo','Source Sans Pro',system-ui,sans-serif",color:T.text}}>
-      {showPaywall&&<PaywallModal onClose={()=>{setShowPaywall(false);setPaywallTab("cliq");}} onSuccess={handleProSuccess} session={session} initialTab={paywallTab}/>}
+      {showPaywall&&<PaywallModal onClose={()=>{setShowPaywall(false);setPaywallTab("cliq");}} onSuccess={handleProSuccess} session={session} initialTab={paywallTab} onRegister={()=>setShowAuth(true)}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
       {showChangePassword&&<ChangePasswordModal onClose={()=>setShowChangePassword(false)}/>}
 
@@ -4163,7 +4157,6 @@ export default function IELTSBot(){
               </div>
             ):(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <button onClick={()=>{ setPaywallTab("code"); setShowPaywall(true); }} style={{background:"transparent",color:T.textMuted,border:"none",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",padding:0,whiteSpace:"nowrap"}}>Have a code?</button>
                 <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign In →</button>
               </div>
             )}
