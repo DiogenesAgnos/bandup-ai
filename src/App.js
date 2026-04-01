@@ -4138,7 +4138,7 @@ export default function IELTSBot(){
           <div style={{display:"flex",alignItems:"center",gap:24}}>
             <Logo size={26}/>
             {/* Hamburger — mobile only */}
-            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:18,color:T.text}}>☰</button>
+            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:`1.5px solid ${T.border}`,borderRadius:10,padding:"8px 12px",cursor:"pointer",fontSize:20,color:T.text,minWidth:44,minHeight:44,justifyContent:"center",alignItems:"center"}}>☰</button>
             <div className="nav-tabs" style={{display:"flex",gap:4,alignItems:"center"}}>
               <MainTab label="✍️ Writing" active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label="🗣️ Speaking" active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
@@ -4664,11 +4664,12 @@ export default function IELTSBot(){
 
       {/* ── MOBILE HAMBURGER MENU OVERLAY ── */}
       {menuOpen&&(
-        <div style={{position:"fixed",inset:0,zIndex:500}} onClick={()=>setMenuOpen(false)}>
+        <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(2px)"}} onClick={()=>setMenuOpen(false)}>
           <div style={{
-            position:"absolute",top:0,right:0,width:280,height:"100%",
+            position:"absolute",top:0,right:0,width:"min(320px, 85vw)",height:"100%",
             background:"white",boxShadow:"-4px 0 24px rgba(0,0,0,0.18)",
-            display:"flex",flexDirection:"column",padding:"0 0 32px"
+            display:"flex",flexDirection:"column",padding:"0 0 32px",
+            animation:"slideIn 0.2s ease-out"
           }} onClick={e=>e.stopPropagation()}>
             {/* Header */}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"18px 20px",borderBottom:`1px solid ${T.border}`}}>
@@ -4677,10 +4678,10 @@ export default function IELTSBot(){
             </div>
             {/* Quick nav tabs at top of menu */}
             <div style={{display:"flex",gap:6,padding:"12px 16px",borderBottom:`1px solid ${T.border}`,flexWrap:"wrap"}}>
-              {[{view:"analyze",icon:"✍️",label:"Writing"},{view:"speaking",icon:"🗣️",label:"Speaking"},{view:"reading",icon:"📖",label:"Reading"}].map(item=>(
+              {[{view:"analyze",icon:"✍️",label:"Writing"},{view:"speaking",icon:"🗣️",label:"Speaking"},{view:"reading",icon:"📖",label:"Reading"},{view:"toolkit",icon:"📚",label:"Toolkit"}].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
-                  style={{flex:1,background:mainView===item.view?T.primaryLight:T.bgGray,border:`1px solid ${mainView===item.view?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px 4px",fontSize:11,fontWeight:700,color:mainView===item.view?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-                  <span>{item.icon}</span>{item.label}
+                  style={{flex:1,background:mainView===item.view?T.primaryLight:T.bgGray,border:`1.5px solid ${mainView===item.view?T.primaryBorder:T.border}`,borderRadius:10,padding:"10px 4px",fontSize:12,fontWeight:700,color:mainView===item.view?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:3,minHeight:52}}>
+                  <span style={{fontSize:18}}>{item.icon}</span>{item.label}
                 </button>
               ))}
             </div>
@@ -4701,13 +4702,13 @@ export default function IELTSBot(){
                   style={{
                     width:"100%",background:mainView===item.view?T.primaryLight:"transparent",
                     border:"none",borderLeft:mainView===item.view?`4px solid ${T.primary}`:"4px solid transparent",
-                    padding:"14px 20px",display:"flex",alignItems:"center",gap:12,
-                    cursor:"pointer",textAlign:"left",
+                    padding:"16px 20px",display:"flex",alignItems:"center",gap:14,
+                    cursor:"pointer",textAlign:"left",minHeight:50,
                     color:mainView===item.view?T.primary:T.text,
-                    fontSize:15,fontWeight:mainView===item.view?700:400,
+                    fontSize:15,fontWeight:mainView===item.view?700:500,
                     fontFamily:"'Source Sans Pro','Inter',system-ui"
                   }}>
-                  <span style={{fontSize:18}}>{item.icon}</span>{item.label}
+                  <span style={{fontSize:20}}>{item.icon}</span>{item.label}
                 </button>
               ))}
               <div style={{height:1,background:T.border,margin:"12px 20px"}}/>
@@ -4778,34 +4779,65 @@ export default function IELTSBot(){
         ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
         @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
         @media (max-width: 768px) {
-          .hamburger-btn { display: block !important; }
+          /* NAV */
+          .hamburger-btn { display: flex !important; }
           .nav-tabs { display: none !important; }
           .nav-right { display: none !important; }
-          .hero-inner { flex-direction: column !important; min-height: auto !important; padding: 28px 16px 32px !important; }
+          .sticky-nav { position: sticky !important; top: 0 !important; }
+          .nav-inner { padding: 0 14px !important; height: 56px !important; }
+
+          /* HERO */
+          .hero-inner { flex-direction: column !important; min-height: auto !important; padding: 20px 16px 24px !important; }
           .hero-text { flex: none !important; width: 100% !important; padding: 0 !important; }
           .hero-image { display: none !important; }
-          .hero-btns { flex-direction: column !important; }
-          .hero-btns button { width: 100% !important; }
-          .stats-inner { gap: 16px !important; padding: 12px 16px !important; }
-          .content-outer { padding: 0 10px !important; margin: 12px auto 40px !important; }
-          .content-card { padding: 14px !important; }
-          .analyze-box { padding: 16px 12px !important; }
+          .hero-btns { flex-direction: column !important; gap: 10px !important; }
+          .hero-btns button { width: 100% !important; padding: 14px 20px !important; font-size: 16px !important; border-radius: 10px !important; }
+
+          /* STATS BAR */
+          .stats-inner { gap: 12px !important; padding: 10px 14px !important; flex-wrap: wrap !important; justify-content: center !important; }
+          .stats-inner > div { gap: 6px !important; }
+          .stats-inner span:first-child { font-size: 15px !important; }
+          .stats-inner span:last-child { font-size: 11px !important; }
+
+          /* CONTENT */
+          .content-outer { padding: 0 8px !important; margin: 10px auto 40px !important; }
+          .content-card { padding: 12px !important; border-radius: 10px !important; }
+          .analyze-box { padding: 14px 10px !important; border-radius: 12px !important; }
           .task-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
-          .result-header { padding: 18px 16px !important; gap: 12px !important; }
-          .tab-row { overflow-x: auto !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; scrollbar-width: none !important; }
+          .result-header { padding: 16px 14px !important; gap: 10px !important; border-radius: 10px !important; }
+
+          /* TABS — bigger touch targets on mobile */
+          .tab-row { overflow-x: auto !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; scrollbar-width: none !important; gap: 6px !important; padding-bottom: 4px !important; }
           .tab-row::-webkit-scrollbar { display: none !important; }
+          .tab-row button { padding: 10px 14px !important; font-size: 13px !important; border-radius: 8px !important; min-height: 42px !important; }
+
+          /* READING — timer & passage display */
+          .reading-timer { font-size: 18px !important; }
+
+          /* CONTACT & PRICING */
           .contact-grid { grid-template-columns: 1fr !important; }
           .pricing-grid { grid-template-columns: 1fr !important; }
-          .footer-top { flex-direction: column !important; gap: 12px !important; }
-          .footer-links { flex-wrap: wrap !important; gap: 12px !important; }
+
+          /* FOOTER */
+          .footer-top { flex-direction: column !important; gap: 12px !important; text-align: center !important; }
+          .footer-links { flex-wrap: wrap !important; gap: 10px !important; justify-content: center !important; }
+
+          /* MOBILE SPECIFIC */
           .mobile-hide { display: none !important; }
           .mobile-disclaimer { display: block !important; }
           .upgrade-btn { display: none !important; }
-          /* Sticky nav can cause scroll issues on Android - make relative on mobile */
-          .sticky-nav { position: relative !important; top: auto !important; }
         }
+
+        /* Extra small phones */
+        @media (max-width: 380px) {
+          .hero-inner { padding: 16px 12px 20px !important; }
+          .content-card { padding: 10px !important; }
+          .tab-row button { padding: 8px 10px !important; font-size: 12px !important; }
+        }
+
         @media (hover: none) and (pointer: coarse) {
           html, body { overscroll-behavior-y: none; touch-action: pan-y; }
         }
