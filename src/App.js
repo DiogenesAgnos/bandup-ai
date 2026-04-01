@@ -4002,7 +4002,13 @@ export default function IELTSBot(){
     clearLastResult();
     setError("");
     switchView("analyze");
-    setTimeout(()=>{ if(analyzeRef.current) analyzeRef.current.scrollIntoView({behavior:"smooth",block:"center"}); },300);
+    // Auto-click analyze after a brief delay to let state update
+    setTimeout(()=>{
+      if(analyzeRef.current){
+        analyzeRef.current.scrollIntoView({behavior:"smooth",block:"center"});
+        setTimeout(()=>{ if(analyzeRef.current) analyzeRef.current.click(); },400);
+      }
+    },300);
   };
 
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setError(newLang==="ar"?"تم تغيير اللغة. اضغط 'Analyze' مجدداً لرؤية التعليقات بالعربية.":"Language changed. Click 'Analyze' again to see feedback in English."); } };
@@ -4181,53 +4187,60 @@ export default function IELTSBot(){
       <div style={{background:"#f0f4ff",position:"relative"}}>
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"48px 40px 48px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
-            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(0,86,210,0.1)",border:"1px solid rgba(0,86,210,0.2)",borderRadius:4,padding:"4px 12px",marginBottom:18,alignSelf:"flex-start"}}>
-              <span style={{color:T.primary,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Smart IELTS Examiner</span>
+
+            {/* BIG CTA — first thing they see */}
+            <div style={{marginBottom:24}}>
+              <div style={{direction:"rtl",textAlign:"right",fontSize:"clamp(18px,2.2vw,26px)",fontWeight:700,color:T.primary,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.5,marginBottom:12}}>
+                جرّب مجاناً — شوف كيف الذكاء الاصطناعي يحلل مقالتك
+              </div>
+              <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:10,padding:"16px 36px",fontSize:18,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 4px 16px rgba(0,120,90,0.35)",width:"100%",maxWidth:420,display:"flex",alignItems:"center",justifyContent:"center",gap:10,transition:"transform 0.15s"}}
+                onMouseOver={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseOut={e=>e.currentTarget.style.transform="scale(1)"}>
+                🎯 Try Sample Essay — Free
+              </button>
+              <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:6}}>No signup needed · See instant results in seconds</div>
             </div>
-            <h1 style={{margin:"0 0 14px",fontSize:"clamp(22px,2.8vw,36px)",fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",color:"#1c1d1f",lineHeight:1.5,direction:"rtl",textAlign:"right"}}>
-              <span style={{color:T.primary}}>موقع متخصص في اختبار الايلتس يحتوي على:</span>
-            </h1>
-            <div style={{direction:"rtl",textAlign:"right",marginBottom:20}}>
-              <p style={{color:T.textMid,fontSize:15,lineHeight:1.8,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 16px"}}>
+
+            {/* Compact Arabic description */}
+            <div style={{direction:"rtl",textAlign:"right",marginBottom:16}}>
+              <div style={{fontSize:"clamp(16px,2vw,22px)",fontWeight:700,color:"#1c1d1f",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:8}}>
+                موقع متخصص في اختبار الايلتس
+              </div>
+              <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 12px"}}>
                 محلل مقالات مبني على ذكاء اصطناعي متقدم، تم تدريبه على مئات المقالات وفق معايير الايلتس الرسمية — يقيّم مقالتك بدقة مثل الممتحن الحقيقي.
               </p>
-              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <div style={{display:"flex",flexDirection:"column",gap:4}}>
                 {[
                   "تحليل فوري مع درجة وفق معايير الايلتس الأربعة",
-                  "تحديد كل غلطة في مقالتك مع التصحيح والشرح",
-                  "ترقية مفردات مقالتك لمستوى الدرجة ٨",
-                  "نموذج إجابة عالية لنفس سؤالك",
-                  "أكثر من ١٢٠ تدريب على القواعد والكتابة",
-                  "تحضير كامل لامتحان المحادثة والقراءة",
-                  "مدقق قواعد وإملاء فوري",
-                  "تتبع تقدمك وتحسّن درجتك"
+                  "تحديد كل غلطة مع التصحيح والشرح",
+                  "أكثر من ١٢٠ تدريب + امتحانات قراءة ومحادثة",
+                  "نموذج إجابة عالية + ترقية مفردات لمستوى الدرجة ٨"
                 ].map((item,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:14,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
-                    {item} <span style={{color:T.green,fontSize:16,flexShrink:0}}>✅</span>
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:6,justifyContent:"flex-end",fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    {item} <span style={{color:T.green,fontSize:14,flexShrink:0}}>✅</span>
                   </div>
                 ))}
               </div>
-              <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:4}}>
-                <div style={{fontSize:13,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>💡 يتم تطوير هذا الموقع باستمرار ليصبح مصدراً شاملاً للتدريب على اللغة الانجليزية والاختبارات العالمية.</div>
-                <div style={{fontSize:14,color:T.primary,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>🔓 اشترك مرة واحدة — وصول مدى الحياة.</div>
+              <div style={{marginTop:10,fontSize:13,color:T.primary,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
+                💡 يتم تطوير الموقع باستمرار · 🔓 اشترك مرة واحدة — وصول مدى الحياة
               </div>
             </div>
-            <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-              <button onClick={()=>switchView("analyze")} style={{background:T.primary,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>Start Analyzing →</button>
-              <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,120,90,0.3)"}}>🎯 Try Sample Essay — Free</button>
+
+            {/* Secondary buttons */}
+            <div className="hero-btns" style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+              <button onClick={()=>{if(analyzeRef.current) analyzeRef.current.scrollIntoView({behavior:"smooth",block:"center"});}} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"11px 20px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.3)"}}>✍️ Write Your Own Essay</button>
               {!proUser&&(
-                <button onClick={()=>setShowPaywall(true)} style={{background:"#f59e0b",color:"white",border:"none",borderRadius:4,padding:"13px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(245,158,11,0.4)"}}>🔓 Upgrade to Pro</button>
+                <button onClick={()=>setShowPaywall(true)} style={{background:"#f59e0b",color:"white",border:"none",borderRadius:6,padding:"11px 20px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🔓 Upgrade to Pro</button>
               )}
             </div>
+
             {/* Mobile disclaimer */}
             <div style={{marginTop:12,background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 14px",display:"none"}} className="mobile-disclaimer">
-              <span style={{fontSize:12,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📱 For the best experience, use a laptop or desktop. The full analysis, corrections, and tools work best on a bigger screen.</span>
+              <span style={{fontSize:12,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📱 للحصول على أفضل تجربة، استخدم جهاز كمبيوتر أو لابتوب.</span>
             </div>
             {!proUser&&(
-              <div style={{marginTop:10,display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🇯🇴 Jordan users: pay</span>
+              <div style={{marginTop:8,display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🇯🇴 Jordan:</span>
                 <span style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:T.primary,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>17 JOD via CLIQ</span>
-                <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.primary,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline",padding:0}}>Learn more →</button>
               </div>
             )}
           </div>
