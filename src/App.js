@@ -411,7 +411,7 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
               {seg.text}
             </span>
             {activeTooltip===seg.idx&&(
-              <span style={{position:"absolute",bottom:"calc(100% + 8px)",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",width:260,zIndex:100,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal"}}>
+              <span style={{position:"absolute",bottom:"calc(100% + 8px)",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",width:260,zIndex:100,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal"}}>
                 <span style={{position:"absolute",bottom:-6,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:"6px solid #1e293b"}}/>
                 <div style={{display:"flex",gap:6,marginBottom:6,flexWrap:"wrap"}}>
                   <span style={{background:`${c}30`,border:`1px solid ${c}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:c,fontWeight:700}}>{seg.mistake.severity}</span>
@@ -453,10 +453,10 @@ const CriteriaCard=({label,data})=>(
     borderLeft: `4px solid ${bandColor(data.band)}`,
   }}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-      <span style={{color:T.textMuted,fontSize:12,fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</span>
+      <span style={{color:T.textMuted,fontSize:12,fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{label}</span>
       <span style={{background:bandBg(data.band),color:bandColor(data.band),fontWeight:700,fontSize:20,borderRadius:6,padding:"4px 14px",border:`1px solid ${bandColor(data.band)}30`}}>{data.band}</span>
     </div>
-    <p style={{color:T.textMid,fontSize:15,lineHeight:1.65,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{data.feedback}</p>
+    <p style={{color:T.textMid,fontSize:15,lineHeight:1.65,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{data.feedback}</p>
   </div>
 );
 
@@ -470,17 +470,17 @@ const MistakeCard=({mistake,i,essay})=>{
   return (
   <div style={{background:severityBg(mistake.severity),border:`1px solid ${severityColor(mistake.severity)}40`,borderLeft:`3px solid ${severityColor(mistake.severity)}`,borderRadius:10,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8}}>
     <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
-      <span style={{fontSize:11,fontWeight:700,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>#{i+1}</span>
-      <span style={{background:"white",border:`1px solid ${severityColor(mistake.severity)}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:severityColor(mistake.severity),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>{mistake.severity}</span>
-      <span style={{background:"white",border:`1px solid ${categoryColor(mistake.category)}50`,borderRadius:20,padding:"1px 8px",fontSize:11,color:categoryColor(mistake.category),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>{mistake.category}</span>
-      {!isLocated&&<span style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:20,padding:"1px 8px",fontSize:10,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>⚠ not highlighted in essay</span>}
+      <span style={{fontSize:11,fontWeight:700,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>#{i+1}</span>
+      <span style={{background:"white",border:`1px solid ${severityColor(mistake.severity)}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:severityColor(mistake.severity),fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>{mistake.severity}</span>
+      <span style={{background:"white",border:`1px solid ${categoryColor(mistake.category)}50`,borderRadius:20,padding:"1px 8px",fontSize:11,color:categoryColor(mistake.category),fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>{mistake.category}</span>
+      {!isLocated&&<span style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:20,padding:"1px 8px",fontSize:10,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>⚠ not highlighted in essay</span>}
     </div>
     <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>ORIGINAL</div><div style={{background:"#fee2e2",borderRadius:6,padding:"5px 10px",color:"#991b1b",fontSize:13,fontStyle:"italic"}}>"{mistake.original}"</div></div>
+      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>ORIGINAL</div><div style={{background:"#fee2e2",borderRadius:6,padding:"5px 10px",color:"#991b1b",fontSize:13,fontStyle:"italic"}}>"{mistake.original}"</div></div>
       <div style={{fontSize:16,color:T.textMuted,alignSelf:"center"}}>→</div>
-      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>CORRECTION</div><div style={{background:"#dcfce7",borderRadius:6,padding:"5px 10px",color:"#166534",fontSize:13}}>"{mistake.correction}"</div></div>
+      <div style={{flex:1,minWidth:130}}><div style={{fontSize:10,color:T.textMuted,marginBottom:3,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>CORRECTION</div><div style={{background:"#dcfce7",borderRadius:6,padding:"5px 10px",color:"#166534",fontSize:13}}>"{mistake.correction}"</div></div>
     </div>
-    <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 {mistake.explanation}</p>
+    <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>💡 {mistake.explanation}</p>
   </div>
   );
 };
@@ -524,7 +524,7 @@ const MainTab=({label,active,onClick})=>(
     cursor: "pointer",
     fontSize: 14,
     fontWeight: active ? 700 : 400,
-    fontFamily: "'Source Sans Pro','Inter',system-ui",
+    fontFamily: "'Cairo','Source Sans Pro',system-ui",
     transition: "color 0.15s, border-color 0.15s",
     whiteSpace: "nowrap",
     flexShrink: 0,
@@ -592,7 +592,7 @@ const AuthModal=({onClose,onSuccess})=>{
     }
   };
 
-  const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
+  const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box"};
 
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
@@ -603,7 +603,7 @@ const AuthModal=({onClose,onSuccess})=>{
           <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 4px"}}>
             {mode==="login"?"Welcome back":mode==="register"?"Create account":"Reset password"}
           </h2>
-          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>
+          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0}}>
             {mode==="login"?"Sign in to access your account":mode==="register"?"Join Englishfool today":"Enter your email to reset your password"}
           </p>
         </div>
@@ -629,31 +629,31 @@ const AuthModal=({onClose,onSuccess})=>{
           )}
           {/* Remember me — login only */}
           {mode==="login"&&(
-            <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+            <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
               <input type="checkbox" checked={rememberMe} onChange={e=>setRememberMe(e.target.checked)}
                 style={{width:16,height:16,cursor:"pointer",accentColor:T.primary}}/>
               Remember my email
             </label>
           )}
-          {error&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</div>}
-          {success&&<div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{success}</div>}
+          {error&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{error}</div>}
+          {success&&<div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{success}</div>}
           <button onClick={handle} disabled={loading}
-            style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",opacity:loading?0.7:1}}>
+            style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",opacity:loading?0.7:1}}>
             {loading?"⏳ Please wait...":mode==="login"?"Sign In →":mode==="register"?"Create Account →":"Send Reset Link →"}
           </button>
         </div>
-        <div style={{textAlign:"center",marginTop:16,fontSize:13,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{textAlign:"center",marginTop:16,fontSize:13,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",flexDirection:"column",gap:8}}>
           {mode==="login"&&(
             <>
-              <div>Don't have an account? <button onClick={()=>{setMode("register");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign up free</button></div>
-              <div><button onClick={()=>{setMode("forgot");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.textMuted,cursor:"pointer",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline"}}>Forgot password?</button></div>
+              <div>Don't have an account? <button onClick={()=>{setMode("register");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign up free</button></div>
+              <div><button onClick={()=>{setMode("forgot");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.textMuted,cursor:"pointer",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline"}}>Forgot password?</button></div>
             </>
           )}
           {mode==="register"&&(
-            <div>Already have an account? <button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign in</button></div>
+            <div>Already have an account? <button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign in</button></div>
           )}
           {mode==="forgot"&&(
-            <div><button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>← Back to sign in</button></div>
+            <div><button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>← Back to sign in</button></div>
           )}
         </div>
       </div>
@@ -685,7 +685,7 @@ const ChangePasswordModal=({onClose})=>{
     setLoading(false);
   };
 
-  const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
+  const inp={width:"100%",background:"#f9f9f9",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box"};
 
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(6px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -694,7 +694,7 @@ const ChangePasswordModal=({onClose})=>{
         <div style={{textAlign:"center",marginBottom:24}}>
           <div style={{fontSize:32,marginBottom:8}}>🔑</div>
           <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 4px"}}>Change Password</h2>
-          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Enter your new password below</p>
+          <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0}}>Enter your new password below</p>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
           <div style={{position:"relative"}}>
@@ -702,9 +702,9 @@ const ChangePasswordModal=({onClose})=>{
             <button type="button" onClick={()=>setShowPass(!showPass)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16,color:T.textMuted,padding:4}}>{showPass?"🙈":"👁️"}</button>
           </div>
           <input value={confirmPass} onChange={e=>setConfirmPass(e.target.value)} placeholder="Confirm new password" type={showPass?"text":"password"} style={inp} onKeyDown={e=>e.key==="Enter"&&handleChange()}/>
-          {error&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</div>}
-          {success&&<div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{success}</div>}
-          <button onClick={handleChange} disabled={loading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",opacity:loading?0.7:1}}>
+          {error&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{error}</div>}
+          {success&&<div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{success}</div>}
+          <button onClick={handleChange} disabled={loading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",opacity:loading?0.7:1}}>
             {loading?"⏳ Updating...":"Update Password →"}
           </button>
         </div>
@@ -773,7 +773,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
   };
 
   const tabBtn=(key,icon,label)=>(
-    <button onClick={()=>setTab(key)} style={{flex:1,minWidth:0,padding:"8px 4px",background:tab===key?T.primaryLight:"transparent",border:`1px solid ${tab===key?T.primaryBorder:T.border}`,borderRadius:8,fontSize:11,fontWeight:tab===key?700:400,color:tab===key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2,lineHeight:1.2,textAlign:"center",wordBreak:"break-word"}}>
+    <button onClick={()=>setTab(key)} style={{flex:1,minWidth:0,padding:"8px 4px",background:tab===key?T.primaryLight:"transparent",border:`1px solid ${tab===key?T.primaryBorder:T.border}`,borderRadius:8,fontSize:11,fontWeight:tab===key?700:400,color:tab===key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:2,lineHeight:1.2,textAlign:"center",wordBreak:"break-word"}}>
       <span style={{fontSize:18}}>{icon}</span><span style={{display:"block"}}>{label}</span>
     </button>
   );
@@ -788,7 +788,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
           <div style={{textAlign:"center",paddingBottom:16}}>
             <div style={{fontSize:32,marginBottom:6}}>🎓</div>
             <h2 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:22,margin:"0 0 6px"}}>Unlock Pro Access</h2>
-            <p style={{color:T.textMid,fontSize:13,lineHeight:1.5,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Unlimited analyses, full toolkit, and all exercises.</p>
+            <p style={{color:T.textMid,fontSize:13,lineHeight:1.5,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0}}>Unlimited analyses, full toolkit, and all exercises.</p>
           </div>
         </div>
 
@@ -799,7 +799,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
         <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"12px 16px",marginBottom:20}}>
           <div style={{display:"flex",flexWrap:"wrap",gap:"4px 0"}}>
             {FEATURES.map((f,i)=>(
-              <div key={i} style={{width:"100%",display:"flex",gap:8,fontSize:12,color:T.primary,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+              <div key={i} style={{width:"100%",display:"flex",gap:8,fontSize:12,color:T.primary,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                 <span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}
               </div>
             ))}
@@ -817,13 +817,13 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
         {tab==="cliq"&&(
           <div>
             <div style={{background:"#f0fdf4",border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px",marginBottom:16,textAlign:"center"}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>🇯🇴 Pay via CLIQ — Available Now</div>
+              <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>🇯🇴 Pay via CLIQ — Available Now</div>
               <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>10 <span style={{fontSize:20,fontWeight:700}}>JOD</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>One-time payment · Lifetime access</div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>One-time payment · Lifetime access</div>
             </div>
             <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:16}}>
-              <div style={{fontSize:13,fontWeight:700,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>📲 How to pay:</div>
-              <ol style={{margin:0,paddingLeft:18,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8}}>
+              <div style={{fontSize:13,fontWeight:700,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>📲 How to pay:</div>
+              <ol style={{margin:0,paddingLeft:18,fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.8}}>
                 <li>Open your banking app → CliQ → Send Money</li>
                 <li>Send <strong>10 JOD</strong> to CliQ alias: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:14}}>Efool2026</strong></li>
                 <li>Fill the form below and submit</li>
@@ -833,22 +833,22 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
             {cliqStatus==="sent"?(
               <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"18px",textAlign:"center"}}>
                 <div style={{fontSize:28,marginBottom:8}}>✅</div>
-                <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Request received!</div>
-                <p style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 8px",lineHeight:1.5}}>We'll verify your payment and WhatsApp your activation code to <strong>{cliqForm.mobile}</strong> within a few hours.</p>
-                <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0}}>Once you receive the code, click <strong>"Enter Code"</strong> tab above.</p>
+                <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>Request received!</div>
+                <p style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:"0 0 8px",lineHeight:1.5}}>We'll verify your payment and WhatsApp your activation code to <strong>{cliqForm.mobile}</strong> within a few hours.</p>
+                <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0}}>Once you receive the code, click <strong>"Enter Code"</strong> tab above.</p>
               </div>
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
                 {[{field:"name",label:"Full Name",placeholder:"Your full name",type:"text"},{field:"email",label:"Email Address",placeholder:"The email you signed up with",type:"email"},{field:"mobile",label:"Mobile Number (for WhatsApp)",placeholder:"e.g. 0791234567",type:"tel"}].map(({field,label,placeholder,type})=>(
                   <div key={field}>
-                    <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</label>
+                    <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{label}</label>
                     <input type={type} value={cliqForm[field]} onChange={e=>setCliqForm(p=>({...p,[field]:e.target.value}))} placeholder={placeholder}
-                      style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"}}/>
+                      style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box"}}/>
                   </div>
                 ))}
-                {cliqStatus==="error"&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Please fill in all fields, or check your connection and try again.</div>}
+                {cliqStatus==="error"&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ Please fill in all fields, or check your connection and try again.</div>}
                 <button onClick={submitCliq} disabled={cliqStatus==="sending"}
-                  style={{background:cliqStatus==="sending"?T.bgGray:T.green,color:cliqStatus==="sending"?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:cliqStatus==="sending"?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  style={{background:cliqStatus==="sending"?T.bgGray:T.green,color:cliqStatus==="sending"?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:cliqStatus==="sending"?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                   {cliqStatus==="sending"?"⏳ Submitting...":"✅ I've Paid — Submit Request"}
                 </button>
               </div>
@@ -861,7 +861,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
           <div style={{textAlign:"center"}}>
             <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",marginBottom:16}}>
               <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$17 <span style={{fontSize:16,color:T.textMuted,fontWeight:400}}>one-time</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>One-time payment · Powered by Paddle</div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>One-time payment · Powered by Paddle</div>
             </div>
             <button onClick={()=>{
               if(window.Paddle){
@@ -873,10 +873,10 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
               } else {
                 alert("Payment system is loading. Please try again in a moment.");
               }
-            }} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadowMd}}>
+            }} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:T.shadowMd}}>
               💳 Buy Pro — $17
             </button>
-            <p style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:10,lineHeight:1.5}}>
+            <p style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:10,lineHeight:1.5}}>
               Secure payment via Paddle. Accepts Visa, Mastercard, PayPal, Apple Pay, Google Pay and more. Paddle is the Merchant of Record.
             </p>
           </div>
@@ -885,33 +885,33 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq"})=>{
         {/* ── Enter Code Tab ── */}
         {tab==="code"&&(
           <div>
-            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10,lineHeight:1.6}}>
+            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10,lineHeight:1.6}}>
               Already paid via CLIQ and received your activation code? Enter it below to unlock Pro instantly.
             </div>
-            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 14px",marginBottom:14,fontSize:12,color:T.amber,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6}}>
+            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 14px",marginBottom:14,fontSize:12,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6}}>
               💡 <strong>Using a new device?</strong> Register or sign in with the same email you used when paying, then enter your code here. Your Pro status activates on any device this way.
             </div>
             {codeSuccess?(
               <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"20px",textAlign:"center"}}>
                 <div style={{fontSize:32,marginBottom:8}}>🎉</div>
-                <div style={{fontSize:15,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Pro activated! Welcome aboard.</div>
+                <div style={{fontSize:15,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Pro activated! Welcome aboard.</div>
               </div>
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
                 <div>
-                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Email Address</label>
+                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Your Email Address</label>
                   <input type="email" value={codeEmail} onChange={e=>setCodeEmail(e.target.value)} placeholder="The email you signed up with"
-                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"}}/>
+                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box"}}/>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Activation Code</label>
+                  <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Activation Code</label>
                   <input type="text" value={codeVal} onChange={e=>setCodeVal(e.target.value)} placeholder="EFOOL-XXXX-XXXX"
-                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box",letterSpacing:"0.05em"}}
+                    style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box",letterSpacing:"0.05em"}}
                     onKeyDown={e=>e.key==="Enter"&&applyCode()}/>
                 </div>
-                {codeErr&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ {codeErr}</div>}
+                {codeErr&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ {codeErr}</div>}
                 <button onClick={applyCode} disabled={codeLoading}
-                  style={{background:codeLoading?T.bgGray:T.primary,color:codeLoading?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:codeLoading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  style={{background:codeLoading?T.bgGray:T.primary,color:codeLoading?T.textMuted:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:codeLoading?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                   {codeLoading?"⏳ Verifying...":"🔓 Activate Pro"}
                 </button>
               </div>
@@ -932,13 +932,13 @@ const ProgressTracker=({onUpgrade,isPro,email})=>{
     <Card style={{textAlign:"center",padding:"40px 24px"}}>
       <div style={{fontSize:40,marginBottom:16}}>📈</div>
       <h3 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:20,marginBottom:8}}>Track Your Progress</h3>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:20,lineHeight:1.6}}>Complete your first essay analysis to start tracking your band score improvement over time.</p>
+      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:20,lineHeight:1.6}}>Complete your first essay analysis to start tracking your band score improvement over time.</p>
     </Card>
   );
   if(history.length===0) return (
     <Card style={{textAlign:"center",padding:"40px 24px"}}>
       <div style={{fontSize:40,marginBottom:16}}>📈</div>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>No essays analysed yet. Complete your first analysis to start tracking progress!</p>
+      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>No essays analysed yet. Complete your first analysis to start tracking progress!</p>
     </Card>
   );
   const latest=history[0];
@@ -951,7 +951,7 @@ const ProgressTracker=({onUpgrade,isPro,email})=>{
         <Card style={{textAlign:"center",background:bandBg(latest.band),border:`1px solid ${bandColor(latest.band)}30`}}>
           <div style={{fontSize:42,fontWeight:900,color:bandColor(latest.band),fontFamily:"Georgia,serif",lineHeight:1}}>{latest.band}</div>
           <div style={{fontSize:11,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase",marginTop:4}}>Latest Band</div>
-          {bandDiff!==null&&<div style={{fontSize:13,color:parseFloat(bandDiff)>=0?T.green:T.red,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{parseFloat(bandDiff)>=0?`▲ +${bandDiff}`:`▼ ${bandDiff}`} vs previous</div>}
+          {bandDiff!==null&&<div style={{fontSize:13,color:parseFloat(bandDiff)>=0?T.green:T.red,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:4}}>{parseFloat(bandDiff)>=0?`▲ +${bandDiff}`:`▼ ${bandDiff}`} vs previous</div>}
         </Card>
         <Card style={{textAlign:"center"}}>
           <div style={{fontSize:42,fontWeight:900,color:T.text,fontFamily:"Georgia,serif",lineHeight:1}}>{history.length}</div>
@@ -960,7 +960,7 @@ const ProgressTracker=({onUpgrade,isPro,email})=>{
         <Card style={{textAlign:"center"}}>
           <div style={{fontSize:42,fontWeight:900,color:T.red,fontFamily:"Georgia,serif",lineHeight:1}}>{latest.mistakeCount}</div>
           <div style={{fontSize:11,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase",marginTop:4}}>Latest Mistakes</div>
-          {mistakeDiff!==null&&<div style={{fontSize:13,color:mistakeDiff<=0?T.green:T.red,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{mistakeDiff<=0?`▲ ${Math.abs(mistakeDiff)} fewer`:`▼ ${mistakeDiff} more`} vs previous</div>}
+          {mistakeDiff!==null&&<div style={{fontSize:13,color:mistakeDiff<=0?T.green:T.red,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:4}}>{mistakeDiff<=0?`▲ ${Math.abs(mistakeDiff)} fewer`:`▼ ${mistakeDiff} more`} vs previous</div>}
         </Card>
         {history.length>=2&&(
           <Card style={{textAlign:"center",background:T.greenBg,border:`1px solid ${T.greenBorder}`}}>
@@ -971,15 +971,15 @@ const ProgressTracker=({onUpgrade,isPro,email})=>{
       </div>
       {history.length>=2&&(
         <Card>
-          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📊 Band Score History</div>
+          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📊 Band Score History</div>
           <div style={{display:"flex",alignItems:"flex-end",gap:8,height:120,padding:"0 8px"}}>
             {[...history].reverse().map((h,i)=>{
               const heightPct=((h.band-4)/(9-4))*100;
               return (
                 <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{fontSize:11,fontWeight:700,color:bandColor(h.band),fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{h.band}</div>
+                  <div style={{fontSize:11,fontWeight:700,color:bandColor(h.band),fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{h.band}</div>
                   <div style={{width:"100%",background:bandColor(h.band),borderRadius:"4px 4px 0 0",height:`${heightPct}%`,minHeight:8,opacity:i===history.length-1?1:0.7,transition:"all 0.3s"}}/>
-                  <div style={{fontSize:9,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",textAlign:"center"}}>{new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}</div>
+                  <div style={{fontSize:9,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",textAlign:"center"}}>{new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}</div>
                 </div>
               );
             })}
@@ -988,19 +988,19 @@ const ProgressTracker=({onUpgrade,isPro,email})=>{
       )}
       {previous&&(
         <Card>
-          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📋 Criteria Comparison — Latest vs Previous</div>
+          <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📋 Criteria Comparison — Latest vs Previous</div>
           {[["Task Achievement","taskAchievement"],["Coherence & Cohesion","coherenceCohesion"],["Lexical Resource","lexicalResource"],["Grammatical Range","grammaticalRange"]].map(([label,key])=>{
             const curr=latest.criteria?.[key]||0;
             const prev=previous.criteria?.[key]||0;
             const diff=(curr-prev).toFixed(1);
             return (
               <div key={key} style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
-                <div style={{width:160,fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>{label}</div>
+                <div style={{width:160,fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0}}>{label}</div>
                 <div style={{flex:1,background:T.bgGray,borderRadius:6,height:8,position:"relative"}}>
                   <div style={{position:"absolute",left:0,top:0,height:"100%",width:`${(curr/9)*100}%`,background:bandColor(curr),borderRadius:6,transition:"width 0.5s"}}/>
                 </div>
-                <div style={{fontSize:13,fontWeight:700,color:bandColor(curr),fontFamily:"'Source Sans Pro','Inter',system-ui",width:32}}>{curr}</div>
-                <div style={{fontSize:12,fontWeight:700,color:parseFloat(diff)>0?T.green:parseFloat(diff)<0?T.red:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",width:40}}>
+                <div style={{fontSize:13,fontWeight:700,color:bandColor(curr),fontFamily:"'Cairo','Source Sans Pro',system-ui",width:32}}>{curr}</div>
+                <div style={{fontSize:12,fontWeight:700,color:parseFloat(diff)>0?T.green:parseFloat(diff)<0?T.red:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",width:40}}>
                   {parseFloat(diff)>0?`+${diff}`:diff}
                 </div>
               </div>
@@ -1009,16 +1009,16 @@ const ProgressTracker=({onUpgrade,isPro,email})=>{
         </Card>
       )}
       <Card>
-        <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📝 Essay History</div>
+        <div style={{fontSize:12,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📝 Essay History</div>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {history.map((h,i)=>(
             <div key={h.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:i===0?bandBg(h.band):T.bg,borderRadius:10,border:i===0?`1px solid ${bandColor(h.band)}30`:`1px solid ${T.border}`}}>
               <div style={{fontSize:24,fontWeight:900,color:bandColor(h.band),fontFamily:"Georgia,serif",lineHeight:1,width:40}}>{h.band}</div>
               <div style={{flex:1}}>
-                <div style={{fontSize:13,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,marginBottom:2}}>{h.taskType==="task2"?"Task 2 Essay":h.taskType==="task1academic"?"Task 1 Academic":"Task 1 General"} {i===0&&<span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:20,padding:"1px 8px",fontSize:10,color:T.gold,fontWeight:700}}>Latest</span>}</div>
-                <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{h.wordCount} words · {h.mistakeCount} mistakes · {new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</div>
+                <div style={{fontSize:13,color:T.text,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:2}}>{h.taskType==="task2"?"Task 2 Essay":h.taskType==="task1academic"?"Task 1 Academic":"Task 1 General"} {i===0&&<span style={{background:"#fff5f5",border:"1px solid #ffcccc",borderRadius:20,padding:"1px 8px",fontSize:10,color:T.gold,fontWeight:700}}>Latest</span>}</div>
+                <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{h.wordCount} words · {h.mistakeCount} mistakes · {new Date(h.date).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</div>
               </div>
-              <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",textAlign:"right"}}>{bandLabel(h.band)}</div>
+              <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",textAlign:"right"}}>{bandLabel(h.band)}</div>
             </div>
           ))}
         </div>
@@ -1040,8 +1040,8 @@ const ToolkitContent=({isPro,onUpgrade})=>{
       <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}>
         <div style={{fontSize:36}}>🔒</div>
         <div style={{textAlign:"center"}}>
-          <div style={{color:T.text,fontWeight:700,fontSize:15,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Pro Feature</div>
-          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro — $17</button>
+          <div style={{color:T.text,fontWeight:700,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>Pro Feature</div>
+          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Upgrade to Pro — $17</button>
         </div>
       </div>
     </div>
@@ -1049,25 +1049,25 @@ const ToolkitContent=({isPro,onUpgrade})=>{
   return (
     <div>
       <Card style={{marginBottom:16,background:"#fff5f5",border:"1px solid #ffcccc"}}>
-        <p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎓 Your personal IELTS reference guide. {!isPro&&<span style={{color:T.textMid}}>Linking Words and Grammar are free. Upgrade for full access.</span>}</p>
+        <p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🎓 Your personal IELTS reference guide. {!isPro&&<span style={{color:T.textMid}}>Linking Words and Grammar are free. Upgrade for full access.</span>}</p>
       </Card>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>
         {sections.map(s=>(
           <button key={s.key} onClick={()=>setSection(s.key)}
-            style={{background:section===s.key?T.primaryLight:T.bgGray,border:section===s.key?`1px solid ${T.primary}`:`1px solid ${T.border}`,color:section===s.key?T.primary:T.textMid,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",alignItems:"center",gap:5}}>
+            style={{background:section===s.key?T.primaryLight:T.bgGray,border:section===s.key?`1px solid ${T.primary}`:`1px solid ${T.border}`,color:section===s.key?T.primary:T.textMid,borderRadius:8,padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",alignItems:"center",gap:5}}>
             {s.label}{!s.free&&!isPro&&<span style={{fontSize:10}}>🔒</span>}
           </button>
         ))}
       </div>
-      {section==="linking"&&<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.linkingWords.map((cat,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:cat.color,marginBottom:10,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase",letterSpacing:"0.06em"}}>{cat.category}</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{cat.words.map((w,j)=><span key={j} style={{background:`${cat.color}12`,border:`1px solid ${cat.color}40`,borderRadius:8,padding:"4px 12px",fontSize:13,color:cat.color,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{w}</span>)}</div></Card>)}</div>}
-      {section==="vocab"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.vocabulary.map((topic,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:T.gold,marginBottom:10,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase"}}>{topic.topic}</div><div style={{display:"flex",flexDirection:"column",gap:6}}>{topic.words.map((pair,j)=><div key={j} style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><span style={{background:"#fee2e2",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#991b1b",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✗ {pair[0]}</span><span style={{color:T.textMuted}}>→</span><span style={{background:"#dcfce7",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#166534",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ {pair[1]}</span></div>)}</div></Card>)}</div>:<LockedSection/>)}
-      {section==="grammar"&&<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.grammarRules.map((item,i)=><Card key={i} style={{border:`1px solid ${T.blueBorder}`,background:T.blueBg}}><div style={{fontSize:13,fontWeight:700,color:T.blue,marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📐 {item.rule}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{item.tip}</p></Card>)}</div>}
-      {section==="peeves"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.petPeeves.map((item,i)=><Card key={i} style={{border:`1px solid ${T.redBorder}`,background:T.redBg}}><div style={{fontSize:13,fontWeight:700,color:T.red,marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ {item.peeve}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✅ {item.fix}</p></Card>)}</div>:<LockedSection/>)}
-      {section==="templates"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.templates.map((item,i)=><Card key={i} style={{border:`1px solid ${T.amberBorder}`,background:T.amberBg}}><div style={{fontSize:11,fontWeight:700,color:T.amber,marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase"}}>📝 {item.type}</div><p style={{color:T.text,fontSize:13,lineHeight:1.8,margin:0,fontFamily:"Georgia,serif",fontStyle:"italic",background:"white",padding:"10px 14px",borderRadius:8,whiteSpace:"pre-wrap",border:`1px solid ${T.amberBorder}`}}>{item.template}</p></Card>)}</div>:<LockedSection/>)}
+      {section==="linking"&&<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.linkingWords.map((cat,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:cat.color,marginBottom:10,fontFamily:"'Cairo','Source Sans Pro',system-ui",textTransform:"uppercase",letterSpacing:"0.06em"}}>{cat.category}</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{cat.words.map((w,j)=><span key={j} style={{background:`${cat.color}12`,border:`1px solid ${cat.color}40`,borderRadius:8,padding:"4px 12px",fontSize:13,color:cat.color,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{w}</span>)}</div></Card>)}</div>}
+      {section==="vocab"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.vocabulary.map((topic,i)=><Card key={i}><div style={{fontSize:11,fontWeight:700,color:T.gold,marginBottom:10,fontFamily:"'Cairo','Source Sans Pro',system-ui",textTransform:"uppercase"}}>{topic.topic}</div><div style={{display:"flex",flexDirection:"column",gap:6}}>{topic.words.map((pair,j)=><div key={j} style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><span style={{background:"#fee2e2",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#991b1b",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✗ {pair[0]}</span><span style={{color:T.textMuted}}>→</span><span style={{background:"#dcfce7",borderRadius:6,padding:"3px 10px",fontSize:13,color:"#166534",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ {pair[1]}</span></div>)}</div></Card>)}</div>:<LockedSection/>)}
+      {section==="grammar"&&<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.grammarRules.map((item,i)=><Card key={i} style={{border:`1px solid ${T.blueBorder}`,background:T.blueBg}}><div style={{fontSize:13,fontWeight:700,color:T.blue,marginBottom:6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📐 {item.rule}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{item.tip}</p></Card>)}</div>}
+      {section==="peeves"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.petPeeves.map((item,i)=><Card key={i} style={{border:`1px solid ${T.redBorder}`,background:T.redBg}}><div style={{fontSize:13,fontWeight:700,color:T.red,marginBottom:6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ {item.peeve}</div><p style={{color:T.textMid,fontSize:13,lineHeight:1.7,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✅ {item.fix}</p></Card>)}</div>:<LockedSection/>)}
+      {section==="templates"&&(isPro?<div style={{display:"flex",flexDirection:"column",gap:10}}>{TOOLKIT.templates.map((item,i)=><Card key={i} style={{border:`1px solid ${T.amberBorder}`,background:T.amberBg}}><div style={{fontSize:11,fontWeight:700,color:T.amber,marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui",textTransform:"uppercase"}}>📝 {item.type}</div><p style={{color:T.text,fontSize:13,lineHeight:1.8,margin:0,fontFamily:"Georgia,serif",fontStyle:"italic",background:"white",padding:"10px 14px",borderRadius:8,whiteSpace:"pre-wrap",border:`1px solid ${T.amberBorder}`}}>{item.template}</p></Card>)}</div>:<LockedSection/>)}
       {section==="essays"&&(isPro?(
         <div style={{display:"flex",flexDirection:"column",gap:14}}>
           <Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}>
-            <p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📖 Study these scored model essays to understand what examiners look for at each band level. Click any essay to expand the full response and examiner commentary.</p>
+            <p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📖 Study these scored model essays to understand what examiners look for at each band level. Click any essay to expand the full response and examiner commentary.</p>
           </Card>
           {TOOLKIT.modelEssays.map((item,i)=>(
             <Card key={i} style={{border:`1px solid ${bandColor(item.band)}30`,cursor:"pointer",transition:"all 0.15s",boxShadow:expandedEssay===i?T.shadowMd:T.shadow}} onClick={()=>setExpandedEssay(expandedEssay===i?null:i)}>
@@ -1075,34 +1075,34 @@ const ToolkitContent=({isPro,onUpgrade})=>{
                 <div style={{flex:1,minWidth:200}}>
                   <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:6,flexWrap:"wrap"}}>
                     <span style={{background:bandBg(item.band),color:bandColor(item.band),fontWeight:800,fontSize:16,borderRadius:6,padding:"3px 12px",border:`1px solid ${bandColor(item.band)}30`,fontFamily:"Georgia,serif"}}>{item.band}</span>
-                    <span style={{fontSize:12,color:bandColor(item.band),fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{bandLabel(item.band)}</span>
-                    <span style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:20,padding:"2px 10px",fontSize:11,color:T.primary,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>{item.taskType}</span>
+                    <span style={{fontSize:12,color:bandColor(item.band),fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{bandLabel(item.band)}</span>
+                    <span style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:20,padding:"2px 10px",fontSize:11,color:T.primary,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>{item.taskType}</span>
                   </div>
-                  <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.5,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{item.topic.length>120?item.topic.slice(0,120)+"...":item.topic}</p>
+                  <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.5,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{item.topic.length>120?item.topic.slice(0,120)+"...":item.topic}</p>
                 </div>
                 <span style={{fontSize:18,color:T.textMuted,transform:expandedEssay===i?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s",flexShrink:0}}>▼</span>
               </div>
               {expandedEssay===i&&(
                 <div style={{marginTop:16,borderTop:`1px solid ${T.border}`,paddingTop:16}} onClick={e=>e.stopPropagation()}>
                   <div style={{marginBottom:12}}>
-                    <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📋 Question</div>
+                    <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📋 Question</div>
                     <div style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:8,padding:"10px 14px"}}>
-                      <p style={{color:T.text,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{item.topic}</p>
+                      <p style={{color:T.text,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{item.topic}</p>
                     </div>
                   </div>
                   <div style={{marginBottom:12}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                      <span style={{fontSize:11,color:T.green,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✍️ Model Response — Band {item.band}</span>
-                      <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{countWords(item.essay)} words</span>
+                      <span style={{fontSize:11,color:T.green,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✍️ Model Response — Band {item.band}</span>
+                      <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{countWords(item.essay)} words</span>
                     </div>
                     <div style={{background:"#fafff8",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"14px 16px"}}>
                       <p style={{color:T.text,fontSize:14,margin:0,lineHeight:1.9,fontFamily:"Georgia,serif",whiteSpace:"pre-wrap"}}>{item.essay}</p>
                     </div>
                   </div>
                   <div>
-                    <div style={{fontSize:11,color:T.amber,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎓 Examiner Commentary</div>
+                    <div style={{fontSize:11,color:T.amber,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🎓 Examiner Commentary</div>
                     <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 14px"}}>
-                      <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.7,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{item.explanation}</p>
+                      <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.7,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{item.explanation}</p>
                     </div>
                   </div>
                 </div>
@@ -1161,13 +1161,13 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
   return (
     <div>
       <Card style={{marginBottom:20,background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-        <p style={{color:T.blue,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎯 <strong>Practice Mode</strong> — Write freely and get live coaching every ~1.5 seconds. Mistakes are highlighted inline in your essay. Each feedback uses one free try.</p>
+        <p style={{color:T.blue,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🎯 <strong>Practice Mode</strong> — Write freely and get live coaching every ~1.5 seconds. Mistakes are highlighted inline in your essay. Each feedback uses one free try.</p>
       </Card>
       {!started?(
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
           <div style={{display:"flex",gap:8}}>
             {[["choose","📋 Choose a Question"],["custom","✏️ Write My Own"]].map(([mode,label])=>(
-              <button key={mode} onClick={()=>setQuestionMode(mode)} style={{flex:1,background:questionMode===mode?T.primary:T.bgGray,border:`2px solid ${questionMode===mode?T.primary:T.border}`,borderRadius:10,padding:"10px",cursor:"pointer",color:questionMode===mode?"white":T.textMid,fontSize:13,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:questionMode===mode?T.shadowMd:'none',transition:'all 0.2s'}}>{label}</button>
+              <button key={mode} onClick={()=>setQuestionMode(mode)} style={{flex:1,background:questionMode===mode?T.primary:T.bgGray,border:`2px solid ${questionMode===mode?T.primary:T.border}`,borderRadius:10,padding:"10px",cursor:"pointer",color:questionMode===mode?"white":T.textMid,fontSize:13,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:questionMode===mode?T.shadowMd:'none',transition:'all 0.2s'}}>{label}</button>
             ))}
           </div>
           {questionMode==="choose"&&(
@@ -1175,13 +1175,13 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
               <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
                 {Object.keys(PRACTICE_QUESTIONS).map(topic=>(
                   <button key={topic} onClick={()=>{ setSelectedTopic(topic); setSelectedQuestion(""); }}
-                    style={{background:selectedTopic===topic?T.primary:T.bgGray,border:`1px solid ${selectedTopic===topic?T.primary:T.border}`,borderRadius:20,padding:"6px 16px",cursor:"pointer",color:selectedTopic===topic?"white":T.textMid,fontSize:12,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:selectedTopic===topic?T.shadowMd:'none',transition:'all 0.18s'}}>{topic}</button>
+                    style={{background:selectedTopic===topic?T.primary:T.bgGray,border:`1px solid ${selectedTopic===topic?T.primary:T.border}`,borderRadius:20,padding:"6px 16px",cursor:"pointer",color:selectedTopic===topic?"white":T.textMid,fontSize:12,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:selectedTopic===topic?T.shadowMd:'none',transition:'all 0.18s'}}>{topic}</button>
                 ))}
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 {PRACTICE_QUESTIONS[selectedTopic].map((q,i)=>(
                   <div key={i} onClick={()=>setSelectedQuestion(q)}
-                    style={{background:selectedQuestion===q?T.primaryLight:T.bgGray,border:selectedQuestion===q?`2px solid ${T.primary}`:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",color:selectedQuestion===q?T.primary:T.textMid,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,transition:"all 0.15s",boxShadow:T.shadow}}>
+                    style={{background:selectedQuestion===q?T.primaryLight:T.bgGray,border:selectedQuestion===q?`2px solid ${T.primary}`:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",color:selectedQuestion===q?T.primary:T.textMid,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,transition:"all 0.15s",boxShadow:T.shadow}}>
                     {i+1}. {q}
                   </div>
                 ))}
@@ -1190,35 +1190,35 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
           )}
           {questionMode==="custom"&&(
             <div>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>Your Question</label>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>Your Question</label>
               <textarea value={customQuestion} onChange={e=>setCustomQuestion(e.target.value)} rows={3}
                 placeholder="Paste your own IELTS question here..."
-                style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
             </div>
           )}
           <button onClick={()=>{ if(question) setStarted(true); }} disabled={!question}
-            style={{background:question?T.primary:T.bgGray,border:`1px solid ${question?T.primary:T.border}`,borderRadius:10,color:question?"white":T.textMuted,fontSize:15,fontWeight:700,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:question?T.shadowMd:"none",transition:"all 0.2s"}}>
+            style={{background:question?T.primary:T.bgGray,border:`1px solid ${question?T.primary:T.border}`,borderRadius:10,color:question?"white":T.textMuted,fontSize:15,fontWeight:700,padding:"15px",cursor:question?"pointer":"not-allowed",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:question?T.shadowMd:"none",transition:"all 0.2s"}}>
             {question?"🖊️ Start Practice Session":"Select a question to begin"}
           </button>
         </div>
       ):(
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
           <Card style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-            <div style={{fontSize:11,color:T.blue,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Question</div>
-            <p style={{color:T.text,fontSize:14,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{question}</p>
+            <div style={{fontSize:11,color:T.blue,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Your Question</div>
+            <p style={{color:T.text,fontSize:14,margin:0,lineHeight:1.6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{question}</p>
           </Card>
           <div style={{display:"flex",gap:16,alignItems:"flex-start",flexWrap:"wrap"}}>
             <div style={{flex:2,minWidth:280,display:"flex",flexDirection:"column",gap:10}}>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>
                 Your Essay
                 <span style={{color:wordCount>=250?T.green:wordCount>=150?T.amber:T.red,marginLeft:10,fontWeight:400}}>{wordCount} words {wordCount>=250?"✓":wordCount>=150?"(keep going!)":"(too short)"}</span>
               </label>
               <textarea value={practiceEssay} onChange={handleEssayChange} rows={12}
                 placeholder="Start writing here — live feedback and inline corrections appear as you pause!"
-                style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               {showAnnotated&&liveFeedback&&practiceAnnotations.length>0&&(
                 <Card style={{border:`1px solid ${T.amberBorder}`}}>
-                  <div style={{fontSize:11,color:T.amber,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between"}}>
+                  <div style={{fontSize:11,color:T.amber,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",justifyContent:"space-between"}}>
                     <span>✏️ Your Essay — Click underlined mistakes</span>
                     <span style={{color:T.red}}>{practiceAnnotations.length} spotted</span>
                   </div>
@@ -1226,23 +1226,23 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
                 </Card>
               )}
               <button onClick={()=>{ setStarted(false); setPracticeEssay(""); setLiveFeedback(null); setShowAnnotated(false); setSelectedQuestion(""); setCustomQuestion(""); }}
-                style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,color:T.textMid,fontSize:12,padding:"6px 14px",cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",alignSelf:"flex-start"}}>← Change Question</button>
+                style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,color:T.textMid,fontSize:12,padding:"6px 14px",cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",alignSelf:"flex-start"}}>← Change Question</button>
             </div>
             <div style={{flex:1,minWidth:220,display:"flex",flexDirection:"column",gap:10}}>
-              <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+              <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                 {loadingFeedback?"🔍 Analysing...":"💬 Live Coaching"}
               </div>
-              {loadingFeedback&&<Card style={{textAlign:"center",background:T.blueBg,border:`1px solid ${T.blueBorder}`}}><div style={{color:T.blue,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Reading your essay... 🎓</div></Card>}
+              {loadingFeedback&&<Card style={{textAlign:"center",background:T.blueBg,border:`1px solid ${T.blueBorder}`}}><div style={{color:T.blue,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Reading your essay... 🎓</div></Card>}
               {liveFeedback&&!loadingFeedback&&(
                 <>
                   <Card style={{display:"flex",alignItems:"center",gap:12}}>
                     <div style={{fontSize:36,fontWeight:900,color:bandColor(liveFeedback.estimatedBand),fontFamily:"Georgia,serif",lineHeight:1}}>{liveFeedback.estimatedBand}</div>
-                    <div><div style={{fontSize:10,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",textTransform:"uppercase",letterSpacing:"0.08em"}}>Estimated Band</div><div style={{fontSize:13,color:bandColor(liveFeedback.estimatedBand),fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>{bandLabel(liveFeedback.estimatedBand)}</div></div>
+                    <div><div style={{fontSize:10,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",textTransform:"uppercase",letterSpacing:"0.08em"}}>Estimated Band</div><div style={{fontSize:13,color:bandColor(liveFeedback.estimatedBand),fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>{bandLabel(liveFeedback.estimatedBand)}</div></div>
                   </Card>
-                  {liveFeedback.quickFix&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><div style={{fontSize:11,color:T.red,fontWeight:700,marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🚨 QUICK FIX</div><p style={{color:"#991b1b",fontSize:13,margin:0,lineHeight:1.5,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{liveFeedback.quickFix}</p></Card>}
+                  {liveFeedback.quickFix&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><div style={{fontSize:11,color:T.red,fontWeight:700,marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🚨 QUICK FIX</div><p style={{color:"#991b1b",fontSize:13,margin:0,lineHeight:1.5,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{liveFeedback.quickFix}</p></Card>}
                   {liveFeedback.spotErrors?.length>0&&(
                     <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`}}>
-                      <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✏️ ERRORS SPOTTED ({liveFeedback.spotErrors.length})</div>
+                      <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✏️ ERRORS SPOTTED ({liveFeedback.spotErrors.length})</div>
                       {liveFeedback.spotErrors.map((e,i)=>(
                         <div key={i} style={{marginBottom:8,paddingBottom:8,borderBottom:i<liveFeedback.spotErrors.length-1?`1px solid ${T.amberBorder}`:"none"}}>
                           <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:4,flexWrap:"wrap"}}>
@@ -1250,19 +1250,19 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
                             <span style={{color:T.textMuted,fontSize:12}}>→</span>
                             <span style={{background:"#dcfce7",borderRadius:4,padding:"1px 6px",fontSize:12,color:"#166534",fontWeight:600}}>"{e.correction}"</span>
                           </div>
-                          <div style={{fontSize:11,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{e.explanation}</div>
+                          <div style={{fontSize:11,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{e.explanation}</div>
                         </div>
                       ))}
                     </Card>
                   )}
                   <Card style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`}}>
-                    <div style={{fontSize:11,color:T.blue,fontWeight:700,marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 TIPS</div>
-                    {liveFeedback.tips?.map((tip,i)=><div key={i} style={{color:T.textMid,fontSize:13,lineHeight:1.5,marginBottom:5,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>• {tip}</div>)}
+                    <div style={{fontSize:11,color:T.blue,fontWeight:700,marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>💡 TIPS</div>
+                    {liveFeedback.tips?.map((tip,i)=><div key={i} style={{color:T.textMid,fontSize:13,lineHeight:1.5,marginBottom:5,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>• {tip}</div>)}
                   </Card>
-                  {liveFeedback.encouragement&&<Card style={{background:"#fff5f5",border:"1px solid #ffcccc"}}><p style={{color:T.gold,fontSize:12,margin:0,fontStyle:"italic",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💬 {liveFeedback.encouragement}</p></Card>}
+                  {liveFeedback.encouragement&&<Card style={{background:"#fff5f5",border:"1px solid #ffcccc"}}><p style={{color:T.gold,fontSize:12,margin:0,fontStyle:"italic",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>💬 {liveFeedback.encouragement}</p></Card>}
                 </>
               )}
-              {!liveFeedback&&!loadingFeedback&&<Card style={{textAlign:"center",padding:"24px 16px"}}><div style={{fontSize:28,marginBottom:8}}>🖊️</div><p style={{color:T.textMuted,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Start writing — feedback and corrections appear after a short pause!</p></Card>}
+              {!liveFeedback&&!loadingFeedback&&<Card style={{textAlign:"center",padding:"24px 16px"}}><div style={{fontSize:28,marginBottom:8}}>🖊️</div><p style={{color:T.textMuted,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Start writing — feedback and corrections appear after a short pause!</p></Card>}
             </div>
           </div>
         </div>
@@ -1348,61 +1348,61 @@ const GrammarChecker = ({isPro}) => {
   return (
     <div>
       <Card style={{ marginBottom: 20, background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
-        <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+        <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           ✏️ <strong>Grammar & Spell Checker</strong> — Enter any word, phrase, or sentence and get instant corrections with explanations. {isPro?"Unlimited checks with Pro.":(<><strong>{dailyLeft}</strong> of {GRAMMAR_DAILY_LIMIT} free checks remaining today.</>)}
         </p>
       </Card>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
         {/* Input side */}
         <div style={{ flex: 1, minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
             Your Text
           </div>
           <textarea value={input} onChange={e => setInput(e.target.value)}
             placeholder="Type a word, phrase, or full sentence here..."
             rows={6}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); check(); } }}
-            style={{ width: "100%", background: T.bgGray, border: `1px solid ${T.border}`, borderRadius: 10, color: T.text, fontSize: 15, padding: "14px 16px", resize: "vertical", fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.7, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }} />
+            style={{ width: "100%", background: T.bgGray, border: `1px solid ${T.border}`, borderRadius: 10, color: T.text, fontSize: 15, padding: "14px 16px", resize: "vertical", fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.7, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }} />
           <button onClick={check} disabled={loading || !input.trim()}
-            style={{ background: loading ? T.bgGray : T.primary, border: "none", borderRadius: 10, color: loading ? T.textMuted : "white", fontSize: 15, fontWeight: 700, padding: "14px", cursor: loading ? "not-allowed" : "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", boxShadow: loading ? "none" : T.shadowMd, transition: "all 0.2s" }}>
+            style={{ background: loading ? T.bgGray : T.primary, border: "none", borderRadius: 10, color: loading ? T.textMuted : "white", fontSize: 15, fontWeight: 700, padding: "14px", cursor: loading ? "not-allowed" : "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", boxShadow: loading ? "none" : T.shadowMd, transition: "all 0.2s" }}>
             {loading ? "⏳ Checking..." : "Check Grammar & Spelling →"}
           </button>
-          {error && <div style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, color: T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{error}</div>}
+          {error && <div style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, color: T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{error}</div>}
         </div>
         {/* Result side */}
         <div style={{ flex: 1, minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
             Result
           </div>
           {!result && !loading && (
             <Card style={{ textAlign: "center", padding: "40px 24px", background: T.bgGray, border: `1px dashed ${T.border}` }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>✏️</div>
-              <p style={{ color: T.textMuted, fontSize: 14, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.6 }}>
+              <p style={{ color: T.textMuted, fontSize: 14, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.6 }}>
                 Type something on the left and click "Check" — your corrected text will appear here.
               </p>
             </Card>
           )}
           {loading && (
             <Card style={{ textAlign: "center", padding: "40px 24px", background: T.blueBg, border: `1px solid ${T.blueBorder}` }}>
-              <div style={{ color: T.blue, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Checking your text... ✏️</div>
+              <div style={{ color: T.blue, fontSize: 14, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Checking your text... ✏️</div>
             </Card>
           )}
           {result && !result.hasErrors && (
             <Card style={{ background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <span style={{ fontSize: 24 }}>✅</span>
-                <span style={{ fontSize: 15, fontWeight: 700, color: T.green, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>No corrections needed!</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: T.green, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>No corrections needed!</span>
               </div>
               <div style={{ background: "white", borderRadius: 8, padding: "12px 16px", border: `1px solid ${T.greenBorder}`, marginBottom: 12 }}>
                 <p style={{ color: T.text, fontSize: 15, margin: 0, lineHeight: 1.7, fontFamily: "Georgia,serif" }}>{result.corrected}</p>
               </div>
-              <p style={{ color: T.green, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {result.noErrorReason}</p>
+              <p style={{ color: T.green, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>💡 {result.noErrorReason}</p>
             </Card>
           )}
           {result && result.hasErrors && (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <Card style={{ background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
-                <div style={{ fontSize: 11, color: T.green, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                <div style={{ fontSize: 11, color: T.green, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                   ✅ Corrected Version
                 </div>
                 <p style={{ color: T.text, fontSize: 15, margin: 0, lineHeight: 1.7, fontFamily: "Georgia,serif" }}>{result.corrected}</p>
@@ -1410,14 +1410,14 @@ const GrammarChecker = ({isPro}) => {
               {result.issues?.map((issue, i) => (
                 <Card key={i} style={{ borderLeft: `3px solid ${issue.type === "Spelling" ? T.red : issue.type === "Punctuation" ? T.purple : issue.type === "Structure" ? T.blue : T.amber}`, background: issue.type === "Spelling" ? T.redBg : issue.type === "Punctuation" ? T.purpleBg : issue.type === "Structure" ? T.blueBg : T.amberBg }}>
                   <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
-                    <span style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: issue.type === "Spelling" ? T.red : issue.type === "Punctuation" ? T.purple : issue.type === "Structure" ? T.blue : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{issue.type}</span>
+                    <span style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: issue.type === "Spelling" ? T.red : issue.type === "Punctuation" ? T.purple : issue.type === "Structure" ? T.blue : T.amber, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{issue.type}</span>
                   </div>
                   <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 8 }}>
-                    <span style={{ background: "#fee2e2", borderRadius: 6, padding: "4px 12px", color: "#991b1b", fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>"{issue.original}"</span>
+                    <span style={{ background: "#fee2e2", borderRadius: 6, padding: "4px 12px", color: "#991b1b", fontSize: 14, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>"{issue.original}"</span>
                     <span style={{ color: T.textMuted, fontSize: 16 }}>→</span>
-                    <span style={{ background: "#dcfce7", borderRadius: 6, padding: "4px 12px", color: "#166534", fontSize: 14, fontWeight: 600, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>"{issue.correction}"</span>
+                    <span style={{ background: "#dcfce7", borderRadius: 6, padding: "4px 12px", color: "#166534", fontSize: 14, fontWeight: 600, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>"{issue.correction}"</span>
                   </div>
-                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {issue.explanation}</p>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>💡 {issue.explanation}</p>
                 </Card>
               ))}
             </div>
@@ -1425,12 +1425,12 @@ const GrammarChecker = ({isPro}) => {
         </div>
       </div>
       <Card style={{ marginTop: 20, background: T.primaryLight, border: `1px solid ${T.primaryBorder}` }}>
-        <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+        <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — 1 free analysis, no sign-up needed.
         </p>
       </Card>
       <Card style={{ marginTop: 16, background: T.amberBg, border: `1px solid ${T.amberBorder}` }}>
-        <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+        <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           🏋️ Looking to practise grammar, paraphrasing, linking words, and more? Head over to the <strong>Exercises</strong> tab — 100+ questions with a 30-minute free session timer.
         </p>
       </Card>
@@ -1747,7 +1747,7 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>🏋️</div>
         <h3 style={{ fontFamily: "Georgia,serif", color: T.text, fontSize: 22, margin: "0 0 8px", fontWeight: 700 }}>Grammar Exercises</h3>
-        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: "0 0 16px", lineHeight: 1.6, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
+        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Cairo','Source Sans Pro',system-ui", margin: "0 0 16px", lineHeight: 1.6, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
           Practice sentence structures, verb forms, articles, prepositions, and more. Tap a category to start — each exercise gives instant feedback with detailed explanations.
         </p>
       </div>
@@ -1758,15 +1758,15 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
           <div style={{ background: timeExpired ? T.redBg : paused ? T.amberBg : T.greenBg, border: `1px solid ${timeExpired ? T.redBorder : paused ? T.amberBorder : T.greenBorder}`, borderRadius: 10, padding: "10px 16px", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 22, fontWeight: 900, color: timeLeft < 300 ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", minWidth: 52 }}>
+                <span style={{ fontSize: 22, fontWeight: 900, color: timeLeft < 300 ? T.red : paused ? T.amber : T.green, fontFamily: "'Cairo','Source Sans Pro',system-ui", minWidth: 52 }}>
                   {formatTime(timeLeft)}
                 </span>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: timeExpired ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: timeExpired ? T.red : paused ? T.amber : T.green, fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.3 }}>
                     {timeExpired ? "Time's up — upgrade to continue practising" : paused ? "⏸ Timer paused — press Play to begin" : "▶ Timer running — exercises unlocked"}
                   </div>
                   {!timeExpired && (
-                    <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", marginTop: 1 }}>
+                    <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginTop: 1 }}>
                       Free plan: 30 minutes of practice time · Pause anytime and pick up where you left off · Go Pro for unlimited access
                     </div>
                   )}
@@ -1775,12 +1775,12 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
               <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                 {!timeExpired && (
                   <button onClick={paused ? startTimer : pauseTimer}
-                    style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                     {paused ? "▶ Play" : "⏸ Pause"}
                   </button>
                 )}
                 {timeExpired && (
-                  <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                  <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                     🔓 Upgrade to Pro
                   </button>
                 )}
@@ -1798,7 +1798,7 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
       {/* Overall score */}
       {totalAnswered > 0 && (
         <Card style={{ marginBottom: 16, textAlign: "center" }}>
-          <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+          <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
             Overall: <strong style={{ color: T.text, fontSize: 16 }}>{totalCorrect}</strong> correct out of <strong>{totalAnswered}</strong> answered ({totalQ} total)
             {totalAnswered > 0 && <span style={{ color: totalCorrect/totalAnswered >= 0.8 ? T.green : totalCorrect/totalAnswered >= 0.6 ? T.amber : T.red, marginLeft: 8, fontWeight: 700 }}>({Math.round(totalCorrect/totalAnswered*100)}%)</span>}
           </span>
@@ -1814,20 +1814,20 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
               <div onClick={() => setOpenCat(isOpen ? null : catIdx)}
                 style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: "pointer", transition: "all 0.15s" }}>
                 <span style={{ fontSize: 20 }}>{cat.icon}</span>
-                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.category}</span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.category}</span>
                 {score.attempted > 0 && (
-                  <span style={{ background: score.correct === score.attempted ? T.greenBg : T.amberBg, border: `1px solid ${score.correct === score.attempted ? T.greenBorder : T.amberBorder}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: score.correct === score.attempted ? T.green : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                  <span style={{ background: score.correct === score.attempted ? T.greenBg : T.amberBg, border: `1px solid ${score.correct === score.attempted ? T.greenBorder : T.amberBorder}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: score.correct === score.attempted ? T.green : T.amber, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                     {score.correct}/{score.attempted}
                   </span>
                 )}
-                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.exercises.length}q</span>
+                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.exercises.length}q</span>
                 <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
               </div>
               {isOpen && (
                 <div style={{ border: `1px solid ${cat.color}40`, borderTop: "none", borderRadius: "0 0 10px 10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16, background: `${cat.color}05` }}>
                   {!canAnswer && !isPro && !timeExpired && (
                     <Card style={{ background: T.amberBg, border: `1px solid ${T.amberBorder}`, textAlign: "center" }}>
-                      <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>⏸ Timer is paused. Click <strong>Play</strong> above to start answering.</p>
+                      <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>⏸ Timer is paused. Click <strong>Play</strong> above to start answering.</p>
                     </Card>
                   )}
                   {cat.exercises.map((ex, exIdx) => {
@@ -1837,14 +1837,14 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
                     return (
                       <div key={exIdx} style={{ background: T.bg, border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}`, borderRadius: 10, padding: "14px 16px" }}>
                         <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 10 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{exIdx + 1}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Q{exIdx + 1}</span>
                           {answered && (
-                            <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                               {isCorrect ? "✓ Correct" : "✗ Incorrect"}
                             </span>
                           )}
                         </div>
-                        <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{ex.sentence}</p>
+                        <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{ex.sentence}</p>
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                           {ex.options.map((opt, optIdx) => {
                             let bg = T.bgGray, border = T.border, color = T.text;
@@ -1856,7 +1856,7 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
                             return (
                               <button key={optIdx} onClick={() => handleAnswer(catIdx, exIdx, optIdx)}
                                 disabled={answered || !canAnswer}
-                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered || !canAnswer ? "default" : "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", opacity: answered && optIdx !== ex.correct && optIdx !== answers[key] ? 0.5 : 1 }}>
+                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered || !canAnswer ? "default" : "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", transition: "all 0.15s", opacity: answered && optIdx !== ex.correct && optIdx !== answers[key] ? 0.5 : 1 }}>
                                 {opt}
                               </button>
                             );
@@ -1864,14 +1864,14 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
                         </div>
                         {showExplanation[key] && (
                           <div style={{ marginTop: 10, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
-                            <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {ex.explanation}</p>
+                            <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>💡 {ex.explanation}</p>
                           </div>
                         )}
                       </div>
                     );
                   })}
                   <div style={{ textAlign: "center", padding: "8px 0" }}>
-                    <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                       Score: <strong style={{ color: score.correct === score.total ? T.green : T.text }}>{score.correct}</strong> / {score.total}
                       {score.correct === score.total && score.attempted === score.total && " — Perfect! 🎉"}
                     </span>
@@ -2023,7 +2023,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       <div style={{ textAlign: "center", marginBottom: 24, padding: "8px 0 0" }}>
         <div style={{ fontSize: 32, marginBottom: 8 }}>🏋️</div>
         <h2 style={{ fontFamily: "Georgia,serif", color: T.text, fontSize: 26, margin: "0 0 8px", fontWeight: 700 }}>Practice Exercises</h2>
-        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: 0, maxWidth: 540, marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
+        <p style={{ color: T.textMid, fontSize: 14, fontFamily: "'Cairo','Source Sans Pro',system-ui", margin: 0, maxWidth: 540, marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
           Sharpen your IELTS writing skills with targeted drills — grammar, paraphrasing, linking words, vocabulary upgrades, and more. All exercises are fully static with instant feedback.
         </p>
       </div>
@@ -2034,15 +2034,15 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
           <div style={{ background: timeExpired ? T.redBg : paused ? T.amberBg : T.greenBg, border: `1px solid ${timeExpired ? T.redBorder : paused ? T.amberBorder : T.greenBorder}`, borderRadius: 10, padding: "10px 16px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 24, fontWeight: 900, color: timeLeft < 300 ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", minWidth: 54, flexShrink: 0 }}>
+                <span style={{ fontSize: 24, fontWeight: 900, color: timeLeft < 300 ? T.red : paused ? T.amber : T.green, fontFamily: "'Cairo','Source Sans Pro',system-ui", minWidth: 54, flexShrink: 0 }}>
                   {formatTime(timeLeft)}
                 </span>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: timeExpired ? T.red : paused ? T.amber : T.green, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: timeExpired ? T.red : paused ? T.amber : T.green, fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.3 }}>
                     {timeExpired ? "⏰ Session expired — upgrade to Pro to continue" : paused ? "⏸ Timer paused — press Play to begin your session" : "▶ Session active — exercises unlocked"}
                   </div>
                   {!timeExpired && (
-                    <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginTop: 2 }}>
                       Free plan: 30 minutes total · Pause at any time and resume later · Pro members get unlimited access
                     </div>
                   )}
@@ -2051,12 +2051,12 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
               <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                 {!timeExpired && (
                   <button onClick={paused ? startTimer : pauseTimer}
-                    style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                    style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                     {paused ? "▶ Play" : "⏸ Pause"}
                   </button>
                 )}
                 {timeExpired && (
-                  <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                  <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                     🔓 Upgrade to Pro
                   </button>
                 )}
@@ -2073,7 +2073,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       {isPro && (
         <div style={{ marginBottom: 16, background: T.greenBg, border: `1px solid ${T.greenBorder}`, borderRadius: 10, padding: "10px 16px", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 20 }}>✅</span>
-          <span style={{ fontSize: 13, color: T.green, fontWeight: 700, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Pro — Unlimited exercise access. No timer restrictions.</span>
+          <span style={{ fontSize: 13, color: T.green, fontWeight: 700, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Pro — Unlimited exercise access. No timer restrictions.</span>
         </div>
       )}
 
@@ -2081,7 +2081,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setActiveExTab(t.key)}
-            style={{ background: activeExTab === t.key ? T.primaryLight : T.bgGray, border: `1px solid ${activeExTab === t.key ? T.primaryBorder : T.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: activeExTab === t.key ? 700 : 400, color: activeExTab === t.key ? T.primary : T.textMid, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", display: "flex", alignItems: "center", gap: 5 }}>
+            style={{ background: activeExTab === t.key ? T.primaryLight : T.bgGray, border: `1px solid ${activeExTab === t.key ? T.primaryBorder : T.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: activeExTab === t.key ? 700 : 400, color: activeExTab === t.key ? T.primary : T.textMid, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", display: "flex", alignItems: "center", gap: 5 }}>
             <span>{t.icon}</span>{t.label}
           </button>
         ))}
@@ -2091,9 +2091,9 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       {timeExpired && !isPro && (
         <Card style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, textAlign: "center", padding: "28px 24px", marginBottom: 16 }}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>⏰</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 8 }}>Your free 30-minute session has ended</div>
-          <p style={{ color: T.textMid, fontSize: 13, fontFamily: "'Source Sans Pro','Inter',system-ui", margin: "0 0 16px", lineHeight: 1.6 }}>Upgrade to Pro for unlimited practice time — all exercise types, all categories, no restrictions.</p>
-          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🔓 Upgrade to Pro — $17</button>
+          <div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginBottom: 8 }}>Your free 30-minute session has ended</div>
+          <p style={{ color: T.textMid, fontSize: 13, fontFamily: "'Cairo','Source Sans Pro',system-ui", margin: "0 0 16px", lineHeight: 1.6 }}>Upgrade to Pro for unlimited practice time — all exercise types, all categories, no restrictions.</p>
+          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>🔓 Upgrade to Pro — $17</button>
         </Card>
       )}
 
@@ -2103,8 +2103,8 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
           <div style={{ position: "absolute", inset: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
             <div style={{ background: "rgba(255,255,255,0.85)", borderRadius: 12, padding: "16px 28px", textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.12)", backdropFilter: "blur(2px)" }}>
               <div style={{ fontSize: 28, marginBottom: 6 }}>⏸</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: T.text, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Timer paused</div>
-              <div style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", marginTop: 2 }}>Press Play to resume</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Timer paused</div>
+              <div style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginTop: 2 }}>Press Play to resume</div>
             </div>
           </div>
         )}
@@ -2143,12 +2143,12 @@ const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade}) => {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 4 }}>
+        <div style={{ fontSize: 13, color: T.textMid, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginBottom: 4 }}>
           <strong>14 categories · {totalQ} questions</strong> covering Subject-Verb Agreement, Articles, Tenses, Prepositions, Passives, Conditionals, Relative Clauses, and more.
         </div>
         {totalAnswered > 0 && (
           <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 14px", display: "inline-block" }}>
-            <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+            <span style={{ fontSize: 13, color: T.textMid, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
               Score: <strong style={{ color: T.text }}>{totalCorrect}</strong>/{totalAnswered} answered
               <span style={{ color: totalCorrect/totalAnswered >= 0.8 ? T.green : totalCorrect/totalAnswered >= 0.6 ? T.amber : T.red, marginLeft: 8, fontWeight: 700 }}>({Math.round(totalCorrect/totalAnswered*100)}%)</span>
             </span>
@@ -2164,20 +2164,20 @@ const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade}) => {
               <div onClick={() => setOpenCat(isOpen ? null : catIdx)}
                 style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: "pointer", transition: "all 0.15s" }}>
                 <span style={{ fontSize: 20 }}>{cat.icon}</span>
-                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.category}</span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.category}</span>
                 {score.attempted > 0 && (
-                  <span style={{ background: score.correct === score.attempted ? T.greenBg : T.amberBg, border: `1px solid ${score.correct === score.attempted ? T.greenBorder : T.amberBorder}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: score.correct === score.attempted ? T.green : T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                  <span style={{ background: score.correct === score.attempted ? T.greenBg : T.amberBg, border: `1px solid ${score.correct === score.attempted ? T.greenBorder : T.amberBorder}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: score.correct === score.attempted ? T.green : T.amber, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                     {score.correct}/{score.attempted}
                   </span>
                 )}
-                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{cat.exercises.length}q</span>
+                <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.exercises.length}q</span>
                 <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
               </div>
               {isOpen && (
                 <div style={{ border: `1px solid ${cat.color}40`, borderTop: "none", borderRadius: "0 0 10px 10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16, background: `${cat.color}05` }}>
                   {!canAnswer && !isPro && (
                     <Card style={{ background: T.amberBg, border: `1px solid ${T.amberBorder}`, textAlign: "center" }}>
-                      <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>⏸ Timer paused — click <strong>Play</strong> above to start answering.</p>
+                      <p style={{ color: T.amber, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>⏸ Timer paused — click <strong>Play</strong> above to start answering.</p>
                     </Card>
                   )}
                   {cat.exercises.map((ex, exIdx) => {
@@ -2187,17 +2187,17 @@ const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade}) => {
                     return (
                       <div key={exIdx} style={{ background: T.bg, border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}`, borderRadius: 10, padding: "14px 16px" }}>
                         <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 10 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{exIdx+1}</span>
-                          {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
+                          <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Q{exIdx+1}</span>
+                          {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
                         </div>
-                        <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{ex.sentence}</p>
+                        <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{ex.sentence}</p>
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                           {ex.options.map((opt, optIdx) => {
                             let bg = T.bgGray, border = T.border, color = T.text;
                             if(answered){ if(optIdx===ex.correct){bg=T.greenBg;border=T.greenBorder;color=T.green;}else if(optIdx===answers[key]&&!isCorrect){bg=T.redBg;border=T.redBorder;color=T.red;}else{bg=T.bgGray;color=T.textMuted;} }
                             return (
                               <button key={optIdx} onClick={() => handleAnswer(catIdx, exIdx, optIdx)} disabled={answered||!canAnswer}
-                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", opacity: answered&&optIdx!==ex.correct&&optIdx!==answers[key]?0.5:1 }}>
+                                style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 14, fontWeight: 600, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", transition: "all 0.15s", opacity: answered&&optIdx!==ex.correct&&optIdx!==answers[key]?0.5:1 }}>
                                 {opt}
                               </button>
                             );
@@ -2205,7 +2205,7 @@ const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade}) => {
                         </div>
                         {showExplanation[key] && (
                           <div style={{ marginTop: 10, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
-                            <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {ex.explanation}</p>
+                            <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>💡 {ex.explanation}</p>
                           </div>
                         )}
                       </div>
@@ -2228,7 +2228,7 @@ const ParaphraseExercises = ({canAnswer}) => {
   return (
     <div>
       <Card style={{ background: T.blueBg, border: `1px solid ${T.blueBorder}`, marginBottom: 16 }}>
-        <p style={{ color: T.blue, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+        <p style={{ color: T.blue, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           🔄 <strong>Paraphrasing</strong> — A core IELTS skill. For each sentence, choose the best academic paraphrase. Look for formal vocabulary, appropriate structure, and precise meaning.
         </p>
       </Card>
@@ -2239,19 +2239,19 @@ const ParaphraseExercises = ({canAnswer}) => {
           return (
             <Card key={i} style={{ border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}` }}>
               <div style={{ marginBottom: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1} — Original sentence</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Q{i+1} — Original sentence</span>
                 <div style={{ background: T.bgGray, borderRadius: 8, padding: "10px 14px", marginTop: 6, border: `1px solid ${T.border}` }}>
                   <p style={{ color: T.text, fontSize: 14, margin: 0, fontFamily: "Georgia,serif", fontStyle: "italic" }}>{item.original}</p>
                 </div>
               </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMid, fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 8 }}>Which option is the best academic paraphrase?</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMid, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginBottom: 8 }}>Which option is the best academic paraphrase?</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {item.options.map((opt, optIdx) => {
                   let bg = T.bgGray, border = T.border, color = T.text;
                   if(answered){ if(optIdx===item.correct){bg=T.greenBg;border=T.greenBorder;color=T.green;}else if(optIdx===answers[i]&&!isCorrect){bg=T.redBg;border=T.redBorder;color=T.red;}else{color=T.textMuted;} }
                   return (
                     <button key={optIdx} onClick={() => { if(!canAnswer||answered) return; setAnswers(p=>({...p,[i]:optIdx})); setShown(p=>({...p,[i]:true})); }} disabled={answered||!canAnswer}
-                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", textAlign: "left", lineHeight: 1.5, transition: "all 0.15s" }}>
+                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", textAlign: "left", lineHeight: 1.5, transition: "all 0.15s" }}>
                       <strong style={{ marginRight: 6 }}>{String.fromCharCode(65+optIdx)}.</strong>{opt}
                     </button>
                   );
@@ -2259,7 +2259,7 @@ const ParaphraseExercises = ({canAnswer}) => {
               </div>
               {shown[i] && (
                 <div style={{ marginTop: 12, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
-                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {item.explanation}</p>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>💡 {item.explanation}</p>
                 </div>
               )}
             </Card>
@@ -2277,7 +2277,7 @@ const LinkingWordsQuiz = ({canAnswer}) => {
   return (
     <div>
       <Card style={{ background: T.purpleBg, border: `1px solid ${T.purpleBorder}`, marginBottom: 16 }}>
-        <p style={{ color: T.purple, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+        <p style={{ color: T.purple, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           🔗 <strong>Linking Words Quiz</strong> — Fill in the blank with the correct linking word. Tests your understanding of cohesion, contrast, cause-effect, and sequencing — all tested in IELTS Coherence & Cohesion.
         </p>
       </Card>
@@ -2289,8 +2289,8 @@ const LinkingWordsQuiz = ({canAnswer}) => {
           return (
             <Card key={i} style={{ border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}` }}>
               <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1}</span>
-                {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui", marginLeft: 4 }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Q{i+1}</span>
+                {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginLeft: 4 }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
               </div>
               <p style={{ color: T.text, fontSize: 14, margin: "0 0 12px", lineHeight: 1.7, fontFamily: "Georgia,serif" }}>
                 {parts[0]}<span style={{ background: answered ? (isCorrect ? "#dcfce7" : "#fee2e2") : T.primaryLight, padding: "1px 10px", borderRadius: 4, fontWeight: 700, color: answered ? (isCorrect ? T.green : T.red) : T.primary, fontStyle: "normal", minWidth: 80, display: "inline-block", textAlign: "center" }}>
@@ -2303,7 +2303,7 @@ const LinkingWordsQuiz = ({canAnswer}) => {
                   if(answered){ if(optIdx===item.correct){bg=T.greenBg;border=T.greenBorder;color=T.green;}else if(optIdx===answers[i]&&!isCorrect){bg=T.redBg;border=T.redBorder;color=T.red;}else{color=T.textMuted;} }
                   return (
                     <button key={optIdx} onClick={() => { if(!canAnswer||answered) return; setAnswers(p=>({...p,[i]:optIdx})); setShown(p=>({...p,[i]:true})); }} disabled={answered||!canAnswer}
-                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s" }}>
+                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", transition: "all 0.15s" }}>
                       {opt}
                     </button>
                   );
@@ -2311,7 +2311,7 @@ const LinkingWordsQuiz = ({canAnswer}) => {
               </div>
               {shown[i] && (
                 <div style={{ marginTop: 10, background: isCorrect ? T.greenBg : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
-                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>💡 {item.explanation}</p>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>💡 {item.explanation}</p>
                 </div>
               )}
             </Card>
@@ -2329,7 +2329,7 @@ const VocabUpgradeExercises = ({canAnswer}) => {
   return (
     <div>
       <Card style={{ background: "#f0fdf4", border: `1px solid ${T.greenBorder}`, marginBottom: 16 }}>
-        <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+        <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           📖 <strong>Vocabulary Upgrade</strong> — Each question shows a weak phrase. Pick the best academic replacement. These upgrades directly raise your Lexical Resource band score.
         </p>
       </Card>
@@ -2340,10 +2340,10 @@ const VocabUpgradeExercises = ({canAnswer}) => {
           return (
             <Card key={i} style={{ border: `1px solid ${answered ? (isCorrect ? T.greenBorder : T.redBorder) : T.border}` }}>
               <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1}</span>
-                <span style={{ background: "#fee2e2", borderRadius: 6, padding: "3px 12px", fontSize: 13, color: "#991b1b", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>✗ "{item.weak}"</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Q{i+1}</span>
+                <span style={{ background: "#fee2e2", borderRadius: 6, padding: "3px 12px", fontSize: 13, color: "#991b1b", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>✗ "{item.weak}"</span>
                 <span style={{ color: T.textMuted, fontSize: 13 }}>→ choose best upgrade</span>
-                {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
+                {answered && <span style={{ fontSize: 11, fontWeight: 700, color: isCorrect ? T.green : T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{isCorrect ? "✓ Correct" : "✗ Incorrect"}</span>}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {item.options.map((opt, optIdx) => {
@@ -2351,7 +2351,7 @@ const VocabUpgradeExercises = ({canAnswer}) => {
                   if(answered){ if(optIdx===item.correct){bg="#dcfce7";border=T.greenBorder;color="#166534";}else if(optIdx===answers[i]&&!isCorrect){bg="#fee2e2";border=T.redBorder;color="#991b1b";}else{color=T.textMuted;} }
                   return (
                     <button key={optIdx} onClick={() => { if(!canAnswer||answered) return; setAnswers(p=>({...p,[i]:optIdx})); setShown(p=>({...p,[i]:true})); }} disabled={answered||!canAnswer}
-                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", textAlign: "left", transition: "all 0.15s" }}>
+                      style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, color, cursor: answered||!canAnswer?"default":"pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", textAlign: "left", transition: "all 0.15s" }}>
                       {opt}
                     </button>
                   );
@@ -2359,7 +2359,7 @@ const VocabUpgradeExercises = ({canAnswer}) => {
               </div>
               {shown[i] && (
                 <div style={{ marginTop: 10, background: isCorrect ? "#f0fdf4" : T.amberBg, border: `1px solid ${isCorrect ? T.greenBorder : T.amberBorder}`, borderRadius: 8, padding: "10px 14px" }}>
-                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>🎓 {item.tip}</p>
+                  <p style={{ color: T.textMid, fontSize: 13, margin: 0, lineHeight: 1.6, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>🎓 {item.tip}</p>
                 </div>
               )}
             </Card>
@@ -2377,7 +2377,7 @@ const ErrorCorrectionExercises = ({canAnswer}) => {
   return (
     <div>
       <Card style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, marginBottom: 16 }}>
-        <p style={{ color: T.red, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+        <p style={{ color: T.red, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           🔍 <strong>Error Correction</strong> — Read each passage carefully and find all the mistakes. Click "Reveal Errors" to see every error highlighted with explanations. Trains the same skill examiners use when marking your essay.
         </p>
       </Card>
@@ -2386,13 +2386,13 @@ const ErrorCorrectionExercises = ({canAnswer}) => {
           <Card key={pi} style={{ border: `1px solid ${T.border}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
               <div>
-                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui", textTransform: "uppercase", letterSpacing: "0.08em" }}>Passage {pi+1}</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: T.text, fontFamily: "'Source Sans Pro','Inter',system-ui", marginLeft: 8 }}>{passage.title}</span>
-                <span style={{ fontSize: 11, color: T.amber, fontFamily: "'Source Sans Pro','Inter',system-ui", marginLeft: 8 }}>({passage.errors.length} errors hidden)</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", textTransform: "uppercase", letterSpacing: "0.08em" }}>Passage {pi+1}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginLeft: 8 }}>{passage.title}</span>
+                <span style={{ fontSize: 11, color: T.amber, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginLeft: 8 }}>({passage.errors.length} errors hidden)</span>
               </div>
               <button onClick={() => { if(!canAnswer) return; setShowAll(p=>({...p,[pi]:!p[pi]})); }}
                 disabled={!canAnswer}
-                style={{ background: showAll[pi] ? T.amberBg : T.primary, color: showAll[pi] ? T.amber : "white", border: `1px solid ${showAll[pi] ? T.amberBorder : T.primary}`, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: canAnswer?"pointer":"default", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>
+                style={{ background: showAll[pi] ? T.amberBg : T.primary, color: showAll[pi] ? T.amber : "white", border: `1px solid ${showAll[pi] ? T.amberBorder : T.primary}`, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: canAnswer?"pointer":"default", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                 {showAll[pi] ? "Hide Errors" : "Reveal Errors"}
               </button>
             </div>
@@ -2419,13 +2419,13 @@ const ErrorCorrectionExercises = ({canAnswer}) => {
             </div>
             {showAll[pi] && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.red, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Errors Found ({passage.errors.length})</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.red, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Errors Found ({passage.errors.length})</div>
                 {passage.errors.map((err, ei) => (
                   <div key={ei} style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, borderRadius: 8, padding: "10px 14px", display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
-                    <span style={{ background: "#fee2e2", borderRadius: 6, padding: "3px 10px", fontSize: 13, color: "#991b1b", fontFamily: "'Source Sans Pro','Inter',system-ui", flexShrink: 0 }}>✗ "{err.wrong}"</span>
+                    <span style={{ background: "#fee2e2", borderRadius: 6, padding: "3px 10px", fontSize: 13, color: "#991b1b", fontFamily: "'Cairo','Source Sans Pro',system-ui", flexShrink: 0 }}>✗ "{err.wrong}"</span>
                     <span style={{ color: T.textMuted, fontSize: 14, flexShrink: 0 }}>→</span>
-                    <span style={{ background: "#dcfce7", borderRadius: 6, padding: "3px 10px", fontSize: 13, color: "#166534", fontFamily: "'Source Sans Pro','Inter',system-ui", flexShrink: 0 }}>✓ "{err.right}"</span>
-                    <span style={{ color: T.textMid, fontSize: 12, fontFamily: "'Source Sans Pro','Inter',system-ui", flex: 1, minWidth: 200 }}>💡 {err.explanation}</span>
+                    <span style={{ background: "#dcfce7", borderRadius: 6, padding: "3px 10px", fontSize: 13, color: "#166534", fontFamily: "'Cairo','Source Sans Pro',system-ui", flexShrink: 0 }}>✓ "{err.right}"</span>
+                    <span style={{ color: T.textMid, fontSize: 12, fontFamily: "'Cairo','Source Sans Pro',system-ui", flex: 1, minWidth: 200 }}>💡 {err.explanation}</span>
                   </div>
                 ))}
               </div>
@@ -2447,7 +2447,7 @@ const BandSelfCheck = () => {
   return (
     <div>
       <Card style={{ background: T.primaryLight, border: `1px solid ${T.primaryBorder}`, marginBottom: 16 }}>
-        <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.6 }}>
+        <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.6 }}>
           🎯 <strong>Band Score Self-Check</strong> — Answer 10 honest questions about your current writing habits. You'll get an estimated band range based on your answers, plus targeted advice on what to fix. No timer needed — answer honestly!
         </p>
       </Card>
@@ -2458,15 +2458,15 @@ const BandSelfCheck = () => {
             <Card key={i} style={{ border: `1px solid ${answered ? T.greenBorder : T.border}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Q{i+1} </span>
-                  <span style={{ fontSize: 14, color: T.text, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.5 }}>{item.q}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Q{i+1} </span>
+                  <span style={{ fontSize: 14, color: T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.5 }}>{item.q}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                   {["yes","no"].map(val => {
                     const active = answers[i] === val;
                     return (
                       <button key={val} onClick={() => setAnswers(p=>({...p,[i]:val}))}
-                        style={{ background: active ? (val==="yes" ? T.greenBg : T.redBg) : T.bgGray, border: `1.5px solid ${active ? (val==="yes" ? T.greenBorder : T.redBorder) : T.border}`, borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, color: active ? (val==="yes" ? T.green : T.red) : T.textMid, cursor: "pointer", fontFamily: "'Source Sans Pro','Inter',system-ui", transition: "all 0.15s", textTransform: "capitalize" }}>
+                        style={{ background: active ? (val==="yes" ? T.greenBg : T.redBg) : T.bgGray, border: `1.5px solid ${active ? (val==="yes" ? T.greenBorder : T.redBorder) : T.border}`, borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, color: active ? (val==="yes" ? T.green : T.red) : T.textMid, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", transition: "all 0.15s", textTransform: "capitalize" }}>
                         {val === "yes" ? "✓ Yes" : "✗ No"}
                       </button>
                     );
@@ -2475,7 +2475,7 @@ const BandSelfCheck = () => {
               </div>
               {answered && answers[i] === "no" && (
                 <div style={{ marginTop: 10, background: T.amberBg, border: `1px solid ${T.amberBorder}`, borderRadius: 8, padding: "8px 14px" }}>
-                  <p style={{ color: T.amber, fontSize: 12, margin: 0, fontFamily: "'Source Sans Pro','Inter',system-ui", lineHeight: 1.5 }}>💡 {item.tip}</p>
+                  <p style={{ color: T.amber, fontSize: 12, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.5 }}>💡 {item.tip}</p>
                 </div>
               )}
             </Card>
@@ -2484,15 +2484,15 @@ const BandSelfCheck = () => {
       </div>
       {allAnswered && (
         <Card style={{ marginTop: 20, background: `linear-gradient(135deg, ${T.primary} 0%, #003a99 100%)`, border: "none", textAlign: "center", padding: "32px 24px" }}>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "'Source Sans Pro','Inter',system-ui" }}>Your Estimated Band</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Your Estimated Band</div>
           <div style={{ fontSize: 72, fontWeight: 900, color: "white", lineHeight: 1, fontFamily: "Georgia,serif", marginBottom: 8 }}>{roundedBand}</div>
-          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", fontFamily: "'Source Sans Pro','Inter',system-ui", marginBottom: 16, lineHeight: 1.6 }}>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", fontFamily: "'Cairo','Source Sans Pro',system-ui", marginBottom: 16, lineHeight: 1.6 }}>
             {roundedBand >= 7.5 ? "Excellent foundation — you're applying most key techniques. Focus on advanced vocabulary and complex structures to reach Band 8+." :
              roundedBand >= 6.5 ? "Good progress — you're following core principles but there are clear gaps. Target the areas where you answered 'No' above." :
              roundedBand >= 5.5 ? "Developing — several fundamentals need attention. Work through the 'No' answers above systematically." :
              "Foundation stage — focus on the basics first: word count, paraphrasing, linking words, and avoiding informal language."}
           </div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", fontFamily: "'Source Sans Pro','Inter',system-ui", fontStyle: "italic" }}>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", fontFamily: "'Cairo','Source Sans Pro',system-ui", fontStyle: "italic" }}>
             This is a self-assessed estimate based on your reported habits. For a precise band score, use the Essay Analyzer above.
           </div>
         </Card>
@@ -2516,7 +2516,7 @@ const AdminPage = ({onBack}) => {
   const [manualLoading, setManualLoading] = useState(false);
   const [manualResult, setManualResult] = useState(null);
 
-  const inp = {width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Source Sans Pro','Inter',system-ui",outline:"none",boxSizing:"border-box"};
+  const inp = {width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 12px",fontFamily:"'Cairo','Source Sans Pro',system-ui",outline:"none",boxSizing:"border-box"};
 
   const tryUnlock = async () => {
     if(passInput !== ADMIN_KEY){ setPassErr("Incorrect password."); return; }
@@ -2578,7 +2578,7 @@ const AdminPage = ({onBack}) => {
 
   if(!unlocked) return (
     <div style={{maxWidth:400,margin:"60px auto",padding:"0 24px"}}>
-      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"0 0 20px",display:"flex",alignItems:"center",gap:6}}>← Back</button>
+      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",padding:"0 0 20px",display:"flex",alignItems:"center",gap:6}}>← Back</button>
       <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:12,padding:"36px 28px",boxShadow:T.shadowMd,textAlign:"center"}}>
         <div style={{fontSize:40,marginBottom:12}}>🔐</div>
         <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 20px"}}>Admin Access</h2>
@@ -2587,7 +2587,7 @@ const AdminPage = ({onBack}) => {
           placeholder="Admin password" style={{...inp,marginBottom:10}}/>
         {passErr&&<div style={{color:T.red,fontSize:13,marginBottom:10}}>{passErr}</div>}
         <button onClick={tryUnlock}
-          style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+          style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
           Unlock →
         </button>
       </div>
@@ -2596,21 +2596,21 @@ const AdminPage = ({onBack}) => {
 
   return (
     <div style={{maxWidth:740,margin:"0 auto",padding:"24px 20px 80px"}}>
-      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
+      <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
 
-      {adminLoading&&<div style={{textAlign:"center",padding:"40px",color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⏳ Loading dashboard...</div>}
+      {adminLoading&&<div style={{textAlign:"center",padding:"40px",color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⏳ Loading dashboard...</div>}
 
       {/* SUCCESS BANNER — stays visible after confirming */}
       {lastConfirmed&&(
         <div style={{background:T.greenBg,border:`2px solid ${T.greenBorder}`,borderRadius:12,padding:"20px",marginBottom:20,boxShadow:T.shadow,position:"relative"}}>
           <button onClick={()=>setLastConfirmed(null)} style={{position:"absolute",top:10,right:12,background:"none",border:"none",fontSize:18,color:T.textMuted,cursor:"pointer",lineHeight:1}}>✕</button>
           <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.green,margin:"0 0 10px"}}>✅ Payment Confirmed — {lastConfirmed.paymentName}</h3>
-          <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>
+          <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:6}}>
             {lastConfirmed.paymentEmail} · 📱 {lastConfirmed.paymentMobile}
           </div>
           {lastConfirmed.accountCreated&&(
             <div style={{background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 14px",marginBottom:10}}>
-              <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>🆕 Account created with credentials:</div>
+              <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:6}}>🆕 Account created with credentials:</div>
               <div style={{fontSize:14,fontFamily:"monospace",color:T.text,lineHeight:1.8}}>
                 📧 {lastConfirmed.paymentEmail}<br/>
                 🔑 {lastConfirmed.tempPassword}
@@ -2618,11 +2618,11 @@ const AdminPage = ({onBack}) => {
             </div>
           )}
           <div style={{background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 14px",marginBottom:10}}>
-            <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:6}}>💬 WhatsApp message to send:</div>
-            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{lastConfirmed.whatsappMessage}</div>
+            <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:6}}>💬 WhatsApp message to send:</div>
+            <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{lastConfirmed.whatsappMessage}</div>
           </div>
           <button onClick={()=>copyText(lastConfirmed.whatsappMessage,"confirmed")}
-            style={{background:copied==="confirmed"?T.greenBg:T.primaryLight,border:`1px solid ${copied==="confirmed"?T.greenBorder:T.primaryBorder}`,borderRadius:8,padding:"8px 18px",fontSize:13,fontWeight:700,color:copied==="confirmed"?T.green:T.primary,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+            style={{background:copied==="confirmed"?T.greenBg:T.primaryLight,border:`1px solid ${copied==="confirmed"?T.greenBorder:T.primaryBorder}`,borderRadius:8,padding:"8px 18px",fontSize:13,fontWeight:700,color:copied==="confirmed"?T.green:T.primary,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
             {copied==="confirmed"?"✓ Copied!":"📋 Copy WhatsApp Message"}
           </button>
         </div>
@@ -2632,8 +2632,8 @@ const AdminPage = ({onBack}) => {
       {confirmError&&(
         <div style={{background:T.redBg,border:`2px solid ${T.redBorder}`,borderRadius:12,padding:"16px 20px",marginBottom:20,position:"relative"}}>
           <button onClick={()=>setConfirmError(null)} style={{position:"absolute",top:8,right:12,background:"none",border:"none",fontSize:18,color:T.textMuted,cursor:"pointer"}}>✕</button>
-          <div style={{fontSize:14,color:T.red,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>❌ Confirmation failed</div>
-          <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{confirmError}</div>
+          <div style={{fontSize:14,color:T.red,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>❌ Confirmation failed</div>
+          <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:4}}>{confirmError}</div>
         </div>
       )}
 
@@ -2644,7 +2644,7 @@ const AdminPage = ({onBack}) => {
             {[["👥 Total Users",adminData.stats?.totalUsers,T.text],["⭐ Pro Users",adminData.stats?.proUsers,T.green],["⏳ Pending",adminData.stats?.pendingPayments,T.amber]].map(([label,val,color])=>(
               <div key={label} style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",textAlign:"center",boxShadow:T.shadow}}>
                 <div style={{fontSize:28,fontWeight:900,color,fontFamily:"Georgia,serif"}}>{val||0}</div>
-                <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4}}>{label}</div>
+                <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:4}}>{label}</div>
               </div>
             ))}
           </div>
@@ -2658,12 +2658,12 @@ const AdminPage = ({onBack}) => {
                   <div key={p.id} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"14px 16px"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
                       <div>
-                        <div style={{fontWeight:700,color:T.text,fontSize:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{p.name}</div>
-                        <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{p.email} · 📱 {p.mobile}</div>
-                        <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:2}}>{p.amount} {p.currency} · {new Date(p.created_at).toLocaleString("en-GB")}</div>
+                        <div style={{fontWeight:700,color:T.text,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{p.name}</div>
+                        <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{p.email} · 📱 {p.mobile}</div>
+                        <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:2}}>{p.amount} {p.currency} · {new Date(p.created_at).toLocaleString("en-GB")}</div>
                       </div>
                       <button onClick={()=>confirmPayment(p)} disabled={confirming===p.id}
-                        style={{background:confirming===p.id?T.bgGray:T.green,color:confirming===p.id?T.textMuted:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:confirming===p.id?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
+                        style={{background:confirming===p.id?T.bgGray:T.green,color:confirming===p.id?T.textMuted:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:confirming===p.id?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0}}>
                         {confirming===p.id?"⏳ Creating account...":"✓ Confirm Payment"}
                       </button>
                     </div>
@@ -2676,7 +2676,7 @@ const AdminPage = ({onBack}) => {
           {/* Manual Pro Activation */}
           <div style={{background:T.bg,border:`2px solid ${T.primaryBorder}`,borderRadius:12,padding:"20px",marginBottom:20,boxShadow:T.shadow}}>
             <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.primary,margin:"0 0 6px"}}>⚡ Activate Pro for Any Email</h3>
-            <p style={{color:T.textMuted,fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:"0 0 14px",lineHeight:1.5}}>
+            <p style={{color:T.textMuted,fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:"0 0 14px",lineHeight:1.5}}>
               If user already has an account → upgrades to Pro instantly.<br/>
               If user doesn't have an account → creates one with a temp password you can send them.
             </p>
@@ -2685,13 +2685,13 @@ const AdminPage = ({onBack}) => {
                 onKeyDown={e=>e.key==="Enter"&&activatePro()}
                 placeholder="user@email.com" style={{...inp,flex:1}}/>
               <button onClick={activatePro} disabled={manualLoading}
-                style={{background:manualLoading?T.bgGray:T.primary,color:manualLoading?T.textMuted:"white",border:"none",borderRadius:8,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:manualLoading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>
+                style={{background:manualLoading?T.bgGray:T.primary,color:manualLoading?T.textMuted:"white",border:"none",borderRadius:8,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:manualLoading?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0}}>
                 {manualLoading?"⏳ Activating...":"⚡ Activate Pro"}
               </button>
             </div>
             {manualResult&&(
               <div style={{marginTop:14,background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px"}}>
-                <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:8}}>
+                <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:8}}>
                   ✅ {manualResult.accountCreated?"Account created & Pro activated":"Pro activated for existing user"}
                 </div>
                 {manualResult.accountCreated&&(
@@ -2702,16 +2702,16 @@ const AdminPage = ({onBack}) => {
                   </div>
                 )}
                 <div style={{background:"white",border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"10px 14px",marginBottom:10}}>
-                  <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>💬 WhatsApp message:</div>
-                  <div style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{manualResult.whatsappMessage}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>💬 WhatsApp message:</div>
+                  <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{manualResult.whatsappMessage}</div>
                 </div>
                 <div style={{display:"flex",gap:8}}>
                   <button onClick={()=>copyText(manualResult.whatsappMessage,"manual")}
-                    style={{background:copied==="manual"?T.greenBg:T.primaryLight,border:`1px solid ${copied==="manual"?T.greenBorder:T.primaryBorder}`,borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:700,color:copied==="manual"?T.green:T.primary,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    style={{background:copied==="manual"?T.greenBg:T.primaryLight,border:`1px solid ${copied==="manual"?T.greenBorder:T.primaryBorder}`,borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:700,color:copied==="manual"?T.green:T.primary,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                     {copied==="manual"?"✓ Copied!":"📋 Copy Message"}
                   </button>
                   <button onClick={()=>setManualResult(null)}
-                    style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                     Dismiss
                   </button>
                 </div>
@@ -2727,11 +2727,11 @@ const AdminPage = ({onBack}) => {
                 <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:p.is_pro?T.greenBg:T.bgGray,borderRadius:8,border:`1px solid ${p.is_pro?T.greenBorder:T.border}`}}>
                   <span style={{fontSize:16}}>{p.is_pro?"⭐":"👤"}</span>
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:13,fontWeight:600,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{p.name||"—"}</div>
-                    <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.email}</div>
+                    <div style={{fontSize:13,fontWeight:600,color:T.text,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{p.name||"—"}</div>
+                    <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.email}</div>
                   </div>
-                  <span style={{fontSize:11,fontWeight:700,color:p.is_pro?T.green:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>{p.is_pro?"PRO":"Free"}</span>
-                  <span style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>{new Date(p.created_at).toLocaleDateString("en-GB")}</span>
+                  <span style={{fontSize:11,fontWeight:700,color:p.is_pro?T.green:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0}}>{p.is_pro?"PRO":"Free"}</span>
+                  <span style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0}}>{new Date(p.created_at).toLocaleDateString("en-GB")}</span>
                 </div>
               ))}
             </div>
@@ -2872,7 +2872,7 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
     {id:"mistakes",label:"⚠️ Common Mistakes",free:true}
   ];
   const toggleAnswer = (key) => setShowAnswer(prev=>({...prev,[key]:!prev[key]}));
-  const sty = {fontFamily:"'Source Sans Pro','Inter',system-ui"};
+  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const card = {background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",marginBottom:16,boxShadow:T.shadow};
   const locked = (free) => !free && !isPro;
 
@@ -3468,7 +3468,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
     {id:"strategies",label:"🎯 Question Strategies"},
     {id:"timetips",label:"⏱️ Time Management"}
   ];
-  const sty = {fontFamily:"'Source Sans Pro','Inter',system-ui"};
+  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const card = {background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",marginBottom:16,boxShadow:T.shadow};
   const isLocked = (idx) => !isPro && idx > 0;
 
@@ -3741,15 +3741,15 @@ const ContactPage = () => {
       setForm({ name:"", country:"", age:"", email:"", message:"" });
     } catch(e) { console.error("EmailJS error:", e); setStatus("error"); }
   };
-  const inputStyle = { width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", fontFamily:"'Source Sans Pro','Inter',system-ui", outline:"none", boxSizing:"border-box", boxShadow:T.shadow, transition:"border-color 0.2s" };
-  const labelStyle = { display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6, fontFamily:"'Source Sans Pro','Inter',system-ui", fontWeight:600 };
+  const inputStyle = { width:"100%", background:"white", border:`1px solid ${T.border}`, borderRadius:10, color:T.text, fontSize:14, padding:"12px 14px", fontFamily:"'Cairo','Source Sans Pro',system-ui", outline:"none", boxSizing:"border-box", boxShadow:T.shadow, transition:"border-color 0.2s" };
+  const labelStyle = { display:"block", fontSize:11, color:T.textMid, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6, fontFamily:"'Cairo','Source Sans Pro',system-ui", fontWeight:600 };
   return (
     <div style={{maxWidth:600,margin:"0 auto",padding:"24px 16px 0"}}>
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{fontSize:48,marginBottom:12}}>✉️</div>
         <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900}}>Contact Us</h2>
-        <p style={{color:T.textMid,fontSize:15,fontFamily:"'Source Sans Pro','Inter',system-ui",margin:0,lineHeight:1.6}}>Have a question, feedback or need support? We'd love to hear from you.</p>
-        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:4,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور.</p>
+        <p style={{color:T.textMid,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0,lineHeight:1.6}}>Have a question, feedback or need support? We'd love to hear from you.</p>
+        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:4,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور.</p>
       </div>
       <Card style={{border:"2px solid #e0e0e0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
@@ -3762,12 +3762,12 @@ const ContactPage = () => {
             <div><label style={labelStyle}>Email Address *</label><input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="your@email.com" style={inputStyle}/></div>
           </div>
           <div><label style={labelStyle}>Message *</label><textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Write your message here... / اكتب رسالتك هنا..." rows={5} style={{...inputStyle,resize:"vertical",lineHeight:1.6}}/></div>
-          {status==="error"&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Please fill in all required fields (Name, Email, Message).</p></Card>}
-          {status==="success"&&<Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✅ Message sent successfully! We'll get back to you soon.</p></Card>}
-          <button onClick={handleSubmit} disabled={status==="sending"} style={{background:status==="sending"?T.bgGray:T.primary,border:"none",borderRadius:4,color:status==="sending"?T.textMuted:"white",fontSize:14,fontWeight:600,padding:"14px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:T.shadow}}>
+          {status==="error"&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ Please fill in all required fields (Name, Email, Message).</p></Card>}
+          {status==="success"&&<Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✅ Message sent successfully! We'll get back to you soon.</p></Card>}
+          <button onClick={handleSubmit} disabled={status==="sending"} style={{background:status==="sending"?T.bgGray:T.primary,border:"none",borderRadius:4,color:status==="sending"?T.textMuted:"white",fontSize:14,fontWeight:600,padding:"14px",cursor:status==="sending"?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:T.shadow}}>
             {status==="sending"?"⏳ Sending...":"Send Message →"}
           </button>
-          {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(<p style={{textAlign:"center",color:T.amber,fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",fontStyle:"italic",margin:0}}>📧 EmailJS verification pending — messages will be delivered once account is verified (up to 48hrs).</p>)}
+          {EMAILJS_PUBLIC_KEY==="YOUR_PUBLIC_KEY"&&(<p style={{textAlign:"center",color:T.amber,fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontStyle:"italic",margin:0}}>📧 EmailJS verification pending — messages will be delivered once account is verified (up to 48hrs).</p>)}
         </div>
       </Card>
     </div>
@@ -3777,17 +3777,17 @@ const ContactPage = () => {
 // ── POLICY PAGES ─────────────────────────────
 const PolicyPage = ({ title, children, onBack }) => (
   <div style={{maxWidth:800, margin:"0 auto", padding:"0 24px 80px"}}>
-    <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:"24px 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
+    <button onClick={onBack} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",padding:"24px 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to Englishfool</button>
     <div style={{background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,padding:"40px 48px",boxShadow:T.shadow}}>
-      <h1 style={{fontFamily:"'Source Sans Pro','Inter',system-ui",fontSize:28,fontWeight:700,color:T.text,marginBottom:8,marginTop:0}}>{title}</h1>
-      <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:32}}>Last updated: {new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}</p>
-      <div style={{color:T.textMid,fontSize:15,lineHeight:1.8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{children}</div>
+      <h1 style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:28,fontWeight:700,color:T.text,marginBottom:8,marginTop:0}}>{title}</h1>
+      <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:32}}>Last updated: {new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}</p>
+      <div style={{color:T.textMid,fontSize:15,lineHeight:1.8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{children}</div>
     </div>
   </div>
 );
 const Section = ({title, children}) => (
   <div style={{marginBottom:28}}>
-    <h2 style={{fontSize:17,fontWeight:700,color:"#1c1d1f",marginBottom:10,marginTop:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{title}</h2>
+    <h2 style={{fontSize:17,fontWeight:700,color:"#1c1d1f",marginBottom:10,marginTop:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{title}</h2>
     {children}
   </div>
 );
@@ -4125,7 +4125,7 @@ export default function IELTSBot(){
   };
 
   return (
-    <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Source Sans Pro','Inter',system-ui,sans-serif",color:T.text}}>
+    <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Cairo','Source Sans Pro',system-ui,sans-serif",color:T.text}}>
       {showPaywall&&<PaywallModal onClose={()=>{setShowPaywall(false);setPaywallTab("cliq");}} onSuccess={handleProSuccess} session={session} initialTab={paywallTab}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
       {showChangePassword&&<ChangePasswordModal onClose={()=>setShowChangePassword(false)}/>}
@@ -4150,21 +4150,21 @@ export default function IELTSBot(){
           </div>
           <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
             {proUser?(
-              <span style={{fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Pro — Unlimited</span>
+              <span style={{fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro — Unlimited</span>
             ):(
-              <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)",letterSpacing:"0.01em"}}>🔓 Upgrade to Pro</button>
+              <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)",letterSpacing:"0.01em"}}>🔓 Upgrade to Pro</button>
             )}
             <div style={{width:1,height:20,background:T.border}}/>
             {session?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:13,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
-                <button onClick={()=>setShowChangePassword(true)} style={{background:"transparent",border:"none",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline",padding:0}}>🔑</button>
-                <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign Out</button>
+                <span style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
+                <button onClick={()=>setShowChangePassword(true)} style={{background:"transparent",border:"none",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",padding:0}}>🔑</button>
+                <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign Out</button>
               </div>
             ):(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <button onClick={()=>{ setPaywallTab("code"); setShowPaywall(true); }} style={{background:"transparent",color:T.textMuted,border:"none",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",textDecoration:"underline",padding:0,whiteSpace:"nowrap"}}>Have a code?</button>
-                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In →</button>
+                <button onClick={()=>{ setPaywallTab("code"); setShowPaywall(true); }} style={{background:"transparent",color:T.textMuted,border:"none",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",padding:0,whiteSpace:"nowrap"}}>Have a code?</button>
+                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign In →</button>
               </div>
             )}
           </div>
@@ -4176,7 +4176,7 @@ export default function IELTSBot(){
         <div style={{background:T.bgGray,borderBottom:`1px solid ${T.border}`,padding:"0 24px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
             {[{v:"analyze",l:"🎓 Analyze"},{v:"practice",l:"🖊️ Practice"},{v:"grammar",l:"✏️ Grammar & Spelling"},{v:"exercises",l:"🏋️ Exercises"}].map(t=>(
-              <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
+              <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
             ))}
           </div>
         </div>
@@ -4184,22 +4184,22 @@ export default function IELTSBot(){
 
       {/* HERO — only on main writing page */}
       {mainView==="analyze"&&(<>
-      <div style={{background:"linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #0056d2 100%)",position:"relative"}}>
+      <div style={{background:"linear-gradient(135deg, #7f1d1d 0%, #b91c1c 50%, #dc2626 100%)",position:"relative"}}>
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"36px 40px 36px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
 
             {/* Price badges — first thing they see */}
             <div style={{direction:"rtl",textAlign:"right",marginBottom:16}}>
-              <div style={{fontSize:"clamp(20px,2.5vw,30px)",fontWeight:700,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.4,marginBottom:14}}>
+              <div style={{fontSize:"clamp(20px,2.5vw,30px)",fontWeight:700,color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.4,marginBottom:14}}>
                 كل هذا بسعر واحد — مدى الحياة:
               </div>
               <div className="hero-prices" style={{display:"flex",gap:12,justifyContent:"flex-end",flexWrap:"wrap",marginBottom:16}}>
                 <div style={{background:"rgba(255,255,255,0.12)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:14,padding:"14px 22px",textAlign:"center",flex:"0 0 auto",backdropFilter:"blur(4px)"}}>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,marginBottom:4}}>🇯🇴 داخل الأردن</div>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:4}}>🇯🇴 داخل الأردن</div>
                   <div style={{fontFamily:"Georgia,serif",fontSize:36,fontWeight:900,color:"#4ade80",lineHeight:1}}>10 <span style={{fontSize:16,fontWeight:600}}>دينار</span></div>
                 </div>
                 <div style={{background:"rgba(255,255,255,0.12)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:14,padding:"14px 22px",textAlign:"center",flex:"0 0 auto",backdropFilter:"blur(4px)"}}>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,marginBottom:4}}>🌍 خارج الأردن</div>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:4}}>🌍 خارج الأردن</div>
                   <div style={{fontFamily:"Georgia,serif",fontSize:36,fontWeight:900,color:"#4ade80",lineHeight:1}}>$17</div>
                 </div>
               </div>
@@ -4207,7 +4207,7 @@ export default function IELTSBot(){
 
             {/* What you get — Arabic features */}
             <div style={{direction:"rtl",textAlign:"right",marginBottom:18}}>
-              <div style={{fontSize:"clamp(15px,1.8vw,19px)",fontWeight:700,color:"rgba(255,255,255,0.9)",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10}}>
+              <div style={{fontSize:"clamp(15px,1.8vw,19px)",fontWeight:700,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10}}>
                 ايش بتحصل عليه؟
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:5}}>
@@ -4220,7 +4220,7 @@ export default function IELTSBot(){
                   "مدقق قواعد وإملاء فوري",
                   "تتبع تقدمك وشوف درجتك كيف بتتحسن"
                 ].map((item,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:"clamp(13px,1.4vw,15px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.5}}>
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:"clamp(13px,1.4vw,15px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.5}}>
                     {item} <span style={{color:"#4ade80",fontSize:15,flexShrink:0}}>✅</span>
                   </div>
                 ))}
@@ -4229,23 +4229,23 @@ export default function IELTSBot(){
 
             {/* CTA buttons */}
             <div className="hero-btns" style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:12}}>
-              <button onClick={trySampleEssay} style={{background:"#4ade80",color:"#0a1628",border:"none",borderRadius:10,padding:"15px 28px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 4px 16px rgba(74,222,128,0.35)",flex:1,minWidth:200,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"transform 0.15s"}}
+              <button onClick={trySampleEssay} style={{background:"#4ade80",color:"#0a1628",border:"none",borderRadius:10,padding:"15px 28px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 4px 16px rgba(74,222,128,0.35)",flex:1,minWidth:200,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"transform 0.15s"}}
                 onMouseOver={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseOut={e=>e.currentTarget.style.transform="scale(1)"}>
                 🎯 جرّب مجاناً — بدون تسجيل
               </button>
               {!proUser&&(
-                <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.15)",color:"white",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:10,padding:"15px 28px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flex:1,minWidth:200,display:"flex",alignItems:"center",justifyContent:"center",gap:8,backdropFilter:"blur(4px)"}}>
+                <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.15)",color:"white",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:10,padding:"15px 28px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flex:1,minWidth:200,display:"flex",alignItems:"center",justifyContent:"center",gap:8,backdropFilter:"blur(4px)"}}>
                   🔓 اشترك الآن
                 </button>
               )}
             </div>
-            <div style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+            <div style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
               💡 يتم تطوير الموقع باستمرار ليصبح مصدراً شاملاً للتدريب على الايلتس
             </div>
 
             {/* Mobile disclaimer */}
             <div style={{marginTop:10,background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:8,padding:"8px 14px",display:"none"}} className="mobile-disclaimer">
-              <span style={{fontSize:12,color:"rgba(255,255,255,0.7)",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>📱 للحصول على أفضل تجربة، استخدم جهاز كمبيوتر أو لابتوب.</span>
+              <span style={{fontSize:12,color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📱 للحصول على أفضل تجربة، استخدم جهاز كمبيوتر أو لابتوب.</span>
             </div>
           </div>
           <div className="hero-image" style={{flex:"0 0 45%",position:"relative",overflow:"hidden",minHeight:320}}>
@@ -4259,8 +4259,8 @@ export default function IELTSBot(){
         <div className="stats-inner" style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:32,alignItems:"center",flexWrap:"wrap"}}>
           {[["9","Band levels covered"],["4","IELTS criteria scored"],["100%","Official band descriptors"],["Task 1 & 2","Academic + General Training"]].map(([num,label])=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:10}}>
-              <span style={{color:T.primary,fontWeight:700,fontSize:18,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{num}</span>
-              <span style={{color:T.textMuted,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{label}</span>
+              <span style={{color:T.primary,fontWeight:700,fontSize:18,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{num}</span>
+              <span style={{color:T.textMuted,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{label}</span>
             </div>
           ))}
         </div>
@@ -4271,15 +4271,15 @@ export default function IELTSBot(){
         <div style={{background:"linear-gradient(135deg,#0a1628 0%,#0056d2 100%)",padding:"14px 24px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
             <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
-              <span style={{fontSize:13,color:"rgba(255,255,255,0.95)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>
+              <span style={{fontSize:13,color:"rgba(255,255,255,0.95)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>
                 🎓 Unlimited analyses · Full toolkit · Practice Mode · All exercises
               </span>
-              <span style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"2px 12px",fontSize:12,color:"white",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
+              <span style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"2px 12px",fontSize:12,color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
                 🇯🇴 Pay via CLIQ — 10 JOD
               </span>
             </div>
             <button onClick={()=>setShowPaywall(true)}
-              style={{background:"white",color:T.primary,border:"none",borderRadius:6,padding:"9px 22px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0,boxShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>
+              style={{background:"white",color:T.primary,border:"none",borderRadius:6,padding:"9px 22px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0,boxShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>
               🔓 Upgrade to Pro →
             </button>
           </div>
@@ -4296,15 +4296,15 @@ export default function IELTSBot(){
         {mainView==="analyze"&&(
           <div className="analyze-box" style={{background:"#ffffff",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}>
             <div style={{marginBottom:20}}>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>Select Task Type</label>
-              <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
+              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>Select Task Type</label>
+              <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
               <div className="task-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
                   <button key={key} onClick={()=>{ setTaskType(key); setResult(null); setImage(null); setImagePreview(null); setError(""); clearLastResult(); }}
                     style={{background:taskType===key?T.primaryLight:"#f9f9f9",border:`2px solid ${taskType===key?T.primary:T.border}`,borderRadius:8,padding:"20px 14px",cursor:"pointer",textAlign:"center",boxShadow:taskType===key?`0 0 0 2px ${T.primaryBorder}`:T.shadow,transition:"all 0.18s"}}>
                     <div style={{fontSize:22,marginBottom:6}}>{task.icon}</div>
-                    <div style={{fontSize:13,fontWeight:600,color:taskType===key?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>{task.label}</div>
-                    <div style={{fontSize:11,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{task.description}</div>
+                    <div style={{fontSize:13,fontWeight:600,color:taskType===key?T.primary:T.text,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>{task.label}</div>
+                    <div style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{task.description}</div>
                   </button>
                 ))}
               </div>
@@ -4314,10 +4314,10 @@ export default function IELTSBot(){
             {!essay.trim()&&!result&&(
               <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 18px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
                 <div>
-                  <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🎯 First time? See it in action!</div>
-                  <div style={{fontSize:12,color:T.textMid,fontFamily:"'Source Sans Pro','Inter',system-ui",marginTop:2}}>Load a sample Band 6 essay and watch the AI analyze it — completely free.</div>
+                  <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🎯 First time? See it in action!</div>
+                  <div style={{fontSize:12,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:2}}>Load a sample Band 6 essay and watch the AI analyze it — completely free.</div>
                 </div>
-                <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0,boxShadow:"0 2px 6px rgba(0,120,90,0.3)"}}>
+                <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0,boxShadow:"0 2px 6px rgba(0,120,90,0.3)"}}>
                   Load Sample Essay →
                 </button>
               </div>
@@ -4325,9 +4325,9 @@ export default function IELTSBot(){
 
             {taskType==="task1academic"&&(
               <div style={{marginBottom:16}}>
-                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>Upload Graph / Chart Image *</label>
+                <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>Upload Graph / Chart Image *</label>
                 <div onClick={()=>fileRef.current.click()} style={{border:`2px dashed ${imagePreview?T.greenBorder:"#e2001a"}`,borderRadius:12,padding:"20px",textAlign:"center",cursor:"pointer",background:"white",boxShadow:T.shadow}}>
-                  {imagePreview?(<div><img src={imagePreview} alt="graph" style={{maxHeight:180,maxWidth:"100%",borderRadius:8,marginBottom:8}}/><div style={{fontSize:12,color:T.green,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Uploaded — click to change</div></div>):(<div><div style={{fontSize:32,marginBottom:8}}>📊</div><div style={{fontSize:14,color:T.gold,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:4}}>Click to upload graph/chart image</div><div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>JPG, PNG — reads and evaluates the graph</div></div>)}
+                  {imagePreview?(<div><img src={imagePreview} alt="graph" style={{maxHeight:180,maxWidth:"100%",borderRadius:8,marginBottom:8}}/><div style={{fontSize:12,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Uploaded — click to change</div></div>):(<div><div style={{fontSize:32,marginBottom:8}}>📊</div><div style={{fontSize:14,color:T.gold,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>Click to upload graph/chart image</div><div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>JPG, PNG — reads and evaluates the graph</div></div>)}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{display:"none"}}/>
               </div>
@@ -4336,11 +4336,11 @@ export default function IELTSBot(){
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
               <div>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
-                  <label style={{fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
+                  <label style={{fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
                     {taskType==="task1general"?"Letter Task Instructions":taskType==="task1academic"?"Task Description":"Essay Question / Topic"}
                   </label>
                   <button type="button" onClick={()=>topicImgRef.current.click()}
-                    style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"4px 10px",fontSize:11,color:T.blue,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
+                    style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"4px 10px",fontSize:11,color:T.blue,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
                     {processingTopicImg ? "⏳ Reading..." : "📷 Upload Image"}
                   </button>
                   <input ref={topicImgRef} type="file" accept="image/*" capture="environment" style={{display:"none"}}
@@ -4348,11 +4348,11 @@ export default function IELTSBot(){
                 </div>
                 <textarea value={topic} onChange={e=>setTopic(e.target.value)} rows={3}
                   placeholder={taskType==="task2"?"e.g. Some people think universities should focus on job skills. Discuss both views and give your opinion.":taskType==="task1academic"?"e.g. The graph below shows changes in energy consumption. Summarise the information and make comparisons.":"e.g. You recently bought a laptop online but it arrived damaged. Write a letter to the manager."}
-                  style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                  style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               <div>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7,flexWrap:"wrap",gap:6}}>
-                  <label style={{fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
+                  <label style={{fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
                     Student's Response
                     <span style={{fontSize:11,color:T.textMuted,fontWeight:400,textTransform:"none",letterSpacing:0}}> (minimum {minWords} words required)</span>
                     <span style={{color:wordCount>=minWords?T.green:wordCount>=(minWords*0.6)?T.amber:T.red,marginLeft:10,fontWeight:500}}>
@@ -4360,7 +4360,7 @@ export default function IELTSBot(){
                     </span>
                   </label>
                   <button type="button" onClick={()=>essayImgRef.current.click()}
-                    style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"4px 10px",fontSize:11,color:T.blue,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
+                    style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"4px 10px",fontSize:11,color:T.blue,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
                     {processingEssayImg ? "⏳ Reading..." : "📷 Upload Image"}
                   </button>
                   <input ref={essayImgRef} type="file" accept="image/*" capture="environment" style={{display:"none"}}
@@ -4369,49 +4369,49 @@ export default function IELTSBot(){
                 <textarea value={essay} onChange={e=>setEssay(e.target.value)}
                   placeholder={taskType==="task1general"?"Dear Sir/Madam,\n\nI am writing to...":taskType==="task1academic"?"The graph illustrates...":"Paste the student's essay here..."}
                   rows={10}
-                  style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
+                  style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
-              {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{error}</p></Card>}
+              {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{error}</p></Card>}
               {!proUser&&usesLeft===1&&!session&&(
                 <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center"}}>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ This is your free analysis. </span>
-                  <button onClick={()=>setShowAuth(true)} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign up for 1 more</button>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}> or </span>
-                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>upgrade to Pro</button>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}> for unlimited access.</span>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ This is your free analysis. </span>
+                  <button onClick={()=>setShowAuth(true)} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign up for 1 more</button>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}> or </span>
+                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>upgrade to Pro</button>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}> for unlimited access.</span>
                 </Card>
               )}
               {!proUser&&usesLeft===1&&session&&(
                 <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center"}}>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>⚠️ Last free analysis! </span>
-                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Upgrade to Pro</button>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Source Sans Pro','Inter',system-ui"}}> for unlimited access.</span>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ Last free analysis! </span>
+                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Upgrade to Pro</button>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}> for unlimited access.</span>
                 </Card>
               )}
               <button ref={analyzeRef} onClick={analyze} disabled={loading}
-                style={{background:loading?T.bgGray:T.primary,border:"none",borderRadius:4,color:loading?T.textMuted:"#fff",fontSize:15,fontWeight:700,padding:"14px 32px",cursor:loading?"not-allowed":"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",transition:"background 0.15s",display:"flex",alignItems:"center",gap:10,justifyContent:"center",letterSpacing:"0.01em"}}>
+                style={{background:loading?T.bgGray:T.primary,border:"none",borderRadius:4,color:loading?T.textMuted:"#fff",fontSize:15,fontWeight:700,padding:"14px 32px",cursor:loading?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",transition:"background 0.15s",display:"flex",alignItems:"center",gap:10,justifyContent:"center",letterSpacing:"0.01em"}}>
                 {loading?"⏳ Examining...":!proUser&&usesLeft<=0?(session?"🔓 Upgrade to Continue":"🔓 Sign Up for 1 More Free"):`Analyze ${TASK_TYPES[taskType].label} →`}
               </button>
 
               {/* Language Selector */}
               <Card style={{background:T.bgGray,border:`1px solid ${T.border}`,marginTop:4}}>
-                <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
+                <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🌐 Feedback Language / لغة التغذية الراجعة</div>
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
                   <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="en"?T.primaryLight:"white",border:`1px solid ${lang==="en"?T.primaryBorder:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s"}} onClick={()=>switchLang("en")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇬🇧</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>English — Feedback in English</div>
-                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>All scores, corrections and tips will appear in English.</div>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="en"?T.primary:T.text,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:2}}>English — Feedback in English</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>All scores, corrections and tips will appear in English.</div>
                     </div>
-                    {lang==="en"&&<span style={{background:T.primary,color:"white",borderRadius:4,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ Active</span>}
+                    {lang==="en"&&<span style={{background:T.primary,color:"white",borderRadius:4,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0}}>✓ Active</span>}
                   </div>
                   <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 14px",background:lang==="ar"?T.primaryLight:"white",border:`1px solid ${lang==="ar"?T.primaryBorder:T.border}`,borderRadius:10,cursor:"pointer",transition:"all 0.2s",direction:"ltr"}} onClick={()=>switchLang("ar")}>
                     <div style={{fontSize:22,flexShrink:0}}>🇸🇦</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?T.primary:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
-                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",direction:"rtl",textAlign:"right"}}>ستظهر جميع الدرجات والتصحيحات والنصائح باللغة العربية.</div>
+                      <div style={{fontSize:13,fontWeight:700,color:lang==="ar"?T.primary:T.text,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:2}}>عربي — التغذية الراجعة بالعربية</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl",textAlign:"right"}}>ستظهر جميع الدرجات والتصحيحات والنصائح باللغة العربية.</div>
                     </div>
-                    {lang==="ar"&&<span style={{background:T.primary,color:"white",borderRadius:4,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui",flexShrink:0}}>✓ نشط</span>}
+                    {lang==="ar"&&<span style={{background:T.primary,color:"white",borderRadius:4,padding:"2px 10px",fontSize:11,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0}}>✓ نشط</span>}
                   </div>
                 </div>
               </Card>
@@ -4421,7 +4421,7 @@ export default function IELTSBot(){
               <div style={{marginTop:32}}>
                 <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
                   <button onClick={()=>{ setResult(null); clearLastResult(); setTopic(""); setEssay(""); window.scrollTo({top:0,behavior:"smooth"}); }}
-                    style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                    style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                     ✏️ New Analysis
                   </button>
                 </div>
@@ -4435,12 +4435,12 @@ export default function IELTSBot(){
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
                       <div style={{fontSize:20,fontWeight:800,color:"white",fontFamily:"Georgia,serif"}}>{bandLabel(result.overallBand)} <span style={{color:bandColor(result.overallBand),background:"rgba(255,255,255,0.15)",borderRadius:6,padding:"2px 10px",fontSize:16}}>{result.overallBand}</span></div>
                       {/* FIX 1: word count badge — dark text on white background, color-coded */}
-                      <span style={{background:"white",border:`1px solid ${T.border}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:wordCount>=minWords?T.green:T.red,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:700}}>
+                      <span style={{background:"white",border:`1px solid ${T.border}`,borderRadius:20,padding:"2px 10px",fontSize:12,color:wordCount>=minWords?T.green:T.red,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
                         {wordCount} words {wordCount>=minWords?"✓":"⚠ below minimum"}
                       </span>
                     </div>
                     <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                      {result.strengths?.map((s,i)=><span key={i} style={{background:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"3px 12px",fontSize:12,color:"rgba(255,255,255,0.9)",fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>✓ {s}</span>)}
+                      {result.strengths?.map((s,i)=><span key={i} style={{background:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"3px 12px",fontSize:12,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>✓ {s}</span>)}
                     </div>
                   </div>
                 </div>
@@ -4448,12 +4448,12 @@ export default function IELTSBot(){
                 {result.mistakes?.length>0&&(
                   <Card style={{marginBottom:16,background:T.bgGray}}>
                     <div style={{marginBottom:8}}>
-                      <div style={{fontSize:13,color:T.text,fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:2,fontWeight:700}}>👆 Click any underlined word to see its correction and explanation.</div>
-                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Source Sans Pro','Inter',system-ui",direction:"rtl",textAlign:"right",marginBottom:8}}>اضغط على أي كلمة تحتها خط لرؤية التصحيح والشرح.</div>
+                      <div style={{fontSize:13,color:T.text,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:2,fontWeight:700}}>👆 Click any underlined word to see its correction and explanation.</div>
+                      <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl",textAlign:"right",marginBottom:8}}>اضغط على أي كلمة تحتها خط لرؤية التصحيح والشرح.</div>
                     </div>
                     <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
                       {[["major",T.red,"Major — خطأ كبير"],["moderate",T.amber,"Moderate — خطأ متوسط"],["minor",T.blue,"Minor — خطأ بسيط"]].map(([s,c,l])=>(
-                        <span key={s} style={{fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",alignItems:"center",gap:4}}>
+                        <span key={s} style={{fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",alignItems:"center",gap:4}}>
                           <span style={{display:"inline-block",width:20,height:2,background:c,borderRadius:1}}/><span style={{color:c,fontWeight:600}}>{l}</span>
                         </span>
                       ))}
@@ -4474,7 +4474,7 @@ export default function IELTSBot(){
                 <div>
                 {activeTab==="annotated"&&(
                   <Card>
-                    <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div style={{fontSize:11,color:T.textMid,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:16,fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <span>📝 Your Essay — 👆 Click underlined words for corrections</span>
                       <span style={{color:T.red,fontWeight:600}}>{result.mistakes?.length} mistakes found</span>
                     </div>
@@ -4490,8 +4490,8 @@ export default function IELTSBot(){
                     <CriteriaCard label="Grammatical Range & Accuracy" data={result.criteria.grammaticalRange}/>
                     {result.improvements?.length>0&&(
                       <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`}}>
-                        <div style={{fontSize:11,color:T.amber,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Key Improvements Needed</div>
-                        {result.improvements.map((imp,i)=><div key={i} style={{color:T.textMid,fontSize:14,lineHeight:1.6,marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>→ {imp}</div>)}
+                        <div style={{fontSize:11,color:T.amber,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Key Improvements Needed</div>
+                        {result.improvements.map((imp,i)=><div key={i} style={{color:T.textMid,fontSize:14,lineHeight:1.6,marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>→ {imp}</div>)}
                       </Card>
                     )}
                   </div>
@@ -4501,11 +4501,11 @@ export default function IELTSBot(){
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
                     <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:4}}>
                       {[["major",T.red],["moderate",T.amber],["minor",T.blue]].map(([s,c])=>(
-                        <span key={s} style={{background:"white",border:`1px solid ${c}60`,borderRadius:20,padding:"3px 10px",fontSize:11,color:c,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600}}>● {s}</span>
+                        <span key={s} style={{background:"white",border:`1px solid ${c}60`,borderRadius:20,padding:"3px 10px",fontSize:11,color:c,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>● {s}</span>
                       ))}
-                      <span style={{color:T.textMuted,fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",alignSelf:"center"}}>— {result.mistakes?.length} total</span>
+                      <span style={{color:T.textMuted,fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",alignSelf:"center"}}>— {result.mistakes?.length} total</span>
                     </div>
-                    {result.mistakes?.length===0?<Card style={{textAlign:"center",color:T.green,padding:36,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>No mistakes — excellent!</Card>:result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i} essay={essay}/>)}
+                    {result.mistakes?.length===0?<Card style={{textAlign:"center",color:T.green,padding:36,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>No mistakes — excellent!</Card>:result.mistakes.map((m,i)=><MistakeCard key={i} mistake={m} i={i} essay={essay}/>)}
                   </div>
                 )}
 
@@ -4515,12 +4515,12 @@ export default function IELTSBot(){
                       <div style={{textAlign:"center"}}><div style={{fontSize:36,fontWeight:900,color:bandColor(result.bandBooster.currentBand),fontFamily:"Georgia,serif"}}>{result.bandBooster.currentBand}</div><div style={{fontSize:10,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase"}}>Current</div></div>
                       <div style={{fontSize:24,color:T.red}}>→</div>
                       <div style={{textAlign:"center"}}><div style={{fontSize:36,fontWeight:900,color:bandColor(result.bandBooster.targetBand),fontFamily:"Georgia,serif"}}>{result.bandBooster.targetBand}</div><div style={{fontSize:10,color:T.textMuted,fontFamily:"monospace",textTransform:"uppercase"}}>Target</div></div>
-                      <div style={{flex:1}}><div style={{fontSize:14,color:T.gold,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>What to do:</div></div>
+                      <div style={{flex:1}}><div style={{fontSize:14,color:T.gold,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>What to do:</div></div>
                     </div>
                     {result.bandBooster.specificActions?.map((a,i)=>(
                       <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:10}}>
-                        <span style={{background:T.red,borderRadius:2,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{i+1}</span>
-                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{a}</p>
+                        <span style={{background:T.red,borderRadius:2,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{i+1}</span>
+                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{a}</p>
                       </div>
                     ))}
                   </Card>
@@ -4535,7 +4535,7 @@ export default function IELTSBot(){
                           <div style={{fontSize:16,color:T.textMuted}}>→</div>
                           <div style={{background:"#dcfce7",borderRadius:6,padding:"4px 12px",color:"#166534",fontSize:14,fontWeight:600}}>"{v.advanced}"</div>
                         </div>
-                        <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>💡 {v.reason}</p>
+                        <p style={{color:T.textMid,fontSize:13,margin:0,lineHeight:1.6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>💡 {v.reason}</p>
                       </Card>
                     ))}
                   </div>
@@ -4546,8 +4546,8 @@ export default function IELTSBot(){
                     {result.examinerTips?.map((tip,i)=>(
                       <Card key={i} style={{display:"flex",gap:14,alignItems:"flex-start"}}>
                         {/* FIX 2: tip number circles — solid red background so number is visible */}
-                        <span style={{background:T.red,border:"none",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{i+1}</span>
-                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{tip}</p>
+                        <span style={{background:T.red,border:"none",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"white",fontWeight:700,flexShrink:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{i+1}</span>
+                        <p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{tip}</p>
                       </Card>
                     ))}
                   </div>
@@ -4557,25 +4557,25 @@ export default function IELTSBot(){
                   <div style={{display:"flex",flexDirection:"column",gap:14}}>
                     <Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:8}}>
-                        <div style={{fontSize:11,color:T.green,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Band 8+ Model Response</div>
-                        <div style={{fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui",fontWeight:600,color:sampleWordCount>=minWords?T.green:T.red}}>{sampleWordCount} words {sampleWordCount>=minWords?"✓":"⚠ below minimum"}</div>
+                        <div style={{fontSize:11,color:T.green,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Band 8+ Model Response</div>
+                        <div style={{fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,color:sampleWordCount>=minWords?T.green:T.red}}>{sampleWordCount} words {sampleWordCount>=minWords?"✓":"⚠ below minimum"}</div>
                       </div>
                       <p style={{color:T.text,fontSize:15,lineHeight:1.9,whiteSpace:"pre-wrap",margin:0,fontFamily:"Georgia,serif"}}>{result.sampleEssay}</p>
                     </Card>
                     {result.sampleEssayExplanation&&(
                       <Card>
-                        <div style={{fontSize:11,color:T.blue,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Why This Response Scores High</div>
+                        <div style={{fontSize:11,color:T.blue,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:14,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Why This Response Scores High</div>
                         <div style={{display:"flex",flexDirection:"column",gap:12}}>
                           {[["Introduction",result.sampleEssayExplanation.introduction],["Body Paragraphs",result.sampleEssayExplanation.bodyParagraphs],["Conclusion",result.sampleEssayExplanation.conclusion]].map(([lbl,txt])=>(
-                            <div key={lbl}><div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:4,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{lbl}</div><p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{txt}</p></div>
+                            <div key={lbl}><div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{lbl}</div><p style={{color:T.textMid,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{txt}</p></div>
                           ))}
                           {result.sampleEssayExplanation.vocabularyHighlights?.length>0&&(
                             <div>
-                              <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:6,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Advanced Vocabulary Used</div>
-                              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{result.sampleEssayExplanation.vocabularyHighlights.map((v,i)=><span key={i} style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"2px 9px",fontSize:12,color:T.blue,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>{v}</span>)}</div>
+                              <div style={{fontSize:11,color:T.amber,fontWeight:700,marginBottom:6,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Advanced Vocabulary Used</div>
+                              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{result.sampleEssayExplanation.vocabularyHighlights.map((v,i)=><span key={i} style={{background:T.blueBg,border:`1px solid ${T.blueBorder}`,borderRadius:6,padding:"2px 9px",fontSize:12,color:T.blue,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{v}</span>)}</div>
                             </div>
                           )}
-                          <Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>🏆 {result.sampleEssayExplanation.whyHighScore}</p></Card>
+                          <Card style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`}}><p style={{color:T.green,fontSize:14,lineHeight:1.7,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🏆 {result.sampleEssayExplanation.whyHighScore}</p></Card>
                         </div>
                       </Card>
                     )}
@@ -4612,13 +4612,13 @@ export default function IELTSBot(){
             <Logo size={20} style={{cursor:"default"}}/>
             <div className="footer-links" style={{display:"flex",gap:24,flexWrap:"wrap"}}>
               {[["terms","Terms of Service"],["privacy","Privacy Policy"],["refund","Refund Policy"],["pricing","Pricing"]].map(([key,label])=>(
-                <button key={key} onClick={()=>switchView(key)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",padding:0}}>{label}</button>
+                <button key={key} onClick={()=>switchView(key)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",padding:0}}>{label}</button>
               ))}
             </div>
           </div>
           <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
-            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>© {new Date().getFullYear()} Englishfool. All rights reserved.</span>
-            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Your Smart IELTS Writing Examiner</span>
+            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>© {new Date().getFullYear()} Englishfool. All rights reserved.</span>
+            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Your Smart IELTS Writing Examiner</span>
           </div>
         </div>
       </div>
@@ -4655,10 +4655,10 @@ export default function IELTSBot(){
             maxWidth:300,
             pointerEvents:"none"
           }}>
-            <div style={{fontSize:17,fontWeight:700,color:"#1f1f1f",fontFamily:"'Source Sans Pro','Inter',system-ui",marginBottom:8}}>
+            <div style={{fontSize:17,fontWeight:700,color:"#1f1f1f",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:8}}>
               Analysing your essay...
             </div>
-            <div style={{fontSize:13,color:"#636363",fontFamily:"'Source Sans Pro','Inter',system-ui",lineHeight:1.6}}>
+            <div style={{fontSize:13,color:"#636363",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6}}>
               Please stay on this page.<br/>This usually takes 15–30 seconds.
             </div>
           </div>
@@ -4683,7 +4683,7 @@ export default function IELTSBot(){
             <div style={{display:"flex",gap:6,padding:"12px 16px",borderBottom:`1px solid ${T.border}`,flexWrap:"wrap"}}>
               {[{view:"analyze",icon:"✍️",label:"Writing"},{view:"speaking",icon:"🗣️",label:"Speaking"},{view:"reading",icon:"📖",label:"Reading"},{view:"toolkit",icon:"📚",label:"Toolkit"}].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
-                  style={{flex:1,background:mainView===item.view?T.primaryLight:T.bgGray,border:`1.5px solid ${mainView===item.view?T.primaryBorder:T.border}`,borderRadius:10,padding:"10px 4px",fontSize:12,fontWeight:700,color:mainView===item.view?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:3,minHeight:52}}>
+                  style={{flex:1,background:mainView===item.view?T.primaryLight:T.bgGray,border:`1.5px solid ${mainView===item.view?T.primaryBorder:T.border}`,borderRadius:10,padding:"10px 4px",fontSize:12,fontWeight:700,color:mainView===item.view?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:3,minHeight:52}}>
                   <span style={{fontSize:18}}>{item.icon}</span>{item.label}
                 </button>
               ))}
@@ -4709,7 +4709,7 @@ export default function IELTSBot(){
                     cursor:"pointer",textAlign:"left",minHeight:50,
                     color:mainView===item.view?T.primary:T.text,
                     fontSize:15,fontWeight:mainView===item.view?700:500,
-                    fontFamily:"'Source Sans Pro','Inter',system-ui"
+                    fontFamily:"'Cairo','Source Sans Pro',system-ui"
                   }}>
                   <span style={{fontSize:20}}>{item.icon}</span>{item.label}
                 </button>
@@ -4717,7 +4717,7 @@ export default function IELTSBot(){
               <div style={{height:1,background:T.border,margin:"12px 20px"}}/>
               {/* Language switcher inside menu */}
               <div style={{padding:"8px 20px"}}>
-                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Feedback Language</div>
+                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Feedback Language</div>
                 <div style={{display:"flex",gap:8}}>
                   {["en","ar"].map(l=>(
                     <button key={l} onClick={()=>switchLang(l)} style={{
@@ -4725,7 +4725,7 @@ export default function IELTSBot(){
                       border:`1px solid ${lang===l?T.primaryBorder:T.border}`,
                       borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,
                       color:lang===l?T.primary:T.textMuted,cursor:"pointer",
-                      fontFamily:"'Source Sans Pro','Inter',system-ui"
+                      fontFamily:"'Cairo','Source Sans Pro',system-ui"
                     }}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
                   ))}
                 </div>
@@ -4737,32 +4737,32 @@ export default function IELTSBot(){
                 <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
                   width:"100%",background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",
                   borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,
-                  cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)"
+                  cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)"
                 }}>🔓 Upgrade to Pro — $17</button>
                 <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
                   width:"100%",background:"#f0fdf4",color:T.green,border:`1px solid ${T.greenBorder}`,
                   borderRadius:8,padding:"10px",fontSize:13,fontWeight:700,
-                  cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"
+                  cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"
                 }}>🇯🇴 Jordan: Pay 10 JOD via CLIQ</button>
               </div>
             )}
             {proUser&&(
               <div style={{padding:"0 20px"}}>
-                <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 16px",textAlign:"center",fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Source Sans Pro','Inter',system-ui"}}>✓ Pro — Unlimited Access</div>
+                <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 16px",textAlign:"center",fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro — Unlimited Access</div>
               </div>
             )}
             <div style={{padding:"12px 20px 0"}}>
               {session?(
                 <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  <button onClick={()=>{setShowChangePassword(true);setMenuOpen(false);}} style={{width:"100%",background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  <button onClick={()=>{setShowChangePassword(true);setMenuOpen(false);}} style={{width:"100%",background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                     🔑 Change Password
                   </button>
-                  <button onClick={handleSignOut} style={{width:"100%",background:"#f3f3f3",border:`1px solid ${T.border}`,borderRadius:8,padding:"12px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>
+                  <button onClick={handleSignOut} style={{width:"100%",background:"#f3f3f3",border:`1px solid ${T.border}`,borderRadius:8,padding:"12px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
                     🚪 Sign Out ({session.email})
                   </button>
                 </div>
               ):(
-                <button onClick={()=>{setShowAuth(true);setMenuOpen(false);}} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Source Sans Pro','Inter',system-ui"}}>Sign In / Register →</button>
+                <button onClick={()=>{setShowAuth(true);setMenuOpen(false);}} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign In / Register →</button>
               )}
             </div>
           </div>
@@ -4771,11 +4771,11 @@ export default function IELTSBot(){
 
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Rubik:wght@900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Rubik:wght@900&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-y: scroll; overscroll-behavior: none; }
-        body { font-family: 'Source Sans 3','Inter',system-ui,sans-serif; margin: 0; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
-        textarea, input, select, button { font-family: 'Source Sans Pro','Inter',system-ui,sans-serif; }
+        body { font-family: 'Cairo','Source Sans Pro','Inter',system-ui,sans-serif; margin: 0; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
+        textarea, input, select, button { font-family: 'Cairo','Source Sans Pro','Inter',system-ui,sans-serif; }
         img { max-width: 100%; height: auto; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #F3F4F6; }
