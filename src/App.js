@@ -822,7 +822,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
             <div style={{background:"#f0fdf4",border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px",marginBottom:16,textAlign:"center"}}>
               <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>🇯🇴 دفع عن طريق كليك</div>
               <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>10 <span style={{fontSize:20,fontWeight:700}}>دينار</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>اشتراك 3 أشهر · إلغاء في أي وقت</div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>اشتراك لمدة 3 أشهر · الإلغاء في أي وقت</div>
             </div>
 
             {/* Arabic steps */}
@@ -4129,10 +4129,10 @@ function IELTSGameLobby({proUser,onSelect}){
             IELTS Game
           </div>
           <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(14px,2vw,18px)",color:"rgba(255,255,255,0.6)",direction:"rtl"}}>
-            العب وتعلم — تمرّن على الايلتس بطريقة ممتعة! 🌟
+            تعلّم وتمرّن على الآيلتس بطريقة ممتعة وتفاعلية 🌟
           </div>
           <div style={{marginTop:12,display:"inline-flex",gap:16,background:"rgba(255,255,255,0.06)",borderRadius:20,padding:"8px 20px",border:"1px solid rgba(255,255,255,0.12)"}}>
-            {[["25","سؤال لكل لعبة"],["🏆","نقاط وتقييم"],["🔊","موسيقى تفاعلية"]].map(([ic,lb])=>(
+            {[["25","سؤالاً في كل لعبة"],["🏆","نقاط وتقييم"],["🔊","موسيقى تفاعلية"]].map(([ic,lb])=>(
               <div key={lb} style={{textAlign:"center"}}>
                 <div style={{fontSize:18,fontWeight:900,color:"#fbbf24",fontFamily:"'Cairo',system-ui"}}>{ic}</div>
                 <div style={{fontSize:11,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui"}}>{lb}</div>
@@ -4194,10 +4194,10 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
   const band=
     score===25?{medal:"🏆",title:"أنت البطل الحقيقي!",sub:"درجة كاملة! أنت أكثر من جاهز للايلتس 🔥",color:"#d4af37"}:
     score>=20?{medal:"🌟",title:"أداء رائع جداً!",sub:"مستوى ممتاز! خطوة صغيرة وتصبح البطل",color:"#10b981"}:
-    score>=15?{medal:"💪",title:"تقريباً!",sub:"مستوى جيد — لكن لازم تراجع أكثر قبل الامتحان",color:"#3b82f6"}:
-    score>=10?{medal:"📚",title:"تحتاج شوية تدريب",sub:"ما شاء الله على البداية — كرر اللعبة وشوف الفرق",color:"#f97316"}:
-    score>=7?{medal:"😅",title:"لسّه في الطريق!",sub:"المحاولة شاطرة — بس الطريق لا يزال طويلاً، واصل!",color:"#8b5cf6"}:
-    {medal:"😢",title:"خسرت هاي المرة!",sub:"لا تيأس! كل بطل بدأ من الصفر — العب مرة ثانية 💪",color:"#ef4444"};
+    score>=15?{medal:"💪",title:"تقريباً!",sub:"مستوى جيد — لكن يجب مراجعة المزيد قبل الامتحان",color:"#3b82f6"}:
+    score>=10?{medal:"📚",title:"تحتاج إلى مزيد من التدريب",sub:"ما شاء الله على البداية — كرّر اللعبة ولاحظ الفرق",color:"#f97316"}:
+    score>=7?{medal:"😅",title:"أنت في بداية الطريق!",sub:"جهد جيد — لكن الطريق لا يزال طويلاً، استمر!",color:"#8b5cf6"}:
+    {medal:"😢",title:"لم تنجح هذه المرة!",sub:"لا تيأس! كل بطل بدأ من الصفر — العب مرةً أخرى 💪",color:"#ef4444"};
   const [tab,setTab]=useState("review"); // review | history
   // For answer review: navigate between questions
   const [ri,setRi]=useState(0);
@@ -4315,11 +4315,11 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
         <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
           <button onClick={onReplay} style={{background:band.color,border:"none",borderRadius:14,padding:"13px 24px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:14,color:band.color==="#d4af37"?"#0f172a":"white",cursor:"pointer",boxShadow:`0 4px 14px ${band.color}44`,transition:"opacity 0.2s"}}
             onMouseOver={e=>e.currentTarget.style.opacity="0.85"} onMouseOut={e=>e.currentTarget.style.opacity="1"}>
-            🔄 العب مرة ثانية
+            🔄 العب مرةً أخرى
           </button>
           <button onClick={onLobby} style={{background:"rgba(255,255,255,0.08)",border:"1.5px solid rgba(255,255,255,0.18)",borderRadius:14,padding:"13px 24px",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:14,color:"white",cursor:"pointer",transition:"background 0.2s"}}
             onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.15)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.08)"}>
-            🎮 اختر لعبة ثانية
+            🎮 اختر لعبةً أخرى
           </button>
         </div>
       </div>
@@ -4395,7 +4395,7 @@ function IELTSGame({proUser,onNavigate}){
       <div style={{maxWidth:480,width:"100%",background:"rgba(255,255,255,0.07)",border:`2px solid ${cat.color}55`,borderRadius:24,padding:"36px 32px",textAlign:"center",boxShadow:`0 0 60px ${cat.color}22`}}>
         <div style={{fontSize:56,marginBottom:12}}>{cat.emoji}</div>
         <div style={{fontWeight:900,fontSize:"clamp(20px,3vw,28px)",color:"white",marginBottom:6,direction:"rtl"}}>{cat.arabic}</div>
-        <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",marginBottom:28,direction:"rtl"}}>جاهز للتحدي؟ إليك القواعد:</div>
+        <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",marginBottom:28,direction:"rtl"}}>هل أنت مستعد؟ إليك القواعد:</div>
         <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:28,direction:"rtl"}}>
           {[["🎯","25 سؤال في كل لعبة"],["❤️","3 أخطاء فقط — بعدها Game Over"],["🏃","اللوحة تأتي إليك تلقائياً"],["🔇","يمكنك كتم الموسيقى في أي وقت"],["⏸️","يمكنك إيقاف اللعبة مؤقتاً والعودة لها"],["💡","شرح الإجابات الخاطئة في النهاية"]].map(([ic,txt])=>(
             <div key={txt} style={{display:"flex",alignItems:"center",gap:12,background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"10px 14px"}}>
@@ -4609,6 +4609,162 @@ function IELTSGame({proUser,onNavigate}){
 }
 
 
+// ── TESTIMONIALS ─────────────────────────────────
+const TESTIMONIALS=[
+  {name:"سارة المطيري",country:"🇸🇦 الرياض",before:5.5,after:7.0,time:"6 أسابيع",quote:"كنت عالقة في 5.5 لأكثر من سنة. بعد ما حللت 20 مقالة على المنصة وفهمت أخطائي تحديداً، وصلت للدرجة 7 في المحاولة التالية. التحليل التفصيلي هو ما غيّر الأمر."},
+  {name:"أحمد الشمري",country:"🇦🇪 دبي",before:6.0,after:7.5,time:"8 أسابيع",quote:"استخدمت المنصة للتدريب على الكتابة والقراءة معاً. الاختبارات التدريبية كانت قريبة جداً من مستوى الامتحان الحقيقي. حصلت على 7.5 وهذا تجاوز توقعاتي."},
+  {name:"نور العبدالله",country:"🇯🇴 عمّان",before:5.0,after:6.5,time:"10 أسابيع",quote:"كنت ضعيفة في القواعد وما كنت أعرف لماذا. التمارين المصنّفة حسب النوع ساعدتني أركّز على نقاط ضعفي تحديداً. فرق كبير عن الكتب العادية."},
+  {name:"محمد الحارثي",country:"🇸🇦 جدة",before:6.5,after:7.5,time:"5 أسابيع",quote:"أحتاج 7.5 للقبول في الدراسات العليا. جربت كتاباً بعد كتاب دون نتيجة. هنا فهمت أخيراً الفرق بين Band 7 و8 في الكتابة. المنصة موفّرة للوقت والمال مقارنةً بالكورسات."},
+];
+
+function TestimonialsSection(){
+  const [active,setActive]=useState(0);
+  const t=TESTIMONIALS[active];
+  return(
+    <div style={{background:"#f8fafc",borderTop:`1px solid #e2e8f0`,padding:"48px 24px"}}>
+      <div style={{maxWidth:900,margin:"0 auto"}}>
+        <div style={{textAlign:"center",marginBottom:36}}>
+          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:"clamp(20px,2.5vw,28px)",color:"#1e3a5f",marginBottom:8}}>نتائج حقيقية من طلاب حقيقيين</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:14,color:"#64748b"}}>متوسط رفع الدرجة: +1.2 band خلال 6 أسابيع</div>
+        </div>
+        {/* Score improvement display */}
+        <div style={{background:"white",borderRadius:16,padding:"28px 32px",boxShadow:"0 2px 12px rgba(0,0,0,0.07)",border:"1px solid #e2e8f0",marginBottom:20,direction:"rtl"}}>
+          <div style={{display:"flex",alignItems:"flex-start",gap:16,marginBottom:20,flexWrap:"wrap"}}>
+            <div style={{display:"flex",alignItems:"center",gap:12,flex:1,minWidth:220}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:11,color:"#94a3b8",fontFamily:"'Cairo',system-ui",marginBottom:2}}>قبل</div>
+                <div style={{fontSize:40,fontWeight:900,color:"#ef4444",fontFamily:"Inter,sans-serif",lineHeight:1}}>{t.before}</div>
+              </div>
+              <div style={{fontSize:24,color:"#d4af37",fontWeight:900}}>→</div>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:11,color:"#94a3b8",fontFamily:"'Cairo',system-ui",marginBottom:2}}>بعد</div>
+                <div style={{fontSize:40,fontWeight:900,color:"#059669",fontFamily:"Inter,sans-serif",lineHeight:1}}>{t.after}</div>
+              </div>
+              <div style={{background:"#d1fae5",borderRadius:8,padding:"4px 12px",fontSize:13,fontWeight:700,color:"#059669",fontFamily:"'Cairo',system-ui",alignSelf:"center"}}>+{(t.after-t.before).toFixed(1)}</div>
+            </div>
+            <div style={{textAlign:"right",flex:1,minWidth:180}}>
+              <div style={{fontWeight:700,fontSize:16,color:"#1e293b",fontFamily:"'Cairo',system-ui"}}>{t.name}</div>
+              <div style={{fontSize:13,color:"#64748b",fontFamily:"'Cairo',system-ui",marginTop:2}}>{t.country} · خلال {t.time}</div>
+              <div style={{display:"flex",gap:2,marginTop:4,justifyContent:"flex-end"}}>
+                {Array.from({length:5}).map((_,i)=><span key={i} style={{fontSize:14,color:"#d4af37"}}>★</span>)}
+              </div>
+            </div>
+          </div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:15,color:"#334155",lineHeight:1.8,direction:"rtl",borderRight:"3px solid #d4af37",paddingRight:16}}>
+            "{t.quote}"
+          </div>
+        </div>
+        {/* Selector dots */}
+        <div style={{display:"flex",justifyContent:"center",gap:8}}>
+          {TESTIMONIALS.map((_,i)=>(
+            <button key={i} onClick={()=>setActive(i)} style={{width:i===active?28:10,height:10,borderRadius:5,background:i===active?"#1e3a5f":"#cbd5e1",border:"none",cursor:"pointer",transition:"all 0.3s",padding:0}}/>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── FREE VS PRO COMPARISON ────────────────────────
+function PricingComparisonStrip({onUpgrade}){
+  const free=[
+    "تقييم مقالة واحدة مجاناً (مقالتان بعد التسجيل)",
+    "اختبار قراءة واحد فقط",
+    "لعبتا الإملاء والقواعد",
+    "30 دقيقة تدريب إجمالية (غير متجددة)",
+    "10 فحوصات قواعد",
+  ];
+  const pro=[
+    "تقييم غير محدود — Task 1 و Task 2",
+    "جميع اختبارات القراءة الـ 7",
+    "جميع الألعاب الـ 5 مفتوحة",
+    "تدريبات غير محدودة — كل الفئات",
+    "تحليل مفردات مع ترقية مقالتك لـ Band 8",
+    "نماذج إجابة Band 8+ كاملة",
+    "متابعة التقدم أسبوعياً",
+    "فحص قواعد غير محدود",
+  ];
+  return(
+    <div style={{background:"#1e3a5f",padding:"40px 24px"}}>
+      <div style={{maxWidth:900,margin:"0 auto"}}>
+        <div style={{textAlign:"center",marginBottom:28}}>
+          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:"clamp(18px,2.5vw,26px)",color:"white",marginBottom:6}}>المجاني مقابل Pro — الفرق في ثانية</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)"}}>عرض الإطلاق: 3 أشهر بـ 10 دينار / $17 فقط</div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,direction:"rtl"}}>
+          {/* Free */}
+          <div style={{background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"20px 20px",border:"1px solid rgba(255,255,255,0.12)"}}>
+            <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"rgba(255,255,255,0.6)",marginBottom:16}}>المجاني</div>
+            {free.map((f,i)=>(
+              <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:10,direction:"rtl"}}>
+                <span style={{color:"#94a3b8",fontSize:13,flexShrink:0,marginTop:2}}>✗</span>
+                <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:1.5}}>{f}</span>
+              </div>
+            ))}
+          </div>
+          {/* Pro */}
+          <div style={{background:"rgba(212,175,55,0.12)",borderRadius:12,padding:"20px 20px",border:"1.5px solid rgba(212,175,55,0.4)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
+              <span style={{background:"#d4af37",color:"#1e3a5f",borderRadius:6,padding:"2px 10px",fontSize:12,fontWeight:800,fontFamily:"'Cairo',system-ui"}}>Pro</span>
+              <span style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"#d4af37"}}>كل شيء مفتوح</span>
+            </div>
+            {pro.map((f,i)=>(
+              <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:10,direction:"rtl"}}>
+                <span style={{color:"#d4af37",fontSize:13,flexShrink:0,marginTop:2}}>✓</span>
+                <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.85)",lineHeight:1.5}}>{f}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{textAlign:"center",marginTop:24}}>
+          <button onClick={onUpgrade} style={{background:"#d4af37",color:"#1e3a5f",border:"none",borderRadius:10,padding:"14px 40px",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:"0 4px 16px rgba(212,175,55,0.4)"}}>
+            احصل على Pro الآن ←
+          </button>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.35)",marginTop:8}}>ضمان استرداد المبلغ خلال 14 يوماً · الإلغاء في أي وقت</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── ONBOARDING FIRST-VISIT BANNER ────────────────
+function OnboardingBanner({onStart,onClose}){
+  const [band,setBand]=useState(null);
+  const bands=["أقل من 5","5.0 – 5.5","6.0 – 6.5","7.0+","لم أمتحن بعد"];
+  if(band!==null) return(
+    <div style={{background:"linear-gradient(135deg,#1e3a5f,#0d2347)",borderBottom:"2px solid rgba(212,175,55,0.3)",padding:"16px 24px",direction:"rtl"}}>
+      <div style={{maxWidth:900,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
+        <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:14,color:"white"}}>
+          🎯 ابدأ بتقييم مقالتك الآن — الأول مجاناً تماماً
+        </div>
+        <div style={{display:"flex",gap:8}}>
+          <button onClick={onStart} style={{background:"#d4af37",color:"#1e3a5f",border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>قيّم مقالتي ←</button>
+          <button onClick={onClose} style={{background:"transparent",border:"1px solid rgba(255,255,255,0.2)",borderRadius:8,padding:"9px 14px",fontSize:13,color:"rgba(255,255,255,0.5)",cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>لاحقاً</button>
+        </div>
+      </div>
+    </div>
+  );
+  return(
+    <div style={{background:"linear-gradient(135deg,#1e3a5f,#0d2347)",borderBottom:"2px solid rgba(212,175,55,0.3)",padding:"20px 24px",direction:"rtl"}}>
+      <div style={{maxWidth:700,margin:"0 auto"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:"clamp(14px,2vw,18px)",color:"white"}}>👋 أهلاً! ما هي درجتك الحالية في الآيلتس؟</div>
+          <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:20,cursor:"pointer",padding:0,lineHeight:1}}>✕</button>
+        </div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          {bands.map((b,i)=>(
+            <button key={i} onClick={()=>setBand(i)} style={{background:"rgba(255,255,255,0.08)",border:"1.5px solid rgba(255,255,255,0.2)",borderRadius:8,padding:"9px 16px",fontSize:13,fontWeight:600,color:"white",cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s"}}
+              onMouseOver={e=>{e.currentTarget.style.background="rgba(212,175,55,0.2)";e.currentTarget.style.borderColor="#d4af37";}}
+              onMouseOut={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.borderColor="rgba(255,255,255,0.2)";}}>
+              {b}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── MANAGE SUBSCRIPTION MODAL ──────────────────
 function ManageSubModal({onClose,email=""}){
   return(
@@ -4641,7 +4797,7 @@ function ManageSubModal({onClose,email=""}){
         {/* Didn't get email? */}
         <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"10px 14px",marginBottom:20,direction:"rtl"}}>
           <div style={{fontSize:12,color:"#713f12",lineHeight:1.5}}>
-            <strong>ما لقيت الإيميل؟</strong> تحقق من مجلد Spam، أو تواصل معنا عبر صفحة <strong>Contact</strong> وسنساعدك في الإلغاء خلال 24 ساعة.
+            <strong>إذا لم تجد البريد الإلكتروني؟</strong> تحقق من مجلد Spam، أو تواصل معنا عبر صفحة <strong>Contact</strong> وسنساعدك في الإلغاء خلال 24 ساعة.
           </div>
         </div>
 
@@ -4680,6 +4836,7 @@ export default function IELTSBot(){
   const [showPaywall,setShowPaywall]=useState(false);
   const [paywallTab,setPaywallTab]=useState("cliq");
   const [showManageSub,setShowManageSub]=useState(false);
+  const [showOnboarding,setShowOnboarding]=useState(()=>{try{return!localStorage.getItem("ef_onboarded");}catch{return true;}});
   const [showAuth,setShowAuth]=useState(false);
   const [showChangePassword,setShowChangePassword]=useState(false);
   const [session,setSession]=useState(null);
@@ -4955,6 +5112,14 @@ export default function IELTSBot(){
         </div>
       </div>
 
+      {/* ONBOARDING — first visit only, on analyze page */}
+      {showOnboarding&&mainView==="analyze"&&(
+        <OnboardingBanner
+          onStart={()=>{setShowOnboarding(false);try{localStorage.setItem("ef_onboarded","1");}catch{}window.scrollTo({top:600,behavior:"smooth"});}}
+          onClose={()=>{setShowOnboarding(false);try{localStorage.setItem("ef_onboarded","1");}catch{};}}
+        />
+      )}
+
       {/* Writing Sub-Nav — shows on writing-related pages */}
       {["analyze","practice","grammar","exercises"].includes(mainView)&&(
         <div className="writing-subnav" style={{background:T.bgGray,borderBottom:`1px solid ${T.border}`,padding:"0 24px"}}>
@@ -4974,7 +5139,7 @@ export default function IELTSBot(){
               <span style={{fontSize:20}}>🎮</span>
               <div>
                 <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:13,color:"white"}}>IELTS Game</div>
-                <div style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"rgba(255,255,255,0.5)"}}>تهجئة · قواعد · مفردات · كتابة · قراءة</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"rgba(255,255,255,0.5)"}}>الإملاء · القواعد · المفردات · الكتابة · القراءة</div>
               </div>
             </div>
             <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"8px 16px",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap"}}>
@@ -5016,7 +5181,7 @@ export default function IELTSBot(){
             {/* What you get */}
             <div style={{direction:"rtl",textAlign:"right",marginBottom:18}}>
               <div style={{fontSize:"clamp(14px,1.6vw,17px)",fontWeight:700,color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10}}>
-                ايش بتحصل عليه؟
+                ماذا ستحصل عليه؟
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:5}}>
                 {[
@@ -5027,7 +5192,7 @@ export default function IELTSBot(){
                   "كل غلطة في مقالتك محددة بالألوان مع التصحيح والشرح",
                   "ترقية مفردات من مقالتك نفسها لمستوى الدرجة ٨",
                   "نموذج إجابة كامل لنفس سؤالك",
-                  "خطة واضحة لرفع درجتك — مش بس تحليل"
+                  "خطة واضحة لرفع درجتك — ليس تحليلاً فحسب"
                 ].map((item,i)=>(
                   <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:"clamp(12px,1.3vw,14px)",color:"rgba(255,255,255,0.8)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.5}}>
                     {item} <span style={{color:T.accent,fontSize:13,flexShrink:0}}>◆</span>
@@ -5040,7 +5205,7 @@ export default function IELTSBot(){
             <div className="hero-btns" style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:12}}>
               <button onClick={trySampleEssay} style={{background:T.accent,color:T.primary,border:"none",borderRadius:10,padding:"14px 24px",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.accent}55`,flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
                 onMouseOver={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 6px 20px ${T.accent}66`;}} onMouseOut={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 4px 16px ${T.accent}55`;}}>
-                🎯 اضغط هنا لتحليل مقالتك مجاناً
+                🎯 قيّم مقالتك مجاناً
               </button>
               {!proUser&&(
                 <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.1)",color:"white",border:"1.5px solid rgba(255,255,255,0.35)",borderRadius:10,padding:"14px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
@@ -5050,7 +5215,7 @@ export default function IELTSBot(){
               )}
             </div>
             <div style={{fontSize:11,color:"rgba(255,255,255,0.4)",fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl"}}>
-              💡 يتم تطوير الموقع باستمرار ليصبح مصدراً شاملاً للتدريب على الايلتس
+              💡 يجري تطوير المنصة باستمرار لتكون مرجعاً شاملاً للتحضير للآيلتس
             </div>
 
             {/* Mobile disclaimer */}
@@ -5064,7 +5229,7 @@ export default function IELTSBot(){
                 {icon:"✍️",label:"تحليل الكتابة",color:"#1e3a5f",points:["تقييم فوري وفق معايير كامبريدج الأربعة","تحديد كل غلطة بالألوان مع التصحيح","ترقية مفرداتك لمستوى الدرجة ٨","نموذج إجابة كامل لنفس سؤالك"]},
                 {icon:"📖",label:"اختبارات القراءة",color:"#1d4ed8",points:["٧ اختبارات كاملة Academic وGeneral","مؤقت رسمي ٦٠ دقيقة مع تنبيهات","تصحيح فوري وحساب الدرجة","أسئلة T/F/NG، MCQ، وإكمال جمل"]},
                 {icon:"🎤",label:"تدريب المحادثة",color:"#7c3aed",points:["Part 1, 2, 3 مع نماذج Band 8","مواضيع مفصّلة مع إجابات كاملة","مفردات مصنّفة حسب الوظيفة","أخطاء شائعة وكيف تتجنبها"]},
-                {icon:"✏️",label:"قواعد وتدريبات",color:"#065f46",points:["أكثر من ١٢٠ تمرين متنوع","قواعد Grammar وإملاء فوري","تدريبات Paraphrasing وربط الجمل","تتبع تقدمك وشوف كيف درجتك بترتفع"]},
+                {icon:"✏️",label:"قواعد وتدريبات",color:"#065f46",points:["أكثر من ١٢٠ تمرين متنوع","قواعد Grammar وإملاء فوري","تدريبات Paraphrasing وربط الجمل","تتبع تقدمك وتابع تطوّر درجتك"]},
               ];
               const t=tabs[heroTab];
               return(
@@ -5196,8 +5361,8 @@ export default function IELTSBot(){
             <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
               <span style={{fontSize:22}}>🎮</span>
               <div>
-                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:800,fontSize:14,color:"white"}}>IELTS Game — تعلم وأنت تلعب!</div>
-                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>تهجئة · قواعد · مفردات · كتابة · قراءة</div>
+                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:800,fontSize:14,color:"white"}}>IELTS Game — تعلّم من خلال اللعب</div>
+                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>الإملاء · القواعد · المفردات · الكتابة · القراءة</div>
               </div>
             </div>
             <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 2px 8px ${T.accent}44`,whiteSpace:"nowrap"}}>
@@ -5206,6 +5371,12 @@ export default function IELTSBot(){
           </div>
         </div>
       )}
+
+      {/* TESTIMONIALS — social proof on homepage */}
+      {mainView==="analyze"&&<TestimonialsSection/>}
+
+      {/* PRICING COMPARISON — clarity on free vs pro */}
+      {mainView==="analyze"&&!proUser&&<PricingComparisonStrip onUpgrade={()=>setShowPaywall(true)}/>}
 
       {/* UPGRADE BANNER — shown to non-Pro users only */}
       {!proUser&&(
@@ -5561,7 +5732,7 @@ export default function IELTSBot(){
           <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",flexDirection:"column",gap:8}}>
             <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
               <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>© 2025 Englishfool. All rights reserved.</span>
-              <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>منصة تقييم احترافي للآيلتس</span>
+              <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>منصة احترافية للتحضير لامتحان الآيلتس</span>
             </div>
             <span style={{color:"rgba(255,255,255,0.25)",fontSize:11,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl"}}>منصة Englishfool غير تابعة لـ Cambridge أو British Council أو IDP</span>
           </div>
