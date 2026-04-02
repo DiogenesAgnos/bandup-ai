@@ -3905,6 +3905,7 @@ export default function IELTSBot(){
   const [menuOpen,setMenuOpen]=useState(false);
   const analyzeRef=useRef(null);
   const [proUser, setProUser] = useState(false);
+  const [heroTab, setHeroTab] = useState(0);
   const usesLeft = FREE_USES_LIMIT - uses;
 
   // ── Supabase auth listener — runs on mount ────────────────
@@ -4205,13 +4206,14 @@ export default function IELTSBot(){
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:5}}>
                 {[
-                  "محلل مقالات بذكاء اصطناعي — درجة فورية وفق معايير الايلتس الأربعة",
-                  "تحديد كل غلطة مع التصحيح والشرح بالتفصيل",
-                  "ترقية مفردات + نموذج إجابة لمستوى الدرجة ٨",
-                  "أكثر من ١٢٠ تدريب على القواعد والكتابة",
-                  "اختبارات قراءة كاملة + تحضير للمحادثة",
-                  "مدقق قواعد وإملاء فوري",
-                  "تتبع تقدمك وشوف درجتك كيف بتتحسن"
+                  "محلل مقالات ذكي يعطيك درجة دقيقة لكل معيار — زي الممتحن الحقيقي",
+                  "اختبارات قراءة كاملة مع مؤقت وتصحيح فوري",
+                  "مواضيع محادثة مع نماذج إجابة بمستوى الدرجة ٨",
+                  "تدريبات قواعد ومفردات — أكثر من ١٢٠ تمرين",
+                  "كل غلطة في مقالتك محددة بالألوان مع التصحيح والشرح",
+                  "ترقية مفردات من مقالتك نفسها لمستوى الدرجة ٨",
+                  "نموذج إجابة كامل لنفس سؤالك",
+                  "خطة واضحة لرفع درجتك — مش بس تحليل"
                 ].map((item,i)=>(
                   <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:"clamp(13px,1.4vw,15px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.5}}>
                     {item} <span style={{color:"#4ade80",fontSize:15,flexShrink:0}}>✅</span>
@@ -4241,8 +4243,84 @@ export default function IELTSBot(){
               <span style={{fontSize:12,color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📱 للحصول على أفضل تجربة، استخدم جهاز كمبيوتر أو لابتوب.</span>
             </div>
           </div>
-          <div className="hero-image" style={{flex:"0 0 45%",position:"relative",overflow:"hidden",minHeight:320}}>
-            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=85&auto=format&fit=crop" alt="Student studying for IELTS" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",opacity:0.3}}/>
+          <div className="hero-image" style={{flex:"0 0 45%",position:"relative",display:"flex",alignItems:"center",justifyContent:"center",padding:"28px 0 28px 24px"}}>
+            {(()=>{
+              const tabs=[
+                {icon:"✍️",label:"تحليل الكتابة",color:"#fbbf24",points:["درجة دقيقة لكل معيار من الأربعة","تحديد كل غلطة بالألوان مع التصحيح","ترقية مفرداتك لمستوى الدرجة ٨","نموذج إجابة كامل لنفس سؤالك"]},
+                {icon:"📖",label:"اختبارات القراءة",color:"#60a5fa",points:["٧ اختبارات كاملة Academic وGeneral","مؤقت رسمي ٦٠ دقيقة مع تنبيهات","تصحيح فوري وحساب الدرجة","أسئلة T/F/NG، MCQ، وإكمال جمل"]},
+                {icon:"🎤",label:"تدريب المحادثة",color:"#a78bfa",points:["Part 1, 2, 3 مع نماذج Band 8","مواضيع مفصّلة مع إجابات كاملة","مفردات مصنّفة حسب الوظيفة","أخطاء شائعة وكيف تتجنبها"]},
+                {icon:"✏️",label:"قواعد وتدريبات",color:"#34d399",points:["أكثر من ١٢٠ تمرين متنوع","قواعد Grammar وإملاء فوري","تدريبات Paraphrasing وربط الجمل","تتبع تقدمك وشوف كيف درجتك بترتفع"]},
+              ];
+              const t=tabs[heroTab];
+              return(
+                <div style={{width:"100%",direction:"rtl"}}>
+                  {/* Tab headers */}
+                  <div style={{display:"flex",gap:6,marginBottom:0,justifyContent:"flex-end"}}>
+                    {tabs.map((tb,i)=>(
+                      <button key={i} onClick={()=>setHeroTab(i)} style={{
+                        background:heroTab===i?"rgba(255,255,255,0.18)":"rgba(255,255,255,0.07)",
+                        border:heroTab===i?"1.5px solid rgba(255,255,255,0.5)":"1.5px solid rgba(255,255,255,0.15)",
+                        borderBottom:heroTab===i?"none":"1.5px solid rgba(255,255,255,0.15)",
+                        borderRadius:"10px 10px 0 0",
+                        padding:"8px 14px",
+                        cursor:"pointer",
+                        color:heroTab===i?"white":"rgba(255,255,255,0.55)",
+                        fontFamily:"'Cairo','Source Sans Pro',system-ui",
+                        fontSize:"clamp(11px,1.1vw,13px)",
+                        fontWeight:heroTab===i?700:500,
+                        transition:"all 0.2s",
+                        transform:heroTab===i?"translateY(2px)":"translateY(0)",
+                        boxShadow:heroTab===i?"0 -4px 12px rgba(0,0,0,0.2)":"none",
+                        whiteSpace:"nowrap",
+                        flex:1,
+                        textAlign:"center",
+                      }}>
+                        <span style={{marginLeft:4}}>{tb.icon}</span>{tb.label}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Tab content card */}
+                  <div style={{
+                    background:"rgba(255,255,255,0.13)",
+                    backdropFilter:"blur(12px)",
+                    border:"1.5px solid rgba(255,255,255,0.35)",
+                    borderRadius:"0 0 16px 16px",
+                    padding:"20px 22px",
+                    boxShadow:"0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.2)",
+                  }}>
+                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,justifyContent:"flex-end"}}>
+                      <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(14px,1.5vw,17px)",fontWeight:800,color:"white"}}>{t.label}</div>
+                      <div style={{fontSize:28,lineHeight:1}}>{t.icon}</div>
+                    </div>
+                    <div style={{display:"flex",flexDirection:"column",gap:9}}>
+                      {t.points.map((p,i)=>(
+                        <div key={i} style={{display:"flex",alignItems:"flex-start",gap:8,justifyContent:"flex-end"}}>
+                          <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(12px,1.2vw,14px)",color:"rgba(255,255,255,0.9)",lineHeight:1.5,textAlign:"right"}}>{p}</div>
+                          <span style={{color:t.color,fontSize:14,flexShrink:0,marginTop:2}}>◆</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={()=>{
+                      const views=["analyze","reading","speaking","exercises"];
+                      switchView(views[heroTab]);
+                    }} style={{
+                      marginTop:16,width:"100%",
+                      background:`linear-gradient(135deg,${t.color}22,${t.color}44)`,
+                      border:`1.5px solid ${t.color}88`,
+                      borderRadius:8,padding:"10px 16px",
+                      color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",
+                      fontSize:"clamp(12px,1.2vw,14px)",fontWeight:700,cursor:"pointer",
+                      transition:"all 0.2s",
+                    }}
+                    onMouseOver={e=>e.currentTarget.style.background=`linear-gradient(135deg,${t.color}44,${t.color}66)`}
+                    onMouseOut={e=>e.currentTarget.style.background=`linear-gradient(135deg,${t.color}22,${t.color}44)`}
+                    >
+                      جرّب الآن ←
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -4786,9 +4864,9 @@ export default function IELTSBot(){
           .nav-inner { padding: 0 14px !important; height: 56px !important; }
 
           /* HERO */
-          .hero-inner { flex-direction: column !important; min-height: auto !important; padding: 20px 16px 24px !important; }
+          .hero-inner { flex-direction: column-reverse !important; min-height: auto !important; padding: 20px 16px 24px !important; }
           .hero-text { flex: none !important; width: 100% !important; padding: 0 !important; }
-          .hero-image { display: none !important; }
+          .hero-image { display: flex !important; flex: none !important; width: 100% !important; padding: 0 0 16px 0 !important; }
           .hero-btns { flex-direction: column !important; gap: 10px !important; }
           .hero-btns button { width: 100% !important; padding: 16px 20px !important; font-size: 17px !important; border-radius: 12px !important; min-height: 54px !important; }
           .hero-prices { justify-content: center !important; gap: 10px !important; }
