@@ -4246,57 +4246,59 @@ export default function IELTSBot(){
           <div className="hero-image" style={{flex:"0 0 45%",position:"relative",display:"flex",alignItems:"center",justifyContent:"center",padding:"28px 0 28px 24px"}}>
             {(()=>{
               const tabs=[
-                {icon:"✍️",label:"تحليل الكتابة",color:"#fbbf24",points:["درجة دقيقة لكل معيار من الأربعة","تحديد كل غلطة بالألوان مع التصحيح","ترقية مفرداتك لمستوى الدرجة ٨","نموذج إجابة كامل لنفس سؤالك"]},
-                {icon:"📖",label:"اختبارات القراءة",color:"#60a5fa",points:["٧ اختبارات كاملة Academic وGeneral","مؤقت رسمي ٦٠ دقيقة مع تنبيهات","تصحيح فوري وحساب الدرجة","أسئلة T/F/NG، MCQ، وإكمال جمل"]},
-                {icon:"🎤",label:"تدريب المحادثة",color:"#a78bfa",points:["Part 1, 2, 3 مع نماذج Band 8","مواضيع مفصّلة مع إجابات كاملة","مفردات مصنّفة حسب الوظيفة","أخطاء شائعة وكيف تتجنبها"]},
-                {icon:"✏️",label:"قواعد وتدريبات",color:"#34d399",points:["أكثر من ١٢٠ تمرين متنوع","قواعد Grammar وإملاء فوري","تدريبات Paraphrasing وربط الجمل","تتبع تقدمك وشوف كيف درجتك بترتفع"]},
+                {icon:"✍️",label:"تحليل الكتابة",color:"#b91c1c",points:["درجة دقيقة لكل معيار من الأربعة","تحديد كل غلطة بالألوان مع التصحيح","ترقية مفرداتك لمستوى الدرجة ٨","نموذج إجابة كامل لنفس سؤالك"]},
+                {icon:"📖",label:"اختبارات القراءة",color:"#1d4ed8",points:["٧ اختبارات كاملة Academic وGeneral","مؤقت رسمي ٦٠ دقيقة مع تنبيهات","تصحيح فوري وحساب الدرجة","أسئلة T/F/NG، MCQ، وإكمال جمل"]},
+                {icon:"🎤",label:"تدريب المحادثة",color:"#7c3aed",points:["Part 1, 2, 3 مع نماذج Band 8","مواضيع مفصّلة مع إجابات كاملة","مفردات مصنّفة حسب الوظيفة","أخطاء شائعة وكيف تتجنبها"]},
+                {icon:"✏️",label:"قواعد وتدريبات",color:"#065f46",points:["أكثر من ١٢٠ تمرين متنوع","قواعد Grammar وإملاء فوري","تدريبات Paraphrasing وربط الجمل","تتبع تقدمك وشوف كيف درجتك بترتفع"]},
               ];
               const t=tabs[heroTab];
               return(
                 <div style={{width:"100%",direction:"rtl"}}>
-                  {/* Tab headers */}
-                  <div style={{display:"flex",gap:6,marginBottom:0,justifyContent:"flex-end"}}>
-                    {tabs.map((tb,i)=>(
-                      <button key={i} onClick={()=>setHeroTab(i)} style={{
-                        background:heroTab===i?"rgba(255,255,255,0.18)":"rgba(255,255,255,0.07)",
-                        border:heroTab===i?"1.5px solid rgba(255,255,255,0.5)":"1.5px solid rgba(255,255,255,0.15)",
-                        borderBottom:heroTab===i?"none":"1.5px solid rgba(255,255,255,0.15)",
-                        borderRadius:"10px 10px 0 0",
-                        padding:"8px 14px",
-                        cursor:"pointer",
-                        color:heroTab===i?"white":"rgba(255,255,255,0.55)",
-                        fontFamily:"'Cairo','Source Sans Pro',system-ui",
-                        fontSize:"clamp(11px,1.1vw,13px)",
-                        fontWeight:heroTab===i?700:500,
-                        transition:"all 0.2s",
-                        transform:heroTab===i?"translateY(2px)":"translateY(0)",
-                        boxShadow:heroTab===i?"0 -4px 12px rgba(0,0,0,0.2)":"none",
-                        whiteSpace:"nowrap",
-                        flex:1,
-                        textAlign:"center",
-                      }}>
-                        <span style={{marginLeft:4}}>{tb.icon}</span>{tb.label}
-                      </button>
-                    ))}
+                  {/* Tab headers — 2×2 grid so all 4 fit on mobile */}
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:0}}>
+                    {tabs.map((tb,i)=>{
+                      const active=heroTab===i;
+                      return(
+                        <button key={i} onClick={()=>setHeroTab(i)} style={{
+                          background:active?"white":"rgba(255,255,255,0.15)",
+                          border:active?"2px solid white":"2px solid rgba(255,255,255,0.3)",
+                          borderBottom:active?"2px solid white":"2px solid rgba(255,255,255,0.3)",
+                          borderRadius:active?"10px 10px 0 0":"10px 10px 0 0",
+                          padding:"9px 10px",
+                          cursor:"pointer",
+                          color:active?t.color:"rgba(255,255,255,0.8)",
+                          fontFamily:"'Cairo','Source Sans Pro',system-ui",
+                          fontSize:"clamp(11px,1vw,13px)",
+                          fontWeight:active?800:500,
+                          transition:"all 0.2s",
+                          transform:active?"translateY(3px)":"translateY(0)",
+                          boxShadow:active?"0 -3px 10px rgba(0,0,0,0.15)":"none",
+                          textAlign:"center",
+                          display:"flex",alignItems:"center",justifyContent:"center",gap:5,
+                        }}>
+                          <span>{tb.icon}</span><span>{tb.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                  {/* Tab content card */}
+                  {/* Tab content card — white bg, red text */}
                   <div style={{
-                    background:"rgba(255,255,255,0.13)",
-                    backdropFilter:"blur(12px)",
-                    border:"1.5px solid rgba(255,255,255,0.35)",
+                    background:"white",
+                    border:"2px solid white",
+                    borderTop:"none",
                     borderRadius:"0 0 16px 16px",
                     padding:"20px 22px",
-                    boxShadow:"0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    boxShadow:"0 8px 32px rgba(0,0,0,0.2)",
                   }}>
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,justifyContent:"flex-end"}}>
-                      <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(14px,1.5vw,17px)",fontWeight:800,color:"white"}}>{t.label}</div>
-                      <div style={{fontSize:28,lineHeight:1}}>{t.icon}</div>
+                      <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(14px,1.5vw,17px)",fontWeight:800,color:t.color}}>{t.label}</div>
+                      <div style={{fontSize:26,lineHeight:1}}>{t.icon}</div>
                     </div>
                     <div style={{display:"flex",flexDirection:"column",gap:9}}>
                       {t.points.map((p,i)=>(
                         <div key={i} style={{display:"flex",alignItems:"flex-start",gap:8,justifyContent:"flex-end"}}>
-                          <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(12px,1.2vw,14px)",color:"rgba(255,255,255,0.9)",lineHeight:1.5,textAlign:"right"}}>{p}</div>
-                          <span style={{color:t.color,fontSize:14,flexShrink:0,marginTop:2}}>◆</span>
+                          <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(12px,1.2vw,14px)",color:"#1f2937",lineHeight:1.5,textAlign:"right"}}>{p}</div>
+                          <span style={{color:t.color,fontSize:14,flexShrink:0,marginTop:3}}>◆</span>
                         </div>
                       ))}
                     </div>
@@ -4305,15 +4307,15 @@ export default function IELTSBot(){
                       switchView(views[heroTab]);
                     }} style={{
                       marginTop:16,width:"100%",
-                      background:`linear-gradient(135deg,${t.color}22,${t.color}44)`,
-                      border:`1.5px solid ${t.color}88`,
-                      borderRadius:8,padding:"10px 16px",
+                      background:t.color,
+                      border:"none",
+                      borderRadius:8,padding:"11px 16px",
                       color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",
-                      fontSize:"clamp(12px,1.2vw,14px)",fontWeight:700,cursor:"pointer",
-                      transition:"all 0.2s",
+                      fontSize:"clamp(13px,1.2vw,15px)",fontWeight:700,cursor:"pointer",
+                      transition:"opacity 0.2s",
                     }}
-                    onMouseOver={e=>e.currentTarget.style.background=`linear-gradient(135deg,${t.color}44,${t.color}66)`}
-                    onMouseOut={e=>e.currentTarget.style.background=`linear-gradient(135deg,${t.color}22,${t.color}44)`}
+                    onMouseOver={e=>e.currentTarget.style.opacity="0.85"}
+                    onMouseOut={e=>e.currentTarget.style.opacity="1"}
                     >
                       جرّب الآن ←
                     </button>
