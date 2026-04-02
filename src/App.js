@@ -3851,7 +3851,14 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
           ))}
         </ul>
         {isPro?(
-          <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ You're on Pro — Unlimited Access</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ أنت على Pro — وصول غير محدود</div>
+            <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer"
+              style={{display:"block",textAlign:"center",background:"white",border:`1.5px solid ${T.border}`,borderRadius:8,padding:"11px",fontSize:13,fontWeight:600,color:T.textMid,textDecoration:"none",direction:"rtl",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+              ⚙️ إدارة اشتراكك أو إلغاؤه → Paddle
+            </a>
+            <div style={{fontSize:11,color:T.textMuted,textAlign:"center",direction:"rtl",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>ستحتاج إلى البريد الإلكتروني الذي دفعت به</div>
+          </div>
         ):(
           <button onClick={onUpgrade} style={{width:"100%",background:T.primary,color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:"pointer",boxShadow:T.shadowMd}}>
             احصل على Pro — $17 (3 أشهر)
@@ -3865,6 +3872,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
     </Section>
     <Section title="Cancellation">
       <p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No further charges will be made after cancellation.</p>
+      <p style={{margin:"0 0 12px"}}>To cancel, visit <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer" style={{color:T.primary,fontWeight:700}}>customer.paddle.com</a> and sign in with the email you used to purchase. You can manage or cancel your subscription there directly.</p>
     </Section>
     <Section title="Refunds">
       <p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new subscribers, in accordance with Paddle's Buyer Terms. If you are not satisfied within 14 days of your initial purchase, you are entitled to a full refund via Paddle or through our <strong>Contact Us</strong> page. See our full <button onClick={()=>{const path="/refund";window.history.pushState({},"",path);window.location.reload();}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:15,fontFamily:"inherit",padding:0,textDecoration:"underline"}}>Refund Policy</button> for details.</p>
@@ -4878,7 +4886,10 @@ export default function IELTSBot(){
           </div>
           <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
             {proUser?(
-              <span style={{fontSize:13,color:"#6ee7b7",fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro — Unlimited</span>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:13,color:"#6ee7b7",fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro</span>
+                <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer" style={{fontSize:11,color:"rgba(255,255,255,0.45)",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",cursor:"pointer"}}>إدارة الاشتراك</a>
+              </div>
             ):(
               <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.accent,color:T.primary,border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(212,175,55,0.4)",letterSpacing:"0.01em"}}>🔓 احصل على Pro</button>
             )}
@@ -5637,7 +5648,11 @@ export default function IELTSBot(){
             )}
             {proUser&&(
               <div style={{padding:"0 20px"}}>
-                <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 16px",textAlign:"center",fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro — Unlimited Access</div>
+                <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 16px",textAlign:"center",fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:8}}>✓ Pro — Unlimited Access</div>
+                <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer"
+                  style={{display:"block",width:"100%",textAlign:"center",background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"none",boxSizing:"border-box",direction:"rtl"}}>
+                  ⚙️ إدارة الاشتراك أو الإلغاء
+                </a>
               </div>
             )}
             <div style={{padding:"12px 20px 0"}}>
