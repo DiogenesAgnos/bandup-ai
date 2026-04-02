@@ -42,29 +42,33 @@ const getLastResult = () => { try{ return JSON.parse(localStorage.getItem(LAST_R
 const clearLastResult = () => { try{ localStorage.removeItem(LAST_RESULT_KEY); }catch{} };
 
 const T = {
-  primary:      "#0056d2",
-  primaryHover: "#0041a8",
-  primaryLight: "#e8f0fc",
-  primaryBorder:"#b3ccf5",
-  bg:           "#ffffff",
-  bgMuted:      "#f9f9f9",
-  bgGray:       "#f3f3f3",
-  text:         "#1f1f1f",
-  textMid:      "#3c3c3c",
-  textMuted:    "#636363",
-  textLight:    "#8c8c8c",
-  border:       "#e0e0e0",
-  borderMid:    "#c7c7c7",
-  green:        "#00785a", greenBg:"#e6f4f1",  greenBorder:"#99d6c8",
-  red:          "#c0392b", redBg:"#fdf2f2",    redBorder:"#f0a09a",
-  amber:        "#b45309", amberBg:"#fef9ec",  amberBorder:"#fcd97a",
-  blue:         "#0056d2", blueBg:"#e8f0fc",   blueBorder:"#b3ccf5",
-  purple:       "#6554af", purpleBg:"#f2f0ff", purpleBorder:"#c2b8ff",
-  gold:         "#b45309",
-  shadow:    "0 2px 4px rgba(0,0,0,0.08)",
-  shadowMd:  "0 4px 12px rgba(0,0,0,0.1)",
-  shadowLg:  "0 8px 32px rgba(0,0,0,0.12)",
-  shadowNav: "0 2px 4px rgba(0,0,0,0.1)",
+  primary:      "#1e3a5f",   // Deep Navy
+  primaryHover: "#152a45",
+  primaryLight: "#e8eef5",
+  primaryBorder:"#b3c6d9",
+  accent:       "#d4af37",   // Muted Gold
+  accentLight:  "#fdf6dc",
+  accentBorder: "#e8d27a",
+  bg:           "#f8f9fa",   // Warm Off-White
+  bgSurface:    "#ffffff",
+  bgMuted:      "#f1f5f9",
+  bgGray:       "#f1f5f9",
+  text:         "#1e293b",
+  textMid:      "#334155",
+  textMuted:    "#64748b",
+  textLight:    "#94a3b8",
+  border:       "#e2e8f0",
+  borderMid:    "#cbd5e1",
+  green:        "#059669", greenBg:"#d1fae5",  greenBorder:"#6ee7b7",
+  red:          "#dc2626", redBg:"#fee2e2",    redBorder:"#fca5a5",
+  amber:        "#d97706", amberBg:"#fef3c7",  amberBorder:"#fcd34d",
+  blue:         "#2563eb", blueBg:"#dbeafe",   blueBorder:"#93c5fd",
+  purple:       "#7c3aed", purpleBg:"#ede9fe", purpleBorder:"#c4b5fd",
+  gold:         "#d4af37",
+  shadow:    "0 2px 8px rgba(0,0,0,0.06)",
+  shadowMd:  "0 4px 16px rgba(0,0,0,0.08)",
+  shadowLg:  "0 8px 32px rgba(0,0,0,0.10)",
+  shadowNav: "0 2px 4px rgba(0,0,0,0.08)",
 };
 
 const TASK_TYPES = {
@@ -517,8 +521,8 @@ const MainTab=({label,active,onClick})=>(
   <button onClick={onClick} style={{
     background: "transparent",
     border: "none",
-    borderBottom: active ? `3px solid ${T.primary}` : "3px solid transparent",
-    color: active ? T.primary : T.textMuted,
+    borderBottom: active ? `3px solid ${T.accent}` : "3px solid transparent",
+    color: active ? T.accent : "rgba(255,255,255,0.75)",
     padding: "0 14px",
     height: 64,
     cursor: "pointer",
@@ -818,7 +822,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
             <div style={{background:"#f0fdf4",border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px",marginBottom:16,textAlign:"center"}}>
               <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>🇯🇴 دفع عن طريق كليك</div>
               <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>10 <span style={{fontSize:20,fontWeight:700}}>دينار</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>دفعة واحدة · وصول مدى الحياة</div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>اشتراك 3 أشهر · إلغاء في أي وقت</div>
             </div>
 
             {/* Arabic steps */}
@@ -1317,7 +1321,7 @@ const GrammarChecker = ({isPro}) => {
 
   const check = async () => {
     if (!input.trim()) { setError("Please enter a word or sentence to check."); return; }
-    if (!isPro && dailyUses >= GRAMMAR_DAILY_LIMIT) { setError("Daily limit reached (10/day). Upgrade to Pro for unlimited grammar checks."); return; }
+    if (!isPro && dailyUses >= GRAMMAR_DAILY_LIMIT) { setError("لقد استنفدت فحوصاتك المجانية (10 فحوصات). احصل على Pro للفحص غير المحدود."); return; }
     setError(""); setLoading(true); setResult(null);
     try {
       const res = await fetch(API_URL, {
@@ -1343,7 +1347,7 @@ const GrammarChecker = ({isPro}) => {
     <div>
       <Card style={{ marginBottom: 20, background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
         <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
-          ✏️ <strong>Grammar & Spell Checker</strong> — Enter any word, phrase, or sentence and get instant corrections with explanations. {isPro?"Unlimited checks with Pro.":(<><strong>{dailyLeft}</strong> of {GRAMMAR_DAILY_LIMIT} free checks remaining today.</>)}
+          ✏️ <strong>Grammar & Spell Checker</strong> — Enter any word, phrase, or sentence and get instant corrections with explanations. {isPro?"Unlimited checks with Pro.":(<><strong>{dailyLeft}</strong> of {GRAMMAR_DAILY_LIMIT} free checks remaining.</>)}
         </p>
       </Card>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
@@ -4760,12 +4764,12 @@ export default function IELTSBot(){
 
 
       {/* NAV BAR 2 */}
-      <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,background:T.bg,borderBottom:`1px solid ${T.border}`,boxShadow:T.shadowNav}}>
+      <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,background:T.primary,borderBottom:`1px solid rgba(255,255,255,0.1)`,boxShadow:"0 2px 8px rgba(30,58,95,0.2)"}}>
         <div className="nav-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
           <div style={{display:"flex",alignItems:"center",gap:24}}>
             <Logo size={26}/>
             {/* Hamburger — mobile only */}
-            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:`1.5px solid ${T.border}`,borderRadius:10,padding:"8px 12px",cursor:"pointer",fontSize:20,color:T.text,minWidth:44,minHeight:44,justifyContent:"center",alignItems:"center"}}>☰</button>
+            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 12px",cursor:"pointer",fontSize:20,color:"white",minWidth:44,minHeight:44,justifyContent:"center",alignItems:"center"}}>☰</button>
             <div className="nav-tabs" style={{display:"flex",gap:4,alignItems:"center"}}>
               <MainTab label="✍️ Writing" active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label="🗣️ Speaking" active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
@@ -4778,20 +4782,20 @@ export default function IELTSBot(){
           </div>
           <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
             {proUser?(
-              <span style={{fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro — Unlimited</span>
+              <span style={{fontSize:13,color:"#6ee7b7",fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro — Unlimited</span>
             ):(
-              <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)",letterSpacing:"0.01em"}}>🔓 Upgrade to Pro</button>
+              <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.accent,color:T.primary,border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(212,175,55,0.4)",letterSpacing:"0.01em"}}>🔓 احصل على Pro</button>
             )}
-            <div style={{width:1,height:20,background:T.border}}/>
+            <div style={{width:1,height:20,background:"rgba(255,255,255,0.15)"}}/>
             {session?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
-                <button onClick={()=>setShowChangePassword(true)} style={{background:"transparent",border:"none",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",padding:0}}>🔑</button>
-                <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign Out</button>
+                <span style={{fontSize:13,color:"rgba(255,255,255,0.8)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
+                <button onClick={()=>setShowChangePassword(true)} style={{background:"transparent",border:"none",fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.5)",cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",padding:0}}>🔑</button>
+                <button onClick={handleSignOut} style={{background:"transparent",border:"1px solid rgba(255,255,255,0.25)",borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.7)",cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign Out</button>
               </div>
             ):(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign In →</button>
+                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:"rgba(255,255,255,0.9)",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:4,padding:"7px 16px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign In →</button>
               </div>
             )}
           </div>
@@ -4811,35 +4815,41 @@ export default function IELTSBot(){
 
       {/* HERO — only on main writing page */}
       {mainView==="analyze"&&(<>
-      <div style={{background:"linear-gradient(135deg, #7f1d1d 0%, #b91c1c 50%, #dc2626 100%)",position:"relative"}}>
+      <div style={{background:T.primary,position:"relative"}}>
         <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"stretch",minHeight:340}}>
           <div className="hero-text" style={{flex:"0 0 55%",padding:"36px 40px 36px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
 
-            {/* Price badges — first thing they see */}
+            {/* Headline */}
             <div style={{direction:"rtl",textAlign:"right",marginBottom:16}}>
-              <div style={{fontSize:"clamp(20px,2.5vw,30px)",fontWeight:700,color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.4,marginBottom:14}}>
-                كل هذا بسعر واحد — مدى الحياة:
+              <div style={{fontSize:"clamp(20px,2.5vw,30px)",fontWeight:800,color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.4,marginBottom:6}}>
+                منصة الآيلتس الشاملة
               </div>
+              <div style={{fontSize:"clamp(13px,1.5vw,16px)",color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,marginBottom:16}}>
+                تقييم فوري · ألعاب تدريب · اختبارات قراءة · محادثة وقواعد
+              </div>
+              {/* Launch offer badges */}
               <div className="hero-prices" style={{display:"flex",gap:12,justifyContent:"flex-end",flexWrap:"wrap",marginBottom:16}}>
-                <div style={{background:"rgba(255,255,255,0.12)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:14,padding:"14px 22px",textAlign:"center",flex:"0 0 auto",backdropFilter:"blur(4px)"}}>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:4}}>🇯🇴 داخل الأردن</div>
-                  <div style={{fontFamily:"Georgia,serif",fontSize:36,fontWeight:900,color:"#4ade80",lineHeight:1}}>10 <span style={{fontSize:16,fontWeight:600}}>دينار</span></div>
+                <div style={{background:"rgba(255,255,255,0.08)",border:`1.5px solid ${T.accent}55`,borderRadius:14,padding:"12px 20px",textAlign:"center",flex:"0 0 auto"}}>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,0.6)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:4}}>🇯🇴 داخل الأردن · عرض إطلاق</div>
+                  <div style={{fontFamily:"Inter,sans-serif",fontSize:32,fontWeight:900,color:T.accent,lineHeight:1}}>10 <span style={{fontSize:15,fontWeight:600}}>دينار</span></div>
+                  <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:3}}>3 أشهر · يجدد بـ ١٥ دينار</div>
                 </div>
-                <div style={{background:"rgba(255,255,255,0.12)",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:14,padding:"14px 22px",textAlign:"center",flex:"0 0 auto",backdropFilter:"blur(4px)"}}>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:4}}>🌍 خارج الأردن</div>
-                  <div style={{fontFamily:"Georgia,serif",fontSize:36,fontWeight:900,color:"#4ade80",lineHeight:1}}>$17</div>
+                <div style={{background:"rgba(255,255,255,0.08)",border:`1.5px solid ${T.accent}55`,borderRadius:14,padding:"12px 20px",textAlign:"center",flex:"0 0 auto"}}>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,0.6)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:4}}>🌍 دولي · عرض إطلاق</div>
+                  <div style={{fontFamily:"Inter,sans-serif",fontSize:32,fontWeight:900,color:T.accent,lineHeight:1}}>$17</div>
+                  <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:3}}>3 months · renews at $25</div>
                 </div>
               </div>
             </div>
 
-            {/* What you get — Arabic features */}
+            {/* What you get */}
             <div style={{direction:"rtl",textAlign:"right",marginBottom:18}}>
-              <div style={{fontSize:"clamp(15px,1.8vw,19px)",fontWeight:700,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10}}>
+              <div style={{fontSize:"clamp(14px,1.6vw,17px)",fontWeight:700,color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10}}>
                 ايش بتحصل عليه؟
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:5}}>
                 {[
-                  "محلل مقالات ذكي يعطيك درجة دقيقة لكل معيار — زي الممتحن الحقيقي",
+                  "تقييم فوري لمقالتك وفق معايير كامبريدج الأربعة",
                   "اختبارات قراءة كاملة مع مؤقت وتصحيح فوري",
                   "مواضيع محادثة مع نماذج إجابة بمستوى الدرجة ٨",
                   "تدريبات قواعد ومفردات — أكثر من ١٢٠ تمرين",
@@ -4848,8 +4858,8 @@ export default function IELTSBot(){
                   "نموذج إجابة كامل لنفس سؤالك",
                   "خطة واضحة لرفع درجتك — مش بس تحليل"
                 ].map((item,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:"clamp(13px,1.4vw,15px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.5}}>
-                    {item} <span style={{color:"#4ade80",fontSize:15,flexShrink:0}}>✅</span>
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:"clamp(12px,1.3vw,14px)",color:"rgba(255,255,255,0.8)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.5}}>
+                    {item} <span style={{color:T.accent,fontSize:13,flexShrink:0}}>◆</span>
                   </div>
                 ))}
               </div>
@@ -4857,29 +4867,30 @@ export default function IELTSBot(){
 
             {/* CTA buttons */}
             <div className="hero-btns" style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:12}}>
-              <button onClick={trySampleEssay} style={{background:"#4ade80",color:"#0a1628",border:"none",borderRadius:10,padding:"15px 28px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 4px 16px rgba(74,222,128,0.35)",flex:1,minWidth:200,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"transform 0.15s"}}
-                onMouseOver={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseOut={e=>e.currentTarget.style.transform="scale(1)"}>
-                🎯 جرّب مجاناً — بدون تسجيل
+              <button onClick={trySampleEssay} style={{background:T.accent,color:T.primary,border:"none",borderRadius:10,padding:"14px 24px",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.accent}55`,flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
+                onMouseOver={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 6px 20px ${T.accent}66`;}} onMouseOut={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 4px 16px ${T.accent}55`;}}>
+                🎯 قيّم مقالي مجاناً
               </button>
               {!proUser&&(
-                <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.15)",color:"white",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:10,padding:"15px 28px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flex:1,minWidth:200,display:"flex",alignItems:"center",justifyContent:"center",gap:8,backdropFilter:"blur(4px)"}}>
-                  🔓 اشترك الآن
+                <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.1)",color:"white",border:"1.5px solid rgba(255,255,255,0.35)",borderRadius:10,padding:"14px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
+                  onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.18)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.1)"}>
+                  🔓 احصل على Pro
                 </button>
               )}
             </div>
-            <div style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.4)",fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl"}}>
               💡 يتم تطوير الموقع باستمرار ليصبح مصدراً شاملاً للتدريب على الايلتس
             </div>
 
             {/* Mobile disclaimer */}
-            <div style={{marginTop:10,background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:8,padding:"8px 14px",display:"none"}} className="mobile-disclaimer">
-              <span style={{fontSize:12,color:"rgba(255,255,255,0.7)",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📱 للحصول على أفضل تجربة، استخدم جهاز كمبيوتر أو لابتوب.</span>
+            <div style={{marginTop:10,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,padding:"8px 14px",display:"none"}} className="mobile-disclaimer">
+              <span style={{fontSize:12,color:"rgba(255,255,255,0.6)",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📱 للحصول على أفضل تجربة، استخدم جهاز كمبيوتر أو لابتوب.</span>
             </div>
           </div>
           <div className="hero-image" style={{flex:"0 0 45%",position:"relative",display:"flex",alignItems:"center",justifyContent:"center",padding:"28px 0 28px 24px"}}>
             {(()=>{
               const tabs=[
-                {icon:"✍️",label:"تحليل الكتابة",color:"#b91c1c",points:["درجة دقيقة لكل معيار من الأربعة","تحديد كل غلطة بالألوان مع التصحيح","ترقية مفرداتك لمستوى الدرجة ٨","نموذج إجابة كامل لنفس سؤالك"]},
+                {icon:"✍️",label:"تحليل الكتابة",color:"#1e3a5f",points:["تقييم فوري وفق معايير كامبريدج الأربعة","تحديد كل غلطة بالألوان مع التصحيح","ترقية مفرداتك لمستوى الدرجة ٨","نموذج إجابة كامل لنفس سؤالك"]},
                 {icon:"📖",label:"اختبارات القراءة",color:"#1d4ed8",points:["٧ اختبارات كاملة Academic وGeneral","مؤقت رسمي ٦٠ دقيقة مع تنبيهات","تصحيح فوري وحساب الدرجة","أسئلة T/F/NG، MCQ، وإكمال جمل"]},
                 {icon:"🎤",label:"تدريب المحادثة",color:"#7c3aed",points:["Part 1, 2, 3 مع نماذج Band 8","مواضيع مفصّلة مع إجابات كاملة","مفردات مصنّفة حسب الوظيفة","أخطاء شائعة وكيف تتجنبها"]},
                 {icon:"✏️",label:"قواعد وتدريبات",color:"#065f46",points:["أكثر من ١٢٠ تمرين متنوع","قواعد Grammar وإملاء فوري","تدريبات Paraphrasing وربط الجمل","تتبع تقدمك وشوف كيف درجتك بترتفع"]},
@@ -5009,19 +5020,19 @@ export default function IELTSBot(){
 
       {/* UPGRADE BANNER — shown to non-Pro users only */}
       {!proUser&&(
-        <div style={{background:"linear-gradient(135deg,#0a1628 0%,#0056d2 100%)",padding:"14px 24px"}}>
+        <div style={{background:T.primary,borderTop:"1px solid rgba(255,255,255,0.08)",padding:"12px 24px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
-            <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
-              <span style={{fontSize:13,color:"rgba(255,255,255,0.95)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>
-                🎓 Unlimited analyses · Full toolkit · Practice Mode · All exercises
+            <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",direction:"rtl"}}>
+              <span style={{fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>
+                🎓 تحليل غير محدود · جميع الاختبارات · الألعاب · التدريبات
               </span>
-              <span style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"2px 12px",fontSize:12,color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
-                🇯🇴 Pay via CLIQ — 10 JOD
+              <span style={{background:`${T.accent}22`,border:`1px solid ${T.accent}66`,borderRadius:20,padding:"2px 12px",fontSize:12,color:T.accent,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
+                🇯🇴 CLIQ — 10 دينار (3 أشهر)
               </span>
             </div>
             <button onClick={()=>setShowPaywall(true)}
-              style={{background:"white",color:T.primary,border:"none",borderRadius:6,padding:"9px 22px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0,boxShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>
-              🔓 Upgrade to Pro →
+              style={{background:T.accent,color:T.primary,border:"none",borderRadius:6,padding:"9px 22px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0,boxShadow:`0 2px 8px ${T.accent}44`}}>
+              🔓 احصل على Pro →
             </button>
           </div>
         </div>
@@ -5358,9 +5369,12 @@ export default function IELTSBot(){
               ))}
             </div>
           </div>
-          <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
-            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>© {new Date().getFullYear()} Englishfool. All rights reserved.</span>
-            <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Your Smart IELTS Writing Examiner</span>
+          <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",flexDirection:"column",gap:8}}>
+            <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+              <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>© 2025 Englishfool. All rights reserved.</span>
+              <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>منصة تقييم احترافي للآيلتس</span>
+            </div>
+            <span style={{color:"rgba(255,255,255,0.25)",fontSize:11,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl"}}>منصة Englishfool غير تابعة لـ Cambridge أو British Council أو IDP</span>
           </div>
         </div>
       </div>
@@ -5417,9 +5431,9 @@ export default function IELTSBot(){
             animation:"slideIn 0.2s ease-out"
           }} onClick={e=>e.stopPropagation()}>
             {/* Header */}
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"18px 20px",borderBottom:`1px solid ${T.border}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"18px 20px",background:T.primary,borderBottom:`1px solid rgba(255,255,255,0.1)`}}>
               <Logo size={20}/>
-              <button onClick={()=>setMenuOpen(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:T.textMuted,padding:4}}>✕</button>
+              <button onClick={()=>setMenuOpen(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"rgba(255,255,255,0.7)",padding:4}}>✕</button>
             </div>
             {/* Quick nav tabs at top of menu */}
             <div style={{display:"flex",gap:6,padding:"12px 16px",borderBottom:`1px solid ${T.border}`,flexWrap:"wrap"}}>
@@ -5478,7 +5492,7 @@ export default function IELTSBot(){
             {!proUser&&(
               <div style={{padding:"0 20px",display:"flex",flexDirection:"column",gap:8}}>
                 <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
-                  width:"100%",background:"linear-gradient(135deg,#0056d2,#0041a8)",color:"white",border:"none",
+                  width:"100%",background:T.primary,color:"white",border:"none",
                   borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,
                   cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)"
                 }}>🔓 Upgrade to Pro — $17</button>
