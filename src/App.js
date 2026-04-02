@@ -894,8 +894,8 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
         {tab==="international"&&(
           <div style={{textAlign:"center"}}>
             <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",marginBottom:16}}>
-              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$17 <span style={{fontSize:16,color:T.textMuted,fontWeight:400}}>one-time</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>One-time payment · Powered by Paddle</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$17 <span style={{fontSize:14,color:T.textMuted,fontWeight:400}}>/ 3 أشهر</span></div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>اشتراك 3 أشهر · يجدد بـ $25 · إلغاء في أي وقت</div>
             </div>
             <button onClick={()=>{
               if(window.Paddle){
@@ -908,7 +908,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
                 alert("Payment system is loading. Please try again in a moment.");
               }
             }} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:T.shadowMd}}>
-              💳 Buy Pro — $17
+              💳 احصل على Pro — $17 (3 أشهر)
             </button>
             <p style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:10,lineHeight:1.5}}>
               Secure payment via Paddle. Accepts Visa, Mastercard, PayPal, Apple Pay, Google Pay and more. Paddle is the Merchant of Record.
@@ -3844,7 +3844,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
         <div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:T.primary,color:"white",borderRadius:20,padding:"3px 16px",fontSize:11,fontWeight:700,letterSpacing:"0.05em"}}>MOST POPULAR</div>
         <div style={{fontSize:13,fontWeight:700,color:T.primary,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:12}}>Pro Plan</div>
         <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:4}}><sup style={{fontSize:20,verticalAlign:"super"}}>$</sup>17</div>
-        <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>one-time payment · lifetime access</div>
+        <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>اشتراك 3 أشهر · يجدد تلقائياً</div>
         <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
           {["Unlimited essay analyses","Complete mistake detection","Inline essay annotations","Band 8+ model responses","Progress tracker","Vocabulary upgrades from YOUR essay","Band Booster coaching","Full IELTS Toolkit access","Practice Mode with live coaching","Unlimited Grammar & Spell Checker","Graph image upload (Task 1 Academic)","6 scored model essays with commentary"].map((f,i)=>(
             <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
@@ -3854,7 +3854,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
           <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ You're on Pro — Unlimited Access</div>
         ):(
           <button onClick={onUpgrade} style={{width:"100%",background:T.primary,color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:"pointer",boxShadow:T.shadowMd}}>
-            Get Pro — $17 (one-time)
+            احصل على Pro — $17 (3 أشهر)
           </button>
         )}
       </div>
@@ -4028,46 +4028,73 @@ const IELTS_GAME_QS={
 // ─────────────────────────────────────────────────────────────
 const gameAudio={
   _ctx:null,
-  _bgNodes:[],
   _bgPlaying:false,
+  _muted:false,
+  _bgTimer:null,
   ctx(){
     if(!this._ctx){
       try{ this._ctx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){}
     }
     return this._ctx;
   },
-  note(freq,start,dur,type='square',vol=0.07){
+  note(freq,start,dur,type='sine',vol=0.07){
+    if(this._muted) return;
     const c=this.ctx(); if(!c) return;
     try{
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g); g.connect(c.destination);
+      const o=c.createOscillator(),g=c.createGain(),rev=c.createGain();
+      o.connect(g); g.connect(rev); rev.connect(c.destination);
       o.frequency.value=freq; o.type=type;
       g.gain.setValueAtTime(vol,c.currentTime+start);
       g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+start+dur);
+      rev.gain.value=0.85;
       o.start(c.currentTime+start); o.stop(c.currentTime+start+dur+0.05);
     }catch(e){}
   },
-  correct(){ [[523,0],[659,0.09],[784,0.18],[1047,0.27]].forEach(([f,t])=>this.note(f,t,0.18)); },
-  wrong(){ [[330,0],[247,0.12],[196,0.24]].forEach(([f,t])=>this.note(f,t,0.2,'sawtooth',0.06)); },
-  complete(){ [[523,0],[587,0.08],[659,0.16],[784,0.24],[1047,0.32],[784,0.44],[1047,0.52]].forEach(([f,t])=>this.note(f,t,0.22)); },
-  coin(){ this.note(988,0,0.08); this.note(1319,0.08,0.15); },
+  chord(freqs,start,dur,vol=0.05){
+    freqs.forEach(f=>this.note(f,start,dur,'sine',vol));
+  },
+  // Triumphant correct — ascending fanfare
+  correct(){
+    [[523,0,0.15],[659,0.1,0.15],[784,0.2,0.15],[1047,0.3,0.35],[784,0.32,0.25],[1047,0.5,0.4]].forEach(([f,t,d])=>this.note(f,t,d,'sine',0.08));
+  },
+  // Wrong — somber descending minor
+  wrong(){
+    [[392,0,0.25],[330,0.15,0.25],[262,0.3,0.35]].forEach(([f,t,d])=>this.note(f,t,d,'triangle',0.06));
+  },
+  // Complete — full triumphant fanfare
+  complete(){
+    const seq=[[523,0],[659,0.12],[784,0.24],[1047,0.38],[880,0.52],[1047,0.62],[1319,0.76]];
+    seq.forEach(([f,t])=>this.note(f,t,0.28,'sine',0.09));
+    [[523,659,784],].forEach(([a,b,cc])=>this.chord([a,b,cc],1.0,0.5,0.05));
+  },
+  // Background — Yanni-inspired arpeggios in C major
   startBg(){
     if(this._bgPlaying) return;
     const c=this.ctx(); if(!c) return;
     this._bgPlaying=true;
-    const melody=[392,392,0,392,0,330,392,0,440,0,0,0,220,0,0,0,
-                  294,0,0,220,0,0,165,0,0,0,220,0,0,262,0,0];
-    let step=0;
+    // Arpeggiated chord progression: C-Am-F-G
+    const progressions=[
+      [523,659,784],[440,523,659],[349,440,523],[392,494,587],
+    ];
+    let prog=0,note=0;
     const tick=()=>{
       if(!this._bgPlaying) return;
-      const f=melody[step%melody.length];
-      if(f) this.note(f,0,0.13,'square',0.04);
-      step++;
-      this._bgTimer=setTimeout(tick,180);
+      if(!this._muted){
+        const chord=progressions[prog%progressions.length];
+        const f=chord[note%chord.length];
+        this.note(f,0,0.6,'sine',0.025);
+        // Bass note every 3
+        if(note%3===0) this.note(chord[0]/2,0,0.55,'sine',0.03);
+      }
+      note++;
+      if(note%3===0) prog++;
+      this._bgTimer=setTimeout(tick,280);
     };
     tick();
   },
   stopBg(){ this._bgPlaying=false; clearTimeout(this._bgTimer); },
+  toggleMute(){ this._muted=!this._muted; return this._muted; },
+  isMuted(){ return this._muted; },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -4153,67 +4180,137 @@ function IELTSGameLobby({proUser,onSelect}){
 // ─────────────────────────────────────────────────────────────
 // IELTS GAME — COMPLETE SCREEN
 // ─────────────────────────────────────────────────────────────
-function IELTSGameComplete({answers,score,category,onReplay,onLobby}){
+function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],reviewIdx,setReviewIdx}){
   useEffect(()=>{ gameAudio.stopBg(); setTimeout(()=>gameAudio.complete(),200); },[]);
   const pct=Math.round((score/25)*100);
   const band=
-    score===25?{medal:"🏆",title:"أنت الهيرو المطلق!",sub:"درجة كاملة! أنت أكثر من جاهز للايلتس 🔥",color:"#f59e0b"}:
-    score>=20?{medal:"🌟",title:"شغل حلو! أنت على الطريق!",sub:"مستوى ممتاز — فرق صغير عن القمة، واصل!",color:"#10b981"}:
-    score>=15?{medal:"💪",title:"تقريباً وصلت!",sub:"خطوة وتكون محترف — راجع الأخطاء وكرر اللعبة",color:"#3b82f6"}:
-    score>=7?{medal:"📚",title:"يحتاج شوية شغل",sub:"ما وصلت لمستواك بعد — واصل التدريب وكرر اللعبة",color:"#f97316"}:
-    {medal:"😅",title:"لوزر! 😅",sub:"ارجع تذاكر من الأول — الدرجة 8 تحتاج أكثر من كذا!",color:"#ef4444"};
+    score===25?{medal:"🏆",title:"أنت البطل الحقيقي!",sub:"درجة كاملة! أنت أكثر من جاهز للايلتس 🔥",color:"#d4af37"}:
+    score>=20?{medal:"🌟",title:"أداء رائع جداً!",sub:"مستوى ممتاز! خطوة صغيرة وتصبح البطل",color:"#10b981"}:
+    score>=15?{medal:"💪",title:"تقريباً!",sub:"مستوى جيد — لكن لازم تراجع أكثر قبل الامتحان",color:"#3b82f6"}:
+    score>=10?{medal:"📚",title:"تحتاج شوية تدريب",sub:"ما شاء الله على البداية — كرر اللعبة وشوف الفرق",color:"#f97316"}:
+    score>=7?{medal:"😅",title:"لسّه في الطريق!",sub:"المحاولة شاطرة — بس الطريق لا يزال طويلاً، واصل!",color:"#8b5cf6"}:
+    {medal:"😢",title:"خسرت هاي المرة!",sub:"لا تيأس! كل بطل بدأ من الصفر — العب مرة ثانية 💪",color:"#ef4444"};
+  const [tab,setTab]=useState("review"); // review | history
+  // For answer review: navigate between questions
+  const [ri,setRi]=useState(0);
+  const ra=answers[ri];
+
   return(
-    <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0f172a,#1e1b4b,#0f172a)",padding:"40px 20px",display:"flex",flexDirection:"column",alignItems:"center"}}>
+    <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0a0f2e,#1e1b4b,#0a0f2e)",padding:"28px 16px",display:"flex",flexDirection:"column",alignItems:"center",fontFamily:"'Cairo',system-ui"}}>
       <div style={{maxWidth:680,width:"100%"}}>
         {/* Result header */}
-        <div style={{textAlign:"center",marginBottom:28}}>
-          <div style={{fontSize:72,marginBottom:8,animation:"celebratePop 0.6s cubic-bezier(0.16,1,0.3,1)"}}>{band.medal}</div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:"clamp(20px,3vw,28px)",color:"white",marginBottom:6,direction:"rtl"}}>{band.title}</div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(12px,1.5vw,14px)",color:"rgba(255,255,255,0.55)",direction:"rtl",marginBottom:12}}>{band.sub}</div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(36px,5vw,56px)",fontWeight:900,color:band.color,lineHeight:1}}>{score}<span style={{fontSize:"0.5em",color:"rgba(255,255,255,0.4)"}}>/25</span></div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:14,color:"rgba(255,255,255,0.4)",marginTop:4}}>{pct}% نسبة الإجابات الصحيحة</div>
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <div style={{fontSize:64,marginBottom:6,animation:"celebratePop 0.6s cubic-bezier(0.16,1,0.3,1)"}}>{band.medal}</div>
+          <div style={{fontWeight:900,fontSize:"clamp(18px,3vw,26px)",color:"white",marginBottom:5,direction:"rtl"}}>{band.title}</div>
+          <div style={{fontSize:"clamp(12px,1.4vw,14px)",color:"rgba(255,255,255,0.5)",direction:"rtl",marginBottom:10}}>{band.sub}</div>
+          <div style={{fontSize:"clamp(32px,5vw,52px)",fontWeight:900,color:band.color,lineHeight:1}}>{score}<span style={{fontSize:"0.5em",color:"rgba(255,255,255,0.3)"}}>/25</span></div>
         </div>
-
         {/* Progress bar */}
-        <div style={{background:"rgba(255,255,255,0.1)",borderRadius:50,height:12,marginBottom:24,overflow:"hidden"}}>
-          <div style={{height:"100%",background:`linear-gradient(90deg,${band.color},${band.color}bb)`,width:`${pct}%`,borderRadius:50,transition:"width 1.2s cubic-bezier(0.22,1,0.36,1)",boxShadow:`0 0 10px ${band.color}88`}}/>
+        <div style={{background:"rgba(255,255,255,0.08)",borderRadius:50,height:10,marginBottom:18,overflow:"hidden"}}>
+          <div style={{height:"100%",background:band.color,width:`${pct}%`,borderRadius:50,transition:"width 1.2s cubic-bezier(0.22,1,0.36,1)",boxShadow:`0 0 10px ${band.color}88`}}/>
         </div>
-
-        {/* Stats row */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:20}}>
+        {/* Stats */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:18}}>
           {[[`${score}✅`,"صحيح"],[`${25-score}❌`,"خطأ"],[`${pct}%`,"نسبتك"]].map(([val,lbl])=>(
-            <div key={lbl} style={{background:"rgba(255,255,255,0.07)",borderRadius:14,padding:"14px 10px",textAlign:"center",border:"1px solid rgba(255,255,255,0.1)"}}>
-              <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:20,color:"white",marginBottom:4}}>{val}</div>
-              <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.4)"}}>{lbl}</div>
+            <div key={lbl} style={{background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"12px 8px",textAlign:"center",border:"1px solid rgba(255,255,255,0.08)"}}>
+              <div style={{fontWeight:900,fontSize:18,color:"white",marginBottom:3}}>{val}</div>
+              <div style={{fontSize:11,color:"rgba(255,255,255,0.4)"}}>{lbl}</div>
             </div>
           ))}
         </div>
+        {/* Tabs: Review / History */}
+        <div style={{display:"flex",gap:6,marginBottom:14}}>
+          {[["review","📋 مراجعة الإجابات"],["history","📈 سجل تقدمك"]].map(([t,l])=>(
+            <button key={t} onClick={()=>setTab(t)} style={{flex:1,background:tab===t?"rgba(212,175,55,0.2)":"rgba(255,255,255,0.04)",border:tab===t?"1.5px solid #d4af37":"1px solid rgba(255,255,255,0.1)",borderRadius:10,padding:"10px",fontFamily:"'Cairo',system-ui",fontWeight:tab===t?700:500,fontSize:13,color:tab===t?"#d4af37":"rgba(255,255,255,0.5)",cursor:"pointer",direction:"rtl"}}>{l}</button>
+          ))}
+        </div>
 
-        {/* Answer review with explanations */}
-        <div style={{background:"rgba(255,255,255,0.06)",borderRadius:16,padding:"18px",marginBottom:22,maxHeight:320,overflowY:"auto",border:"1px solid rgba(255,255,255,0.1)"}}>
-          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,color:"white",marginBottom:12,textAlign:"center",fontSize:14,direction:"rtl"}}>📋 مراجعة إجاباتك</div>
-          {answers.map((a,i)=>(
-            <div key={i} style={{marginBottom:9,padding:"10px 12px",background:a.ok?"rgba(16,185,129,0.08)":"rgba(239,68,68,0.08)",borderRadius:10,border:`1px solid ${a.ok?"rgba(16,185,129,0.25)":"rgba(239,68,68,0.25)"}`,direction:"rtl"}}>
-              <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
-                <span style={{fontSize:15,flexShrink:0,marginTop:1}}>{a.ok?"✅":"❌"}</span>
-                <div style={{flex:1}}>
-                  <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.6)",marginBottom:a.ok?0:4,lineHeight:1.4}}>{a.q}</div>
-                  {!a.ok&&<div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"#fbbf24",fontWeight:700,marginBottom:a.exp?4:0}}>✓ {a.correct}</div>}
-                  {!a.ok&&a.exp&&<div style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"#fde68a",background:"rgba(251,191,36,0.08)",borderRadius:6,padding:"4px 8px",lineHeight:1.5}}>💡 {a.exp}</div>}
-                </div>
+        {/* ── REVIEW TAB ── with prev/next navigation */}
+        {tab==="review"&&answers.length>0&&(
+          <div style={{background:"rgba(255,255,255,0.05)",borderRadius:16,padding:"16px",border:"1px solid rgba(255,255,255,0.08)",marginBottom:18}}>
+            {/* Navigator */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,direction:"rtl"}}>
+              <div style={{display:"flex",gap:4,flexWrap:"wrap",flex:1,justifyContent:"flex-start"}}>
+                {answers.map((a,i)=>(
+                  <button key={i} onClick={()=>setRi(i)} style={{width:26,height:26,borderRadius:6,border:"none",cursor:"pointer",fontWeight:800,fontSize:10,
+                    background:ri===i?(a.ok?"#10b981":"#ef4444"):a.ok?"rgba(16,185,129,0.2)":"rgba(239,68,68,0.2)",
+                    color:ri===i?"white":a.ok?"#6ee7b7":"#fca5a5",
+                    boxShadow:ri===i?"0 0 0 2px white":""}}>{i+1}</button>
+                ))}
+              </div>
+              <div style={{fontSize:12,color:"rgba(255,255,255,0.4)",flexShrink:0,marginRight:8}}>
+                {ri+1}/{answers.length}
               </div>
             </div>
-          ))}
-        </div>
+            {/* Current answer card */}
+            {ra&&(
+              <div style={{background:ra.ok?"rgba(16,185,129,0.08)":"rgba(239,68,68,0.08)",borderRadius:12,padding:"14px",border:`1px solid ${ra.ok?"rgba(16,185,129,0.25)":"rgba(239,68,68,0.25)"}`,direction:"rtl"}}>
+                <div style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:10}}>
+                  <span style={{fontSize:16,flexShrink:0}}>{ra.ok?"✅":"❌"}</span>
+                  <div style={{fontWeight:700,fontSize:"clamp(12px,1.4vw,14px)",color:"rgba(255,255,255,0.9)",lineHeight:1.5}}>{ra.q}</div>
+                </div>
+                {/* All options shown with highlights */}
+                <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:ra.exp&&!ra.ok?10:0}}>
+                  {ra.opts&&ra.opts.map((opt,oi)=>{
+                    let bg="rgba(255,255,255,0.04)",border="1px solid rgba(255,255,255,0.1)",col="rgba(255,255,255,0.6)";
+                    if(oi===ra.correct){bg="rgba(16,185,129,0.2)";border="1.5px solid #10b981";col="#6ee7b7";}
+                    else if(oi===ra.chosen&&!ra.ok){bg="rgba(239,68,68,0.15)";border="1.5px solid #ef4444";col="#fca5a5";}
+                    return(
+                      <div key={oi} style={{background:bg,border,borderRadius:8,padding:"8px 12px",display:"flex",gap:8,alignItems:"center"}}>
+                        <span style={{color:"#d4af37",fontSize:11,fontWeight:700,width:16,flexShrink:0}}>{["أ","ب","ج","د"][oi]}</span>
+                        <span style={{fontSize:"clamp(11px,1.3vw,13px)",color:col,fontWeight:oi===ra.correct?700:400}}>{opt}</span>
+                        {oi===ra.correct&&<span style={{marginRight:"auto",fontSize:12}}>✓</span>}
+                        {oi===ra.chosen&&!ra.ok&&<span style={{marginRight:"auto",fontSize:12}}>✗</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+                {!ra.ok&&ra.exp&&(
+                  <div style={{background:"rgba(212,175,55,0.08)",border:"1px solid rgba(212,175,55,0.25)",borderRadius:8,padding:"8px 12px",fontSize:"clamp(11px,1.2vw,13px)",color:"#fde68a",lineHeight:1.5}}>💡 {ra.exp}</div>
+                )}
+              </div>
+            )}
+            {/* Prev / Next buttons */}
+            <div style={{display:"flex",gap:8,marginTop:12,justifyContent:"center"}}>
+              <button onClick={()=>setRi(r=>Math.max(0,r-1))} disabled={ri===0} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:10,padding:"9px 20px",color:ri===0?"rgba(255,255,255,0.2)":"white",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:13,cursor:ri===0?"not-allowed":"pointer"}}>→ السابق</button>
+              <button onClick={()=>setRi(r=>Math.min(answers.length-1,r+1))} disabled={ri===answers.length-1} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:10,padding:"9px 20px",color:ri===answers.length-1?"rgba(255,255,255,0.2)":"white",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:13,cursor:ri===answers.length-1?"not-allowed":"pointer"}}>← التالي</button>
+            </div>
+          </div>
+        )}
 
-        {/* Buttons */}
-        <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-          <button onClick={onReplay} style={{background:band.color,border:"none",borderRadius:14,padding:"14px 28px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:15,color:"white",cursor:"pointer",boxShadow:`0 4px 16px ${band.color}55`,transition:"opacity 0.2s"}}
+        {/* ── HISTORY TAB ── */}
+        {tab==="history"&&(
+          <div style={{background:"rgba(255,255,255,0.05)",borderRadius:16,padding:"16px",border:"1px solid rgba(255,255,255,0.08)",marginBottom:18,maxHeight:300,overflowY:"auto"}}>
+            {history.length===0?(
+              <div style={{textAlign:"center",color:"rgba(255,255,255,0.3)",padding:"24px",direction:"rtl"}}>لم تلعب أي لعبة بعد — هذه هي أولى جلساتك! 🎮</div>
+            ):(
+              <>
+                <div style={{fontWeight:700,color:"rgba(255,255,255,0.6)",fontSize:12,marginBottom:10,direction:"rtl",textAlign:"center"}}>آخر {history.length} جلسة</div>
+                {history.map((h,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px",background:"rgba(255,255,255,0.04)",borderRadius:10,marginBottom:7,border:"1px solid rgba(255,255,255,0.06)",direction:"rtl"}}>
+                    <div>
+                      <div style={{fontWeight:700,fontSize:13,color:"white"}}>{h.catName}</div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",marginTop:2}}>{h.date}</div>
+                    </div>
+                    <div style={{textAlign:"center"}}>
+                      <div style={{fontWeight:900,fontSize:20,color:h.score>=20?"#d4af37":h.score>=15?"#10b981":h.score>=10?"#3b82f6":"#ef4444"}}>{h.score}<span style={{fontSize:12,color:"rgba(255,255,255,0.3)"}}>/{h.total}</span></div>
+                      <div style={{fontSize:10,color:"rgba(255,255,255,0.3)"}}>{Math.round((h.score/h.total)*100)}%</div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+          <button onClick={onReplay} style={{background:band.color,border:"none",borderRadius:14,padding:"13px 24px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:14,color:band.color==="#d4af37"?"#0f172a":"white",cursor:"pointer",boxShadow:`0 4px 14px ${band.color}44`,transition:"opacity 0.2s"}}
             onMouseOver={e=>e.currentTarget.style.opacity="0.85"} onMouseOut={e=>e.currentTarget.style.opacity="1"}>
             🔄 العب مرة ثانية
           </button>
-          <button onClick={onLobby} style={{background:"rgba(255,255,255,0.1)",border:"1.5px solid rgba(255,255,255,0.2)",borderRadius:14,padding:"14px 28px",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:15,color:"white",cursor:"pointer",transition:"background 0.2s"}}
-            onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.18)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.1)"}>
+          <button onClick={onLobby} style={{background:"rgba(255,255,255,0.08)",border:"1.5px solid rgba(255,255,255,0.18)",borderRadius:14,padding:"13px 24px",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:14,color:"white",cursor:"pointer",transition:"background 0.2s"}}
+            onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.15)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.08)"}>
             🎮 اختر لعبة ثانية
           </button>
         </div>
@@ -4223,81 +4320,80 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby}){
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// IELTS GAME — MAIN GAME SCREEN
-// ─────────────────────────────────────────────────────────────
 function IELTSGame({proUser,onNavigate}){
   const [screen,setScreen]=useState("lobby");
   const [cat,setCat]=useState(null);
   const [qIdx,setQIdx]=useState(0);
-  const [gState,setGState]=useState("running"); // running|question
+  const [gState,setGState]=useState("running");
   const [chosen,setChosen]=useState(null);
   const [correct,setCorrect]=useState(null);
   const [score,setScore]=useState(0);
   const [lives,setLives]=useState(3);
   const [answers,setAnswers]=useState([]);
-  const [blockKey,setBlockKey]=useState(0); // remount block to re-trigger animation
+  const [blockKey,setBlockKey]=useState(0);
+  const [muted,setMuted]=useState(false);
+  const [paused,setPaused]=useState(false);
+  const [reviewIdx,setReviewIdx]=useState(null);
+  const getHistory=()=>{try{return JSON.parse(localStorage.getItem("ef_game_history")||"[]");}catch{return[];}};
+  const saveHistory=(entry)=>{try{const h=getHistory();h.unshift(entry);localStorage.setItem("ef_game_history",JSON.stringify(h.slice(0,50)));}catch{}};
 
   const qs=cat?IELTS_GAME_QS[cat.id]:[];
   const cq=qs[qIdx]||qs[0];
 
-  // Background music
   useEffect(()=>{
-    if(screen==="playing") gameAudio.startBg();
+    if(screen==="playing"&&!paused) gameAudio.startBg();
     else gameAudio.stopBg();
     return()=>gameAudio.stopBg();
-  },[screen]);
+  },[screen,paused]);
 
-  const startGame=(c)=>{
-    setCat(c); setScreen("intro");
-  };
+  const toggleMute=()=>{ const m=gameAudio.toggleMute(); setMuted(m); };
+  const togglePause=()=>setPaused(p=>!p);
+  const startGame=(c)=>{ setCat(c); setScreen("intro"); };
 
   const beginPlaying=()=>{
-    setScreen("playing"); setQIdx(0);
-    setScore(0); setLives(3); setAnswers([]);
-    setChosen(null); setCorrect(null); setGState("running");
-    setBlockKey(k=>k+1);
+    setScreen("playing"); setQIdx(0); setScore(0); setLives(3);
+    setAnswers([]); setChosen(null); setCorrect(null);
+    setGState("running"); setBlockKey(k=>k+1); setPaused(false);
   };
 
   const handleAnswer=(i)=>{
-    if(chosen!==null) return;
+    if(chosen!==null||paused) return;
     setChosen(i);
     const ok=i===cq.a;
     setCorrect(ok);
-    if(ok){ gameAudio.correct(); setScore(s=>s+1); }
-    else{ gameAudio.wrong(); setLives(l=>l-1); }
-    const nextLives=ok?lives:lives-1;
-    setAnswers(a=>[...a,{q:cq.q,chosen:cq.opts[i],correct:cq.opts[cq.a],exp:cq.exp||"",ok}]);
+    if(ok) gameAudio.correct(); else gameAudio.wrong();
+    const newLives=ok?lives:lives-1;
+    if(!ok) setLives(l=>l-1);
+    if(ok) setScore(s=>s+1);
+    const newAnswers=[...answers,{q:cq.q,opts:cq.opts,chosen:i,correct:cq.a,correctText:cq.opts[cq.a],exp:cq.exp||"",ok}];
+    setAnswers(newAnswers);
     setTimeout(()=>{
       setChosen(null); setCorrect(null);
-      if(qIdx+1>=25||nextLives<=0){ setScreen("complete"); }
-      else{ setQIdx(j=>j+1); setGState("running"); setBlockKey(k=>k+1); }
-    },1400);
+      if(qIdx+1>=25||newLives<=0){
+        const entry={cat:cat.id,catName:cat.arabic,score:ok?score+1:score,total:qIdx+1,date:new Date().toLocaleDateString("ar-SA"),ts:Date.now()};
+        saveHistory(entry);
+        setScreen("complete");
+      } else { setQIdx(j=>j+1); setGState("running"); setBlockKey(k=>k+1); }
+    },1500);
   };
 
   if(screen==="lobby") return <IELTSGameLobby proUser={proUser} onSelect={startGame}/>;
 
-  // ── INTRO SCREEN ──
   if(screen==="intro"&&cat) return(
-    <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0f172a,#1e1b4b)",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"'Cairo',system-ui"}}>
+    <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0a0f2e,#1e1b4b)",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"'Cairo',system-ui"}}>
       <div style={{maxWidth:480,width:"100%",background:"rgba(255,255,255,0.07)",border:`2px solid ${cat.color}55`,borderRadius:24,padding:"36px 32px",textAlign:"center",boxShadow:`0 0 60px ${cat.color}22`}}>
         <div style={{fontSize:56,marginBottom:12}}>{cat.emoji}</div>
         <div style={{fontWeight:900,fontSize:"clamp(20px,3vw,28px)",color:"white",marginBottom:6,direction:"rtl"}}>{cat.arabic}</div>
-        <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",marginBottom:28,direction:"rtl"}}>جاهز للتحدي؟ إليك القواعد أولاً:</div>
-        <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:32,direction:"rtl"}}>
-          {[
-            ["🎯","25 سؤال في كل لعبة"],
-            ["❤️","لديك 3 أخطاء فقط — بعدها Game Over"],
-            ["🏃","الشخصية تمشي نحو لوحة السؤال تلقائياً"],
-            ["💡","إجابات خاطئة؟ ستجد شرح لها في النهاية"],
-          ].map(([ic,txt])=>(
-            <div key={txt} style={{display:"flex",alignItems:"center",gap:12,background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"12px 16px"}}>
-              <span style={{fontSize:22,flexShrink:0}}>{ic}</span>
-              <span style={{fontWeight:600,fontSize:14,color:"rgba(255,255,255,0.85)"}}>{txt}</span>
+        <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",marginBottom:28,direction:"rtl"}}>جاهز للتحدي؟ إليك القواعد:</div>
+        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:28,direction:"rtl"}}>
+          {[["🎯","25 سؤال في كل لعبة"],["❤️","3 أخطاء فقط — بعدها Game Over"],["🏃","اللوحة تأتي إليك تلقائياً"],["🔇","يمكنك كتم الموسيقى في أي وقت"],["⏸️","يمكنك إيقاف اللعبة مؤقتاً والعودة لها"],["💡","شرح الإجابات الخاطئة في النهاية"]].map(([ic,txt])=>(
+            <div key={txt} style={{display:"flex",alignItems:"center",gap:12,background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"10px 14px"}}>
+              <span style={{fontSize:18,flexShrink:0}}>{ic}</span>
+              <span style={{fontWeight:600,fontSize:13,color:"rgba(255,255,255,0.85)"}}>{txt}</span>
             </div>
           ))}
         </div>
-        <button onClick={beginPlaying} style={{width:"100%",background:cat.color,border:"none",borderRadius:14,padding:"16px",fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:17,color:"white",cursor:"pointer",boxShadow:`0 6px 20px ${cat.color}55`,transition:"transform 0.15s,opacity 0.15s"}}
+        <button onClick={beginPlaying} style={{width:"100%",background:cat.color,border:"none",borderRadius:14,padding:"16px",fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:17,color:"white",cursor:"pointer",boxShadow:`0 6px 20px ${cat.color}55`,transition:"transform 0.15s"}}
           onMouseOver={e=>e.currentTarget.style.transform="scale(1.03)"} onMouseOut={e=>e.currentTarget.style.transform="scale(1)"}>
           🚀 ابدأ اللعبة!
         </button>
@@ -4306,206 +4402,159 @@ function IELTSGame({proUser,onNavigate}){
     </div>
   );
 
-  if(screen==="complete") return <IELTSGameComplete answers={answers} score={score} category={cat} onReplay={()=>{setCat(cat);setScreen("intro");}} onLobby={()=>setScreen("lobby")}/>;
+  if(screen==="complete") return <IELTSGameComplete answers={answers} score={score} category={cat} reviewIdx={reviewIdx} setReviewIdx={setReviewIdx} onReplay={()=>{setCat(cat);setScreen("intro");}} onLobby={()=>setScreen("lobby")} history={getHistory()}/>;
 
-  // Cloud positions
-  const clouds=[{top:"10%",speed:22,delay:0},{top:"20%",speed:28,delay:8},{top:"6%",speed:18,delay:15}];
+  const stars=Array.from({length:55},(_,i)=>({x:(i*37+13)%100,y:(i*53+7)%55,r:i%7===0?3.5:i%3===0?2.5:1.5,dur:2+(i%4)*0.7,delay:i%5*0.4}));
 
   return(
     <div style={{position:"relative",height:"calc(100vh - 64px)",overflow:"hidden",userSelect:"none",fontFamily:"'Cairo',system-ui"}}>
-
-      {/* ── SKY ── */}
-      <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,#1a1a6e 0%,#4a5fcf 30%,#7aa3e8 65%,#a8c8f0 100%)"}}/>
-
-      {/* ── CLOUDS ── */}
-      {clouds.map((cl,i)=>(
-        <div key={i} style={{position:"absolute",top:cl.top,zIndex:1,animation:`cloudDrift ${cl.speed}s linear ${cl.delay}s infinite`}}>
-          <div style={{background:"rgba(255,255,255,0.85)",borderRadius:50,padding:"10px 24px",boxShadow:"0 4px 12px rgba(0,0,0,0.08)",fontSize:0,display:"flex",alignItems:"center",gap:0}}>
-            <div style={{width:30,height:20,background:"white",borderRadius:"50%",marginRight:-8}}/>
-            <div style={{width:50,height:30,background:"white",borderRadius:"50%"}}/>
-            <div style={{width:25,height:18,background:"white",borderRadius:"50%",marginLeft:-8}}/>
+      {/* Van Gogh Night Sky */}
+      <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,#0a0f2e 0%,#0d1a4a 20%,#1a2a6c 45%,#253b7e 60%,#2d5016 76%,#1a3a0d 100%)"}}/>
+      <svg style={{position:"absolute",inset:0,width:"100%",height:"62%",opacity:0.3,pointerEvents:"none"}} viewBox="0 0 100 60" preserveAspectRatio="none">
+        {["M10 30 Q25 10 40 30 Q55 50 70 30","M20 20 Q40 0 60 20 Q80 40 100 20","M0 40 Q20 20 40 40 Q60 60 80 40"].map((d,i)=>(
+          <path key={i} d={d} stroke={["#d4af37","#7aa7e0","#c8b8f0"][i]} strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+        ))}
+        <circle cx="78" cy="12" r="7" fill="#fef9c3" opacity="0.95"/>
+        <circle cx="75" cy="11" r="6.5" fill="#fdf6a0" opacity="0.55"/>
+        {[10,14,18].map((r,i)=><circle key={i} cx="78" cy="12" r={r} fill="none" stroke="#d4af37" strokeWidth="0.4" opacity={0.28-i*0.07}/>)}
+      </svg>
+      {stars.map((s,i)=>(
+        <div key={i} style={{position:"absolute",left:`${s.x}%`,top:`${s.y}%`,width:s.r*2,height:s.r*2,borderRadius:"50%",background:i%5===0?"#fef9c3":i%3===0?"#c8d8f8":"white",boxShadow:s.r>2?`0 0 ${s.r*4}px ${s.r}px ${i%5===0?"#d4af37aa":"#7aa7e055"}`:"none",animation:`twinkle ${s.dur}s ease-in-out ${s.delay}s infinite alternate`,pointerEvents:"none",zIndex:1}}/>
+      ))}
+      <svg style={{position:"absolute",bottom:72,left:0,right:0,width:"100%",height:100,pointerEvents:"none",zIndex:2}} viewBox="0 0 400 100" preserveAspectRatio="none">
+        <path d="M0 80 Q50 40 100 60 Q150 80 200 50 Q250 20 300 55 Q350 80 400 60 L400 100 L0 100Z" fill="#1e4a10" opacity="0.85"/>
+        <path d="M0 90 Q60 65 120 75 Q180 85 240 65 Q300 45 360 70 L400 75 L400 100 L0 100Z" fill="#2d5016"/>
+        {[60,160,280,340].map((x,i)=><ellipse key={i} cx={x} cy={60-(i%2)*10} rx={5} ry={22-(i%2)*4} fill="#0f3d0a" opacity="0.9"/>)}
+      </svg>
+      {/* Ground */}
+      <div style={{position:"absolute",bottom:0,left:0,right:0,height:72,zIndex:3}}>
+        <div style={{height:10,background:"#3a6b1a",borderTop:"2px solid rgba(212,175,55,0.3)"}}/>
+        <div style={{height:62,background:"linear-gradient(180deg,#1e3d0d,#0f2008)"}}/>
+        <div style={{position:"absolute",top:10,left:0,right:0,height:6,overflow:"hidden"}}>
+          <div style={{display:"flex",gap:0,animation:"groundScroll2 0.8s linear infinite",whiteSpace:"nowrap"}}>
+            {Array.from({length:40}).map((_,i)=><div key={i} style={{width:32,height:3,background:i%2===0?"rgba(212,175,55,0.45)":"transparent",marginRight:20,flexShrink:0,borderRadius:2}}/>)}
           </div>
         </div>
-      ))}
-
-      {/* ── DISTANT HILLS ── */}
-      <div style={{position:"absolute",bottom:72,left:0,right:0,zIndex:2,height:90,display:"flex",alignItems:"flex-end",gap:-20,animation:"hillScroll 12s linear infinite"}}>
-        {Array.from({length:8}).map((_,i)=>(
-          <div key={i} style={{width:200,height:70+i%3*20,background:"#2d5016",borderRadius:"50% 50% 0 0",flexShrink:0,marginRight:-30,opacity:0.6}}/>
-        ))}
       </div>
-
-      {/* ── GROUND ── */}
-      <div style={{position:"absolute",bottom:0,left:0,right:0,height:72,zIndex:3}}>
-        <div style={{height:12,background:"#4ade80",borderTop:"3px solid #86efac",animation:"groundScroll2 2s linear infinite"}}/>
-        <div style={{height:60,background:"#1a3a0d"}}/>
-      </div>
-
-      {/* ── ROAD MARKINGS — shows movement ── */}
-      <div style={{position:"absolute",bottom:68,left:0,right:0,zIndex:4,height:8,overflow:"hidden",pointerEvents:"none"}}>
-        <div style={{display:"flex",gap:0,animation:"groundScroll2 1s linear infinite",whiteSpace:"nowrap"}}>
-          {Array.from({length:30}).map((_,i)=>(
-            <div key={i} style={{width:40,height:4,background:i%2===0?"rgba(255,255,255,0.4)":"transparent",marginRight:20,flexShrink:0,borderRadius:2}}/>
-          ))}
-        </div>
-      </div>
-
-      {/* ── WALKING QUESTION WALL ── slides from right, triggers question on arrival */}
-      {gState==="running"&&(
-        <div key={blockKey} style={{position:"absolute",bottom:72,zIndex:6,animation:"blockWalkIn 3s linear forwards"}}
-          onAnimationEnd={()=>setGState("question")}>
+      {/* Walking question wall */}
+      {gState==="running"&&!paused&&(
+        <div key={blockKey} style={{position:"absolute",bottom:72,zIndex:6,animation:"blockWalkIn 1.6s linear forwards"}} onAnimationEnd={()=>setGState("question")}>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-            {/* Floating ? block above wall */}
-            <div style={{background:"#fbbf24",border:"3px solid #92400e",borderRadius:8,width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:24,color:"#92400e",boxShadow:"0 4px 16px rgba(0,0,0,0.4)",animation:"blockBounce 0.5s ease-in-out infinite",marginBottom:4}}>?</div>
-            {/* Brick wall */}
+            <div style={{background:"#d4af37",border:"3px solid #92400e",borderRadius:8,width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:24,color:"#0f172a",boxShadow:"0 4px 20px rgba(212,175,55,0.8)",animation:"blockBounce 0.5s ease-in-out infinite",marginBottom:4}}>?</div>
             <div style={{display:"flex",flexDirection:"column",gap:1}}>
               {Array.from({length:4}).map((_,row)=>(
                 <div key={row} style={{display:"flex",gap:1}}>
-                  {Array.from({length:3}).map((_,col)=>(
-                    <div key={col} style={{width:14,height:11,background:row%2===0&&col===1?"#b45309":"#ca8a04",border:"1px solid #92400e",borderRadius:1}}/>
-                  ))}
+                  {Array.from({length:3}).map((_,col)=><div key={col} style={{width:14,height:11,background:row%2===0&&col===1?"#1e3a5f":"#2d5a8e",border:"1px solid #0f2a4f",borderRadius:1}}/>)}
                 </div>
               ))}
             </div>
           </div>
         </div>
       )}
-      {/* Static background pipes for decoration */}
-      <div style={{position:"absolute",bottom:72,left:0,right:0,zIndex:2,height:60,overflow:"hidden",pointerEvents:"none"}}>
-        {[{left:"70%",h:40},{left:"85%",h:30}].map((p,i)=>(
-          <div key={i} style={{position:"absolute",bottom:0,left:p.left,width:22,height:p.h,background:"#16a34a",border:"3px solid #15803d",borderRadius:"4px 4px 0 0",opacity:0.7}}>
-            <div style={{position:"absolute",top:-9,left:-4,right:-4,height:12,background:"#16a34a",border:"3px solid #15803d",borderRadius:3}}/>
-          </div>
-        ))}
-      </div>
-
-      {/* ── CHARACTER ── */}
-      <div style={{
-        position:"absolute",bottom:72,left:"18%",zIndex:10,
-        animation:gState==="running"?"charBob 0.45s ease-in-out infinite":"charThink 1.2s ease-in-out infinite",
-        transition:"filter 0.3s",
-        filter:gState==="question"?"drop-shadow(0 0 10px #fbbf24)":"none",
-      }}>
-        {/* Body */}
+      {/* Character */}
+      <div style={{position:"absolute",bottom:72,left:"18%",zIndex:10,animation:paused?"none":gState==="running"?"charBob 0.45s ease-in-out infinite":"charThink 1.2s ease-in-out infinite",filter:gState==="question"?"drop-shadow(0 0 12px #d4af37)":"none",transition:"filter 0.3s"}}>
         <div style={{position:"relative",display:"flex",flexDirection:"column",alignItems:"center",gap:0}}>
-          {/* Question mark bubble */}
-          {gState==="question"&&(
-            <div style={{position:"absolute",top:-44,left:"50%",transform:"translateX(-50%)",background:"white",borderRadius:12,padding:"4px 10px",fontSize:16,fontWeight:900,color:cat.color,border:`2px solid ${cat.color}`,animation:"qBubble 0.8s ease-in-out infinite",whiteSpace:"nowrap",boxShadow:"0 4px 12px rgba(0,0,0,0.2)"}}>
-              ؟
-            </div>
-          )}
-          {/* Coin burst */}
-          {correct===true&&<div style={{position:"absolute",top:-20,left:"50%",transform:"translateX(-50%)",fontSize:20,animation:"coinBurst 0.5s ease-out forwards"}}>🪙</div>}
-          {/* Character sprite */}
+          {gState==="question"&&<div style={{position:"absolute",top:-44,left:"50%",transform:"translateX(-50%)",background:"white",borderRadius:12,padding:"4px 10px",fontSize:16,fontWeight:900,color:cat.color,border:`2px solid ${cat.color}`,animation:"qBubble 0.8s ease-in-out infinite",whiteSpace:"nowrap",boxShadow:"0 4px 12px rgba(0,0,0,0.3)"}}>؟</div>}
+          {correct===true&&<div style={{position:"absolute",top:-20,left:"50%",transform:"translateX(-50%)",fontSize:20,animation:"coinBurst 0.5s ease-out forwards"}}>⭐</div>}
           <div style={{fontSize:0,lineHeight:0}}>
-            {/* Hat */}
-            <div style={{width:28,height:10,background:cat?cat.color:"#dc2626",borderRadius:"4px 4px 0 0",margin:"0 auto",marginBottom:-2}}/>
-            <div style={{width:36,height:6,background:cat?cat.color:"#dc2626",borderRadius:2,margin:"0 auto"}}/>
+            <div style={{width:28,height:10,background:cat?cat.color:"#1e3a5f",borderRadius:"4px 4px 0 0",margin:"0 auto",marginBottom:-2}}/>
+            <div style={{width:36,height:6,background:cat?cat.color:"#1e3a5f",borderRadius:2,margin:"0 auto"}}/>
           </div>
-          {/* Face */}
-          <div style={{width:34,height:30,background:"#fde68a",borderRadius:"50% 50% 40% 40%",position:"relative",border:"2px solid #d97706",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>
-            {gState==="question"?"🤔":correct===true?"😄":correct===false?"😬":"😊"}
+          <div style={{width:34,height:30,background:"#fde68a",borderRadius:"50% 50% 40% 40%",border:"2px solid #d97706",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>
+            {paused?"😴":gState==="question"?"🤔":correct===true?"😄":correct===false?"😬":"😊"}
           </div>
-          {/* Body */}
-          <div style={{width:30,height:28,background:cat?cat.color:"#dc2626",border:`2px solid ${cat?cat.color+"bb":"#991b1b"}`,borderRadius:4}}/>
-          {/* Legs */}
+          <div style={{width:30,height:28,background:cat?cat.color:"#1e3a5f",border:`2px solid ${cat?(cat.color+"bb"):"#152a45"}`,borderRadius:4}}/>
           <div style={{display:"flex",gap:4,marginTop:1}}>
-            <div style={{width:12,height:20,background:"#1e40af",borderRadius:"0 0 3px 3px",animation:gState==="running"?"legL 0.45s ease-in-out infinite":"none",transformOrigin:"top center"}}/>
-            <div style={{width:12,height:20,background:"#1e40af",borderRadius:"0 0 3px 3px",animation:gState==="running"?"legR 0.45s ease-in-out infinite 0.225s":"none",transformOrigin:"top center"}}/>
+            <div style={{width:12,height:20,background:"#1e3a5f",borderRadius:"0 0 3px 3px",animation:(!paused&&gState==="running")?"legL 0.45s ease-in-out infinite":"none",transformOrigin:"top center"}}/>
+            <div style={{width:12,height:20,background:"#1e3a5f",borderRadius:"0 0 3px 3px",animation:(!paused&&gState==="running")?"legR 0.45s ease-in-out infinite 0.225s":"none",transformOrigin:"top center"}}/>
           </div>
         </div>
       </div>
-
-      {/* ── HUD ── */}
-      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:20,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)"}}>
-        <div style={{display:"flex",gap:4,alignItems:"center"}}>
-          {Array.from({length:3}).map((_,i)=><span key={i} style={{fontSize:20,opacity:i<lives?1:0.2}}>❤️</span>)}
+      {/* HUD */}
+      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:20,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 14px",background:"rgba(10,15,46,0.8)",backdropFilter:"blur(8px)",borderBottom:"1px solid rgba(212,175,55,0.2)"}}>
+        <div style={{display:"flex",gap:3,alignItems:"center"}}>
+          {Array.from({length:3}).map((_,i)=><span key={i} style={{fontSize:18,opacity:i<lives?1:0.2}}>❤️</span>)}
         </div>
-        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,mx:16}}>
-          <div style={{color:"white",fontWeight:700,fontSize:"clamp(11px,1.5vw,13px)",direction:"rtl"}}>{cat.arabic} · سؤال {qIdx+1} من ٢٥</div>
-          <div style={{width:"min(280px,50vw)",height:5,background:"rgba(255,255,255,0.15)",borderRadius:50,overflow:"hidden"}}>
-            <div style={{height:"100%",background:"#4ade80",width:`${((qIdx)/25)*100}%`,transition:"width 0.5s",borderRadius:50}}/>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,padding:"0 10px"}}>
+          <div style={{color:"rgba(255,255,255,0.9)",fontWeight:700,fontSize:"clamp(10px,1.3vw,12px)",direction:"rtl"}}>{cat.arabic} · سؤال {qIdx+1} من ٢٥</div>
+          <div style={{width:"min(220px,42vw)",height:4,background:"rgba(255,255,255,0.1)",borderRadius:50,overflow:"hidden"}}>
+            <div style={{height:"100%",background:"#d4af37",width:`${(qIdx/25)*100}%`,transition:"width 0.5s",borderRadius:50}}/>
           </div>
         </div>
-        <div style={{color:"#fbbf24",fontWeight:800,fontSize:"clamp(14px,2vw,18px)",display:"flex",alignItems:"center",gap:4}}>
-          ⭐ {score}
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{color:"#d4af37",fontWeight:800,fontSize:"clamp(13px,1.8vw,16px)"}}>⭐{score}</div>
+          <button onClick={toggleMute} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{muted?"🔇":"🔊"}</button>
+          <button onClick={togglePause} style={{background:paused?"#d4af37":"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:paused?"#0f172a":"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{paused?"▶":"⏸"}</button>
         </div>
       </div>
-
-      {/* ── QUESTION PANEL ── */}
-      {gState==="question"&&(
-        <div style={{
-          position:"absolute",bottom:72,left:"4%",right:"4%",zIndex:30,
-          background:"white",borderRadius:"20px 20px 0 0",
-          boxShadow:"0 -6px 40px rgba(0,0,0,0.35)",
-          animation:"panelSlideUp 0.4s cubic-bezier(0.16,1,0.3,1)",
-          padding:"20px 20px 16px",
-        }}>
-          {/* Q header */}
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,direction:"rtl"}}>
-            <div style={{background:cat.color,color:"white",borderRadius:50,width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,flexShrink:0}}>
-              {qIdx+1}
-            </div>
-            <div style={{fontWeight:800,fontSize:"clamp(13px,1.8vw,16px)",color:"#1f2937",flex:1,direction:"rtl",textAlign:"right",lineHeight:1.4}}>
-              {cq.q}
-            </div>
+      {/* Pause overlay */}
+      {paused&&(
+        <div style={{position:"absolute",inset:0,zIndex:50,background:"rgba(10,15,46,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{background:"rgba(255,255,255,0.07)",border:"2px solid rgba(212,175,55,0.4)",borderRadius:24,padding:"40px 32px",textAlign:"center",maxWidth:300}}>
+            <div style={{fontSize:48,marginBottom:12}}>⏸️</div>
+            <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:22,color:"white",marginBottom:8,direction:"rtl"}}>اللعبة متوقفة مؤقتاً</div>
+            <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:24,direction:"rtl"}}>سؤال {qIdx+1} من ٢٥ · نقاط: {score}</div>
+            <button onClick={togglePause} style={{width:"100%",background:"#d4af37",border:"none",borderRadius:12,padding:"14px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"#0f172a",cursor:"pointer",marginBottom:10}}>▶ متابعة اللعبة</button>
+            <button onClick={()=>{gameAudio.stopBg();setScreen("lobby");}} style={{width:"100%",background:"transparent",border:"1px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"11px",fontFamily:"'Cairo',system-ui",fontWeight:600,fontSize:14,color:"rgba(255,255,255,0.6)",cursor:"pointer"}}>🏠 رجوع للقائمة</button>
           </div>
-          {/* Options */}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+        </div>
+      )}
+      {/* Question panel */}
+      {gState==="question"&&!paused&&(
+        <div style={{position:"absolute",bottom:72,left:"3%",right:"3%",zIndex:30,background:"rgba(15,23,46,0.97)",borderRadius:"20px 20px 0 0",boxShadow:"0 -8px 40px rgba(0,0,0,0.6)",animation:"panelSlideUp 0.35s cubic-bezier(0.16,1,0.3,1)",padding:"16px 16px 12px",border:"1px solid rgba(212,175,55,0.3)",borderBottom:"none"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12,direction:"rtl"}}>
+            <div style={{background:cat.color,color:"white",borderRadius:50,width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:12,flexShrink:0}}>{qIdx+1}</div>
+            <div style={{fontWeight:800,fontSize:"clamp(13px,1.7vw,15px)",color:"white",flex:1,direction:"rtl",textAlign:"right",lineHeight:1.4}}>{cq.q}</div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
             {cq.opts.map((opt,i)=>{
-              let bg="white",border=`2px solid #e5e7eb`,color="#1f2937",shadow="none";
+              let bg="rgba(255,255,255,0.07)",border="1px solid rgba(255,255,255,0.15)",col="rgba(255,255,255,0.9)";
               if(chosen!==null){
-                if(i===cq.a){bg="#d1fae5";border="2px solid #10b981";color="#065f46";}
-                else if(i===chosen&&!correct){bg="#fee2e2";border="2px solid #ef4444";color="#991b1b";}
+                if(i===cq.a){bg="rgba(16,185,129,0.25)";border="2px solid #10b981";col="#6ee7b7";}
+                else if(i===chosen&&!correct){bg="rgba(239,68,68,0.2)";border="2px solid #ef4444";col="#fca5a5";}
               }
-              const letter=["أ","ب","ج","د"][i];
               return(
                 <button key={i} onClick={()=>handleAnswer(i)} disabled={chosen!==null}
-                  style={{background:bg,border,borderRadius:12,padding:"10px 12px",cursor:chosen===null?"pointer":"default",transition:"all 0.18s",display:"flex",alignItems:"center",gap:8,boxShadow:shadow,direction:"rtl",textAlign:"right"}}
-                  onMouseOver={e=>{if(chosen===null){e.currentTarget.style.background="#f3f4f6";e.currentTarget.style.transform="scale(1.02)";}}}
-                  onMouseOut={e=>{if(chosen===null){e.currentTarget.style.background="white";e.currentTarget.style.transform="scale(1)";}}}
+                  style={{background:bg,border,borderRadius:12,padding:"10px 12px",cursor:chosen===null?"pointer":"default",transition:"all 0.18s",display:"flex",alignItems:"center",gap:8,direction:"rtl"}}
+                  onMouseOver={e=>{if(chosen===null) e.currentTarget.style.background="rgba(212,175,55,0.15)";}}
+                  onMouseOut={e=>{if(chosen===null) e.currentTarget.style.background="rgba(255,255,255,0.07)";}}
                 >
-                  <span style={{background:cat.color+"22",color:cat.color,borderRadius:50,width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:12,flexShrink:0}}>{letter}</span>
-                  <span style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(11px,1.4vw,13px)",fontWeight:600,color,lineHeight:1.3,flex:1}}>{opt}</span>
+                  <span style={{background:"rgba(212,175,55,0.2)",color:"#d4af37",borderRadius:50,width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:11,flexShrink:0}}>{["أ","ب","ج","د"][i]}</span>
+                  <span style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(11px,1.3vw,13px)",fontWeight:600,color:col,lineHeight:1.3,flex:1}}>{opt}</span>
                 </button>
               );
             })}
           </div>
-          {/* Feedback */}
           {chosen!==null&&(
-            <div style={{marginTop:12,direction:"rtl",animation:"feedbackPop 0.3s cubic-bezier(0.16,1,0.3,1)"}}>
-              <div style={{textAlign:"center",fontWeight:800,fontSize:"clamp(13px,1.8vw,16px)",color:correct?"#10b981":"#ef4444",marginBottom:correct||!cq.exp?0:6}}>
+            <div style={{marginTop:10,direction:"rtl",animation:"feedbackPop 0.3s cubic-bezier(0.16,1,0.3,1)"}}>
+              <div style={{textAlign:"center",fontWeight:800,fontSize:"clamp(12px,1.6vw,14px)",color:correct?"#10b981":"#ef4444",marginBottom:(!correct&&cq.exp)?5:0}}>
                 {correct?"🎉 ممتاز! إجابة صحيحة!":"❌ الإجابة الصحيحة: "+cq.opts[cq.a]}
               </div>
               {!correct&&cq.exp&&(
-                <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"8px 12px",fontSize:"clamp(11px,1.3vw,13px)",color:"#713f12",fontWeight:600,textAlign:"right",lineHeight:1.5}}>
-                  💡 {cq.exp}
-                </div>
+                <div style={{background:"rgba(251,191,36,0.1)",border:"1px solid rgba(251,191,36,0.3)",borderRadius:8,padding:"7px 12px",fontSize:"clamp(11px,1.2vw,12px)",color:"#fde68a",fontWeight:600,textAlign:"right",lineHeight:1.5}}>💡 {cq.exp}</div>
               )}
             </div>
           )}
         </div>
       )}
-
-      {/* ── CSS ANIMATIONS ── */}
       <style>{`
         @keyframes charBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
         @keyframes charThink{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-4px) rotate(-3deg)}}
         @keyframes legL{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(20deg)}}
         @keyframes legR{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-20deg)}}
-        @keyframes cloudDrift{from{transform:translateX(110vw)}to{transform:translateX(-300px)}}
-        @keyframes hillScroll{from{transform:translateX(0)}to{transform:translateX(-200px)}}
-        @keyframes groundScroll2{from{background-position-x:0}to{background-position-x:-60px}}
+        @keyframes groundScroll2{from{transform:translateX(0)}to{transform:translateX(-112px)}}
         @keyframes panelSlideUp{from{transform:translateY(110%);opacity:0}to{transform:translateY(0);opacity:1}}
-        @keyframes qBubble{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
-        @keyframes coinBurst{from{transform:translateX(-50%) translateY(0);opacity:1}to{transform:translateX(-50%) translateY(-40px);opacity:0}}
-        @keyframes feedbackPop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+        @keyframes qBubble{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
+        @keyframes coinBurst{from{transform:translateX(-50%) translateY(0);opacity:1}to{transform:translateX(-50%) translateY(-45px);opacity:0}}
+        @keyframes feedbackPop{from{transform:scale(0.85);opacity:0}to{transform:scale(1);opacity:1}}
         @keyframes blockWalkIn{from{left:105%}to{left:26%}}
-        @keyframes blockBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+        @keyframes blockBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes twinkle{from{opacity:0.2;transform:scale(0.8)}to{opacity:1;transform:scale(1.3)}}
       `}</style>
     </div>
   );
 }
+
 
 // ── URL Routing ──────────────────────────────
 const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game"};
@@ -4869,7 +4918,7 @@ export default function IELTSBot(){
             <div className="hero-btns" style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:12}}>
               <button onClick={trySampleEssay} style={{background:T.accent,color:T.primary,border:"none",borderRadius:10,padding:"14px 24px",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.accent}55`,flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
                 onMouseOver={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 6px 20px ${T.accent}66`;}} onMouseOut={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 4px 16px ${T.accent}55`;}}>
-                🎯 قيّم مقالي مجاناً
+                🎯 اضغط هنا لتحليل مقالتك مجاناً
               </button>
               {!proUser&&(
                 <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.1)",color:"white",border:"1.5px solid rgba(255,255,255,0.35)",borderRadius:10,padding:"14px 24px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
@@ -5017,6 +5066,24 @@ export default function IELTSBot(){
           ))}
         </div>
       </div>
+
+      {/* GAME PROMO STRIP — always visible on homepage */}
+      {mainView==="analyze"&&(
+        <div style={{background:`linear-gradient(135deg,${T.primary} 0%,#0d2347 100%)`,borderTop:"1px solid rgba(212,175,55,0.2)",padding:"14px 24px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12,direction:"rtl"}}>
+            <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+              <span style={{fontSize:24}}>🎮</span>
+              <div>
+                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:800,fontSize:14,color:"white"}}>IELTS Game — تعلم بطريقة ممتعة!</div>
+                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>ألعاب تهجئة وقواعد مجانية · Van Gogh night sky · موسيقى كلاسيكية</div>
+              </div>
+            </div>
+            <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 2px 8px ${T.accent}44`,whiteSpace:"nowrap"}}>
+              العب الآن 🕹️
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* UPGRADE BANNER — shown to non-Pro users only */}
       {!proUser&&(
