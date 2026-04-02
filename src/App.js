@@ -4371,8 +4371,10 @@ function IELTSGame({proUser,onNavigate}){
     setTimeout(()=>{
       setChosen(null); setCorrect(null);
       if(qIdx+1>=25||newLives<=0){
-        const entry={cat:cat.id,catName:cat.arabic,score:ok?score+1:score,total:qIdx+1,date:new Date().toLocaleDateString("ar-SA"),ts:Date.now()};
-        saveHistory(entry);
+        const finalScore=(ok?score+1:score);
+        const entry={cat:cat.id,catName:cat.arabic,score:finalScore,total:qIdx+1,date:new Date().toLocaleDateString("ar-SA"),ts:Date.now()};
+        const h=getHistory(); h.unshift(entry);
+        try{localStorage.setItem("ef_game_history",JSON.stringify(h.slice(0,50)));}catch{}
         setScreen("complete");
       } else { setQIdx(j=>j+1); setGState("running"); setBlockKey(k=>k+1); setShowPrev(false); }
     },1500);
@@ -4472,24 +4474,30 @@ function IELTSGame({proUser,onNavigate}){
         </div>
       </div>
       {/* HUD */}
-      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:20,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 14px",background:"rgba(10,15,46,0.8)",backdropFilter:"blur(8px)",borderBottom:"1px solid rgba(212,175,55,0.2)"}}>
-        <div style={{display:"flex",gap:3,alignItems:"center"}}>
-          {Array.from({length:3}).map((_,i)=><span key={i} style={{fontSize:18,opacity:i<lives?1:0.2}}>❤️</span>)}
-        </div>
-        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,padding:"0 10px"}}>
-          <div style={{color:"rgba(255,255,255,0.9)",fontWeight:700,fontSize:"clamp(10px,1.3vw,12px)",direction:"rtl"}}>{cat.arabic} · سؤال {qIdx+1} من ٢٥</div>
-          <div style={{width:"min(220px,42vw)",height:4,background:"rgba(255,255,255,0.1)",borderRadius:50,overflow:"hidden"}}>
-            <div style={{height:"100%",background:"#d4af37",width:`${(qIdx/25)*100}%`,transition:"width 0.5s",borderRadius:50}}/>
+      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:20,background:"rgba(10,15,46,0.85)",backdropFilter:"blur(8px)",borderBottom:"1px solid rgba(212,175,55,0.2)"}}>
+        {/* Main row */}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 10px"}}>
+          <div style={{display:"flex",gap:3,alignItems:"center"}}>
+            {Array.from({length:3}).map((_,i)=><span key={i} style={{fontSize:16,opacity:i<lives?1:0.2}}>❤️</span>)}
+          </div>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,flex:1,padding:"0 8px"}}>
+            <div style={{color:"rgba(255,255,255,0.85)",fontWeight:700,fontSize:"clamp(9px,1.2vw,11px)",direction:"rtl"}}>{cat.arabic} · {qIdx+1}/25</div>
+            <div style={{width:"min(180px,38vw)",height:3,background:"rgba(255,255,255,0.1)",borderRadius:50,overflow:"hidden"}}>
+              <div style={{height:"100%",background:"#d4af37",width:`${(qIdx/25)*100}%`,transition:"width 0.5s",borderRadius:50}}/>
+            </div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:5}}>
+            <div style={{color:"#d4af37",fontWeight:800,fontSize:"clamp(12px,1.6vw,15px)"}}>⭐{score}</div>
+            <button onClick={toggleMute} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:6,width:28,height:28,cursor:"pointer",fontSize:13,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{muted?"🔇":"🔊"}</button>
+            <button onClick={togglePause} style={{background:paused?"#d4af37":"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:6,width:28,height:28,cursor:"pointer",fontSize:13,color:paused?"#0f172a":"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{paused?"▶":"⏸"}</button>
           </div>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:6}}>
-          <div style={{color:"#d4af37",fontWeight:800,fontSize:"clamp(13px,1.8vw,16px)"}}>⭐{score}</div>
-          <button onClick={toggleMute} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{muted?"🔇":"🔊"}</button>
-          <button onClick={togglePause} style={{background:paused?"#d4af37":"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:paused?"#0f172a":"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{paused?"▶":"⏸"}</button>
-          {answers.length>0&&(
-            <button onClick={()=>setShowPrev(p=>!p)} title="السؤال السابق" style={{background:showPrev?"#d4af37":"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:showPrev?"#0f172a":"white",display:"flex",alignItems:"center",justifyContent:"center"}}>⬅</button>
-          )}
-        </div>
+        {/* Prev question button — full width strip below main row, only after Q1 */}
+        {answers.length>0&&(
+          <button onClick={()=>setShowPrev(p=>!p)} style={{width:"100%",background:showPrev?"rgba(212,175,55,0.25)":"rgba(255,255,255,0.05)",border:"none",borderTop:"1px solid rgba(255,255,255,0.08)",padding:"5px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontFamily:"'Cairo',system-ui",fontSize:12,color:showPrev?"#d4af37":"rgba(255,255,255,0.45)",fontWeight:showPrev?700:400,transition:"all 0.2s"}}>
+            {showPrev?"🔼 إخفاء السؤال السابق":"🔽 السؤال السابق — للمراجعة فقط"}
+          </button>
+        )}
       </div>
       {/* Pause overlay */}
       {paused&&(
@@ -4852,8 +4860,10 @@ export default function IELTSBot(){
       {/* NAV BAR 2 */}
       <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,background:T.primary,borderBottom:`1px solid rgba(255,255,255,0.1)`,boxShadow:"0 2px 8px rgba(30,58,95,0.2)"}}>
         <div className="nav-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
-          <div style={{display:"flex",alignItems:"center",gap:24}}>
-            <Logo size={26}/>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <Logo size={26} style={{cursor:"pointer"}} onClick={()=>switchView("analyze")}/>
+            {/* Mobile Home button — only shows on mobile */}
+            <button className="mobile-home-btn" onClick={()=>switchView("analyze")} style={{display:"none",background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.25)",borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:13,color:"white",fontFamily:"'Cairo',system-ui",fontWeight:700,alignItems:"center",gap:5,whiteSpace:"nowrap"}}>🏠 الرئيسية</button>
             {/* Hamburger — mobile only */}
             <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.3)",borderRadius:10,padding:"8px 12px",cursor:"pointer",fontSize:20,color:"white",minWidth:44,minHeight:44,justifyContent:"center",alignItems:"center"}}>☰</button>
             <div className="nav-tabs" style={{display:"flex",gap:4,alignItems:"center"}}>
@@ -5714,6 +5724,7 @@ export default function IELTSBot(){
           .writing-subnav { display: none !important; }
           .mobile-game-strip { display: block !important; }
           .desktop-game-strip { display: none !important; }
+          .mobile-home-btn { display: flex !important; }
           .mobile-disclaimer { display: block !important; }
           .upgrade-btn { display: none !important; }
         }
