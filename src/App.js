@@ -4294,31 +4294,66 @@ export default function IELTSBot(){
                       <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(14px,1.5vw,17px)",fontWeight:800,color:t.color}}>{t.label}</div>
                       <div style={{fontSize:26,lineHeight:1}}>{t.icon}</div>
                     </div>
-                    <div style={{display:"flex",flexDirection:"column",gap:9}}>
-                      {t.points.map((p,i)=>(
-                        <div key={i} style={{display:"flex",alignItems:"flex-start",gap:8,justifyContent:"flex-end"}}>
-                          <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(12px,1.2vw,14px)",color:"#1f2937",lineHeight:1.5,textAlign:"right"}}>{p}</div>
-                          <span style={{color:t.color,fontSize:14,flexShrink:0,marginTop:3}}>◆</span>
+
+                    {heroTab===0?(
+                      /* Writing tab — 4 sub-nav buttons */
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        {[
+                          {label:"📝 حلّل مقالتك",action:()=>{switchView("analyze");setTimeout(()=>{if(analyzeRef.current){analyzeRef.current.scrollIntoView({behavior:"smooth",block:"center"});}},300);}},
+                          {label:"🖊️ تدريب",action:()=>switchView("practice")},
+                          {label:"✏️ قواعد وإملاء",action:()=>switchView("grammar")},
+                          {label:"🏋️ تدريبات",action:()=>switchView("exercises")},
+                        ].map((btn,i)=>(
+                          <button key={i} onClick={btn.action} style={{
+                            width:"100%",
+                            background:"white",
+                            border:`2px solid ${t.color}33`,
+                            borderRadius:8,
+                            padding:"11px 16px",
+                            color:t.color,
+                            fontFamily:"'Cairo','Source Sans Pro',system-ui",
+                            fontSize:"clamp(13px,1.2vw,15px)",
+                            fontWeight:700,
+                            cursor:"pointer",
+                            textAlign:"right",
+                            direction:"rtl",
+                            transition:"all 0.18s",
+                          }}
+                          onMouseOver={e=>{e.currentTarget.style.background=t.color;e.currentTarget.style.color="white";}}
+                          onMouseOut={e=>{e.currentTarget.style.background="white";e.currentTarget.style.color=t.color;}}
+                          >{btn.label}</button>
+                        ))}
+                      </div>
+                    ):(
+                      /* Other tabs — bullet points + Try Now button */
+                      <>
+                        <div style={{display:"flex",flexDirection:"column",gap:9}}>
+                          {t.points.map((p,i)=>(
+                            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:8,justifyContent:"flex-end"}}>
+                              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(12px,1.2vw,14px)",color:"#1f2937",lineHeight:1.5,textAlign:"right"}}>{p}</div>
+                              <span style={{color:t.color,fontSize:14,flexShrink:0,marginTop:3}}>◆</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    <button onClick={()=>{
-                      const views=["analyze","reading","speaking","exercises"];
-                      switchView(views[heroTab]);
-                    }} style={{
-                      marginTop:16,width:"100%",
-                      background:t.color,
-                      border:"none",
-                      borderRadius:8,padding:"11px 16px",
-                      color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",
-                      fontSize:"clamp(13px,1.2vw,15px)",fontWeight:700,cursor:"pointer",
-                      transition:"opacity 0.2s",
-                    }}
-                    onMouseOver={e=>e.currentTarget.style.opacity="0.85"}
-                    onMouseOut={e=>e.currentTarget.style.opacity="1"}
-                    >
-                      جرّب الآن ←
-                    </button>
+                        <button onClick={()=>{
+                          const views=["analyze","reading","speaking","exercises"];
+                          switchView(views[heroTab]);
+                        }} style={{
+                          marginTop:16,width:"100%",
+                          background:t.color,
+                          border:"none",
+                          borderRadius:8,padding:"11px 16px",
+                          color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",
+                          fontSize:"clamp(13px,1.2vw,15px)",fontWeight:700,cursor:"pointer",
+                          transition:"opacity 0.2s",
+                        }}
+                        onMouseOver={e=>e.currentTarget.style.opacity="0.85"}
+                        onMouseOut={e=>e.currentTarget.style.opacity="1"}
+                        >
+                          جرّب الآن ←
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               );
