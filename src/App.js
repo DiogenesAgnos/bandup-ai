@@ -3910,31 +3910,31 @@ const IELTS_GAME_QS={
     {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["concluson","conclussion","conclusoin","conclusion"],a:3},
   ],
   grammar:[
-    {q:"اختر الجملة الصحيحة:",opts:["She don't like studying","She doesn't like studying","She not like studying","She isn't like studying"],a:1},
-    {q:"The number of students ___ increasing.",opts:["are","were","is","have been"],a:2},
-    {q:"Despite ___ tired, she kept studying.",opts:["to be","be","been","being"],a:3},
-    {q:"He suggested that she ___ more carefully.",opts:["reads","read","reading","to read"],a:1},
-    {q:"Neither the teachers nor the student ___ ready.",opts:["are","were","have been","was"],a:3},
-    {q:"By 2030, scientists ___ a cure.",opts:["will find","find","have found","will have found"],a:3},
-    {q:"The report, along with its appendices, ___ submitted.",opts:["were","have been","was","are"],a:2},
-    {q:"She is used to ___ long hours.",opts:["work","worked","working","works"],a:2},
-    {q:"If I ___ you, I would apologise.",opts:["am","was","were","had been"],a:2},
-    {q:"The data ___ clearly show a rising trend.",opts:["do","does","is","has"],a:0},
-    {q:"___ the rain, the event continued.",opts:["Although","Despite","However","Because"],a:1},
-    {q:"There has been a significant ___ in pollution.",opts:["raise","rise","risen","arose"],a:1},
-    {q:"The government ___ new policies since last year.",opts:["implemented","has implemented","implements","implement"],a:1},
-    {q:"The findings suggest that exercise ___ mental health.",opts:["improves","improve","improving","improved"],a:0},
-    {q:"She asked me ___ the window.",opts:["close","to close","closing","closed"],a:1},
-    {q:"This is the report ___ I mentioned yesterday.",opts:["which","who","whom","whose"],a:0},
-    {q:"___ more research is needed, the results are promising.",opts:["Despite","However","Although","Because"],a:2},
-    {q:"The population has ___ doubled in 20 years.",opts:["near","nearly","nearest","nearer"],a:1},
-    {q:"He made a number of ___ mistakes.",opts:["grammar","grammatic","grammatical","grammarically"],a:2},
-    {q:"The evidence ___ that diets affect mood.",opts:["suggest","suggests","suggesting","suggested"],a:1},
-    {q:"It is ___ that students revise regularly.",opts:["advise","advised","advisable","advisory"],a:2},
-    {q:"The solution ___ by the team last week.",opts:["discover","was discovered","discovered","has discovered"],a:1},
-    {q:"She has been living here ___ five years.",opts:["since","for","during","while"],a:1},
-    {q:"The majority of students ___ passed the exam.",opts:["has","is","have","was"],a:2},
-    {q:"He works ___ a teacher in a local school.",opts:["like","as","for","with"],a:1},
+    {q:"اختر الجملة الصحيحة:",opts:["She don't like studying","She doesn't like studying","She not like studying","She isn't like studying"],a:1,exp:"مع he/she/it نستخدم doesn't وليس don't"},
+    {q:"The number of students ___ increasing.",opts:["are","were","is","have been"],a:2,exp:"'The number of' تُعامل كمفرد دائماً → is"},
+    {q:"Despite ___ tired, she kept studying.",opts:["to be","be","been","being"],a:3,exp:"بعد Despite/preposition نستخدم الـ gerund (being)"},
+    {q:"He suggested that she ___ more carefully.",opts:["reads","read","reading","to read"],a:1,exp:"بعد suggest/recommend نستخدم المصدر البسيط (subjunctive) بدون s → read وليس reads"},
+    {q:"Neither the teachers nor the student ___ ready.",opts:["are","were","have been","was"],a:3,exp:"مع Neither...nor الفعل يتفق مع أقرب اسم (the student = مفرد) → was"},
+    {q:"By 2030, scientists ___ a cure.",opts:["will find","find","have found","will have found"],a:3,exp:"By + وقت مستقبلي = Future Perfect → will have found"},
+    {q:"The report, along with its appendices, ___ submitted.",opts:["were","have been","was","are"],a:2,exp:"'along with' لا تغير المبتدأ. The report = مفرد → was"},
+    {q:"She is used to ___ long hours.",opts:["work","worked","working","works"],a:2,exp:"بعد 'used to' بمعنى معتادة على نستخدم gerund → working"},
+    {q:"If I ___ you, I would apologise.",opts:["am","was","were","had been"],a:2,exp:"في Second Conditional نستخدم were مع جميع الضمائر → If I were"},
+    {q:"The data ___ clearly show a rising trend.",opts:["do","does","is","has"],a:0,exp:"'data' اسم جمع في الكتابة الأكاديمية → do"},
+    {q:"___ the rain, the event continued.",opts:["Although","Despite","However","Because"],a:1,exp:"Despite + اسم/gerund بدون جملة كاملة → Despite the rain"},
+    {q:"There has been a significant ___ in pollution.",opts:["raise","rise","risen","arose"],a:1,exp:"rise (اسم) = ارتفاع. raise = يرفع شيئاً آخر. a significant rise"},
+    {q:"The government ___ new policies since last year.",opts:["implemented","has implemented","implements","implement"],a:1,exp:"since = Present Perfect → has implemented"},
+    {q:"The findings suggest that exercise ___ mental health.",opts:["improves","improve","improving","improved"],a:0,exp:"المبتدأ exercise = مفرد → improves"},
+    {q:"She asked me ___ the window.",opts:["close","to close","closing","closed"],a:1,exp:"ask + شخص + to do → asked me to close"},
+    {q:"This is the report ___ I mentioned yesterday.",opts:["which","who","whom","whose"],a:0,exp:"which للأشياء، who للأشخاص → the report which"},
+    {q:"___ more research is needed, the results are promising.",opts:["Despite","However","Although","Because"],a:2,exp:"Although + جملة كاملة = على الرغم من أن"},
+    {q:"The population has ___ doubled in 20 years.",opts:["near","nearly","nearest","nearer"],a:1,exp:"nearly = تقريباً وصف للفعل → nearly doubled"},
+    {q:"He made a number of ___ mistakes.",opts:["grammar","grammatic","grammatical","grammarically"],a:2,exp:"الصفة تسبق الاسم → grammatical mistakes"},
+    {q:"The evidence ___ that diets affect mood.",opts:["suggest","suggests","suggesting","suggested"],a:1,exp:"The evidence = مفرد → suggests"},
+    {q:"It is ___ that students revise regularly.",opts:["advise","advised","advisable","advisory"],a:2,exp:"It is + صفة + that... → advisable (مستحسن)"},
+    {q:"The solution ___ by the team last week.",opts:["discover","was discovered","discovered","has discovered"],a:1,exp:"last week = Past Simple Passive → was discovered"},
+    {q:"She has been living here ___ five years.",opts:["since","for","during","while"],a:1,exp:"for + مدة زمنية → for five years. since + نقطة زمنية"},
+    {q:"The majority of students ___ passed the exam.",opts:["has","is","have","was"],a:2,exp:"'the majority of' + اسم جمع → have"},
+    {q:"He works ___ a teacher in a local school.",opts:["like","as","for","with"],a:1,exp:"as = بصفته وظيفة. like = يشبه → works as a teacher"},
   ],
   writing:[
     {q:"أي كلمة تعبّر عن التناقض؟",opts:["Furthermore","Therefore","However","Consequently"],a:2},
@@ -4152,52 +4152,59 @@ function IELTSGameLobby({proUser,onSelect}){
 function IELTSGameComplete({answers,score,category,onReplay,onLobby}){
   useEffect(()=>{ gameAudio.stopBg(); setTimeout(()=>gameAudio.complete(),200); },[]);
   const pct=Math.round((score/25)*100);
-  const medal=pct>=90?"🥇":pct>=70?"🥈":pct>=50?"🥉":"💪";
-  const msg=pct>=90?"أداء استثنائي! أنت جاهز للايلتس!":pct>=70?"جيد جداً! استمر في التدريب!":pct>=50?"مستوى جيد، واصل المحاولة!":"تحتاج مزيداً من التدريب، لا تستسلم!";
+  const band=
+    score===25?{medal:"🏆",title:"أنت الهيرو المطلق!",sub:"درجة كاملة! أنت أكثر من جاهز للايلتس 🔥",color:"#f59e0b"}:
+    score>=20?{medal:"🌟",title:"شغل حلو! أنت على الطريق!",sub:"مستوى ممتاز — فرق صغير عن القمة، واصل!",color:"#10b981"}:
+    score>=15?{medal:"💪",title:"تقريباً وصلت!",sub:"خطوة وتكون محترف — راجع الأخطاء وكرر اللعبة",color:"#3b82f6"}:
+    score>=7?{medal:"📚",title:"يحتاج شوية شغل",sub:"ما وصلت لمستواك بعد — واصل التدريب وكرر اللعبة",color:"#f97316"}:
+    {medal:"😅",title:"لوزر! 😅",sub:"ارجع تذاكر من الأول — الدرجة 8 تحتاج أكثر من كذا!",color:"#ef4444"};
   return(
     <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0f172a,#1e1b4b,#0f172a)",padding:"40px 20px",display:"flex",flexDirection:"column",alignItems:"center"}}>
       <div style={{maxWidth:680,width:"100%"}}>
         {/* Result header */}
-        <div style={{textAlign:"center",marginBottom:32}}>
-          <div style={{fontSize:72,marginBottom:8,animation:"celebratePop 0.6s cubic-bezier(0.16,1,0.3,1)"}}>{medal}</div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:"clamp(22px,3vw,32px)",color:"white",marginBottom:8,direction:"rtl"}}>{msg}</div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(36px,5vw,56px)",fontWeight:900,color:"#fbbf24",lineHeight:1}}>{score}<span style={{fontSize:"0.5em",color:"rgba(255,255,255,0.4)"}}>/25</span></div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:15,color:"rgba(255,255,255,0.5)",marginTop:4}}>{pct}% نسبة الإجابات الصحيحة</div>
+        <div style={{textAlign:"center",marginBottom:28}}>
+          <div style={{fontSize:72,marginBottom:8,animation:"celebratePop 0.6s cubic-bezier(0.16,1,0.3,1)"}}>{band.medal}</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:"clamp(20px,3vw,28px)",color:"white",marginBottom:6,direction:"rtl"}}>{band.title}</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(12px,1.5vw,14px)",color:"rgba(255,255,255,0.55)",direction:"rtl",marginBottom:12}}>{band.sub}</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(36px,5vw,56px)",fontWeight:900,color:band.color,lineHeight:1}}>{score}<span style={{fontSize:"0.5em",color:"rgba(255,255,255,0.4)"}}>/25</span></div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:14,color:"rgba(255,255,255,0.4)",marginTop:4}}>{pct}% نسبة الإجابات الصحيحة</div>
         </div>
 
         {/* Progress bar */}
-        <div style={{background:"rgba(255,255,255,0.1)",borderRadius:50,height:14,marginBottom:32,overflow:"hidden",boxShadow:"inset 0 2px 4px rgba(0,0,0,0.3)"}}>
-          <div style={{height:"100%",background:`linear-gradient(90deg,${category.color},${category.color}cc)`,width:`${pct}%`,borderRadius:50,transition:"width 1.2s cubic-bezier(0.22,1,0.36,1)",boxShadow:`0 0 12px ${category.color}88`}}/>
+        <div style={{background:"rgba(255,255,255,0.1)",borderRadius:50,height:12,marginBottom:24,overflow:"hidden"}}>
+          <div style={{height:"100%",background:`linear-gradient(90deg,${band.color},${band.color}bb)`,width:`${pct}%`,borderRadius:50,transition:"width 1.2s cubic-bezier(0.22,1,0.36,1)",boxShadow:`0 0 10px ${band.color}88`}}/>
         </div>
 
         {/* Stats row */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:24}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:20}}>
           {[[`${score}✅`,"صحيح"],[`${25-score}❌`,"خطأ"],[`${pct}%`,"نسبتك"]].map(([val,lbl])=>(
-            <div key={lbl} style={{background:"rgba(255,255,255,0.07)",borderRadius:14,padding:"16px 12px",textAlign:"center",border:"1px solid rgba(255,255,255,0.1)"}}>
-              <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:22,color:"white",marginBottom:4}}>{val}</div>
-              <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.45)"}}>{lbl}</div>
+            <div key={lbl} style={{background:"rgba(255,255,255,0.07)",borderRadius:14,padding:"14px 10px",textAlign:"center",border:"1px solid rgba(255,255,255,0.1)"}}>
+              <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:20,color:"white",marginBottom:4}}>{val}</div>
+              <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.4)"}}>{lbl}</div>
             </div>
           ))}
         </div>
 
-        {/* Answer review */}
-        <div style={{background:"rgba(255,255,255,0.06)",borderRadius:16,padding:"20px",marginBottom:24,maxHeight:280,overflowY:"auto",border:"1px solid rgba(255,255,255,0.1)"}}>
-          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,color:"white",marginBottom:14,textAlign:"center",fontSize:14,direction:"rtl"}}>📋 مراجعة إجاباتك</div>
+        {/* Answer review with explanations */}
+        <div style={{background:"rgba(255,255,255,0.06)",borderRadius:16,padding:"18px",marginBottom:22,maxHeight:320,overflowY:"auto",border:"1px solid rgba(255,255,255,0.1)"}}>
+          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,color:"white",marginBottom:12,textAlign:"center",fontSize:14,direction:"rtl"}}>📋 مراجعة إجاباتك</div>
           {answers.map((a,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:8,padding:"10px 12px",background:a.ok?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)",borderRadius:10,border:`1px solid ${a.ok?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`,direction:"rtl"}}>
-              <span style={{fontSize:16,flexShrink:0,marginTop:1}}>{a.ok?"✅":"❌"}</span>
-              <div style={{flex:1}}>
-                <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.65)",marginBottom:3,lineHeight:1.4}}>{a.q}</div>
-                {!a.ok&&<div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"#fbbf24",fontWeight:700}}>✓ {a.correct}</div>}
+            <div key={i} style={{marginBottom:9,padding:"10px 12px",background:a.ok?"rgba(16,185,129,0.08)":"rgba(239,68,68,0.08)",borderRadius:10,border:`1px solid ${a.ok?"rgba(16,185,129,0.25)":"rgba(239,68,68,0.25)"}`,direction:"rtl"}}>
+              <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
+                <span style={{fontSize:15,flexShrink:0,marginTop:1}}>{a.ok?"✅":"❌"}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.6)",marginBottom:a.ok?0:4,lineHeight:1.4}}>{a.q}</div>
+                  {!a.ok&&<div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"#fbbf24",fontWeight:700,marginBottom:a.exp?4:0}}>✓ {a.correct}</div>}
+                  {!a.ok&&a.exp&&<div style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"#fde68a",background:"rgba(251,191,36,0.08)",borderRadius:6,padding:"4px 8px",lineHeight:1.5}}>💡 {a.exp}</div>}
+                </div>
               </div>
-              <div style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"rgba(255,255,255,0.3)",flexShrink:0,marginTop:1}}>#{i+1}</div>
             </div>
           ))}
         </div>
 
         {/* Buttons */}
         <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-          <button onClick={onReplay} style={{background:category.color,border:"none",borderRadius:14,padding:"14px 28px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:15,color:"white",cursor:"pointer",boxShadow:`0 4px 16px ${category.color}55`,transition:"opacity 0.2s"}}
+          <button onClick={onReplay} style={{background:band.color,border:"none",borderRadius:14,padding:"14px 28px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:15,color:"white",cursor:"pointer",boxShadow:`0 4px 16px ${band.color}55`,transition:"opacity 0.2s"}}
             onMouseOver={e=>e.currentTarget.style.opacity="0.85"} onMouseOut={e=>e.currentTarget.style.opacity="1"}>
             🔄 العب مرة ثانية
           </button>
@@ -4219,26 +4226,16 @@ function IELTSGame({proUser,onNavigate}){
   const [screen,setScreen]=useState("lobby");
   const [cat,setCat]=useState(null);
   const [qIdx,setQIdx]=useState(0);
-  const [gState,setGState]=useState("running"); // running|question|feedback
+  const [gState,setGState]=useState("running"); // running|question
   const [chosen,setChosen]=useState(null);
   const [correct,setCorrect]=useState(null);
   const [score,setScore]=useState(0);
   const [lives,setLives]=useState(3);
   const [answers,setAnswers]=useState([]);
-  const [coins,setCoins]=useState([]);
-  const [bgPos,setBgPos]=useState(0);
-  const bgRef=useRef(null);
-  const walkRef=useRef(null);
+  const [blockKey,setBlockKey]=useState(0); // remount block to re-trigger animation
 
   const qs=cat?IELTS_GAME_QS[cat.id]:[];
   const cq=qs[qIdx]||qs[0];
-
-  // Scrolling background & auto question trigger
-  useEffect(()=>{
-    if(screen!=="playing"||gState!=="running") return;
-    const t=setTimeout(()=>setGState("question"),2800);
-    return()=>clearTimeout(t);
-  },[screen,gState,qIdx]);
 
   // Background music
   useEffect(()=>{
@@ -4248,10 +4245,14 @@ function IELTSGame({proUser,onNavigate}){
   },[screen]);
 
   const startGame=(c)=>{
-    setCat(c); setScreen("playing"); setQIdx(0);
+    setCat(c); setScreen("intro");
+  };
+
+  const beginPlaying=()=>{
+    setScreen("playing"); setQIdx(0);
     setScore(0); setLives(3); setAnswers([]);
     setChosen(null); setCorrect(null); setGState("running");
-    setCoins([]);
+    setBlockKey(k=>k+1);
   };
 
   const handleAnswer=(i)=>{
@@ -4259,21 +4260,51 @@ function IELTSGame({proUser,onNavigate}){
     setChosen(i);
     const ok=i===cq.a;
     setCorrect(ok);
-    if(ok){ gameAudio.correct(); setScore(s=>s+1); setCoins(c=>[...c,Date.now()]); }
+    if(ok){ gameAudio.correct(); setScore(s=>s+1); }
     else{ gameAudio.wrong(); setLives(l=>l-1); }
-    setAnswers(a=>[...a,{q:cq.q,chosen:cq.opts[i],correct:cq.opts[cq.a],ok}]);
+    const nextLives=ok?lives:lives-1;
+    setAnswers(a=>[...a,{q:cq.q,chosen:cq.opts[i],correct:cq.opts[cq.a],exp:cq.exp||"",ok}]);
     setTimeout(()=>{
       setChosen(null); setCorrect(null);
-      const nextLives=ok?lives:lives-1;
       if(qIdx+1>=25||nextLives<=0){ setScreen("complete"); }
-      else{ setQIdx(j=>j+1); setGState("running"); }
-    },1300);
+      else{ setQIdx(j=>j+1); setGState("running"); setBlockKey(k=>k+1); }
+    },1400);
   };
 
   if(screen==="lobby") return <IELTSGameLobby proUser={proUser} onSelect={startGame}/>;
-  if(screen==="complete") return <IELTSGameComplete answers={answers} score={score} category={cat} onReplay={()=>startGame(cat)} onLobby={()=>setScreen("lobby")}/>;
 
-  // Cloud positions (stable across renders)
+  // ── INTRO SCREEN ──
+  if(screen==="intro"&&cat) return(
+    <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0f172a,#1e1b4b)",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"'Cairo',system-ui"}}>
+      <div style={{maxWidth:480,width:"100%",background:"rgba(255,255,255,0.07)",border:`2px solid ${cat.color}55`,borderRadius:24,padding:"36px 32px",textAlign:"center",boxShadow:`0 0 60px ${cat.color}22`}}>
+        <div style={{fontSize:56,marginBottom:12}}>{cat.emoji}</div>
+        <div style={{fontWeight:900,fontSize:"clamp(20px,3vw,28px)",color:"white",marginBottom:6,direction:"rtl"}}>{cat.arabic}</div>
+        <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",marginBottom:28,direction:"rtl"}}>جاهز للتحدي؟ إليك القواعد أولاً:</div>
+        <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:32,direction:"rtl"}}>
+          {[
+            ["🎯","25 سؤال في كل لعبة"],
+            ["❤️","لديك 3 أخطاء فقط — بعدها Game Over"],
+            ["🏃","الشخصية تمشي نحو لوحة السؤال تلقائياً"],
+            ["💡","إجابات خاطئة؟ ستجد شرح لها في النهاية"],
+          ].map(([ic,txt])=>(
+            <div key={txt} style={{display:"flex",alignItems:"center",gap:12,background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"12px 16px"}}>
+              <span style={{fontSize:22,flexShrink:0}}>{ic}</span>
+              <span style={{fontWeight:600,fontSize:14,color:"rgba(255,255,255,0.85)"}}>{txt}</span>
+            </div>
+          ))}
+        </div>
+        <button onClick={beginPlaying} style={{width:"100%",background:cat.color,border:"none",borderRadius:14,padding:"16px",fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:17,color:"white",cursor:"pointer",boxShadow:`0 6px 20px ${cat.color}55`,transition:"transform 0.15s,opacity 0.15s"}}
+          onMouseOver={e=>e.currentTarget.style.transform="scale(1.03)"} onMouseOut={e=>e.currentTarget.style.transform="scale(1)"}>
+          🚀 ابدأ اللعبة!
+        </button>
+        <button onClick={()=>setScreen("lobby")} style={{marginTop:10,background:"transparent",border:"none",color:"rgba(255,255,255,0.35)",fontSize:13,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>← رجوع</button>
+      </div>
+    </div>
+  );
+
+  if(screen==="complete") return <IELTSGameComplete answers={answers} score={score} category={cat} onReplay={()=>{setCat(cat);setScreen("intro");}} onLobby={()=>setScreen("lobby")}/>;
+
+  // Cloud positions
   const clouds=[{top:"10%",speed:22,delay:0},{top:"20%",speed:28,delay:8},{top:"6%",speed:18,delay:15}];
 
   return(
@@ -4306,16 +4337,41 @@ function IELTSGame({proUser,onNavigate}){
         <div style={{height:60,background:"#1a3a0d"}}/>
       </div>
 
-      {/* ── DECORATIONS (pipes/coins) ── */}
-      <div style={{position:"absolute",bottom:72,left:0,right:0,zIndex:3,height:60,overflow:"hidden"}}>
-        {[{left:"65%",h:50},{left:"80%",h:35},{left:"45%",h:45}].map((p,i)=>(
-          <div key={i} style={{position:"absolute",bottom:0,left:p.left,width:24,height:p.h,background:"#16a34a",border:"3px solid #15803d",borderRadius:"4px 4px 0 0",zIndex:3}}>
-            <div style={{position:"absolute",top:-10,left:-5,right:-5,height:14,background:"#16a34a",border:"3px solid #15803d",borderRadius:3}}/>
+      {/* ── ROAD MARKINGS — shows movement ── */}
+      <div style={{position:"absolute",bottom:68,left:0,right:0,zIndex:4,height:8,overflow:"hidden",pointerEvents:"none"}}>
+        <div style={{display:"flex",gap:0,animation:"groundScroll2 1s linear infinite",whiteSpace:"nowrap"}}>
+          {Array.from({length:30}).map((_,i)=>(
+            <div key={i} style={{width:40,height:4,background:i%2===0?"rgba(255,255,255,0.4)":"transparent",marginRight:20,flexShrink:0,borderRadius:2}}/>
+          ))}
+        </div>
+      </div>
+
+      {/* ── WALKING QUESTION WALL ── slides from right, triggers question on arrival */}
+      {gState==="running"&&(
+        <div key={blockKey} style={{position:"absolute",bottom:72,zIndex:6,animation:"blockWalkIn 3s linear forwards"}}
+          onAnimationEnd={()=>setGState("question")}>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+            {/* Floating ? block above wall */}
+            <div style={{background:"#fbbf24",border:"3px solid #92400e",borderRadius:8,width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:24,color:"#92400e",boxShadow:"0 4px 16px rgba(0,0,0,0.4)",animation:"blockBounce 0.5s ease-in-out infinite",marginBottom:4}}>?</div>
+            {/* Brick wall */}
+            <div style={{display:"flex",flexDirection:"column",gap:1}}>
+              {Array.from({length:4}).map((_,row)=>(
+                <div key={row} style={{display:"flex",gap:1}}>
+                  {Array.from({length:3}).map((_,col)=>(
+                    <div key={col} style={{width:14,height:11,background:row%2===0&&col===1?"#b45309":"#ca8a04",border:"1px solid #92400e",borderRadius:1}}/>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-        {/* Floating coin blocks */}
-        {[{left:"55%"},{left:"70%"},{left:"35%"}].map((b,i)=>(
-          <div key={i} style={{position:"absolute",bottom:60+30,left:b.left,width:28,height:28,background:"#ca8a04",border:"3px solid #a16207",borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>?</div>
+        </div>
+      )}
+      {/* Static background pipes for decoration */}
+      <div style={{position:"absolute",bottom:72,left:0,right:0,zIndex:2,height:60,overflow:"hidden",pointerEvents:"none"}}>
+        {[{left:"70%",h:40},{left:"85%",h:30}].map((p,i)=>(
+          <div key={i} style={{position:"absolute",bottom:0,left:p.left,width:22,height:p.h,background:"#16a34a",border:"3px solid #15803d",borderRadius:"4px 4px 0 0",opacity:0.7}}>
+            <div style={{position:"absolute",top:-9,left:-4,right:-4,height:12,background:"#16a34a",border:"3px solid #15803d",borderRadius:3}}/>
+          </div>
         ))}
       </div>
 
@@ -4413,8 +4469,15 @@ function IELTSGame({proUser,onNavigate}){
           </div>
           {/* Feedback */}
           {chosen!==null&&(
-            <div style={{marginTop:12,textAlign:"center",fontWeight:800,fontSize:"clamp(13px,1.8vw,16px)",color:correct?"#10b981":"#ef4444",direction:"rtl",animation:"feedbackPop 0.3s cubic-bezier(0.16,1,0.3,1)"}}>
-              {correct?"🎉 ممتاز! إجابة صحيحة!":"❌ الإجابة الصحيحة: "+cq.opts[cq.a]}
+            <div style={{marginTop:12,direction:"rtl",animation:"feedbackPop 0.3s cubic-bezier(0.16,1,0.3,1)"}}>
+              <div style={{textAlign:"center",fontWeight:800,fontSize:"clamp(13px,1.8vw,16px)",color:correct?"#10b981":"#ef4444",marginBottom:correct||!cq.exp?0:6}}>
+                {correct?"🎉 ممتاز! إجابة صحيحة!":"❌ الإجابة الصحيحة: "+cq.opts[cq.a]}
+              </div>
+              {!correct&&cq.exp&&(
+                <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"8px 12px",fontSize:"clamp(11px,1.3vw,13px)",color:"#713f12",fontWeight:600,textAlign:"right",lineHeight:1.5}}>
+                  💡 {cq.exp}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -4433,6 +4496,8 @@ function IELTSGame({proUser,onNavigate}){
         @keyframes qBubble{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
         @keyframes coinBurst{from{transform:translateX(-50%) translateY(0);opacity:1}to{transform:translateX(-50%) translateY(-40px);opacity:0}}
         @keyframes feedbackPop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+        @keyframes blockWalkIn{from{left:105%}to{left:26%}}
+        @keyframes blockBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
       `}</style>
     </div>
   );
