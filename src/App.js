@@ -438,8 +438,8 @@ const MemoAnnotatedEssay = memo(AnnotatedEssay, (prev, next) =>
 );
 
 // ── Components ─────────────────────────────────
-const Logo=({size=26,style={}})=>(
-  <span style={{fontFamily:"'Rubik',sans-serif",fontWeight:900,fontSize:size,letterSpacing:"-1px",lineHeight:1,cursor:"pointer",...style}}>
+const Logo=({size=26,style={},onClick=null})=>(
+  <span onClick={onClick} style={{fontFamily:"'Rubik',sans-serif",fontWeight:900,fontSize:size,letterSpacing:"-1px",lineHeight:1,cursor:"pointer",...style}}>
     <span style={{color:"#DC2626"}}>E</span><span style={{color:"#EA580C"}}>n</span><span style={{color:"#CA8A04"}}>g</span><span style={{color:"#15803D"}}>l</span><span style={{color:"#0E7490"}}>i</span><span style={{color:"#1D4ED8"}}>s</span><span style={{color:"#7E22CE"}}>h</span><span style={{color:"#BE185D"}}>f</span><span style={{color:"#DC2626"}}>o</span><span style={{color:"#EA580C"}}>o</span><span style={{color:"#15803D"}}>l</span>
   </span>
 );
@@ -3824,7 +3824,7 @@ const RefundPage = ({onBack}) => (
     <Section title="4. Contact"><p style={{margin:"0 0 12px"}}>For refund enquiries, please use our <strong>Contact Us</strong> page.</p></Section>
   </PolicyPage>
 );
-const PricingPage = ({onBack, onUpgrade, isPro}) => (
+const PricingPage = ({onBack, onUpgrade, isPro, onManageSub=()=>{}}) => (
   <PolicyPage title="Pricing" onBack={onBack}>
     <div style={{textAlign:"center",marginBottom:32}}>
       <p style={{fontSize:16,lineHeight:1.7,color:T.textMid}}>Englishfool offers a simple, transparent pricing model with no hidden fees.</p>
@@ -3853,10 +3853,10 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
         {isPro?(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px",fontSize:13,color:T.green,fontWeight:700}}>✓ أنت على Pro — وصول غير محدود</div>
-            <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer"
-              style={{display:"block",textAlign:"center",background:"white",border:`1.5px solid ${T.border}`,borderRadius:8,padding:"11px",fontSize:13,fontWeight:600,color:T.textMid,textDecoration:"none",direction:"rtl",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
-              ⚙️ إدارة اشتراكك أو إلغاؤه → Paddle
-            </a>
+            <button onClick={()=>onManageSub()}
+              style={{display:"block",width:"100%",textAlign:"center",background:"white",border:`1.5px solid ${T.border}`,borderRadius:8,padding:"11px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",direction:"rtl",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxSizing:"box-sizing"}}>
+              ⚙️ إدارة اشتراكك أو إلغاؤه
+            </button>
             <div style={{fontSize:11,color:T.textMuted,textAlign:"center",direction:"rtl",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>ستحتاج إلى البريد الإلكتروني الذي دفعت به</div>
           </div>
         ):(
@@ -3872,7 +3872,7 @@ const PricingPage = ({onBack, onUpgrade, isPro}) => (
     </Section>
     <Section title="Cancellation">
       <p style={{margin:"0 0 12px"}}>You may cancel your subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No further charges will be made after cancellation.</p>
-      <p style={{margin:"0 0 12px"}}>To cancel, visit <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer" style={{color:T.primary,fontWeight:700}}>customer.paddle.com</a> and sign in with the email you used to purchase. You can manage or cancel your subscription there directly.</p>
+      <p style={{margin:"0 0 12px"}}>لإلغاء اشتراكك، اضغط <button onClick={()=>onManageSub()} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:0,fontSize:"inherit",textDecoration:"underline"}}>هنا</button> وسنرشدك خطوة بخطوة.</p>
     </Section>
     <Section title="Refunds">
       <p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new subscribers, in accordance with Paddle's Buyer Terms. If you are not satisfied within 14 days of your initial purchase, you are entitled to a full refund via Paddle or through our <strong>Contact Us</strong> page. See our full <button onClick={()=>{const path="/refund";window.history.pushState({},"",path);window.location.reload();}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:15,fontFamily:"inherit",padding:0,textDecoration:"underline"}}>Refund Policy</button> for details.</p>
@@ -4609,6 +4609,50 @@ function IELTSGame({proUser,onNavigate}){
 }
 
 
+// ── MANAGE SUBSCRIPTION MODAL ──────────────────
+function ManageSubModal({onClose,email=""}){
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{background:"white",borderRadius:16,padding:"32px 28px",maxWidth:440,width:"100%",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",position:"relative",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+        <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"none",border:"none",fontSize:22,cursor:"pointer",color:"#94a3b8",lineHeight:1}}>✕</button>
+        <div style={{textAlign:"center",marginBottom:24}}>
+          <div style={{fontSize:44,marginBottom:8}}>⚙️</div>
+          <div style={{fontWeight:800,fontSize:20,color:"#1e293b",marginBottom:6,direction:"rtl"}}>إدارة اشتراكك</div>
+          <div style={{fontSize:13,color:"#64748b",direction:"rtl",lineHeight:1.6}}>لإدارة أو إلغاء اشتراكك، ستحتاج للدخول على بوابة Paddle عبر إيميل إيصال الدفع.</div>
+        </div>
+
+        {/* Step by step */}
+        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:24,direction:"rtl"}}>
+          {[
+            ["1","افتح بريدك الإلكتروني","ابحث عن إيميل من Paddle (موضوعه: Your Englishfool receipt)"],
+            ["2","اضغط على الرابط","داخل الإيميل ستجد زر أو رابط 'Manage subscription' أو 'Cancel'"],
+            ["3","أكّد الإلغاء","ستُحتفظ بصلاحية Pro حتى نهاية الفترة المدفوعة"],
+          ].map(([n,title,desc])=>(
+            <div key={n} style={{display:"flex",gap:12,alignItems:"flex-start",background:"#f8fafc",borderRadius:10,padding:"12px 14px"}}>
+              <div style={{background:"#1e3a5f",color:"white",borderRadius:"50%",width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:12,flexShrink:0,marginTop:1}}>{n}</div>
+              <div>
+                <div style={{fontWeight:700,fontSize:13,color:"#1e293b",marginBottom:2}}>{title}</div>
+                <div style={{fontSize:12,color:"#64748b",lineHeight:1.5}}>{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Didn't get email? */}
+        <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"10px 14px",marginBottom:20,direction:"rtl"}}>
+          <div style={{fontSize:12,color:"#713f12",lineHeight:1.5}}>
+            <strong>ما لقيت الإيميل؟</strong> تحقق من مجلد Spam، أو تواصل معنا عبر صفحة <strong>Contact</strong> وسنساعدك في الإلغاء خلال 24 ساعة.
+          </div>
+        </div>
+
+        <button onClick={onClose} style={{width:"100%",background:"#1e3a5f",color:"white",border:"none",borderRadius:10,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer"}}>
+          حسناً، فهمت
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── URL Routing ──────────────────────────────
 const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
@@ -4635,6 +4679,7 @@ export default function IELTSBot(){
   const [activeTab,setActiveTab]=useState(()=>getLastResult()?.result?"annotated":"scores");
   const [showPaywall,setShowPaywall]=useState(false);
   const [paywallTab,setPaywallTab]=useState("cliq");
+  const [showManageSub,setShowManageSub]=useState(false);
   const [showAuth,setShowAuth]=useState(false);
   const [showChangePassword,setShowChangePassword]=useState(false);
   const [session,setSession]=useState(null);
@@ -4862,6 +4907,7 @@ export default function IELTSBot(){
       {showPaywall&&<PaywallModal onClose={()=>{setShowPaywall(false);setPaywallTab("cliq");}} onSuccess={handleProSuccess} session={session} initialTab={paywallTab} onRegister={()=>setShowAuth(true)}/>}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
       {showChangePassword&&<ChangePasswordModal onClose={()=>setShowChangePassword(false)}/>}
+      {showManageSub&&<ManageSubModal onClose={()=>setShowManageSub(false)} email={session?.email||""}/>}
 
 
 
@@ -4888,7 +4934,7 @@ export default function IELTSBot(){
             {proUser?(
               <div style={{display:"flex",alignItems:"center",gap:8}}>
                 <span style={{fontSize:13,color:"#6ee7b7",fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>✓ Pro</span>
-                <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer" style={{fontSize:11,color:"rgba(255,255,255,0.45)",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",cursor:"pointer"}}>إدارة الاشتراك</a>
+                <button onClick={()=>setShowManageSub(true)} style={{fontSize:11,color:"rgba(255,255,255,0.45)",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",cursor:"pointer",background:"none",border:"none",padding:0}}>إدارة الاشتراك</button>
               </div>
             ):(
               <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.accent,color:T.primary,border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(212,175,55,0.4)",letterSpacing:"0.01em"}}>🔓 احصل على Pro</button>
@@ -5498,7 +5544,7 @@ export default function IELTSBot(){
       {mainView==="terms"&&<TermsPage onBack={()=>switchView("analyze")}/>}
       {mainView==="privacy"&&<PrivacyPage onBack={()=>switchView("analyze")}/>}
       {mainView==="refund"&&<RefundPage onBack={()=>switchView("analyze")}/>}
-      {mainView==="pricing"&&<PricingPage onBack={()=>switchView("analyze")} onUpgrade={()=>setShowPaywall(true)} isPro={proUser}/> }
+      {mainView==="pricing"&&<PricingPage onBack={()=>switchView("analyze")} onUpgrade={()=>setShowPaywall(true)} isPro={proUser} onManageSub={()=>setShowManageSub(true)}/> }
       {mainView==="admin"&&<AdminPage onBack={()=>{ setMainView("analyze"); window.history.replaceState({view:"analyze"},""," /"); }}/>}
 
       {/* FOOTER */}
@@ -5575,7 +5621,7 @@ export default function IELTSBot(){
           }} onClick={e=>e.stopPropagation()}>
             {/* Header */}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"18px 20px",background:T.primary,borderBottom:`1px solid rgba(255,255,255,0.1)`}}>
-              <Logo size={20}/>
+              <Logo size={20} onClick={()=>{switchView("analyze");setMenuOpen(false);}}/>
               <button onClick={()=>setMenuOpen(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"rgba(255,255,255,0.7)",padding:4}}>✕</button>
             </div>
             {/* Quick nav tabs at top of menu */}
@@ -5649,10 +5695,10 @@ export default function IELTSBot(){
             {proUser&&(
               <div style={{padding:"0 20px"}}>
                 <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"12px 16px",textAlign:"center",fontSize:13,color:T.green,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:8}}>✓ Pro — Unlimited Access</div>
-                <a href="https://customer.paddle.com/" target="_blank" rel="noreferrer"
-                  style={{display:"block",width:"100%",textAlign:"center",background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"none",boxSizing:"border-box",direction:"rtl"}}>
+                <button onClick={()=>{setShowManageSub(true);setMenuOpen(false);}}
+                  style={{display:"block",width:"100%",textAlign:"center",background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl"}}>
                   ⚙️ إدارة الاشتراك أو الإلغاء
-                </a>
+                </button>
               </div>
             )}
             <div style={{padding:"12px 20px 0"}}>
