@@ -4334,6 +4334,7 @@ function IELTSGame({proUser,onNavigate}){
   const [muted,setMuted]=useState(false);
   const [paused,setPaused]=useState(false);
   const [reviewIdx,setReviewIdx]=useState(null);
+  const [showPrev,setShowPrev]=useState(false); // view-only previous question peek
   const getHistory=()=>{try{return JSON.parse(localStorage.getItem("ef_game_history")||"[]");}catch{return[];}};
   const saveHistory=(entry)=>{try{const h=getHistory();h.unshift(entry);localStorage.setItem("ef_game_history",JSON.stringify(h.slice(0,50)));}catch{}};
 
@@ -4373,7 +4374,7 @@ function IELTSGame({proUser,onNavigate}){
         const entry={cat:cat.id,catName:cat.arabic,score:ok?score+1:score,total:qIdx+1,date:new Date().toLocaleDateString("ar-SA"),ts:Date.now()};
         saveHistory(entry);
         setScreen("complete");
-      } else { setQIdx(j=>j+1); setGState("running"); setBlockKey(k=>k+1); }
+      } else { setQIdx(j=>j+1); setGState("running"); setBlockKey(k=>k+1); setShowPrev(false); }
     },1500);
   };
 
@@ -4485,6 +4486,9 @@ function IELTSGame({proUser,onNavigate}){
           <div style={{color:"#d4af37",fontWeight:800,fontSize:"clamp(13px,1.8vw,16px)"}}>⭐{score}</div>
           <button onClick={toggleMute} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{muted?"🔇":"🔊"}</button>
           <button onClick={togglePause} style={{background:paused?"#d4af37":"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:paused?"#0f172a":"white",display:"flex",alignItems:"center",justifyContent:"center"}}>{paused?"▶":"⏸"}</button>
+          {answers.length>0&&(
+            <button onClick={()=>setShowPrev(p=>!p)} title="السؤال السابق" style={{background:showPrev?"#d4af37":"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,width:30,height:30,cursor:"pointer",fontSize:14,color:showPrev?"#0f172a":"white",display:"flex",alignItems:"center",justifyContent:"center"}}>⬅</button>
+          )}
         </div>
       </div>
       {/* Pause overlay */}
@@ -4499,6 +4503,39 @@ function IELTSGame({proUser,onNavigate}){
           </div>
         </div>
       )}
+      {/* Previous Question Peek — view only, no re-answering */}
+      {showPrev&&answers.length>0&&(()=>{
+        const prev=answers[answers.length-1];
+        const pq=qs[qIdx-1]||qs[0];
+        return(
+          <div style={{position:"absolute",top:52,left:"3%",right:"3%",zIndex:40,background:"rgba(15,23,46,0.98)",border:"1.5px solid rgba(212,175,55,0.5)",borderRadius:16,padding:"14px 16px",boxShadow:"0 8px 32px rgba(0,0,0,0.7)",animation:"feedbackPop 0.25s ease-out"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,direction:"rtl"}}>
+              <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,fontWeight:700,color:"#d4af37"}}>👁 السؤال السابق — للمراجعة فقط</div>
+              <button onClick={()=>setShowPrev(false)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:18,cursor:"pointer",lineHeight:1}}>✕</button>
+            </div>
+            <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(12px,1.5vw,14px)",fontWeight:700,color:"white",direction:"rtl",marginBottom:10,lineHeight:1.4}}>{pq.q}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              {pq.opts.map((opt,oi)=>{
+                let bg="rgba(255,255,255,0.05)",border="1px solid rgba(255,255,255,0.1)",col="rgba(255,255,255,0.6)";
+                if(oi===prev.correct){bg="rgba(16,185,129,0.2)";border="1.5px solid #10b981";col="#6ee7b7";}
+                else if(oi===prev.chosen&&!prev.ok){bg="rgba(239,68,68,0.15)";border="1.5px solid #ef4444";col="#fca5a5";}
+                return(
+                  <div key={oi} style={{background:bg,border,borderRadius:8,padding:"7px 12px",display:"flex",alignItems:"center",gap:8,direction:"rtl"}}>
+                    <span style={{color:"#d4af37",fontSize:10,fontWeight:700,width:14,flexShrink:0}}>{["أ","ب","ج","د"][oi]}</span>
+                    <span style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(11px,1.2vw,13px)",color:col,flex:1}}>{opt}</span>
+                    {oi===prev.correct&&<span style={{fontSize:12,flexShrink:0}}>✓</span>}
+                    {oi===prev.chosen&&!prev.ok&&<span style={{fontSize:12,flexShrink:0}}>✗</span>}
+                  </div>
+                );
+              })}
+            </div>
+            {!prev.ok&&prev.exp&&(
+              <div style={{marginTop:8,background:"rgba(212,175,55,0.08)",border:"1px solid rgba(212,175,55,0.25)",borderRadius:8,padding:"7px 12px",fontSize:"clamp(10px,1.1vw,12px)",color:"#fde68a",direction:"rtl",lineHeight:1.5}}>💡 {prev.exp}</div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Question panel */}
       {gState==="question"&&!paused&&(
         <div style={{position:"absolute",bottom:72,left:"3%",right:"3%",zIndex:30,background:"rgba(15,23,46,0.97)",borderRadius:"20px 20px 0 0",boxShadow:"0 -8px 40px rgba(0,0,0,0.6)",animation:"panelSlideUp 0.35s cubic-bezier(0.16,1,0.3,1)",padding:"16px 16px 12px",border:"1px solid rgba(212,175,55,0.3)",borderBottom:"none"}}>
@@ -4853,11 +4890,29 @@ export default function IELTSBot(){
 
       {/* Writing Sub-Nav — shows on writing-related pages */}
       {["analyze","practice","grammar","exercises"].includes(mainView)&&(
-        <div style={{background:T.bgGray,borderBottom:`1px solid ${T.border}`,padding:"0 24px"}}>
+        <div className="writing-subnav" style={{background:T.bgGray,borderBottom:`1px solid ${T.border}`,padding:"0 24px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
             {[{v:"analyze",l:"🎓 Analyze"},{v:"practice",l:"🖊️ Practice"},{v:"grammar",l:"✏️ Grammar & Spelling"},{v:"exercises",l:"🏋️ Exercises"}].map(t=>(
               <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Game Strip — replaces writing sub-nav on mobile, only on analyze page */}
+      {mainView==="analyze"&&(
+        <div className="mobile-game-strip" style={{display:"none",background:`linear-gradient(135deg,${T.primary},#0d2347)`,borderBottom:"2px solid rgba(212,175,55,0.3)",padding:"10px 16px"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,direction:"rtl"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:20}}>🎮</span>
+              <div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:13,color:"white"}}>IELTS Game</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"rgba(255,255,255,0.5)"}}>تهجئة · قواعد · مفردات · كتابة · قراءة</div>
+              </div>
+            </div>
+            <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"8px 16px",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap"}}>
+              العب 🕹️
+            </button>
           </div>
         </div>
       )}
@@ -5067,15 +5122,15 @@ export default function IELTSBot(){
         </div>
       </div>
 
-      {/* GAME PROMO STRIP — always visible on homepage */}
+      {/* GAME PROMO STRIP — desktop only, always visible on homepage */}
       {mainView==="analyze"&&(
-        <div style={{background:`linear-gradient(135deg,${T.primary} 0%,#0d2347 100%)`,borderTop:"1px solid rgba(212,175,55,0.2)",padding:"14px 24px"}}>
-          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12,direction:"rtl"}}>
-            <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
-              <span style={{fontSize:24}}>🎮</span>
+        <div className="desktop-game-strip" style={{background:`linear-gradient(135deg,${T.primary} 0%,#0d2347 100%)`,borderTop:"1px solid rgba(212,175,55,0.2)",padding:"12px 24px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10,direction:"rtl"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+              <span style={{fontSize:22}}>🎮</span>
               <div>
-                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:800,fontSize:14,color:"white"}}>IELTS Game — تعلم بطريقة ممتعة!</div>
-                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>ألعاب تهجئة وقواعد مجانية · Van Gogh night sky · موسيقى كلاسيكية</div>
+                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:800,fontSize:14,color:"white"}}>IELTS Game — تعلم وأنت تلعب!</div>
+                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>تهجئة · قواعد · مفردات · كتابة · قراءة</div>
               </div>
             </div>
             <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 2px 8px ${T.accent}44`,whiteSpace:"nowrap"}}>
@@ -5656,6 +5711,9 @@ export default function IELTSBot(){
 
           /* MOBILE SPECIFIC */
           .mobile-hide { display: none !important; }
+          .writing-subnav { display: none !important; }
+          .mobile-game-strip { display: block !important; }
+          .desktop-game-strip { display: none !important; }
           .mobile-disclaimer { display: block !important; }
           .upgrade-btn { display: none !important; }
         }
