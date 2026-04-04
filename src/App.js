@@ -4669,7 +4669,7 @@ const TESTIMONIALS=[
   {name:"محمد الحارثي",country:"🇸🇦 جدة",before:6.5,after:7.5,time:"5 أسابيع",quote:"أحتاج 7.5 للقبول في الدراسات العليا. جربت كتاباً بعد كتاب دون نتيجة. هنا فهمت أخيراً الفرق بين Band 7 و8 في الكتابة. المنصة موفّرة للوقت والمال مقارنةً بالكورسات."},
 ];
 
-function TestimonialsSection(){
+function TestimonialsSection({uiLang="ar"}){
   const [active,setActive]=useState(0);
   const t=TESTIMONIALS[active];
   return(
@@ -4718,24 +4718,13 @@ function TestimonialsSection(){
 }
 
 // ── FREE VS PRO COMPARISON ────────────────────────
-function PricingComparisonStrip({onUpgrade}){
-  const free=[
-    "تقييم مقالة واحدة مجاناً (مقالتان بعد التسجيل)",
-    "اختبار قراءة واحد فقط",
-    "لعبتا الإملاء والقواعد",
-    "30 دقيقة تدريب إجمالية (غير متجددة)",
-    "10 فحوصات قواعد",
-  ];
-  const pro=[
-    "تقييم غير محدود — Task 1 و Task 2",
-    "جميع اختبارات القراءة الـ 7",
-    "جميع الألعاب الـ 5 مفتوحة",
-    "تدريبات غير محدودة — كل الفئات",
-    "تحليل مفردات مع ترقية مقالتك لـ Band 8",
-    "نماذج إجابة Band 8+ كاملة",
-    "متابعة التقدم أسبوعياً",
-    "فحص قواعد غير محدود",
-  ];
+function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
+  const FREE_AR=["تقييم مقالة واحدة مجاناً (مقالتان بعد التسجيل)","اختبار قراءة واحد فقط","لعبتا الإملاء والقواعد","30 دقيقة تدريب إجمالية (غير متجددة)","10 فحوصات قواعد"];
+  const FREE_EN=["1 free essay analysis (2 after sign-up)","1 reading test only","2 spelling & grammar games","30 total practice minutes (non-renewable)","10 grammar checks"];
+  const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ 7","جميع الألعاب الـ 5 مفتوحة","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقية مقالتك لـ Band 8","نماذج إجابة Band 8+ كاملة","متابعة التقدم أسبوعياً","فحص قواعد غير محدود"];
+  const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","All 5 games unlocked","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Weekly progress tracking","Unlimited grammar checker"];
+  const free=uiLang==="ar"?FREE_AR:FREE_EN;
+  const pro=uiLang==="ar"?PRO_AR:PRO_EN;
   return(
     <div style={{background:"#b91c1c",padding:"56px 32px"}}>
       <div style={{maxWidth:900,margin:"0 auto"}}>
@@ -4869,28 +4858,100 @@ const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$
 // ── UI TRANSLATIONS ────────────────────────────────────────
 const UI = {
   ar:{
+    // Nav
     home:"🏠 الرئيسية", writing:"✍️ الكتابة", speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
     progress:"📈 تقدمي", contact:"✉️ اتصل بنا",
+    // Account
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
-    startFree:"جرّب تحليل مقالة — مجاناً ←",
-    subscribe:"🔓 اشترك — $17 / 10 دينار",
+    // Hero
+    heroPill:"🎓 منصة التحضير للآيلتس — بالعربي",
     heroTitle:"ارفع درجتك في الآيلتس",
     heroSub:"تقييم مقالات فوري بمعايير كامبريدج · اختبارات قراءة كاملة · ألعاب تدريبية تفاعلية",
+    startFree:"جرّب تحليل مقالة — مجاناً ←",
+    subscribe:"🔓 اشترك — $17 / 10 دينار",
+    // Features grid
+    f1t:"تقييم المقالات",f1d:"تقييم فوري وفق معايير كامبريدج الأربعة مع توجيهات لرفع الدرجة",
+    f2t:"اختبارات القراءة",f2d:"٧ اختبارات Academic وGeneral كاملة مع مؤقت رسمي وتصحيح فوري",
+    f3t:"تدريب المحادثة",f3d:"نماذج Band 8 لجميع الأجزاء مع مفردات وأخطاء شائعة",
+    f4t:"ألعاب تعليمية",f4d:"تعلّم الإملاء والقواعد والمفردات من خلال ألعاب تفاعلية ممتعة",
+    f5t:"قواعد وإملاء",f5d:"فحص فوري للقواعد والإملاء مع شرح تفصيلي وتصحيح مباشر",
+    f6t:"تمارين تدريبية",f6d:"أكثر من ١٢٠ تمرين متنوع في المفردات والقواعد والباراغراف",
+    f7t:"أدوات الآيلتس",f7d:"قوالب الإجابات ومعايير التقييم وكل ما تحتاجه للامتحان",
+    f8t:"تتبع تقدمي",f8d:"راجع تاريخ مقالاتك ودرجاتك وتطوّر أدائك عبر الزمن",
+    fStart:"← ابدأ",
+    // Stats bar
+    stat1n:"9",stat1l:"درجات الباند المشمولة",
+    stat2n:"4",stat2l:"معايير الآيلتس الأربعة",
+    stat3n:"100%",stat3l:"وصفات الباند الرسمية",
+    stat4n:"Task 1 & 2",stat4l:"Academic + General Training",
+    // Game strip
+    gameTitle:"IELTS Game — تعلّم من خلال اللعب",
+    gameSub:"الإملاء · القواعد · المفردات · الكتابة · القراءة",
+    gameBtn:"العب الآن 🕹️",
+    // Pricing comparison
+    pricingTitle:uiLang==="ar"?"المجاني مقابل Pro — الفرق في ثانية":"Free vs Pro — The Difference at a Glance",
+    pricingSub:uiLang==="ar"?"عرض الإطلاق: 3 أشهر بـ 10 دينار / $17 فقط":"Launch offer: 3 months for $17 / 10 JOD only",
+    pricingBtn:uiLang==="ar"?"احصل على Pro الآن ←":"Get Pro Now →",
+    pricingNote:uiLang==="ar"?"الإلغاء في أي وقت · دفع آمن عبر Paddle":"Cancel anytime · Secure payment via Paddle",
+    freeLabel:uiLang==="ar"?"المجاني":"Free", proLabel:uiLang==="ar"?"كل شيء مفتوح":"Everything Unlocked",
+    // Writing sub-nav
+    wAnalyze:"🎓 تحليل المقالة",wPractice:"🖊️ تدريب",wGrammar:"✏️ قواعد وإملاء",wExercises:"🏋️ تمارين",
+    // Mobile hamburger
+    siteLang:"لغة الموقع",
+    // Upgrade banner
+    unlimitedBanner:"{UI[uiLang].unlimitedBanner}",
+    upgradeBtn:"🔓 احصل على Pro →",
     feedbackLang:"لغة التحليل",
     languageNote:"اللغة التي سيُكتب بها تحليل مقالتك",
   },
   en:{
+    // Nav
     home:"🏠 Home", writing:"✍️ Writing", speaking:"🗣️ Speaking",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
     progress:"📈 Progress", contact:"✉️ Contact",
+    // Account
     signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
     manageSubscription:"Manage Subscription",
-    startFree:"Try Essay Analysis — Free →",
-    subscribe:"🔓 Subscribe — $17 / 10 JOD",
+    // Hero
+    heroPill:"🎓 IELTS Preparation Platform",
     heroTitle:"Boost Your IELTS Score",
     heroSub:"Instant essay feedback · Full reading tests · Interactive learning games",
+    startFree:"Try Essay Analysis — Free →",
+    subscribe:"🔓 Subscribe — $17 / 10 JOD",
+    // Features grid
+    f1t:"Essay Analysis",f1d:"Instant scoring against all four Cambridge criteria with actionable feedback",
+    f2t:"Reading Tests",f2d:"7 full Academic & General tests with official 60-min timer and instant scoring",
+    f3t:"Speaking Practice",f3d:"Band 8 model answers for all three parts with vocabulary and common mistakes",
+    f4t:"Learning Games",f4d:"Practice spelling, grammar and vocabulary through fun interactive games",
+    f5t:"Grammar & Spelling",f5d:"Instant grammar and spelling checker with detailed explanations",
+    f6t:"Practice Exercises",f6d:"120+ exercises covering vocabulary, grammar, paraphrasing and paragraphs",
+    f7t:"IELTS Toolkit",f7d:"Answer templates, band descriptors and everything you need for exam day",
+    f8t:"Track Progress",f8d:"Review your essay history, scores and performance improvement over time",
+    fStart:"Start →",
+    // Stats bar
+    stat1n:"9",stat1l:"Band levels covered",
+    stat2n:"4",stat2l:"IELTS criteria scored",
+    stat3n:"100%",stat3l:"Official band descriptors",
+    stat4n:"Task 1 & 2",stat4l:"Academic + General Training",
+    // Game strip
+    gameTitle:"IELTS Game — Learn by Playing",
+    gameSub:"Spelling · Grammar · Vocabulary · Writing · Reading",
+    gameBtn:"Play Now 🕹️",
+    // Pricing comparison
+    pricingTitle:"Free vs Pro — The Difference at a Glance",
+    pricingSub:"Launch offer: 3 months for $17 / 10 JOD only",
+    pricingBtn:"Get Pro Now →",
+    pricingNote:"Cancel anytime · Secure payment via Paddle",
+    freeLabel:"Free", proLabel:"Everything Unlocked",
+    // Writing sub-nav
+    wAnalyze:"🎓 Analyze Essay",wPractice:"🖊️ Practice",wGrammar:"✏️ Grammar",wExercises:"🏋️ Exercises",
+    // Mobile hamburger
+    siteLang:"Website Language",
+    // Upgrade banner
+    unlimitedBanner:"🎓 Unlimited Analysis · All Tests · Games · Exercises",
+    upgradeBtn:"🔓 Get Pro →",
     feedbackLang:"Analysis Language",
     languageNote:"The language your essay feedback will be written in",
   }
@@ -5245,7 +5306,17 @@ export default function IELTSBot(){
               <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
-            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontSize:18,color:"white",minWidth:40,minHeight:40,justifyContent:"center",alignItems:"center"}}>☰</button>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              {/* Mobile language toggle — visible on mobile in red nav */}
+              <div className="mobile-lang-toggle" style={{display:"none",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:2,gap:2}}>
+                {["ar","en"].map(l=>(
+                  <button key={l} onClick={()=>setUiLang(l)} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"5px 10px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:"rgba(255,255,255,0.8)",cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s"}}>
+                    {l==="ar"?"ع":"EN"}
+                  </button>
+                ))}
+              </div>
+              <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontSize:18,color:"white",minWidth:40,minHeight:40,justifyContent:"center",alignItems:"center"}}>☰</button>
+            </div>
           </div>
         </div>
       </div>
@@ -5254,7 +5325,7 @@ export default function IELTSBot(){
       {["analyze","practice","grammar","exercises"].includes(mainView)&&(
         <div className="writing-subnav" style={{background:"#f9fafb",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
-            {[{v:"analyze",l:uiLang==="ar"?"🎓 تحليل المقالة":"🎓 Analyze Essay"},{v:"practice",l:uiLang==="ar"?"🖊️ تدريب":"🖊️ Practice"},{v:"grammar",l:uiLang==="ar"?"✏️ قواعد وإملاء":"✏️ Grammar"},{v:"exercises",l:uiLang==="ar"?"🏋️ تمارين":"🏋️ Exercises"}].map(t=>(
+            {[{v:"analyze",l:UI[uiLang].wAnalyze},{v:"practice",l:UI[uiLang].wPractice},{v:"grammar",l:UI[uiLang].wGrammar},{v:"exercises",l:UI[uiLang].wExercises}].map(t=>(
               <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"7px 16px",fontSize:13,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
             ))}
           </div>
@@ -5268,7 +5339,7 @@ export default function IELTSBot(){
           <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
           <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:uiLang==="ar"?"rtl":"ltr",textAlign:"center"}}>
             <div style={{display:"inline-block",background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"5px 18px",fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo',system-ui",fontWeight:600,marginBottom:24}}>
-              🎓 منصة التحضير للآيلتس — بالعربي
+              {UI[uiLang].heroPill}
             </div>
             <h1 style={{fontSize:"clamp(32px,5vw,58px)",fontWeight:900,color:"white",fontFamily:"'Cairo',system-ui",lineHeight:1.2,margin:"0 0 20px",textShadow:"0 2px 20px rgba(0,0,0,0.2)"}}>
               {uiLang==="ar"?"ارفع درجتك في الآيلتس":"Boost Your IELTS Score"}
@@ -5299,22 +5370,22 @@ export default function IELTSBot(){
         <div style={{background:"white",borderBottom:`1px solid ${T.border}`,padding:"40px 32px"}}>
           <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,textAlign:"center"}} className="features-grid">
             {[
-              {icon:"🎓",title:"تقييم المقالات",desc:"تقييم فوري وفق معايير كامبريدج الأربعة مع توجيهات لرفع الدرجة",view:"analyze"},
-              {icon:"📖",title:"اختبارات القراءة",desc:"٧ اختبارات Academic وGeneral كاملة مع مؤقت رسمي وتصحيح فوري",view:"reading"},
-              {icon:"🗣️",title:"تدريب المحادثة",desc:"نماذج Band 8 لجميع الأجزاء مع مفردات وأخطاء شائعة",view:"speaking"},
-              {icon:"🎮",title:"ألعاب تعليمية",desc:"تعلّم الإملاء والقواعد والمفردات من خلال ألعاب تفاعلية ممتعة",view:"game"},
-              {icon:"✏️",title:"قواعد وإملاء",desc:"فحص فوري للقواعد والإملاء مع شرح تفصيلي وتصحيح مباشر",view:"grammar"},
-              {icon:"🏋️",title:"تمارين تدريبية",desc:"أكثر من ١٢٠ تمرين متنوع في المفردات والقواعد والباراغراف",view:"exercises"},
-              {icon:"📚",title:"أدوات الآيلتس",desc:"قوالب الإجابات ومعايير التقييم وكل ما تحتاجه للامتحان",view:"toolkit"},
-              {icon:"📈",title:"تتبع تقدمي",desc:"راجع تاريخ مقالاتك ودرجاتك وتطوّر أدائك عبر الزمن",view:"progress"},
+              {icon:"🎓",tk:"f1t",dk:"f1d",view:"analyze"},
+              {icon:"📖",tk:"f2t",dk:"f2d",view:"reading"},
+              {icon:"🗣️",tk:"f3t",dk:"f3d",view:"speaking"},
+              {icon:"🎮",tk:"f4t",dk:"f4d",view:"game"},
+              {icon:"✏️",tk:"f5t",dk:"f5d",view:"grammar"},
+              {icon:"🏋️",tk:"f6t",dk:"f6d",view:"exercises"},
+              {icon:"📚",tk:"f7t",dk:"f7d",view:"toolkit"},
+              {icon:"📈",tk:"f8t",dk:"f8d",view:"progress"},
             ].map((f,i)=>(
-              <div key={i} onClick={()=>switchView(f.view)} style={{padding:"20px 16px",cursor:"pointer",borderRadius:12,border:`1px solid transparent`,transition:"all 0.2s"}}
+              <div key={i} onClick={()=>switchView(f.view)} style={{padding:"20px 16px",cursor:"pointer",borderRadius:12,border:`1px solid transparent`,transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
                 onMouseOver={e=>{e.currentTarget.style.background=T.primaryLight;e.currentTarget.style.borderColor=T.primaryBorder;}}
                 onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
                 <div style={{fontSize:36,marginBottom:12}}>{f.icon}</div>
-                <div style={{fontWeight:700,fontSize:16,color:T.primary,fontFamily:"'Cairo',system-ui",marginBottom:6}}>{f.title}</div>
-                <div style={{fontSize:14,color:T.textMuted,fontFamily:"'Cairo',system-ui",lineHeight:1.7,direction:"rtl"}}>{f.desc}</div>
-                <div style={{marginTop:10,fontSize:13,color:T.primary,fontWeight:600,fontFamily:"'Cairo',system-ui"}}>← ابدأ</div>
+                <div style={{fontWeight:700,fontSize:16,color:T.primary,fontFamily:"'Cairo',system-ui",marginBottom:6}}>{UI[uiLang][f.tk]}</div>
+                <div style={{fontSize:14,color:T.textMuted,fontFamily:"'Cairo',system-ui",lineHeight:1.7}}>{UI[uiLang][f.dk]}</div>
+                <div style={{marginTop:10,fontSize:13,color:T.primary,fontWeight:600,fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].fStart}</div>
               </div>
             ))}
           </div>
@@ -5324,10 +5395,10 @@ export default function IELTSBot(){
       {/* STATS BAR — homepage only */}
       {mainView==="home"&&<div style={{background:T.bgSurface,borderBottom:`1px solid ${T.border}`,padding:"20px 32px"}}>
         <div className="stats-inner" style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:48,alignItems:"center",flexWrap:"wrap",padding:"0 8px"}}>
-          {[["9","Band levels covered"],["4","IELTS criteria scored"],["100%","Official band descriptors"],["Task 1 & 2","Academic + General Training"]].map(([num,label])=>(
-            <div key={label} style={{display:"flex",alignItems:"center",gap:12}}>
-              <span style={{color:T.primary,fontWeight:800,fontSize:22,fontFamily:"Inter,'Source Sans Pro',system-ui"}}>{num}</span>
-              <span style={{color:T.textMuted,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.4}}>{label}</span>
+          {[["stat1n","stat1l"],["stat2n","stat2l"],["stat3n","stat3l"],["stat4n","stat4l"]].map(([nk,lk])=>(
+            <div key={lk} style={{display:"flex",alignItems:"center",gap:12}}>
+              <span style={{color:T.primary,fontWeight:800,fontSize:22,fontFamily:"Inter,system-ui"}}>{UI[uiLang][nk]}</span>
+              <span style={{color:T.textMuted,fontSize:14,fontFamily:"'Cairo',system-ui",lineHeight:1.4}}>{UI[uiLang][lk]}</span>
             </div>
           ))}
         </div>
@@ -5340,8 +5411,8 @@ export default function IELTSBot(){
             <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
               <span style={{fontSize:22}}>🎮</span>
               <div>
-                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:800,fontSize:14,color:"white"}}>IELTS Game — تعلّم من خلال اللعب</div>
-                <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>الإملاء · القواعد · المفردات · الكتابة · القراءة</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:14,color:"white"}}>{UI[uiLang].gameTitle}</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>{UI[uiLang].gameSub}</div>
               </div>
             </div>
             <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 2px 8px ${T.accent}44`,whiteSpace:"nowrap"}}>
@@ -5352,21 +5423,21 @@ export default function IELTSBot(){
       )}
 
       {/* TESTIMONIALS — social proof on homepage */}
-      {mainView==="home"&&<TestimonialsSection/>}
+      {mainView==="home"&&<TestimonialsSection uiLang={uiLang}/>}
 
       {/* PRICING COMPARISON — clarity on free vs pro */}
-      {mainView==="home"&&!proUser&&<PricingComparisonStrip onUpgrade={()=>setShowPaywall(true)}/>}
+      {mainView==="home"&&!proUser&&<PricingComparisonStrip uiLang={uiLang} onUpgrade={()=>setShowPaywall(true)}/>}
 
       {/* UPGRADE BANNER — shown to non-Pro users only */}
       {!proUser&&(
         <div style={{background:T.primary,borderTop:"1px solid rgba(255,255,255,0.08)",padding:"16px 32px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
             <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",direction:"rtl"}}>
-              <span style={{fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>
-                🎓 تحليل غير محدود · جميع الاختبارات · الألعاب · التدريبات
+              <span style={{fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo',system-ui",fontWeight:600}}>
+                {UI[uiLang].unlimitedBanner}
               </span>
               <span style={{background:`${T.accent}22`,border:`1px solid ${T.accent}66`,borderRadius:20,padding:"2px 12px",fontSize:12,color:T.accent,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
-                🇯🇴 CLIQ — 10 دينار (3 أشهر)
+                uiLang==="ar"?"🇯🇴 CLIQ — 10 دينار (3 أشهر)":"🇯🇴 Jordan: 10 JOD via CLIQ"
               </span>
             </div>
             <button onClick={()=>setShowPaywall(true)}
@@ -5776,17 +5847,17 @@ export default function IELTSBot(){
             {/* Nav items */}
             <div style={{flex:1,overflowY:"auto",padding:"8px 0"}}>
               {[
-                {view:"home",icon:"🏠",label:"الرئيسية"},
-                {view:"analyze",icon:"🎓",label:"تحليل المقالة"},
-                {view:"practice",icon:"🖊️",label:"تدريب الكتابة"},
-                {view:"grammar",icon:"✏️",label:"قواعد وإملاء"},
-                {view:"exercises",icon:"🏋️",label:"تمارين"},
-                {view:"speaking",icon:"🗣️",label:"تدريب المحادثة"},
-                {view:"reading",icon:"📖",label:"اختبارات القراءة"},
-                {view:"game",icon:"🎮",label:"ألعاب الآيلتس"},
-                {view:"toolkit",icon:"📚",label:"أدوات الآيلتس"},
-                {view:"progress",icon:"📈",label:"تتبع تقدمي"},
-                {view:"contact",icon:"✉️",label:"اتصل بنا"},
+                {view:"home",icon:"🏠",label:"الرئيسية",labelEn:"Home"},
+                {view:"analyze",icon:"🎓",label:"تحليل المقالة",labelEn:"Essay Analysis"},
+                {view:"practice",icon:"🖊️",label:"تدريب الكتابة",labelEn:"Writing Practice"},
+                {view:"grammar",icon:"✏️",label:"قواعد وإملاء",labelEn:"Grammar & Spelling"},
+                {view:"exercises",icon:"🏋️",label:"تمارين",labelEn:"Exercises"},
+                {view:"speaking",icon:"🗣️",label:"تدريب المحادثة",labelEn:"Speaking Practice"},
+                {view:"reading",icon:"📖",label:"اختبارات القراءة",labelEn:"Reading Tests"},
+                {view:"game",icon:"🎮",label:"ألعاب الآيلتس",labelEn:"IELTS Games"},
+                {view:"toolkit",icon:"📚",label:"أدوات الآيلتس",labelEn:"IELTS Toolkit"},
+                {view:"progress",icon:"📈",label:"تتبع تقدمي",labelEn:"My Progress"},
+                {view:"contact",icon:"✉️",label:"اتصل بنا",labelEn:"Contact"},
               ].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
                   style={{
@@ -5798,12 +5869,12 @@ export default function IELTSBot(){
                     fontSize:15,fontWeight:mainView===item.view?700:500,
                     fontFamily:"'Cairo',system-ui"
                   }}>
-                  <span style={{fontSize:18}}>{item.icon}</span>{item.label}
+                  <span style={{fontSize:18}}>{item.icon}</span>{uiLang==="ar"?item.label:item.labelEn||item.label}
                 </button>
               ))}
               <div style={{height:1,background:T.border,margin:"8px 20px"}}/>
               <div style={{padding:"8px 20px"}}>
-                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,marginBottom:8,fontFamily:"'Cairo',system-ui",direction:"rtl"}}>{uiLang==="ar"?"لغة الموقع":"Website Language"}</div>
+                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,marginBottom:8,fontFamily:"'Cairo',system-ui",direction:"rtl"}}>{UI[uiLang].siteLang}</div>
                 <div style={{display:"flex",gap:8}}>
                   {["ar","en"].map(l=>(
                     <button key={l} onClick={()=>setUiLang(l)} style={{flex:1,background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{l==="ar"?"🇸🇦 عربي (AR)":"🇬🇧 English (EN)"}</button>
@@ -5897,6 +5968,7 @@ export default function IELTSBot(){
 
           /* NAV TIER 2 */
           .hamburger-btn { display: flex !important; }
+          .mobile-lang-toggle { display: flex !important; }
           .nav-tabs { display: none !important; }
           .sticky-nav { position: sticky !important; top: 0 !important; }
 
