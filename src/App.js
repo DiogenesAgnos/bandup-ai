@@ -3875,7 +3875,7 @@ const PricingPage = ({onBack, onUpgrade, isPro, onManageSub=()=>{}}) => (
       <p style={{margin:"0 0 12px"}}>لإلغاء اشتراكك، اضغط <button onClick={()=>onManageSub()} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:0,fontSize:"inherit",textDecoration:"underline"}}>هنا</button> وسنرشدك خطوة بخطوة.</p>
     </Section>
     <Section title="Refunds">
-      <p style={{margin:"0 0 12px"}}>We offer a <strong>14-day money-back guarantee</strong> for new subscribers, in accordance with Paddle's Buyer Terms. If you are not satisfied within 14 days of your initial purchase, you are entitled to a full refund via Paddle or through our <strong>Contact Us</strong> page. See our full <button onClick={()=>{const path="/refund";window.history.pushState({},"",path);window.location.reload();}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:15,fontFamily:"inherit",padding:0,textDecoration:"underline"}}>Refund Policy</button> for details.</p>
+      <p style={{margin:"0 0 12px"}}>المدفوعات تُعالَج بأمان عبر <strong>Paddle.com</strong> بوصفها وكيل البيع المعتمد. تقبل المنصة بطاقات الائتمان والخصم الرئيسية، وPayPal، وApple Pay، وGoogle Pay. لأي استفسارات متعلقة بالفواتير، يمكنك التواصل معنا عبر صفحة <strong>Contact</strong>.</p>
     </Section>
     <Section title="Questions?">
       <p style={{margin:"0 0 12px"}}>For any billing or pricing enquiries, please use our <strong>Contact Us</strong> page.</p>
@@ -4720,7 +4720,7 @@ function PricingComparisonStrip({onUpgrade}){
           <button onClick={onUpgrade} style={{background:"#d4af37",color:"#1e3a5f",border:"none",borderRadius:10,padding:"14px 40px",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:"0 4px 16px rgba(212,175,55,0.4)"}}>
             احصل على Pro الآن ←
           </button>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.35)",marginTop:8}}>ضمان استرداد المبلغ خلال 14 يوماً · الإلغاء في أي وقت</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.35)",marginTop:8}}>الإلغاء في أي وقت · دفع آمن عبر Paddle</div>
         </div>
       </div>
     </div>
@@ -4971,12 +4971,54 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {analyze:"Englishfool — IELTS Writing Examiner",practice:"Practice Mode — Englishfool",progress:"Progress Tracker — Englishfool",toolkit:"IELTS Toolkit — Englishfool",contact:"Contact Us — Englishfool",grammar:"Grammar & Spell Checker — Englishfool",exercises:"Practice Exercises — Englishfool",admin:"Admin — Englishfool",terms:"Terms of Service — Englishfool",privacy:"Privacy Policy — Englishfool",refund:"Refund Policy — Englishfool",pricing:"Pricing — Englishfool",speaking:"IELTS Speaking — Englishfool",reading:"IELTS Reading — Englishfool"};
+  const PAGE_TITLES = {analyze:"Englishfool — منصة الآيلتس الشاملة | تقييم مقالات + ألعاب + اختبارات",practice:"تدريب الكتابة — Englishfool",progress:"متابعة التقدم — Englishfool",toolkit:"أدوات الآيلتس — Englishfool",contact:"تواصل معنا — Englishfool",grammar:"مدقق القواعد والإملاء — Englishfool",exercises:"تمارين الآيلتس — Englishfool",admin:"Admin — Englishfool",terms:"شروط الخدمة — Englishfool",privacy:"سياسة الخصوصية — Englishfool",refund:"سياسة الاسترداد — Englishfool",pricing:"الأسعار — Englishfool",speaking:"تدريب المحادثة — Englishfool",reading:"اختبارات القراءة — Englishfool",game:"ألعاب الآيلتس — Englishfool"};
+  const PAGE_DESCS = {analyze:"احصل على تقييم فوري لمقالتك بناءً على معايير كامبريدج الأربعة. مع نماذج إجابة، تصحيح أخطاء، وخطة لرفع درجتك. جرّب مجاناً.",practice:"تدرّب على كتابة الآيلتس مع تغذية راجعة فورية لكل جملة. Task 1 و Task 2 بدعم من معايير Band 8+.",reading:"7 اختبارات قراءة آيلتس كاملة (Academic + General) مع مؤقت رسمي وتصحيح فوري.",speaking:"نماذج إجابة Band 8 لجميع أجزاء الآيلتس Speaking: Part 1, 2, 3 مع مفردات وأخطاء شائعة.",game:"تعلّم الآيلتس من خلال ألعاب تفاعلية: إملاء، قواعد، مفردات، كتابة، وقراءة.",pricing:"اشتراك Pro لمدة 3 أشهر بـ 10 دينار (الأردن) أو $17 (دولي). وصول كامل لجميع الأدوات.",default:"منصة Englishfool للتحضير للآيلتس — تقييم مقالات احترافي، اختبارات قراءة، ألعاب تدريبية، وتمارين قواعد."};
+  const PAGE_PATHS = {analyze:"/",practice:"/practice",reading:"/reading",speaking:"/speaking",game:"/game",pricing:"/pricing",grammar:"/grammar",exercises:"/exercises",progress:"/progress",toolkit:"/toolkit",contact:"/contact"};
+
+  const updateSEO=(view)=>{
+    const title=PAGE_TITLES[view]||"Englishfool";
+    const desc=PAGE_DESCS[view]||PAGE_DESCS.default;
+    const path=PAGE_PATHS[view]||"/";
+    const url=`https://www.englishfool.com${path}`;
+    // Title
+    document.title=title;
+    // Description
+    let metaDesc=document.querySelector("meta[name='description']");
+    if(!metaDesc){metaDesc=document.createElement("meta");metaDesc.name="description";document.head.appendChild(metaDesc);}
+    metaDesc.content=desc;
+    // Canonical
+    let canonical=document.querySelector("link[rel='canonical']");
+    if(!canonical){canonical=document.createElement("link");canonical.rel="canonical";document.head.appendChild(canonical);}
+    canonical.href=url;
+    // Open Graph
+    const ogTags={
+      "og:title":title,
+      "og:description":desc,
+      "og:url":url,
+      "og:type":"website",
+      "og:image":"https://www.englishfool.com/og-image.png",
+      "og:site_name":"Englishfool",
+      "og:locale":"ar_AR",
+    };
+    Object.entries(ogTags).forEach(([prop,content])=>{
+      let el=document.querySelector(`meta[property='${prop}']`);
+      if(!el){el=document.createElement("meta");el.setAttribute("property",prop);document.head.appendChild(el);}
+      el.content=content;
+    });
+    // Twitter Card
+    const twitterTags={"twitter:card":"summary_large_image","twitter:title":title,"twitter:description":desc,"twitter:image":"https://www.englishfool.com/og-image.png"};
+    Object.entries(twitterTags).forEach(([name,content])=>{
+      let el=document.querySelector(`meta[name='${name}']`);
+      if(!el){el=document.createElement("meta");el.name=name;document.head.appendChild(el);}
+      el.content=content;
+    });
+  };
+
   const switchView=(view)=>{ 
     setMainView(view); 
     const path = VIEW_TO_PATH[view] || "/";
     if(window.location.pathname !== path) window.history.pushState({view}, "", path);
-    document.title = PAGE_TITLES[view] || "Englishfool";
+    updateSEO(view);
     window.scrollTo({top:0,behavior:'smooth'}); 
   };
 
@@ -4985,12 +5027,11 @@ export default function IELTSBot(){
     const onPop = () => { 
       const view = getViewFromPath();
       setMainView(view); 
-      document.title = PAGE_TITLES[view] || "Englishfool";
+      updateSEO(view);
       window.scrollTo({top:0}); 
     };
     window.addEventListener('popstate', onPop);
-    // Set title on initial load
-    document.title = PAGE_TITLES[mainView] || "Englishfool";
+    updateSEO(mainView);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
