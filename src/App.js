@@ -5313,7 +5313,6 @@ export default function IELTSBot(){
           </div>
         </div>
       )}
-      </>)}
 
       {/* CONTENT AREA — visible on all non-policy pages */}
       {!["terms","privacy","refund","pricing"].includes(mainView)&&(
