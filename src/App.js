@@ -4891,11 +4891,11 @@ const UI = {
     gameSub:"الإملاء · القواعد · المفردات · الكتابة · القراءة",
     gameBtn:"العب الآن 🕹️",
     // Pricing comparison
-    pricingTitle:uiLang==="ar"?"المجاني مقابل Pro — الفرق في ثانية":"Free vs Pro — The Difference at a Glance",
-    pricingSub:uiLang==="ar"?"عرض الإطلاق: 3 أشهر بـ 10 دينار / $17 فقط":"Launch offer: 3 months for $17 / 10 JOD only",
-    pricingBtn:uiLang==="ar"?"احصل على Pro الآن ←":"Get Pro Now →",
-    pricingNote:uiLang==="ar"?"الإلغاء في أي وقت · دفع آمن عبر Paddle":"Cancel anytime · Secure payment via Paddle",
-    freeLabel:uiLang==="ar"?"المجاني":"Free", proLabel:uiLang==="ar"?"كل شيء مفتوح":"Everything Unlocked",
+    pricingTitle:"المجاني مقابل Pro — الفرق في ثانية",
+    pricingSub:"عرض الإطلاق: 3 أشهر بـ 10 دينار / $17 فقط",
+    pricingBtn:"احصل على Pro الآن ←",
+    pricingNote:"الإلغاء في أي وقت · دفع آمن عبر Paddle",
+    freeLabel:"المجاني", proLabel:"كل شيء مفتوح",
     // Writing sub-nav
     wAnalyze:"🎓 تحليل المقالة",wPractice:"🖊️ تدريب",wGrammar:"✏️ قواعد وإملاء",wExercises:"🏋️ تمارين",
     // Mobile hamburger
@@ -5437,7 +5437,7 @@ export default function IELTSBot(){
                 {UI[uiLang].unlimitedBanner}
               </span>
               <span style={{background:`${T.accent}22`,border:`1px solid ${T.accent}66`,borderRadius:20,padding:"2px 12px",fontSize:12,color:T.accent,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
-                uiLang==="ar"?"🇯🇴 CLIQ — 10 دينار (3 أشهر)":"🇯🇴 Jordan: 10 JOD via CLIQ"
+                {uiLang==="ar"?"🇯🇴 CLIQ — 10 دينار (3 أشهر)":"🇯🇴 Jordan: 10 JOD via CLIQ"}
               </span>
             </div>
             <button onClick={()=>setShowPaywall(true)}
