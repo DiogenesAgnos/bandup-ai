@@ -3605,6 +3605,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
     const globalOffset = allQ.filter(q=>q.pIdx<activePsg).length;
 
     return (
+      <div>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:16}}>
         <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});setTimerRunning(false);window.scrollTo({top:0,behavior:"smooth"});}} style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,color:T.primary,fontSize:13,fontWeight:700,cursor:"pointer",...sty,padding:"8px 16px",borderRadius:8,display:"flex",alignItems:"center",gap:6}}>← Change Test</button>
         <div style={{...sty,fontSize:13,color:T.textMuted,fontWeight:600}}>{test.title}</div>
@@ -3679,6 +3680,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
             </button>
           )}
         </div>
+      </div>
       </div>
     );
   };
