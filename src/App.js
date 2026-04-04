@@ -1050,7 +1050,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
   return (
     <div>
       <Card style={{marginBottom:16,background:"#fff5f5",border:"1px solid #ffcccc"}}>
-        <p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🎓 Your personal IELTS reference guide. {!isPro&&<span style={{color:T.textMid}}>Linking Words and Grammar are free. Upgrade for full access.</span>}</p>
+        <p style={{color:T.red,fontSize:13,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"ltr",textAlign:"left"}}>🎓 Your personal IELTS reference guide. {!isPro&&<span style={{color:T.textMid}}>Linking Words and Grammar are free. Upgrade for full access.</span>}</p>
       </Card>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>
         {sections.map(s=>(
@@ -2881,8 +2881,8 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
 
   return (
     <div style={{maxWidth:900,margin:"0 auto",padding:"36px 24px 80px"}}>
-      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px"}}>🗣️ IELTS Speaking</h1>
-      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}>Prepare for all three parts of the IELTS Speaking test with model answers, vocabulary, tips, and video examples.</p>
+      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px",direction:"ltr",textAlign:"left"}}>🗣️ IELTS Speaking</h1>
+      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}></p>
 
       {/* Tab bar */}
       <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:24,paddingBottom:4}} className="tab-row">
@@ -3651,7 +3651,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 
         <div style={card}>
           <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px",direction:"ltr",textAlign:"left"}}>{psg.title}</h2>
-          <div style={{background:T.bgGray,borderRadius:8,padding:"24px",marginBottom:20,lineHeight:1.9,...sty,fontSize:15,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto",border:`1px solid ${T.border}`,direction:"ltr",textAlign:"left"}}>
+          <div style={{background:T.bgGray,borderRadius:8,padding:"24px",marginBottom:20,lineHeight:1.9,...sty,fontSize:15,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto",border:`1px solid ${T.border}`,direction:"ltr",textAlign:"left"}} className="reading-passage"}}>
             {psg.text}
           </div>
           <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px",direction:"ltr",textAlign:"left"}}>Questions {globalOffset+1}–{globalOffset+psgQuestions.length}</h3>
@@ -3688,8 +3688,8 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 
   return (
     <div style={{maxWidth:900,margin:"0 auto",padding:"36px 24px 80px"}}>
-      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px"}}>📖 IELTS Reading</h1>
-      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}>Full practice tests with scoring, answer keys with explanations, and strategies for every question type.</p>
+      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px",direction:"ltr",textAlign:"left"}}>📖 IELTS Reading</h1>
+      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.6,direction:"ltr",textAlign:"left"}}>Full practice tests with scoring, answer keys with explanations, and strategies for every question type.</p>
 
       {!activeTest&&(
         <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:24,paddingBottom:4}} className="tab-row">
@@ -3795,7 +3795,7 @@ const ContactPage = () => {
     <div style={{maxWidth:600,margin:"0 auto",padding:"36px 24px 0"}}>
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{fontSize:48,marginBottom:12}}>✉️</div>
-        <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900}}>اتصل بنا</h2>
+        <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900,direction:"rtl"}}>اتصل بنا</h2>
         <p style={{color:T.textMid,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0,lineHeight:1.6,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور، أو راسلنا مباشرةً عبر Messenger.</p>
         <a href="https://www.facebook.com/profile.php?id=61579432547860" target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:8,background:"#1877f2",color:"white",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:700,textDecoration:"none",fontFamily:"'Cairo',system-ui",marginTop:12}}>
           <span style={{fontSize:18}}>💬</span> تواصل عبر Facebook Messenger
@@ -4866,6 +4866,37 @@ const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "home"; };
 
+// ── UI TRANSLATIONS ────────────────────────────────────────
+const UI = {
+  ar:{
+    home:"🏠 الرئيسية", writing:"✍️ الكتابة", speaking:"🗣️ المحادثة",
+    reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
+    progress:"📈 تقدمي", contact:"✉️ اتصل بنا",
+    signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
+    manageSubscription:"إدارة الاشتراك",
+    startFree:"جرّب تحليل مقالة — مجاناً ←",
+    subscribe:"🔓 اشترك — $17 / 10 دينار",
+    heroTitle:"ارفع درجتك في الآيلتس",
+    heroSub:"تقييم مقالات فوري بمعايير كامبريدج · اختبارات قراءة كاملة · ألعاب تدريبية تفاعلية",
+    feedbackLang:"لغة التحليل",
+    languageNote:"اللغة التي سيُكتب بها تحليل مقالتك",
+  },
+  en:{
+    home:"🏠 Home", writing:"✍️ Writing", speaking:"🗣️ Speaking",
+    reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
+    progress:"📈 Progress", contact:"✉️ Contact",
+    signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
+    manageSubscription:"Manage Subscription",
+    startFree:"Try Essay Analysis — Free →",
+    subscribe:"🔓 Subscribe — $17 / 10 JOD",
+    heroTitle:"Boost Your IELTS Score",
+    heroSub:"Instant essay feedback · Full reading tests · Interactive learning games",
+    feedbackLang:"Analysis Language",
+    languageNote:"The language your essay feedback will be written in",
+  }
+};
+
+
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
   const [mainView,setMainView]=useState(()=>getViewFromPath());
@@ -4894,6 +4925,7 @@ export default function IELTSBot(){
   const [session,setSession]=useState(null);
   const [uses,setUses]=useState(0);
   const [lang,setLang]=useState("en");
+  const [uiLang,setUiLang]=useState("ar"); // Website UI language
   const [menuOpen,setMenuOpen]=useState(false);
   const analyzeRef=useRef(null);
   const [proUser, setProUser] = useState(false);
@@ -5170,12 +5202,15 @@ export default function IELTSBot(){
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",height:56}}>
             <Logo size={26} style={{cursor:"pointer"}} onClick={()=>switchView("home")}/>
             <div className="nav-right" style={{display:"flex",alignItems:"center",gap:12}}>
-              <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2}}>
-                {["ar","en"].map(l=>(
-                  <button key={l} onClick={()=>switchLang(l)} style={{background:lang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:lang===l?700:500,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s",boxShadow:lang===l?T.shadow:"none"}}>
-                    {l==="ar"?"عربي":"EN"}
-                  </button>
-                ))}
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo',system-ui"}}>{uiLang==="ar"?"لغة الموقع:":"Site:"}</span>
+                <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2}}>
+                  {["ar","en"].map(l=>(
+                    <button key={l} onClick={()=>setUiLang(l)} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s",boxShadow:uiLang===l?T.shadow:"none"}}>
+                      {l==="ar"?"ع":"EN"}
+                    </button>
+                  ))}
+                </div>
               </div>
               {proUser?(
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -5183,15 +5218,15 @@ export default function IELTSBot(){
                   <button onClick={()=>setShowManageSub(true)} style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo',system-ui",textDecoration:"underline",cursor:"pointer",background:"none",border:"none",padding:0}}>إدارة الاشتراك</button>
                 </div>
               ):(
-                <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>🔓 احصل على Pro</button>
+                <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].getPro}</button>
               )}
               {session?(
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:12,color:T.textMid,fontFamily:"'Cairo',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
-                  <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"5px 10px",fontSize:12,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>Sign Out</button>
+                  <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"5px 10px",fontSize:12,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].signOut}</button>
                 </div>
               ):(
-                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:6,padding:"6px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>Sign In →</button>
+                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:6,padding:"6px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].signIn}</button>
               )}
             </div>
           </div>
@@ -5201,14 +5236,14 @@ export default function IELTSBot(){
         <div style={{background:T.primary}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center"}}>
-              <MainTab label="🏠 الرئيسية" active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
-              <MainTab label="✍️ الكتابة" active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label="🗣️ المحادثة" active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
-              <MainTab label="📖 القراءة" active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
-              <MainTab label="🎮 ألعاب" active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
-              <MainTab label="📚 أدوات" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label="📈 تقدمي" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
-              <MainTab label="✉️ اتصل بنا" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
+              <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
+              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
+              <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
+              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
             <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontSize:18,color:"white",minWidth:40,minHeight:40,justifyContent:"center",alignItems:"center"}}>☰</button>
           </div>
@@ -5219,7 +5254,7 @@ export default function IELTSBot(){
       {["analyze","practice","grammar","exercises"].includes(mainView)&&(
         <div className="writing-subnav" style={{background:"#f9fafb",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
-            {[{v:"analyze",l:"🎓 تحليل المقالة"},{v:"practice",l:"🖊️ تدريب"},{v:"grammar",l:"✏️ قواعد وإملاء"},{v:"exercises",l:"🏋️ تمارين"}].map(t=>(
+            {[{v:"analyze",l:uiLang==="ar"?"🎓 تحليل المقالة":"🎓 Analyze Essay"},{v:"practice",l:uiLang==="ar"?"🖊️ تدريب":"🖊️ Practice"},{v:"grammar",l:uiLang==="ar"?"✏️ قواعد وإملاء":"✏️ Grammar"},{v:"exercises",l:uiLang==="ar"?"🏋️ تمارين":"🏋️ Exercises"}].map(t=>(
               <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"7px 16px",fontSize:13,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
             ))}
           </div>
@@ -5231,27 +5266,27 @@ export default function IELTSBot(){
         <div style={{background:T.primary,padding:"80px 32px 90px",textAlign:"center",position:"relative",overflow:"hidden"}}>
           {/* Subtle pattern overlay */}
           <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
-          <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:"rtl"}}>
+          <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:uiLang==="ar"?"rtl":"ltr",textAlign:"center"}}>
             <div style={{display:"inline-block",background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"5px 18px",fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo',system-ui",fontWeight:600,marginBottom:24}}>
               🎓 منصة التحضير للآيلتس — بالعربي
             </div>
             <h1 style={{fontSize:"clamp(32px,5vw,58px)",fontWeight:900,color:"white",fontFamily:"'Cairo',system-ui",lineHeight:1.2,margin:"0 0 20px",textShadow:"0 2px 20px rgba(0,0,0,0.2)"}}>
-              ارفع درجتك في الآيلتس
+              {uiLang==="ar"?"ارفع درجتك في الآيلتس":"Boost Your IELTS Score"}
             </h1>
-            <p style={{fontSize:"clamp(16px,2vw,22px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo',system-ui",lineHeight:1.7,margin:"0 0 40px",fontWeight:400}}>
-              تقييم مقالات فوري بمعايير كامبريدج · اختبارات قراءة كاملة · ألعاب تدريبية تفاعلية
+            <p style={{fontSize:"clamp(16px,2vw,22px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo',system-ui",lineHeight:1.7,margin:"0 0 40px",fontWeight:400,direction:uiLang==="ar"?"rtl":"ltr"}}>
+              {uiLang==="ar"?"تقييم مقالات فوري بمعايير كامبريدج · اختبارات قراءة كاملة · ألعاب تدريبية تفاعلية":"Instant essay feedback · Full reading tests · Interactive learning games"}
             </p>
             <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
               <button onClick={trySampleEssay} style={{background:T.accent,color:"#7f1200",border:"none",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:`0 6px 24px rgba(0,0,0,0.25)`,transition:"transform 0.15s"}}
                 onMouseOver={e=>e.currentTarget.style.transform="translateY(-2px)"}
                 onMouseOut={e=>e.currentTarget.style.transform="translateY(0)"}>
-                ابدأ مجاناً ←
+                {uiLang==="ar"?"جرّب تحليل مقالة — مجاناً ←":"Try Essay Analysis — Free →"}
               </button>
               {!proUser&&(
                 <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.12)",color:"white",border:"2px solid rgba(255,255,255,0.5)",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"background 0.15s"}}
                   onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.2)"}
                   onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.12)"}>
-                  🔓 اشترك بـ $17 / 10 دينار
+                  {uiLang==="ar"?"🔓 اشترك — $17 / 10 دينار":"🔓 Subscribe — $17 / 10 JOD"}
                 </button>
               )}
             </div>
@@ -5345,13 +5380,13 @@ export default function IELTSBot(){
       {/* CONTENT AREA — visible on all non-policy tool pages */}
       {!["terms","privacy","refund","pricing","home"].includes(mainView)&&(
       <div className="content-outer" style={{maxWidth:1200,margin:"36px auto 100px",padding:"0 32px"}}>
-        <div className="content-card" style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:12,padding:"44px 40px",boxShadow:T.shadow}}>
+      <div className="content-card en-content" style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:12,padding:"44px 40px",boxShadow:T.shadow}}>
 
         {/* ANALYZE */}
         {mainView==="analyze"&&(
           <div className="analyze-box" style={{background:"#ffffff",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}>
             <div style={{marginBottom:20}}>
-              <label style={{display:"block",fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>Select Task Type</label>
+              <label style={{display:"block",fontSize:13,color:T.text,marginBottom:6,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,direction:uiLang==="ar"?"rtl":"ltr"}}>{uiLang==="ar"?"اختر نوع المهمة الكتابية":"Select your writing task type"}</label>
               <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
               <div className="task-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 {Object.entries(TASK_TYPES).map(([key,task])=>(
@@ -5768,10 +5803,10 @@ export default function IELTSBot(){
               ))}
               <div style={{height:1,background:T.border,margin:"8px 20px"}}/>
               <div style={{padding:"8px 20px"}}>
-                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,marginBottom:8,fontFamily:"'Cairo',system-ui",direction:"rtl"}}>لغة التغذية الراجعة</div>
+                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,marginBottom:8,fontFamily:"'Cairo',system-ui",direction:"rtl"}}>{uiLang==="ar"?"لغة الموقع":"Website Language"}</div>
                 <div style={{display:"flex",gap:8}}>
                   {["ar","en"].map(l=>(
-                    <button key={l} onClick={()=>switchLang(l)} style={{flex:1,background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{l==="ar"?"🇸🇦 عربي":"🇬🇧 English"}</button>
+                    <button key={l} onClick={()=>setUiLang(l)} style={{flex:1,background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{l==="ar"?"🇸🇦 عربي (AR)":"🇬🇧 English (EN)"}</button>
                   ))}
                 </div>
               </div>
@@ -5838,6 +5873,22 @@ export default function IELTSBot(){
 
         /* ── Features grid ── */
         .features-grid { grid-template-columns: repeat(4,1fr) !important; }
+
+        /* ── Direction rules ── */
+        /* English content blocks — always LTR */
+        .en-content { direction: ltr !important; text-align: left !important; }
+        /* Arabic content blocks — always RTL */
+        .ar-content { direction: rtl !important; text-align: right !important; }
+        /* Content card: tool pages (reading, speaking, toolkit, game) are English-first */
+        .content-card h1, .content-card h2, .content-card h3 { direction: ltr; text-align: left; }
+        .content-card p { direction: ltr; text-align: left; }
+        /* But Arabic labels stay RTL */
+        .content-card [lang="ar"], .content-card .ar-label { direction: rtl; text-align: right; }
+        /* Reading passages and questions */
+        .reading-passage { direction: ltr !important; text-align: left !important; font-family: Georgia, serif !important; line-height: 1.9 !important; }
+        .reading-question { direction: ltr !important; text-align: left !important; }
+        /* Speaking model answers */
+        .speaking-answer { direction: ltr !important; text-align: left !important; line-height: 1.8 !important; }
 
         @media (max-width: 768px) {
           /* NAV TIER 1 */
