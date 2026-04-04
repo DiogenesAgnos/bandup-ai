@@ -5523,7 +5523,7 @@ export default function IELTSBot(){
       )}
 
       {/* ── HERO — ieltsanswers style: big + clean + minimal ─── */}
-      {["home","analyze"].includes(mainView)&&(
+      {mainView==="home"&&(
         <div style={{background:T.primary,padding:"80px 32px 90px",textAlign:"center",position:"relative",overflow:"hidden"}}>
           {/* Subtle pattern overlay */}
           <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
@@ -5538,7 +5538,7 @@ export default function IELTSBot(){
               {uiLang==="ar"?"تقييم مقالات فوري بمعايير كامبريدج · اختبارات قراءة كاملة · ألعاب تدريبية تفاعلية":"Instant essay feedback · Full reading tests · Interactive learning games"}
             </p>
             <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
-              <button onClick={trySampleEssay} style={{background:T.accent,color:"#7f1200",border:"none",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:`0 6px 24px rgba(0,0,0,0.25)`,transition:"transform 0.15s"}}
+              <button onClick={()=>{switchView("analyze");setTimeout(()=>{const el=document.getElementById("essay-input-area");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});},300);}} style={{background:T.accent,color:"#7f1200",border:"none",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:`0 6px 24px rgba(0,0,0,0.25)`,transition:"transform 0.15s"}}
                 onMouseOver={e=>e.currentTarget.style.transform="translateY(-2px)"}
                 onMouseOut={e=>e.currentTarget.style.transform="translateY(0)"}>
                 {uiLang==="ar"?"جرّب تحليل مقالة — مجاناً ←":"Try Essay Analysis — Free →"}
@@ -5556,7 +5556,7 @@ export default function IELTSBot(){
       )}
 
       {/* ── FEATURES STRIP (below hero, white background) ────── */}
-      {["home","analyze"].includes(mainView)&&(
+      {mainView==="home"&&(
         <div style={{background:"white",borderBottom:`1px solid ${T.border}`,padding:"40px 32px"}}>
           <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,textAlign:"center"}} className="features-grid">
             {[
@@ -5645,7 +5645,7 @@ export default function IELTSBot(){
 
         {/* ANALYZE */}
         {mainView==="analyze"&&(
-          <div className="analyze-box" style={{background:"#ffffff",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}>
+          <div id="essay-input-area" className="analyze-box" style={{background:"#ffffff",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",padding:"32px 28px"}}>
             <div style={{marginBottom:20}}>
               <label style={{display:"block",fontSize:13,color:T.text,marginBottom:6,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,direction:uiLang==="ar"?"rtl":"ltr"}}>{uiLang==="ar"?"اختر نوع المهمة الكتابية":"Select your writing task type"}</label>
               <p style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:10,marginTop:0}}>Choose the type of writing task you are submitting. Task 2 is the essay. Task 1 Academic is for graphs/charts. Task 1 General is for letters.</p>
