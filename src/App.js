@@ -416,7 +416,7 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
               {seg.text}
             </span>
             {activeTooltip===seg.idx&&(
-              <span style={{position:"absolute",bottom:"calc(100% + 8px)",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",width:260,zIndex:100,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal"}}>
+              <span style={{position:"fixed",bottom:"auto",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",width:"min(260px, 88vw)",maxWidth:"88vw",zIndex:1000,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal",pointerEvents:"none"}}>
                 <span style={{position:"absolute",bottom:-6,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:"6px solid #1e293b"}}/>
                 <div style={{display:"flex",gap:6,marginBottom:6,flexWrap:"wrap"}}>
                   <span style={{background:`${c}30`,border:`1px solid ${c}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:c,fontWeight:700}}>{seg.mistake.severity}</span>
@@ -1324,7 +1324,10 @@ const GrammarChecker = ({isPro}) => {
 
   const check = async () => {
     if (!input.trim()) { setError("Please enter a word or sentence to check."); return; }
-    if (!isPro && dailyUses >= GRAMMAR_DAILY_LIMIT) { setError("لقد استنفدت فحوصاتك المجانية (10 فحوصات). احصل على Pro للفحص غير المحدود."); return; }
+    // Always read fresh from localStorage to avoid stale state
+    const freshUses = getGrammarUsesToday();
+    if(freshUses !== dailyUses) setDailyUses(freshUses);
+    if (!isPro && freshUses >= GRAMMAR_DAILY_LIMIT) { setError("لقد استنفدت فحوصاتك المجانية (10 فحوصات). احصل على Pro للفحص غير المحدود."); return; }
     setError(""); setLoading(true); setResult(null);
     try {
       const res = await fetch(API_URL, {
