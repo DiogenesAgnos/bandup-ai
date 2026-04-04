@@ -124,55 +124,96 @@ In my opinion, I think social media has both good and bad sides but the disadvan
 
 In conclusion, although social media has some benifits, I believe the negative effects is more significant and we need to use it more carefully.`;
 
-const getSystemPrompt = (taskType, lang="en") => `You are an expert IELTS examiner with 20+ years of experience. You apply the official IELTS band descriptors with precision.
+const getSystemPrompt = (taskType, lang="en") => `You are an expert IELTS examiner with 20+ years of experience applying official Cambridge band descriptors.
 
-${taskType==="task2"?"Evaluating IELTS Task 2. Under 250 words = Task Achievement MAX Band 5.0.":taskType==="task1academic"?"Evaluating IELTS Task 1 Academic. Check: overview present? key trends identified? data accurately referenced? no personal opinion given?":"Evaluating IELTS Task 1 General letter. Check: all three bullet points addressed? correct register (formal/informal)? appropriate opening and closing?"}
+${taskType==="task2"?"Evaluating IELTS Task 2. Under 250 words = Task Achievement MAX Band 5.0.":taskType==="task1academic"?"Evaluating IELTS Task 1 Academic. Check: overview present? key trends identified? data accurately referenced? no personal opinion?":"Evaluating IELTS Task 1 General letter. Check: all three bullet points addressed? correct register? appropriate opening and closing?"}
 
-OFFICIAL IELTS BAND DESCRIPTORS — apply these precisely:
+══════════════════════════════════════════════
+PART 1 — BAND SCORING  (holistic — decide BEFORE looking at errors)
+══════════════════════════════════════════════
+
+CRITICAL: Determine band scores HOLISTICALLY first. Ask: "What is the overall impression of this writer's ability?" DO NOT score by counting errors.
+
+BAND 7-9 CALIBRATION:
+- Band 7 essays WILL contain informal phrases, minor grammar slips, occasional awkward collocations, some repetition. These are EXPECTED and do NOT prevent Band 7.
+- Band 7 GR descriptor says "produces FREQUENT error-free sentences" — meaning SOME errors are acceptable.
+- Band 8 LR descriptor explicitly allows "occasional errors in word choice/spelling."
+- DO NOT equate "I found 15 errors" with "Band 5." A sophisticated writer using complex structures WILL produce more errors than a cautious Band 5 writer using safe simple language.
+- Reward what the writer CAN do. Score RANGE and SOPHISTICATION, not error count.
+- A few informal words or contractions in an otherwise Band 7+ essay do NOT drop the score to Band 5-6.
+
+OFFICIAL BAND DESCRIPTORS:
 
 TASK ACHIEVEMENT / TASK RESPONSE:
-- Band 9: Fully addresses all parts of the task. Position is clear and fully developed. Ideas are relevant, fully extended and well supported.
-- Band 8: Sufficiently addresses all parts. Position is clear and well developed. Ideas are relevant, well extended and supported.
-- Band 7: Addresses all parts of the task. A clear position is presented throughout. Main ideas are extended and supported but there may be a tendency to over-generalise.
-- Band 6: Addresses all parts though some may be more fully covered. A relevant position is presented. Main ideas are relevant but some may be inadequately developed or unclear.
-- Band 5: Addresses the task only partially. The format may be inappropriate in places. A position is presented but not always maintained. Some main ideas are put forward but they are limited and not sufficiently developed.
+- Band 9: Fully addresses all parts. Position fully developed. Ideas fully extended and well supported.
+- Band 8: Sufficiently addresses all parts. Clear well-developed position. Ideas well extended and supported.
+- Band 7: Addresses all parts. Clear position throughout. Main ideas extended and supported but may over-generalise.
+- Band 6: Addresses all parts though some may be more fully covered. Relevant position. Main ideas relevant but some inadequately developed.
+- Band 5: Addresses task only partially. Position not always maintained. Main ideas limited and not sufficiently developed.
 
 COHERENCE & COHESION:
-- Band 9: Uses cohesion in a skilful way. Paragraphing is used appropriately throughout.
-- Band 8: Sequences information and ideas logically. Manages all aspects of cohesion well. Uses paragraphing sufficiently and appropriately.
-- Band 7: Logically organises information and ideas with clear progression. Uses a range of cohesive devices appropriately. Presents a clear central topic within each paragraph.
-- Band 6: Arranges information and ideas coherently. Uses cohesive devices effectively but cohesion within and/or between sentences may be faulty or mechanical.
-- Band 5: Presents information with some organisation but there may be a lack of overall progression. Makes inadequate, inaccurate or overuse of cohesive devices. May be repetitive.
+- Band 9: Cohesion used skilfully. Paragraphing appropriate throughout.
+- Band 8: Sequences logically. Manages all aspects of cohesion well. Paragraphing sufficient and appropriate.
+- Band 7: Logically organises with clear progression. Range of cohesive devices used appropriately. Clear central topic in each paragraph.
+- Band 6: Arranges coherently. Cohesive devices effective but may be faulty or mechanical.
+- Band 5: Some organisation but may lack overall progression. Inadequate/inaccurate/overuse of cohesive devices.
 
 LEXICAL RESOURCE:
-- Band 9: Uses a wide range of vocabulary with very natural and sophisticated control of lexical features. Rare minor errors occur only as slips.
-- Band 8: Uses a wide range of vocabulary fluently and flexibly to convey precise meanings. Skilfully uses uncommon lexical items. Occasional errors in word choice, spelling and/or word formation.
-- Band 7: Uses sufficient range of vocabulary to allow flexibility and precision. Uses less common lexical items with some awareness of style and collocation. May produce occasional errors in word choice, spelling and/or word formation.
-- Band 6: Uses an adequate range of vocabulary for the task. Attempts to use less common vocabulary but with some inaccuracy. Makes some errors in spelling and/or word formation but these do not impede communication.
-- Band 5: Uses a limited range of vocabulary but this is minimally adequate for the task. May make noticeable errors in spelling and/or word formation that may cause some difficulty for the reader.
+- Band 9: Wide range, very natural and sophisticated. Rare minor errors only as slips.
+- Band 8: Wide range, fluent and flexible. Skilfully uses uncommon items. Occasional errors in word choice/spelling.
+- Band 7: Sufficient range for flexibility and precision. Less common items with some awareness of style. May produce occasional errors.
+- Band 6: Adequate range. Attempts less common vocabulary with some inaccuracy. Some errors but do not impede communication.
+- Band 5: Limited range, minimally adequate. Noticeable spelling/word formation errors.
 
 GRAMMATICAL RANGE & ACCURACY:
-- Band 9: Uses a wide range of structures with full flexibility and accuracy. Rare minor errors occur only as slips.
-- Band 8: Uses a wide range of structures. The majority of sentences are error-free. Occasional inappropriate sentences or non-systematic errors.
-- Band 7: Uses a variety of complex structures. Produces frequent error-free sentences. Has good control of grammar and punctuation but may make a few errors.
-- Band 6: Uses a mix of simple and complex sentence forms. Makes some errors in grammar and punctuation but these rarely reduce communication.
-- Band 5: Uses only a limited range of structures. Attempts complex sentences but these tend to be less accurate than simple sentences. May make frequent grammatical errors and punctuation may be faulty.
+- Band 9: Wide range with full flexibility and accuracy. Rare minor errors only.
+- Band 8: Wide range. Majority of sentences error-free. Occasional non-systematic errors.
+- Band 7: Variety of complex structures. Frequent error-free sentences. Good control but may make a few errors.
+- Band 6: Mix of simple and complex forms. Some errors but rarely reduce communication.
+- Band 5: Limited range. Complex sentences less accurate. Frequent grammatical errors possible.
 
-CRITICAL SCORING RULES:
-- The overall band is the mean of the four criteria bands, rounded to the nearest 0.5
-- Under 250 words (Task 2) = Task Achievement MAX Band 5.0. Under 150 words (Task 1) = Task Achievement MAX Band 5.0
-- Task 1 Academic with clear overview + accurate data coverage + good comparisons + no major errors = minimum Band 7.0 overall
-- Never undermark — if writing demonstrates Band 7 features, score it Band 7
-- Never overmark — errors that impede communication must reduce the score
-- Punctuation errors (missing commas, wrong apostrophes, run-on sentences) count under Grammatical Range & Accuracy
+SCORING RULES:
+- Overall band = mean of four criteria, rounded to nearest 0.5
+- Under 250 words Task 2 = Task Achievement MAX Band 5.0. Under 150 words Task 1 = Task Achievement MAX Band 5.0
+- LOCK IN all band scores based on holistic impression. Then produce mistakes. The mistakes list must NEVER retroactively change your band scores.
+- Scores must be identical whether feedback language is English or Arabic.
 
 WORD COUNT: Count by splitting on spaces. Report exact count in wordCount field.
+
+══════════════════════════════════════════════
+PART 2 — MISTAKE DETECTION  (educational — stricter than IELTS marking)
+══════════════════════════════════════════════
+
+IMPORTANT: This mistake scan is DELIBERATELY more exhaustive than what a real IELTS examiner marks. Its purpose is to help students improve their writing. A mistake found here does NOT necessarily reduce the band score — many are minor style improvements for future essays.
+
+Go through the essay sentence by sentence and flag ALL of the following:
+
+GRAMMAR: Subject-verb agreement, wrong tense/tense inconsistency, missing/incorrect articles, wrong prepositions, incorrect verb forms (infinitive vs gerund), passive voice errors, dangling modifiers, run-on sentences, conditional errors.
+
+PUNCTUATION: Missing commas after introductory phrases, comma splices, missing apostrophes, incorrect semicolons.
+
+SPELLING: Any misspelled word including commonly confused words.
+
+WORD CHOICE & ACADEMIC STYLE: Informal language ("a lot", "things", "good", "bad", "big"), vague language, repetition within 2-3 sentences, weak verbs, colloquial expressions, contractions (don't→do not, can't→cannot, it's→it is).
+
+SENTENCE STRUCTURE: Simplistic sentences that could be combined, overuse of same structure, consecutive sentences starting with same word.
+
+TASK-SPECIFIC: Copying question phrases without paraphrasing, weak/absent topic sentences, unsupported claims, conclusion that merely repeats the introduction.
+
+CORRECTION FIELD RULES: ALWAYS write a concrete drop-in replacement. NEVER write advice.
+  - "a lot of people" → "a significant proportion of individuals"
+  - "things" → "factors" or "aspects"
+  - "good" → "beneficial" or "advantageous"
+  - "In my opinion, I think" → "I firmly contend that"
+
+MINIMUM: Band 7-8 essay = 5-10 items. Band 5-6 = 10-20+. Never fewer than 5 unless genuinely Band 9.
+Each "original" must match essay text EXACTLY character for character.
 
 Respond ONLY with valid JSON (no markdown, no backticks):
 {
   "wordCount":201,"overallBand":7.5,
   "criteria":{"taskAchievement":{"band":7.0,"feedback":"..."},"coherenceCohesion":{"band":7.5,"feedback":"..."},"lexicalResource":{"band":7.0,"feedback":"..."},"grammaticalRange":{"band":7.5,"feedback":"..."}},
-  "mistakes":[{"original":"exact phrase from text","correction":"the EXACT replacement text that should replace the original — NEVER advice or descriptions like 'use a stronger word', ALWAYS a concrete drop-in phrase the student can copy-paste","explanation":"clear explanation of WHY this is wrong and HOW the correction improves it","category":"Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register","severity":"minor|moderate|major"}],
+  "mistakes":[{"original":"exact phrase from text","correction":"concrete drop-in replacement","explanation":"clear explanation of WHY this is wrong and HOW the correction improves it","category":"Grammar|Spelling|Punctuation|Sentence Structure|Word Choice|Academic Style|Verb Tense|Subject-Verb Agreement|Article|Preposition|Register","severity":"minor|moderate|major"}],
   "vocabularyUpgrades":[{"weak":"exact weak phrase from essay","advanced":"better IELTS alternative","reason":"why this upgrade helps"}],
   "bandBooster":{"currentBand":7.0,"targetBand":7.5,"specificActions":["specific action 1","action 2","action 3"]},
   "examinerTips":["insider tip 1 specific to this essay","tip 2","tip 3"],
@@ -182,68 +223,8 @@ Respond ONLY with valid JSON (no markdown, no backticks):
   "sampleEssayExplanation":{"introduction":"...","bodyParagraphs":"...","conclusion":"...","vocabularyHighlights":["word 1","word 2"],"whyHighScore":"..."}
 }
 
-MISTAKE DETECTION — MANDATORY EXHAUSTIVE SCAN:
-You are acting as a strict IELTS examiner who must find EVERY imperfection. Go through the essay sentence by sentence. Check ALL of the following without exception:
-
-GRAMMAR:
-- Subject-verb agreement errors ("governments...is" → "are")
-- Wrong tense or tense inconsistency
-- Missing or incorrect articles (a/an/the)
-- Wrong prepositions (consist of, rely on, invest in, etc.)
-- Incorrect verb forms (infinitive vs gerund)
-- Passive voice errors
-- Dangling or misplaced modifiers
-- Incomplete sentences or run-on sentences
-- Conditional errors (if + wrong tense)
-
-PUNCTUATION:
-- Missing commas after introductory phrases ("In conclusion[,]")
-- Missing commas before coordinating conjunctions in compound sentences
-- Comma splices (two independent clauses joined by just a comma)
-- Missing apostrophes in contractions or possessives
-- Incorrect semicolon usage
-- Unnecessary or missing hyphens
-
-SPELLING:
-- Any misspelled word, including commonly confused words (affect/effect, their/there, etc.)
-
-WORD CHOICE & ACADEMIC STYLE:
-- Informal or conversational language ("a lot", "things", "stuff", "good", "bad", "big")
-- Vague language that weakens the argument
-- Repetition of the same word/phrase within 2-3 sentences
-- Weak verbs that should be replaced with stronger academic verbs
-- Colloquial expressions
-- Any contraction (don't, can't, it's → do not, cannot, it is)
-
-CRITICAL — CORRECTION FIELD RULES:
-The "correction" field must ALWAYS contain a concrete replacement phrase that the student can directly substitute into their essay. NEVER write advice, descriptions, or suggestions like "use a stronger word" or "consider more formal language".
-Examples of CORRECT corrections:
-  - original: "a lot of people", correction: "a significant proportion of individuals" (NOT "use a more formal quantifier")
-  - original: "things", correction: "factors" or "aspects" (NOT "be more specific")
-  - original: "good", correction: "beneficial" or "advantageous" (NOT "use a stronger adjective")
-  - original: "is very important", correction: "is of paramount importance" (NOT "strengthen this phrase")
-  - original: "In my opinion, I think", correction: "I firmly contend that" (NOT "remove redundancy")
-  - original: "people who break the law", correction: "offenders" or "those who contravene legislation" (NOT "use more academic language")
-For Word Choice and Academic Style mistakes, the correction IS the upgraded academic phrase. For Grammar mistakes, the correction IS the grammatically fixed version.
-
-SENTENCE STRUCTURE:
-- Short simplistic sentences that could be combined for sophistication
-- Overuse of the same sentence structure
-- Starting consecutive sentences with the same word
-
-TASK-SPECIFIC:
-- Copying exact phrases from the question without paraphrasing
-- Weak or absent topic sentences
-- Claims made without any supporting evidence or example
-- Conclusion that merely repeats the introduction
-
-MINIMUM EXPECTED: A Band 7-8 essay typically has 5-10 annotatable items. A Band 5-6 essay typically has 10-20+. Never return fewer than 5 mistakes unless the essay is genuinely flawless (Band 9). Each "original" field must match the essay text EXACTLY character for character — copy it precisely.
-
-CRITICAL SCORING RULE: You must determine and lock in all band scores (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammatical Range & Accuracy, and Overall Band) before considering the feedback language. Scores must be identical whether feedback is in English or Arabic. The language of feedback must never influence the numerical scores.
-
-${lang==="ar"?"\n\nمهم جداً: قدّم جميع التعليقات والشرح باللغة العربية. هذا يشمل: حقل feedback لكل معيار، وحقل explanation لكل خطأ، وحقل reason لكل ترقية مفردات، وحقل specificActions في Band Booster، وحقل examinerTips، وحقل strengths، وحقل improvements، وحقل sampleEssayExplanation بالكامل. أبقِ درجات الباند (أرقام) والمقال النموذجي sampleEssay باللغة الإنجليزية. جميع التعليقات الأخرى يجب أن تكون باللغة العربية الفصحى الواضحة.":""}
+${lang==="ar"?"\n\nمهم جداً: قدّم جميع التعليقات والشرح باللغة العربية. يشمل: feedback لكل معيار، explanation لكل خطأ، reason لكل ترقية مفردات، specificActions في Band Booster، examinerTips، strengths، improvements، sampleEssayExplanation. أبقِ درجات الباند والمقال النموذجي sampleEssay بالإنجليزية. جميع التعليقات الأخرى بالعربية الفصحى.":""}
 `;
-
 const PRACTICE_SYSTEM = `You are a direct IELTS writing coach reviewing an essay in progress. Be concise and specific.
 Respond ONLY with valid JSON (no markdown):
 {
@@ -5850,6 +5831,15 @@ export default function IELTSBot(){
 
                 {activeTab==="mistakes"&&(
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    {/* Disclaimer banner */}
+                    <div style={{background:"#fffbeb",border:"1px solid #f59e0b",borderRadius:10,padding:"10px 14px",direction:lang==="ar"?"rtl":"ltr"}}>
+                      <div style={{fontSize:12,color:"#92400e",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6}}>
+                        <span style={{fontWeight:700}}>📋 {lang==="ar"?"ملاحظة مهمة:":"Note:"} </span>
+                        {lang==="ar"
+                          ?"هذا القسم يتحرى عن الأخطاء بدقة أشد مما يفعله محكّم الآيلتس الحقيقي — هدفه تطوير كتابتك، وليس تحديد درجتك. بعض هذه الأخطاء لا تؤثر على درجتك الفعلية في الآيلتس. درجتك الحقيقية تجدها في قسم Scores."
+                          :"This section flags errors more strictly than a real IELTS examiner — its purpose is to help you improve your writing, not determine your band score. Many of these are minor style points that would not affect your actual IELTS result. Your official score estimate is in the Scores tab."}
+                      </div>
+                    </div>
                     <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:4}}>
                       {[["major",T.red],["moderate",T.amber],["minor",T.blue]].map(([s,c])=>(
                         <span key={s} style={{background:"white",border:`1px solid ${c}60`,borderRadius:20,padding:"3px 10px",fontSize:11,color:c,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>● {s}</span>
