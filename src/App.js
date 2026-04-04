@@ -744,7 +744,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
       });
       // Also send email notification via EmailJS (backup)
       try{
-        if(window.emailjs) await window.emailjs.send("service_9es76g1","template_jrd4i4n",{
+        if(window.emailjs?.send) await window.emailjs.send("service_9es76g1","template_jrd4i4n",{
           from_name:"CLIQ PRO REQUEST: "+cliqForm.name.trim(),
           from_email:cliqForm.email.trim(),
           country:cliqForm.mobile.trim(),
@@ -3763,10 +3763,25 @@ const trackEvent = (eventName, params={}) => {
   try { if(window.gtag) window.gtag("event", eventName, params); } catch(e) {}
 };
 
+// ── EmailJS Self-Init ─────────────────────────
 // ── Contact Page ─────────────────────────────
 const EMAILJS_SERVICE_ID = "service_9es76g1";
 const EMAILJS_TEMPLATE_ID = "template_jrd4i4n";
-const EMAILJS_PUBLIC_KEY = "Wl_oo3VnUzPGW3MB4";
+const EMAILJS_PUBLIC_KEY  = "Wl_oo3VnUzPGW3MB4";
+
+// Load and initialize EmailJS SDK if not already present
+(()=>{
+  if(typeof window!=="undefined"&&!window._ejsLoaded){
+    window._ejsLoaded=true;
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
+    s.async=true;
+    s.onload=()=>{
+      try{ window.emailjs.init({publicKey: EMAILJS_PUBLIC_KEY}); }catch(e){ console.error("EmailJS init failed",e); }
+    };
+    document.head.appendChild(s);
+  }
+})();
 
 const ContactPage = () => {
   const [form, setForm] = useState({ name:"", country:"", age:"", email:"", message:"" });
@@ -3778,12 +3793,8 @@ const ContactPage = () => {
     setStatus("sending");
     trackEvent("contact_form_submit", { country: form.country, age_group: form.age });
     try {
-      if(EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-        await new Promise(r => setTimeout(r, 1500));
-        setStatus("success");
-        setForm({ name:"", country:"", age:"", email:"", message:"" });
-        return;
-      }
+      let attempts=0;
+      while(!window.emailjs?.send && attempts<20){ await new Promise(r=>setTimeout(r,150)); attempts++; }
       await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
         from_name: form.name, from_email: form.email, country: form.country,
         age_group: form.age, message: form.message, to_email: "diogenes.agnos@gmail.com"
@@ -4838,8 +4849,10 @@ function ConsultationModal({onClose, uiLang="ar"}){
       form.message
     ].join("\n");
     try {
-      // Ensure emailjs is loaded
-      if(!window.emailjs){ throw new Error("EmailJS not loaded"); }
+      // Wait for emailjs to be ready (it loads async)
+      let attempts=0;
+      while(!window.emailjs?.send && attempts<20){ await new Promise(r=>setTimeout(r,150)); attempts++; }
+      if(!window.emailjs?.send){ throw new Error("EmailJS not available"); }
       await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
         from_name: `[Consultation] ${form.name}`,
         from_email: "consultation@englishfool.com",
@@ -5220,7 +5233,13 @@ export default function IELTSBot(){
   const handleAuthSuccess=(sess)=>{
     setSession(sess);
     setUses(getStoredUses(sess.email));
-    fetchProStatus(sess.email).then(setProUser);
+    fetchProStatus(sess.email).then(isPro=>{
+      setProUser(isPro);
+      // If they just logged in as Pro and have a generated password, prompt to change it
+      if(isPro && sess.isGeneratedPassword){
+        setTimeout(()=>setShowChangePassword(true), 800);
+      }
+    });
     setShowAuth(false);
     setShowPaywall(false);
   };
@@ -5450,6 +5469,7 @@ export default function IELTSBot(){
               {session?(
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:12,color:T.textMid,fontFamily:"'Cairo',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
+                  <button onClick={()=>setShowChangePassword(true)} title="Change Password" style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:6,padding:"4px 8px",fontSize:11,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>🔑</button>
                   <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"5px 10px",fontSize:12,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].signOut}</button>
                 </div>
               ):(
