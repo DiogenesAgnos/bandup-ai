@@ -5074,7 +5074,7 @@ const UI = {
     // Mobile hamburger
     siteLang:"لغة الموقع",
     // Upgrade banner
-    unlimitedBanner:"{UI[uiLang].unlimitedBanner}",
+    unlimitedBanner:"🎓 تحليل غير محدود · جميع الاختبارات · الألعاب · التدريبات",
     upgradeBtn:"🔓 احصل على Pro →",
     feedbackLang:"لغة التحليل",
     languageNote:"اللغة التي سيُكتب بها تحليل مقالتك",
