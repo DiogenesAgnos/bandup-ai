@@ -2941,10 +2941,12 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
                       {showAnswer[`p2-${i}`]?"Hide Model Answer":"Show Band 8+ Model Answer"}
                     </button>
                     {showAnswer[`p2-${i}`]&&(
-                      <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"10px 14px",marginBottom:8,fontSize:12,color:"#713f12",lineHeight:1.5}}>
-                        ⚠️ <strong>لا تحفظ هذه الإجابة حرفياً.</strong> الممتحن مدرَّب على اكتشاف الإجابات المحفوظة. استخدمها كمثال على الهيكل والمفردات، ثم تحدّث بأسلوبك الخاص عن تجربتك الشخصية.
-                      </div>
-                      <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"14px",...sty,fontSize:13,color:T.textMid,lineHeight:1.7,whiteSpace:"pre-line"}}>{item.model}</div>
+                      <>
+                        <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"10px 14px",marginBottom:8,fontSize:12,color:"#713f12",lineHeight:1.5}}>
+                          ⚠️ <strong>لا تحفظ هذه الإجابة حرفياً.</strong> الممتحن مدرَّب على اكتشاف الإجابات المحفوظة. استخدمها كمثال على الهيكل والمفردات، ثم تحدّث بأسلوبك الخاص عن تجربتك الشخصية.
+                        </div>
+                        <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:8,padding:"14px",...sty,fontSize:13,color:T.textMid,lineHeight:1.7,whiteSpace:"pre-line"}}>{item.model}</div>
+                      </>
                     )}
                   </div>
                 )}
