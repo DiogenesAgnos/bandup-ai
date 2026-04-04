@@ -142,6 +142,13 @@ BAND 7-9 CALIBRATION:
 - Reward what the writer CAN do. Score RANGE and SOPHISTICATION, not error count.
 - A few informal words or contractions in an otherwise Band 7+ essay do NOT drop the score to Band 5-6.
 
+CONCRETE CALIBRATION EXAMPLES — anchor your scoring to these:
+- Essay with clear position + good paragraphs + counterargument + wide vocabulary range + some informal words ("a lot", "big issue") + complex sentences with a few grammar slips + 350+ words = Band 7 to 7.5. NOT Band 6.
+- Essay using hedging language ("tends to", "appears to be", "might"), wide vocabulary, complex structures, rare spelling errors, logical paragraphing, counterargument addressed = Band 7.5 to 8. Even with 10-15 minor findable issues, the RANGE earns Band 7+.
+- Contractions ("don't", "can't") alone do NOT drop a sophisticated essay below Band 7.
+- One misspelled word (e.g. "celebraties") does not make the essay Band 5 vocabulary. It is ONE slip in an otherwise adequate range.
+
+
 OFFICIAL BAND DESCRIPTORS:
 
 TASK ACHIEVEMENT / TASK RESPONSE:
@@ -385,7 +392,7 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
   clean.forEach(f=>{ if(f.pos>cursor) segments.push({text:essay.slice(cursor,f.pos),type:"normal"}); segments.push({text:essay.slice(f.pos,f.end),type:"mistake",mistake:f.mistake,idx:f.idx}); cursor=f.end; });
   if(cursor<essay.length) segments.push({text:essay.slice(cursor),type:"normal"});
   return (
-    <div style={{position:"relative",fontSize:15,lineHeight:1.9,fontFamily:"Georgia,serif",whiteSpace:"pre-wrap",color:T.text}}>
+    <div style={{position:"relative",fontSize:15,lineHeight:1.9,fontFamily:"Georgia,serif",whiteSpace:"pre-wrap",color:T.text,overflow:"visible"}}>
       {segments.map((seg,i)=>{
         if(seg.type==="normal") return <span key={i}>{seg.text}</span>;
         const c=severityColor(seg.mistake.severity);
@@ -393,11 +400,11 @@ const AnnotatedEssay = ({ essay, mistakes }) => {
         return (
           <span key={i} style={{position:"relative",display:"inline"}}>
             <span onClick={()=>setActiveTooltip(activeTooltip===seg.idx?null:seg.idx)}
-              style={{borderBottom:`2px solid ${T.red}`,cursor:"pointer",background:activeTooltip===seg.idx?`${T.red}18`:"transparent",borderRadius:3,padding:"0 1px",transition:"background 0.15s"}}>
+              style={{borderBottom:`2px solid ${severityColor(seg.mistake.severity)}`,cursor:"pointer",background:activeTooltip===seg.idx?`${T.red}18`:"transparent",borderRadius:3,padding:"0 1px",transition:"background 0.15s"}}>
               {seg.text}
             </span>
             {activeTooltip===seg.idx&&(
-              <span style={{position:"fixed",bottom:"auto",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",width:"min(260px, 88vw)",maxWidth:"88vw",zIndex:1000,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal",pointerEvents:"none"}}>
+              <span style={{position:"absolute",bottom:"calc(100% + 8px)",left:"50%",transform:"translateX(-50%)",background:"#1e293b",color:"white",borderRadius:10,padding:"10px 14px",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",width:"min(280px,70vw)",zIndex:500,boxShadow:T.shadowLg,lineHeight:1.5,fontStyle:"normal",whiteSpace:"normal",display:"block"}}>
                 <span style={{position:"absolute",bottom:-6,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:"6px solid #1e293b"}}/>
                 <div style={{display:"flex",gap:6,marginBottom:6,flexWrap:"wrap"}}>
                   <span style={{background:`${c}30`,border:`1px solid ${c}60`,borderRadius:20,padding:"1px 8px",fontSize:11,color:c,fontWeight:700}}>{seg.mistake.severity}</span>
