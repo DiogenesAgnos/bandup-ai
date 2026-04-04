@@ -2746,34 +2746,34 @@ const AdminPage = ({onBack}) => {
 // ── IELTS Speaking Page ──────────────────────
 const SPEAKING_PART1 = [
   {topic:"Hometown",questions:[
-    {q:"Where is your hometown?",a:"My hometown is Amman, the capital of Jordan. It's a bustling city built on several hills, with a fascinating mix of ancient ruins and modern developments. I've lived there most of my life and I'm quite attached to it."},
-    {q:"What do you like about your hometown?",a:"What I appreciate most is the warmth of the people — there's a real sense of community. I also love the food scene; you can find incredible traditional dishes like mansaf and falafel on practically every street. The city has a unique character that blends tradition with modernity."},
-    {q:"Is there anything you would like to change about your hometown?",a:"I'd definitely improve the public transport system. Currently, most people rely heavily on private cars, which leads to terrible traffic congestion during rush hour. A proper metro or tram network would make a huge difference to daily life."}
+    {q:"Where is your hometown?",a:"I'm from Amman — it's the capital of Jordan. It's a fairly large city, built across a series of hills, and it has this interesting mix of really ancient history and quite modern development. I've spent most of my life there, so there's a real sense of attachment."},
+    {q:"What do you like about your hometown?",a:"The thing I appreciate most is probably the sense of community — people are genuinely warm and quite welcoming to strangers. The food culture is brilliant too. You can find extraordinary traditional dishes like mansaf or falafel at almost any street corner. And the city has a character that's hard to describe — traditional and contemporary at the same time."},
+    {q:"Is there anything you would like to change about your hometown?",a:"Honestly, the public transport. Most people depend entirely on private cars, which means the traffic congestion during peak hours is quite severe. A proper metro system or reliable tram network would transform the city. Several proposals have been made over the years, but nothing substantial has materialised yet."}
   ]},
   {topic:"Work & Studies",questions:[
-    {q:"Do you work or study?",a:"I currently work in the education sector. I've been involved in coordinating English language examinations for the past few years. It's quite rewarding because I get to help students achieve their academic goals through proper certification."},
-    {q:"What do you enjoy about your work?",a:"I particularly enjoy the problem-solving aspect. Every day brings different challenges, whether it's resolving logistical issues or finding creative solutions to help students. The variety keeps things interesting and I rarely feel bored."},
-    {q:"Would you like to change your job in the future?",a:"I'm actually considering transitioning into business development. I feel my experience has given me strong interpersonal and analytical skills that would transfer well. Ideally, I'd like to combine my education background with commercial strategy."}
+    {q:"Do you work or study?",a:"I work in the education sector — I've been involved in coordinating English language examinations for a few years now. It's genuinely rewarding because the work directly affects students' opportunities. When someone achieves the score they need for university admission or a visa, that has a real impact on their life."},
+    {q:"What do you enjoy about your work?",a:"The variety, mostly. No two days are identical — you're dealing with different institutions, different challenges, different people. I also enjoy the problem-solving aspect. There are often logistical or administrative issues that need creative solutions, and I find that quite engaging rather than frustrating."},
+    {q:"Would you like to change your job in the future?",a:"I'm considering a move into business development, actually. The skills I've built — relationship management, analytical thinking, strategic communication — would transfer well. Ideally I'd retain the connection to education but shift focus towards building partnerships and commercial strategy rather than day-to-day coordination."}
   ]},
   {topic:"Technology",questions:[
-    {q:"How often do you use your phone?",a:"Honestly, I use it constantly throughout the day — probably more than I should. It's essentially my connection to work emails, social media, news, and messaging apps. I'd estimate I spend at least four or five hours on it daily."},
-    {q:"Do you think people spend too much time on technology?",a:"Absolutely. I think there's a growing dependency on screens that's quite concerning. People scroll through social media instead of having real conversations. That said, technology also enables incredible things like remote work and instant access to education."},
-    {q:"What technology do you find most useful?",a:"I'd say translation apps and AI tools have been game-changers for me. They help me communicate across language barriers and automate repetitive tasks. GPS navigation is another one — I genuinely don't know how people managed without it."}
+    {q:"How often do you use your phone?",a:"Constantly, if I'm honest — probably more than I should. It's essentially the hub for everything: work communications, news, messaging. I'd estimate four or five hours daily, which sounds excessive when you say it out loud. I've tried reducing screen time but it's genuinely difficult when so much professional communication happens through messaging apps."},
+    {q:"Do you think people spend too much time on technology?",a:"I think there's a real and growing dependency, yes. The concerning part isn't just the time — it's the displacement of richer activities. People scroll instead of having conversations, or check notifications instead of being present. That said, technology has also enabled remarkable things. The question is whether we're using it intentionally or being used by it."},
+    {q:"What technology do you find most useful?",a:"GPS navigation, without question. I genuinely don't understand how people managed before it — the cognitive load of navigating an unfamiliar city without real-time guidance must have been enormous. Translation tools are a close second. For someone working across language contexts, they've become indispensable."}
   ]},
   {topic:"Food & Cooking",questions:[
-    {q:"Do you enjoy cooking?",a:"Yes, I do actually. I find it quite therapeutic after a long day at work. I particularly enjoy experimenting with different cuisines — I've recently been trying my hand at Asian dishes, which require techniques quite different from Middle Eastern cooking."},
-    {q:"What kind of food do you usually eat?",a:"My diet is fairly typical for the region — lots of rice, grilled meats, fresh salads, and olive oil. I try to incorporate vegetables into most meals, though I have a weakness for street food like shawarma and falafel sandwiches."},
-    {q:"Have your eating habits changed over the years?",a:"Definitely. When I was younger, I ate whatever was convenient without thinking about nutrition. Now I'm much more conscious about what I consume. I've reduced my sugar intake significantly and try to avoid processed foods where possible."}
+    {q:"Do you enjoy cooking?",a:"I do, actually — more than I expected to. I find it quite meditative after a demanding day. Recently I've been experimenting with Asian techniques, which are quite different from Middle Eastern cooking — different spice profiles, different methods entirely. Getting those dishes right is genuinely satisfying."},
+    {q:"What kind of food do you usually eat?",a:"Fairly typical for this region — rice, grilled meats, fresh salads with olive oil. I try to be reasonably conscious about nutrition, but I have a real weakness for good street food. A proper falafel sandwich from the right place is hard to beat, regardless of what I know about balanced diets."},
+    {q:"Have your eating habits changed over the years?",a:"Significantly, yes. When I was younger, convenience was the only criterion. Now I'm much more deliberate — less sugar, fewer processed foods, more attention to where ingredients come from. I wouldn't say I'm obsessive about it, but there's a level of awareness now that simply wasn't there before."}
   ]},
   {topic:"Environment",questions:[
-    {q:"Are you interested in protecting the environment?",a:"Yes, increasingly so. I've become much more aware of environmental issues in recent years, partly through media coverage and partly through visible changes in my own city. I try to reduce waste and conserve water, though I know I could do more."},
-    {q:"What environmental problems are common in your country?",a:"Water scarcity is probably the most pressing issue. Jordan is one of the most water-scarce countries in the world. Air pollution from traffic and industrial activity is another growing concern, particularly in urban areas like Amman and Zarqa."},
-    {q:"Do you think individuals can make a difference to the environment?",a:"I believe individual actions matter collectively. If millions of people make small changes — reducing plastic use, conserving energy, choosing public transport — the cumulative impact is significant. However, systemic change through government policy is equally essential."}
+    {q:"Are you interested in protecting the environment?",a:"Increasingly so. Partly through media coverage and partly through things you observe directly — water availability in Jordan has become a visibly pressing issue over my lifetime. I've made personal changes, though I'm aware individual actions are limited without broader structural change."},
+    {q:"What environmental problems are common in your country?",a:"Water scarcity is the most critical — Jordan is among the most water-stressed countries in the world, which has real implications for agriculture and daily life. Beyond that, air quality in urban areas, particularly Amman and Zarqa, has deteriorated significantly due to traffic density and industrial activity."},
+    {q:"Do you think individuals can make a difference to the environment?",a:"Individually, the impact is marginal. Collectively, it can be significant — but only if millions of people make changes simultaneously, which requires cultural shifts that governments and institutions need to drive. I think framing it purely as individual responsibility actually lets corporations and policymakers off the hook."}
   ]},
   {topic:"Social Media",questions:[
-    {q:"Which social media platforms do you use?",a:"I mainly use Instagram for browsing content and WhatsApp for daily communication. I also check Facebook occasionally, though less than I used to. For professional networking, I sometimes browse LinkedIn to stay updated on industry trends."},
-    {q:"Do you think social media has more advantages or disadvantages?",a:"It's a double-edged sword, honestly. The advantages include instant communication, access to global news, and networking opportunities. But the disadvantages — misinformation, addiction, and the negative impact on mental health — are equally significant."},
-    {q:"How has social media changed the way people communicate?",a:"It's fundamentally transformed communication. People now prefer sending voice messages over making phone calls, and group chats have replaced many face-to-face social gatherings. While it's made staying in touch easier, I think the quality of interactions has somewhat diminished."}
+    {q:"Which social media platforms do you use?",a:"Mainly WhatsApp for daily communication and Instagram for content. I check LinkedIn occasionally to follow professional developments in my field. Facebook less so — I use it mainly to stay connected with family who are geographically dispersed. The platforms I use most are almost entirely defined by who else uses them."},
+    {q:"Do you think social media has more advantages or disadvantages?",a:"The honest answer is that it depends almost entirely on how you use it. For staying connected, accessing information and building professional networks — it's genuinely valuable. The problems arise from the design of these platforms, which are engineered to maximise engagement rather than wellbeing. Those incentives produce real harms: misinformation, anxiety, polarisation."},
+    {q:"How has social media changed the way people communicate?",a:"It's fundamentally restructured it. Asynchronous communication has largely replaced synchronous — people now default to sending a voice message rather than making a call. Group conversations that would once have required physical presence happen through chat. Whether this represents genuine connection or a pale substitute for it is something I think about quite a bit."}
   ]}
 ];
 
@@ -3497,26 +3497,42 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 
   const typeInstruction = (type) => {
     if(type==="tfng") return "Do the following statements agree with the information given in the reading passage? Write TRUE if the statement agrees with the information, FALSE if the statement contradicts the information, or NOT GIVEN if there is no information on this.";
+    if(type==="yn") return "Do the following statements agree with the views or claims of the writer? Write YES if the statement agrees with the writer's views, NO if the statement contradicts the writer's views, or NOT GIVEN if it is impossible to say what the writer thinks.";
     if(type==="mc") return "Choose the correct letter, A, B, C or D.";
-    if(type==="completion") return "Complete the sentences below. Choose NO MORE THAN TWO WORDS from the passage for each answer.";
+    if(type==="completion") return "Complete the sentences below. Choose NO MORE THAN TWO WORDS AND/OR A NUMBER from the passage for each answer.";
+    if(type==="matching_headings") return "The reading passage has several paragraphs. Choose the correct heading for each paragraph from the list of headings. Write the correct letter (A–H) next to each paragraph.";
     return "";
   };
 
   const renderQ = (q, i, showTypeHeader) => {
     const key = q.key;
+    const typeLabel = q.type==="tfng"?"True / False / Not Given":q.type==="yn"?"Yes / No / Not Given":q.type==="mc"?"Multiple Choice":q.type==="matching_headings"?"Matching Headings":"Sentence Completion";
     return (
       <div key={key}>
         {showTypeHeader&&(
           <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:8,padding:"12px 16px",marginBottom:10,marginTop:i>0?18:0}}>
-            <div style={{...sty,fontSize:13,fontWeight:700,color:T.primary,marginBottom:4,textTransform:"uppercase",letterSpacing:"0.05em"}}>{q.type==="tfng"?"True / False / Not Given":q.type==="mc"?"Multiple Choice":"Sentence Completion"}</div>
+            <div style={{...sty,fontSize:13,fontWeight:700,color:T.primary,marginBottom:4,textTransform:"uppercase",letterSpacing:"0.05em"}}>{typeLabel}</div>
             <div style={{...sty,fontSize:12,color:T.textMid,lineHeight:1.5,fontStyle:"italic"}}>{typeInstruction(q.type)}</div>
           </div>
         )}
         <div style={{marginBottom:14,padding:"12px 14px",background:T.bgGray,borderRadius:8,border:`1px solid ${T.border}`}}>
           <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600}}>{i+1}. {q.q}</div>
-          {q.type==="tfng"&&(
+          {(q.type==="tfng")&&(
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
               {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
+                <button key={opt} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
+                  style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:submitted?"default":"pointer",
+                    background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
+                    border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
+                    color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+          {q.type==="yn"&&(
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+              {["YES","NO","NOT GIVEN"].map(opt=>(
                 <button key={opt} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
                   style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:submitted?"default":"pointer",
                     background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
@@ -3540,10 +3556,10 @@ const ReadingPage = ({isPro, onUpgrade}) => {
               ))}
             </div>
           )}
-          {q.type==="completion"&&(
+          {(q.type==="completion"||q.type==="matching_headings")&&(
             <input value={userAnswers[key]||""} onChange={e=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:e.target.value}));}}
-              placeholder="Type your answer..." readOnly={submitted}
-              style={{...sty,fontSize:14,padding:"8px 12px",border:`1px solid ${submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBorder:T.redBorder):T.border}`,borderRadius:6,width:"100%",maxWidth:300,background:submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBg:T.redBg):"white",boxSizing:"border-box"}}/>
+              placeholder={q.type==="matching_headings"?"Enter heading letter (A, B, C...)":"Type your answer (max 3 words)"} readOnly={submitted}
+              style={{...sty,fontSize:14,padding:"8px 12px",border:`1px solid ${submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBorder:T.redBorder):T.border}`,borderRadius:6,width:"100%",maxWidth:340,background:submitted?(userAnswers[key]?.toLowerCase().trim()===q.a.toLowerCase()?T.greenBg:T.redBg):"white",boxSizing:"border-box"}}/>
           )}
           {submitted&&(
             <div style={{marginTop:8}}>
@@ -3589,8 +3605,10 @@ const ReadingPage = ({isPro, onUpgrade}) => {
     const globalOffset = allQ.filter(q=>q.pIdx<activePsg).length;
 
     return (
-      <div>
-        <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});setTimerRunning(false);}} style={{background:"none",border:"none",color:T.primary,fontSize:14,fontWeight:600,cursor:"pointer",...sty,padding:"0 0 16px",display:"flex",alignItems:"center",gap:6}}>← Back to tests</button>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:16}}>
+        <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});setTimerRunning(false);window.scrollTo({top:0,behavior:"smooth"});}} style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,color:T.primary,fontSize:13,fontWeight:700,cursor:"pointer",...sty,padding:"8px 16px",borderRadius:8,display:"flex",alignItems:"center",gap:6}}>← Change Test</button>
+        <div style={{...sty,fontSize:13,color:T.textMuted,fontWeight:600}}>{test.title}</div>
+      </div>
 
         {/* Sticky Timer Bar */}
         {!submitted&&(
@@ -3644,8 +3662,8 @@ const ReadingPage = ({isPro, onUpgrade}) => {
         {/* Navigation + Submit */}
         <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:"space-between",alignItems:"center"}}>
           <div style={{display:"flex",gap:8}}>
-            {activePsg>0&&<button onClick={()=>setActivePsg(activePsg-1)} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>← Previous Passage</button>}
-            {activePsg<test.passages.length-1&&<button onClick={()=>setActivePsg(activePsg+1)} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Next Passage →</button>}
+            {activePsg>0&&<button onClick={()=>{setActivePsg(activePsg-1);setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),50);}} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:600,color:T.textMid,cursor:"pointer",...sty}}>← Previous Passage</button>}
+            {activePsg<test.passages.length-1&&<button onClick={()=>{setActivePsg(activePsg+1);setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),50);}} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Next Passage →</button>}
           </div>
           {!submitted?(
             activePsg===test.passages.length-1?(
@@ -5250,8 +5268,9 @@ export default function IELTSBot(){
                   "نموذج إجابة كامل لنفس سؤالك",
                   "خطة واضحة لرفع درجتك — ليس تحليلاً فحسب"
                 ].map((item,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end",fontSize:"clamp(12px,1.3vw,14px)",color:"rgba(255,255,255,0.8)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.5}}>
-                    {item} <span style={{color:T.accent,fontSize:13,flexShrink:0}}>◆</span>
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,direction:"rtl",fontSize:"clamp(12px,1.3vw,14px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6}}>
+                    <span style={{color:T.accent,fontSize:12,flexShrink:0}}>◆</span>
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
