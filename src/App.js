@@ -4809,6 +4809,98 @@ function OnboardingBanner({onStart,onClose}){
   );
 }
 
+// ── FREE CONSULTATION MODAL ──────────────────────
+const FB_PAGE_URL = "https://www.facebook.com/profile.php?id=61579432547860";
+
+function ConsultationModal({onClose, uiLang="ar"}){
+  const [channel, setChannel] = useState(null);
+  const [form, setForm] = useState({name:"",phone:"",message:""});
+  const [status, setStatus] = useState(null);
+  const isAr = uiLang==="ar";
+
+  const handleWhatsAppSubmit = async () => {
+    if(!form.name.trim()||!form.phone.trim()||!form.message.trim()){ setStatus("error"); return; }
+    setStatus("sending");
+    try {
+      await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        from_name: form.name,
+        from_email: "consultation@englishfool.com",
+        country: "WhatsApp Consultation",
+        age_group: form.phone,
+        message: `📱 WhatsApp Consultation\n\nName: ${form.name}\nWhatsApp: ${form.phone}\n\n${form.message}`,
+        to_email: "sartawi.ahmad@gmail.com"
+      });
+      setStatus("success");
+    } catch(e){ console.error(e); setStatus("error"); }
+  };
+
+  const inp={width:"100%",background:"#f9fafb",border:`1px solid ${T.border}`,borderRadius:10,color:T.text,fontSize:14,padding:"12px 14px",fontFamily:"'Cairo',system-ui",outline:"none",boxSizing:"border-box",direction:isAr?"rtl":"ltr"};
+  const lbl={display:"block",fontSize:12,color:T.textMid,fontWeight:700,marginBottom:6,fontFamily:"'Cairo',system-ui",textAlign:isAr?"right":"left"};
+
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div style={{background:"white",borderRadius:16,maxWidth:440,width:"100%",boxShadow:"0 8px 40px rgba(0,0,0,0.2)",position:"relative",overflow:"hidden",fontFamily:"'Cairo',system-ui"}}>
+        <div style={{background:T.primary,padding:"20px 24px",position:"relative"}}>
+          <button onClick={onClose} style={{position:"absolute",top:12,left:12,background:"rgba(255,255,255,0.15)",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",color:"white",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          <div style={{textAlign:"center"}}>
+            <div style={{fontSize:36,marginBottom:6}}>🎓</div>
+            <div style={{fontWeight:800,fontSize:18,color:"white"}}>{isAr?"استشارة مجانية في الآيلتس":"Free IELTS Consultation"}</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,0.7)",marginTop:4}}>{isAr?"اختر طريقة التواصل المناسبة لك":"Choose how you would like to reach us"}</div>
+          </div>
+        </div>
+        <div style={{padding:"24px"}}>
+          {!channel&&(
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <button onClick={()=>setChannel("whatsapp")} style={{display:"flex",alignItems:"center",gap:14,background:"#f0fdf4",border:"2px solid #86efac",borderRadius:12,padding:"16px 20px",cursor:"pointer",transition:"all 0.2s",textAlign:isAr?"right":"left",direction:isAr?"rtl":"ltr"}}
+                onMouseOver={e=>{e.currentTarget.style.background="#dcfce7";e.currentTarget.style.borderColor="#4ade80";}}
+                onMouseOut={e=>{e.currentTarget.style.background="#f0fdf4";e.currentTarget.style.borderColor="#86efac";}}>
+                <span style={{fontSize:32,flexShrink:0}}>📱</span>
+                <div>
+                  <div style={{fontWeight:700,fontSize:15,color:"#166534"}}>WhatsApp</div>
+                  <div style={{fontSize:13,color:"#4b7c5a",marginTop:2}}>{isAr?"أرسل لنا اسمك ورقمك وسنتواصل معك":"Send us your details and we will reach out to you"}</div>
+                </div>
+              </button>
+              <button onClick={()=>{window.open(FB_PAGE_URL,"_blank");onClose();}} style={{display:"flex",alignItems:"center",gap:14,background:"#eff6ff",border:"2px solid #93c5fd",borderRadius:12,padding:"16px 20px",cursor:"pointer",transition:"all 0.2s",textAlign:isAr?"right":"left",direction:isAr?"rtl":"ltr"}}
+                onMouseOver={e=>{e.currentTarget.style.background="#dbeafe";e.currentTarget.style.borderColor="#60a5fa";}}
+                onMouseOut={e=>{e.currentTarget.style.background="#eff6ff";e.currentTarget.style.borderColor="#93c5fd";}}>
+                <span style={{fontSize:32,flexShrink:0}}>💬</span>
+                <div>
+                  <div style={{fontWeight:700,fontSize:15,color:"#1d4ed8"}}>Facebook</div>
+                  <div style={{fontSize:13,color:"#3b5fc0",marginTop:2}}>{isAr?"راسلنا عبر صفحتنا على Facebook":"Message us via our Facebook Page"}</div>
+                </div>
+              </button>
+            </div>
+          )}
+          {channel==="whatsapp"&&status!=="success"&&(
+            <div style={{direction:isAr?"rtl":"ltr"}}>
+              <button onClick={()=>{setChannel(null);setStatus(null);setForm({name:"",phone:"",message:""});}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontSize:13,fontWeight:600,marginBottom:16,padding:0,display:"flex",alignItems:"center",gap:4}}>
+                ← {isAr?"رجوع":"Back"}
+              </button>
+              <div style={{display:"flex",flexDirection:"column",gap:14}}>
+                <div><label style={lbl}>{isAr?"الاسم الكامل *":"Full Name *"}</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder={isAr?"اكتب اسمك...":"Your name..."} style={inp}/></div>
+                <div><label style={lbl}>{isAr?"رقم WhatsApp (مع كود الدولة) *":"WhatsApp Number (with country code) *"}</label><input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} placeholder="+962XXXXXXXXX" style={{...inp,direction:"ltr"}}/></div>
+                <div><label style={lbl}>{isAr?"موضوع الاستشارة *":"Your question or topic *"}</label><textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder={isAr?"مثال: درجتي 5.5 وأحتاج 7 للجامعة، كيف أحسّن الكتابة؟":"e.g. My score is 5.5, I need 7 for university. How do I improve writing?"} rows={4} style={{...inp,resize:"vertical",lineHeight:1.6}}/></div>
+                {status==="error"&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"10px 14px",fontSize:13,color:T.red}}>{isAr?"⚠️ يرجى ملء جميع الحقول المطلوبة":"⚠️ Please fill in all required fields"}</div>}
+                <button onClick={handleWhatsAppSubmit} disabled={status==="sending"} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px",fontSize:15,fontWeight:700,cursor:status==="sending"?"not-allowed":"pointer",opacity:status==="sending"?0.7:1}}>
+                  {status==="sending"?(isAr?"جارٍ الإرسال...":"Sending..."):(isAr?"إرسال الطلب ←":"Submit Request →")}
+                </button>
+              </div>
+            </div>
+          )}
+          {status==="success"&&(
+            <div style={{textAlign:"center",padding:"12px 0"}}>
+              <div style={{fontSize:52,marginBottom:12}}>✅</div>
+              <div style={{fontWeight:800,fontSize:18,color:T.green,marginBottom:8}}>{isAr?"تم الإرسال بنجاح!":"Request Sent!"}</div>
+              <div style={{fontSize:14,color:T.textMid,lineHeight:1.7,direction:isAr?"rtl":"ltr"}}>{isAr?"شكراً لك. سيتواصل معك أحمد على WhatsApp خلال 24 ساعة.":"Thank you! Ahmad will contact you on WhatsApp within 24 hours."}</div>
+              <button onClick={onClose} style={{marginTop:20,background:T.primary,color:"white",border:"none",borderRadius:10,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:"pointer"}}>{isAr?"إغلاق":"Close"}</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── MANAGE SUBSCRIPTION MODAL ──────────────────
 function ManageSubModal({onClose,email=""}){
   return(
@@ -4983,6 +5075,7 @@ export default function IELTSBot(){
   const [showPaywall,setShowPaywall]=useState(false);
   const [paywallTab,setPaywallTab]=useState("cliq");
   const [showManageSub,setShowManageSub]=useState(false);
+  const [showConsultation,setShowConsultation]=useState(false);
   const [showOnboarding,setShowOnboarding]=useState(()=>{try{return!localStorage.getItem("ef_onboarded");}catch{return true;}});
   const [showAuth,setShowAuth]=useState(false);
   const [showChangePassword,setShowChangePassword]=useState(false);
@@ -5254,6 +5347,7 @@ export default function IELTSBot(){
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onSuccess={handleAuthSuccess}/>}
       {showChangePassword&&<ChangePasswordModal onClose={()=>setShowChangePassword(false)}/>}
       {showManageSub&&<ManageSubModal onClose={()=>setShowManageSub(false)} email={session?.email||""}/>}
+      {showConsultation&&<ConsultationModal onClose={()=>setShowConsultation(false)} uiLang={uiLang}/>}
 
 
 
@@ -5265,7 +5359,11 @@ export default function IELTSBot(){
         <div style={{background:"#ffffff",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",height:56}}>
             <Logo size={26} style={{cursor:"pointer"}} onClick={()=>switchView("home")}/>
-            <div className="nav-right" style={{display:"flex",alignItems:"center",gap:12}}>
+            <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
+              {/* Free Consultation — desktop only */}
+              <button onClick={()=>setShowConsultation(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5,flexShrink:0,boxShadow:`0 2px 8px ${T.primary}44`}}>
+                🎓 {uiLang==="ar"?"استشارة مجانية":"Free Consultation"}
+              </button>
               <div style={{display:"flex",alignItems:"center",gap:6}}>
                 <span style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo',system-ui"}}>{uiLang==="ar"?"لغة الموقع:":"Site:"}</span>
                 <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2}}>
@@ -5310,7 +5408,11 @@ export default function IELTSBot(){
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
-              {/* Mobile language toggle — visible on mobile in red nav */}
+              {/* Mobile consultation button */}
+              <button className="mobile-consult-btn" onClick={()=>setShowConsultation(true)} style={{display:"none",background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.5)",borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:11,color:"white",fontFamily:"'Cairo',system-ui",fontWeight:700,whiteSpace:"nowrap",alignItems:"center",gap:4}}>
+                🎓 {uiLang==="ar"?"استشارة":"Consult"}
+              </button>
+              {/* Mobile language toggle */}
               <div className="mobile-lang-toggle" style={{display:"none",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:2,gap:2}}>
                 {["ar","en"].map(l=>(
                   <button key={l} onClick={()=>setUiLang(l)} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"5px 10px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:"rgba(255,255,255,0.8)",cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s"}}>
@@ -5972,6 +6074,7 @@ export default function IELTSBot(){
           /* NAV TIER 2 */
           .hamburger-btn { display: flex !important; }
           .mobile-lang-toggle { display: flex !important; }
+          .mobile-consult-btn { display: flex !important; }
           .nav-tabs { display: none !important; }
           .sticky-nav { position: sticky !important; top: 0 !important; }
 
