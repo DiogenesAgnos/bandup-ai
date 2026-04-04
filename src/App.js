@@ -148,6 +148,22 @@ CONCRETE CALIBRATION EXAMPLES — anchor your scoring to these:
 - Contractions ("don't", "can't") alone do NOT drop a sophisticated essay below Band 7.
 - One misspelled word (e.g. "celebraties") does not make the essay Band 5 vocabulary. It is ONE slip in an otherwise adequate range.
 
+PER-CRITERION SCORING GUIDANCE:
+
+LEXICAL RESOURCE — common AI mistake: scoring too low by averaging weak words with strong ones.
+- Score LR on the BEST vocabulary present, not on the average. If the essay has sophisticated hedging ("tends to", "appears to be"), collocation ("art of cookery", "negative impact"), topic-specific terms ("obesity", "sedentary"), and less common items — this is Band 7-8 range. The presence of "a lot" or "bad" alongside sophisticated language does NOT make it Band 6. Examiners reward RANGE — the ability to USE sophisticated vocabulary when appropriate.
+- Band 6 LR means vocabulary is MOSTLY basic and ATTEMPTS at less common vocabulary often fail. If the essay clearly succeeds at less common vocabulary in many places, it is Band 7+.
+
+COHERENCE & COHESION — common AI mistake: penalising paragraph length rather than logical flow.
+- CC is about PROGRESSION and FLOW, not perfect paragraph separation. An essay with one long body paragraph that still has clear logical sequencing (cause → effect → counterargument) can still reach Band 7. The Band 7 descriptor says "clear progression throughout" — look for progression, not perfect formatting.
+- Mechanical cohesive devices ("Firstly", "Secondly", "Moreover") are noted as a Band 7 trait — they are NOT a demotion to Band 6. Band 6 is when devices are FAULTY or INACCURATE, not when they are formulaic.
+- If ideas flow logically from one to the next with clear overall direction, score CC at 7 minimum.
+
+GRAMMATICAL RANGE & ACCURACY — common AI mistake: treating all errors as equally serious.
+- GR Band 7 says "frequent error-free sentences" — this means MOST sentences are correct, not ALL.
+- Complex sentence forms used anywhere in the essay — relative clauses, conditionals, passive voice, hedging constructions — count as evidence of RANGE even if errors exist elsewhere.
+- Subject-verb agreement errors ("games that makes") are genuine errors, but the GR score should reflect the RANGE of structures attempted. If 80% of sentences are correct and some complex structures are well-used, this is GR Band 6.5-7, not Band 5.
+
 
 OFFICIAL BAND DESCRIPTORS:
 
