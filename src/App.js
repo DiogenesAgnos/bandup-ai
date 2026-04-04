@@ -3518,9 +3518,9 @@ const ReadingPage = ({isPro, onUpgrade}) => {
           </div>
         )}
         <div style={{marginBottom:14,padding:"12px 14px",background:T.bgGray,borderRadius:8,border:`1px solid ${T.border}`}}>
-          <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600}}>{i+1}. {q.q}</div>
+          <div style={{...sty,fontSize:14,color:T.text,marginBottom:8,fontWeight:600,direction:"ltr",textAlign:"left"}}>{i+1}. {q.q}</div>
           {(q.type==="tfng")&&(
-            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap",direction:"ltr"}}>
               {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
                 <button key={opt} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
                   style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:submitted?"default":"pointer",
@@ -3533,7 +3533,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
             </div>
           )}
           {q.type==="yn"&&(
-            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap",direction:"ltr"}}>
               {["YES","NO","NOT GIVEN"].map(opt=>(
                 <button key={opt} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
                   style={{padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:600,...sty,cursor:submitted?"default":"pointer",
@@ -3549,7 +3549,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
             <div style={{display:"flex",flexDirection:"column",gap:6}}>
               {q.options.map((opt,oi)=>(
                 <button key={oi} onClick={()=>{if(!submitted)setUserAnswers(prev=>({...prev,[key]:opt}));}}
-                  style={{textAlign:"left",padding:"8px 12px",borderRadius:6,fontSize:13,...sty,cursor:submitted?"default":"pointer",
+                  style={{textAlign:"left",direction:"ltr",padding:"9px 14px",borderRadius:6,fontSize:13,...sty,cursor:submitted?"default":"pointer",
                     background:userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBg:T.redBg):T.primaryLight):"white",
                     border:`1px solid ${userAnswers[key]===opt?(submitted?(opt===q.a?T.greenBorder:T.redBorder):T.primaryBorder):T.border}`,
                     color:userAnswers[key]===opt?(submitted?(opt===q.a?T.green:T.red):T.primary):T.textMid}}>
@@ -3589,7 +3589,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
             {isLocked(i)?(
               <button onClick={onUpgrade} style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,color:T.amber,cursor:"pointer",...sty}}>🔒 Pro Only</button>
             ):(
-              <button onClick={()=>{setActiveTest({type,idx:i});setActivePsg(0);setShowAnswers(false);setSubmitted(false);setUserAnswers({});}} style={{background:type==="ac"?T.primary:T.green,color:"white",border:"none",borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>Start Test →</button>
+              <button onClick={()=>{setActiveTest({type,idx:i});setActivePsg(0);setShowAnswers(false);setSubmitted(false);setUserAnswers({});}} style={{background:type==="ac"?T.primary:T.green,color:"white",border:"none",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>Start Test →</button>
             )}
           </div>
         </div>
@@ -3615,7 +3615,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 
         {/* Sticky Timer Bar */}
         {!submitted&&(
-          <div style={{position:"sticky",top:64,zIndex:100,background:"white",border:`1px solid ${timerSeconds>3300?T.amberBorder:T.border}`,borderRadius:10,padding:"8px 16px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",boxShadow:T.shadow}}>
+          <div style={{position:"sticky",top:110,zIndex:100,background:"white",border:`1px solid ${timerSeconds>3300?T.amberBorder:T.border}`,borderRadius:10,padding:"10px 18px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.12)"}}>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <span style={{fontSize:20}}>⏱️</span>
               <div>
@@ -3650,11 +3650,11 @@ const ReadingPage = ({isPro, onUpgrade}) => {
         </div>
 
         <div style={card}>
-          <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px"}}>{psg.title}</h2>
-          <div style={{background:T.bgGray,borderRadius:8,padding:"20px",marginBottom:20,lineHeight:1.8,...sty,fontSize:14,color:T.textMid,whiteSpace:"pre-line",maxHeight:450,overflowY:"auto",border:`1px solid ${T.border}`}}>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px",direction:"ltr",textAlign:"left"}}>{psg.title}</h2>
+          <div style={{background:T.bgGray,borderRadius:8,padding:"24px",marginBottom:20,lineHeight:1.9,...sty,fontSize:15,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto",border:`1px solid ${T.border}`,direction:"ltr",textAlign:"left"}}>
             {psg.text}
           </div>
-          <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px"}}>Questions {globalOffset+1}–{globalOffset+psgQuestions.length}</h3>
+          <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px",direction:"ltr",textAlign:"left"}}>Questions {globalOffset+1}–{globalOffset+psgQuestions.length}</h3>
           {psgQuestions.map((q,qi)=>{
             const prevType = qi>0?psgQuestions[qi-1].type:null;
             const showHeader = q.type!==prevType;
@@ -3742,6 +3742,20 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 };
 // ── Analytics Helper ─────────────────────────
 const GA_ID = "G-9JN8WF1R0M";
+// Initialize GA4 if not already loaded
+(()=>{
+  if(typeof window!=="undefined"&&!window._gaLoaded){
+    window._gaLoaded=true;
+    window.dataLayer=window.dataLayer||[];
+    window.gtag=function(){window.dataLayer.push(arguments);};
+    window.gtag("js",new Date());
+    window.gtag("config",GA_ID,{send_page_view:true});
+    const s=document.createElement("script");
+    s.async=true;
+    s.src=`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+    document.head.appendChild(s);
+  }
+})();
 const trackEvent = (eventName, params={}) => {
   try { if(window.gtag) window.gtag("event", eventName, params); } catch(e) {}
 };
@@ -3781,9 +3795,11 @@ const ContactPage = () => {
     <div style={{maxWidth:600,margin:"0 auto",padding:"36px 24px 0"}}>
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{fontSize:48,marginBottom:12}}>✉️</div>
-        <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900}}>Contact Us</h2>
-        <p style={{color:T.textMid,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0,lineHeight:1.6}}>Have a question, feedback or need support? We'd love to hear from you.</p>
-        <p style={{color:T.textMuted,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:4,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور.</p>
+        <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900}}>اتصل بنا</h2>
+        <p style={{color:T.textMid,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0,lineHeight:1.6,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور، أو راسلنا مباشرةً عبر Messenger.</p>
+        <a href="https://www.facebook.com/profile.php?id=61579432547860" target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:8,background:"#1877f2",color:"white",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:700,textDecoration:"none",fontFamily:"'Cairo',system-ui",marginTop:12}}>
+          <span style={{fontSize:18}}>💬</span> تواصل عبر Facebook Messenger
+        </a>
       </div>
       <Card style={{border:"2px solid #e0e0e0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
@@ -4846,9 +4862,9 @@ function ManageSubModal({onClose,email=""}){
 }
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game"};
+const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
-const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "analyze"; };
+const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "home"; };
 
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
@@ -5007,7 +5023,7 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {analyze:"Englishfool — منصة الآيلتس الشاملة | تقييم مقالات + ألعاب + اختبارات",practice:"تدريب الكتابة — Englishfool",progress:"متابعة التقدم — Englishfool",toolkit:"أدوات الآيلتس — Englishfool",contact:"تواصل معنا — Englishfool",grammar:"مدقق القواعد والإملاء — Englishfool",exercises:"تمارين الآيلتس — Englishfool",admin:"Admin — Englishfool",terms:"شروط الخدمة — Englishfool",privacy:"سياسة الخصوصية — Englishfool",refund:"سياسة الاسترداد — Englishfool",pricing:"الأسعار — Englishfool",speaking:"تدريب المحادثة — Englishfool",reading:"اختبارات القراءة — Englishfool",game:"ألعاب الآيلتس — Englishfool"};
+  const PAGE_TITLES = {home:"Englishfool — منصة الآيلتس الشاملة",analyze:"Englishfool — منصة الآيلتس الشاملة | تقييم مقالات + ألعاب + اختبارات",practice:"تدريب الكتابة — Englishfool",progress:"متابعة التقدم — Englishfool",toolkit:"أدوات الآيلتس — Englishfool",contact:"تواصل معنا — Englishfool",grammar:"مدقق القواعد والإملاء — Englishfool",exercises:"تمارين الآيلتس — Englishfool",admin:"Admin — Englishfool",terms:"شروط الخدمة — Englishfool",privacy:"سياسة الخصوصية — Englishfool",refund:"سياسة الاسترداد — Englishfool",pricing:"الأسعار — Englishfool",speaking:"تدريب المحادثة — Englishfool",reading:"اختبارات القراءة — Englishfool",game:"ألعاب الآيلتس — Englishfool"};
   const PAGE_DESCS = {analyze:"احصل على تقييم فوري لمقالتك بناءً على معايير كامبريدج الأربعة. مع نماذج إجابة، تصحيح أخطاء، وخطة لرفع درجتك. جرّب مجاناً.",practice:"تدرّب على كتابة الآيلتس مع تغذية راجعة فورية لكل جملة. Task 1 و Task 2 بدعم من معايير Band 8+.",reading:"7 اختبارات قراءة آيلتس كاملة (Academic + General) مع مؤقت رسمي وتصحيح فوري.",speaking:"نماذج إجابة Band 8 لجميع أجزاء الآيلتس Speaking: Part 1, 2, 3 مع مفردات وأخطاء شائعة.",game:"تعلّم الآيلتس من خلال ألعاب تفاعلية: إملاء، قواعد، مفردات، كتابة، وقراءة.",pricing:"اشتراك Pro لمدة 3 أشهر بـ 10 دينار (الأردن) أو $17 (دولي). وصول كامل لجميع الأدوات.",default:"منصة Englishfool للتحضير للآيلتس — تقييم مقالات احترافي، اختبارات قراءة، ألعاب تدريبية، وتمارين قواعد."};
   const PAGE_PATHS = {analyze:"/",practice:"/practice",reading:"/reading",speaking:"/speaking",game:"/game",pricing:"/pricing",grammar:"/grammar",exercises:"/exercises",progress:"/progress",toolkit:"/toolkit",contact:"/contact"};
 
@@ -5149,13 +5165,18 @@ export default function IELTSBot(){
       {/* ── TWO-TIER NAV (ieltsanswers style) ───────────── */}
       <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,boxShadow:"0 2px 8px rgba(0,0,0,0.1)"}}>
 
-        {/* TIER 1 — White topbar: logo + account */}
+        {/* TIER 1 — White topbar: logo + language + account */}
         <div style={{background:"#ffffff",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",height:56}}>
-            {/* Logo */}
-            <Logo size={26} style={{cursor:"pointer"}} onClick={()=>switchView("analyze")}/>
-            {/* Account */}
-            <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
+            <Logo size={26} style={{cursor:"pointer"}} onClick={()=>switchView("home")}/>
+            <div className="nav-right" style={{display:"flex",alignItems:"center",gap:12}}>
+              <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2}}>
+                {["ar","en"].map(l=>(
+                  <button key={l} onClick={()=>switchLang(l)} style={{background:lang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:lang===l?700:500,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s",boxShadow:lang===l?T.shadow:"none"}}>
+                    {l==="ar"?"عربي":"EN"}
+                  </button>
+                ))}
+              </div>
               {proUser?(
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:12,color:T.primary,fontWeight:700,fontFamily:"'Cairo',system-ui",background:T.primaryLight,padding:"3px 10px",borderRadius:20,border:`1px solid ${T.primaryBorder}`}}>✓ Pro</span>
@@ -5180,15 +5201,15 @@ export default function IELTSBot(){
         <div style={{background:T.primary}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center"}}>
+              <MainTab label="🏠 الرئيسية" active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
               <MainTab label="✍️ الكتابة" active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label="🗣️ المحادثة" active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
               <MainTab label="📖 القراءة" active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
               <MainTab label="🎮 ألعاب" active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
               <MainTab label="📚 أدوات" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
               <MainTab label="📈 تقدمي" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
-              <MainTab label="✉️ تواصل" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
+              <MainTab label="✉️ اتصل بنا" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
-            {/* Hamburger on red bar */}
             <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontSize:18,color:"white",minWidth:40,minHeight:40,justifyContent:"center",alignItems:"center"}}>☰</button>
           </div>
         </div>
@@ -5206,7 +5227,7 @@ export default function IELTSBot(){
       )}
 
       {/* ── HERO — ieltsanswers style: big + clean + minimal ─── */}
-      {mainView==="analyze"&&(
+      {["home","analyze"].includes(mainView)&&(
         <div style={{background:T.primary,padding:"80px 32px 90px",textAlign:"center",position:"relative",overflow:"hidden"}}>
           {/* Subtle pattern overlay */}
           <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
@@ -5239,27 +5260,34 @@ export default function IELTSBot(){
       )}
 
       {/* ── FEATURES STRIP (below hero, white background) ────── */}
-      {mainView==="analyze"&&(
+      {["home","analyze"].includes(mainView)&&(
         <div style={{background:"white",borderBottom:`1px solid ${T.border}`,padding:"40px 32px"}}>
-          <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:32,textAlign:"center"}} className="features-grid">
+          <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,textAlign:"center"}} className="features-grid">
             {[
-              {icon:"🎓",title:"تقييم المقالات",desc:"تقييم فوري وفق معايير كامبريدج الأربعة مع توجيهات لرفع الدرجة"},
-              {icon:"📖",title:"اختبارات القراءة",desc:"٧ اختبارات Academic وGeneral كاملة مع مؤقت رسمي وتصحيح فوري"},
-              {icon:"🗣️",title:"تدريب المحادثة",desc:"نماذج Band 8 لجميع الأجزاء مع مفردات وأخطاء شائعة"},
-              {icon:"🎮",title:"ألعاب تعليمية",desc:"تعلّم الإملاء والقواعد والمفردات من خلال ألعاب تفاعلية ممتعة"},
+              {icon:"🎓",title:"تقييم المقالات",desc:"تقييم فوري وفق معايير كامبريدج الأربعة مع توجيهات لرفع الدرجة",view:"analyze"},
+              {icon:"📖",title:"اختبارات القراءة",desc:"٧ اختبارات Academic وGeneral كاملة مع مؤقت رسمي وتصحيح فوري",view:"reading"},
+              {icon:"🗣️",title:"تدريب المحادثة",desc:"نماذج Band 8 لجميع الأجزاء مع مفردات وأخطاء شائعة",view:"speaking"},
+              {icon:"🎮",title:"ألعاب تعليمية",desc:"تعلّم الإملاء والقواعد والمفردات من خلال ألعاب تفاعلية ممتعة",view:"game"},
+              {icon:"✏️",title:"قواعد وإملاء",desc:"فحص فوري للقواعد والإملاء مع شرح تفصيلي وتصحيح مباشر",view:"grammar"},
+              {icon:"🏋️",title:"تمارين تدريبية",desc:"أكثر من ١٢٠ تمرين متنوع في المفردات والقواعد والباراغراف",view:"exercises"},
+              {icon:"📚",title:"أدوات الآيلتس",desc:"قوالب الإجابات ومعايير التقييم وكل ما تحتاجه للامتحان",view:"toolkit"},
+              {icon:"📈",title:"تتبع تقدمي",desc:"راجع تاريخ مقالاتك ودرجاتك وتطوّر أدائك عبر الزمن",view:"progress"},
             ].map((f,i)=>(
-              <div key={i} style={{padding:"8px 0"}}>
-                <div style={{fontSize:36,marginBottom:14}}>{f.icon}</div>
-                <div style={{fontWeight:700,fontSize:16,color:T.text,fontFamily:"'Cairo',system-ui",marginBottom:8}}>{f.title}</div>
+              <div key={i} onClick={()=>switchView(f.view)} style={{padding:"20px 16px",cursor:"pointer",borderRadius:12,border:`1px solid transparent`,transition:"all 0.2s"}}
+                onMouseOver={e=>{e.currentTarget.style.background=T.primaryLight;e.currentTarget.style.borderColor=T.primaryBorder;}}
+                onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
+                <div style={{fontSize:36,marginBottom:12}}>{f.icon}</div>
+                <div style={{fontWeight:700,fontSize:16,color:T.primary,fontFamily:"'Cairo',system-ui",marginBottom:6}}>{f.title}</div>
                 <div style={{fontSize:14,color:T.textMuted,fontFamily:"'Cairo',system-ui",lineHeight:1.7,direction:"rtl"}}>{f.desc}</div>
+                <div style={{marginTop:10,fontSize:13,color:T.primary,fontWeight:600,fontFamily:"'Cairo',system-ui"}}>← ابدأ</div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* STATS BAR */}
-      <div style={{background:T.bgSurface,borderBottom:`1px solid ${T.border}`,padding:"20px 32px"}}>
+      {/* STATS BAR — homepage only */}
+      {mainView==="home"&&<div style={{background:T.bgSurface,borderBottom:`1px solid ${T.border}`,padding:"20px 32px"}}>
         <div className="stats-inner" style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:48,alignItems:"center",flexWrap:"wrap",padding:"0 8px"}}>
           {[["9","Band levels covered"],["4","IELTS criteria scored"],["100%","Official band descriptors"],["Task 1 & 2","Academic + General Training"]].map(([num,label])=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:12}}>
@@ -5268,10 +5296,10 @@ export default function IELTSBot(){
             </div>
           ))}
         </div>
-      </div>
+      </div>}
 
       {/* GAME PROMO STRIP — desktop only, always visible on homepage */}
-      {mainView==="analyze"&&(
+      {mainView==="home"&&(
         <div className="desktop-game-strip" style={{background:`linear-gradient(135deg,${T.primary} 0%,#7f1d1d 100%)`,borderTop:"1px solid rgba(212,175,55,0.2)",padding:"16px 32px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10,direction:"rtl"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
@@ -5289,10 +5317,10 @@ export default function IELTSBot(){
       )}
 
       {/* TESTIMONIALS — social proof on homepage */}
-      {mainView==="analyze"&&<TestimonialsSection/>}
+      {mainView==="home"&&<TestimonialsSection/>}
 
       {/* PRICING COMPARISON — clarity on free vs pro */}
-      {mainView==="analyze"&&!proUser&&<PricingComparisonStrip onUpgrade={()=>setShowPaywall(true)}/>}
+      {mainView==="home"&&!proUser&&<PricingComparisonStrip onUpgrade={()=>setShowPaywall(true)}/>}
 
       {/* UPGRADE BANNER — shown to non-Pro users only */}
       {!proUser&&(
@@ -5314,8 +5342,8 @@ export default function IELTSBot(){
         </div>
       )}
 
-      {/* CONTENT AREA — visible on all non-policy pages */}
-      {!["terms","privacy","refund","pricing"].includes(mainView)&&(
+      {/* CONTENT AREA — visible on all non-policy tool pages */}
+      {!["terms","privacy","refund","pricing","home"].includes(mainView)&&(
       <div className="content-outer" style={{maxWidth:1200,margin:"36px auto 100px",padding:"0 32px"}}>
         <div className="content-card" style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:12,padding:"44px 40px",boxShadow:T.shadow}}>
 
@@ -5710,59 +5738,45 @@ export default function IELTSBot(){
               <Logo size={20} onClick={()=>{switchView("analyze");setMenuOpen(false);}}/>
               <button onClick={()=>setMenuOpen(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"rgba(255,255,255,0.7)",padding:4}}>✕</button>
             </div>
-            {/* Quick nav tabs at top of menu */}
-            <div style={{display:"flex",gap:6,padding:"12px 16px",borderBottom:`1px solid ${T.border}`,flexWrap:"wrap"}}>
-              {[{view:"analyze",icon:"✍️",label:"Writing"},{view:"speaking",icon:"🗣️",label:"Speaking"},{view:"reading",icon:"📖",label:"Reading"},{view:"toolkit",icon:"📚",label:"Toolkit"},{view:"game",icon:"🎮",label:"Game"}].map(item=>(
-                <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
-                  style={{flex:1,background:mainView===item.view?T.primaryLight:T.bgGray,border:`1.5px solid ${mainView===item.view?T.primaryBorder:T.border}`,borderRadius:10,padding:"10px 4px",fontSize:12,fontWeight:700,color:mainView===item.view?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",flexDirection:"column",alignItems:"center",gap:3,minHeight:52}}>
-                  <span style={{fontSize:18}}>{item.icon}</span>{item.label}
-                </button>
-              ))}
-            </div>
             {/* Nav items */}
             <div style={{flex:1,overflowY:"auto",padding:"8px 0"}}>
               {[
-                {view:"analyze",icon:"🎓",label:"Writing: Analyze"},
-                {view:"practice",icon:"🖊️",label:"Writing: Practice"},
-                {view:"grammar",icon:"✏️",label:"Writing: Grammar"},
-                {view:"exercises",icon:"🏋️",label:"Writing: Exercises"},
-                {view:"speaking",icon:"🗣️",label:"IELTS Speaking"},
-                {view:"reading",icon:"📖",label:"IELTS Reading"},
-                {view:"toolkit",icon:"📚",label:"IELTS Toolkit"},
-                {view:"progress",icon:"📈",label:"Progress Tracker"},
-                {view:"contact",icon:"✉️",label:"Contact Us"},
-                {view:"game",icon:"🎮",label:"🎮 IELTS Game"},
+                {view:"home",icon:"🏠",label:"الرئيسية"},
+                {view:"analyze",icon:"🎓",label:"تحليل المقالة"},
+                {view:"practice",icon:"🖊️",label:"تدريب الكتابة"},
+                {view:"grammar",icon:"✏️",label:"قواعد وإملاء"},
+                {view:"exercises",icon:"🏋️",label:"تمارين"},
+                {view:"speaking",icon:"🗣️",label:"تدريب المحادثة"},
+                {view:"reading",icon:"📖",label:"اختبارات القراءة"},
+                {view:"game",icon:"🎮",label:"ألعاب الآيلتس"},
+                {view:"toolkit",icon:"📚",label:"أدوات الآيلتس"},
+                {view:"progress",icon:"📈",label:"تتبع تقدمي"},
+                {view:"contact",icon:"✉️",label:"اتصل بنا"},
               ].map(item=>(
                 <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
                   style={{
                     width:"100%",background:mainView===item.view?T.primaryLight:"transparent",
-                    border:"none",borderLeft:mainView===item.view?`4px solid ${T.primary}`:"4px solid transparent",
-                    padding:"16px 20px",display:"flex",alignItems:"center",gap:14,
-                    cursor:"pointer",textAlign:"left",minHeight:50,
+                    border:"none",borderRight:mainView===item.view?`4px solid ${T.primary}`:"4px solid transparent",
+                    padding:"14px 20px",display:"flex",alignItems:"center",gap:14,
+                    cursor:"pointer",textAlign:"right",direction:"rtl",minHeight:48,
                     color:mainView===item.view?T.primary:T.text,
                     fontSize:15,fontWeight:mainView===item.view?700:500,
-                    fontFamily:"'Cairo','Source Sans Pro',system-ui"
+                    fontFamily:"'Cairo',system-ui"
                   }}>
-                  <span style={{fontSize:20}}>{item.icon}</span>{item.label}
+                  <span style={{fontSize:18}}>{item.icon}</span>{item.label}
                 </button>
               ))}
-              <div style={{height:1,background:T.border,margin:"12px 20px"}}/>
-              {/* Language switcher inside menu */}
+              <div style={{height:1,background:T.border,margin:"8px 20px"}}/>
               <div style={{padding:"8px 20px"}}>
-                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Feedback Language</div>
+                <div style={{fontSize:11,color:T.textMuted,fontWeight:700,marginBottom:8,fontFamily:"'Cairo',system-ui",direction:"rtl"}}>لغة التغذية الراجعة</div>
                 <div style={{display:"flex",gap:8}}>
-                  {["en","ar"].map(l=>(
-                    <button key={l} onClick={()=>switchLang(l)} style={{
-                      flex:1,background:lang===l?T.primaryLight:"transparent",
-                      border:`1px solid ${lang===l?T.primaryBorder:T.border}`,
-                      borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,
-                      color:lang===l?T.primary:T.textMuted,cursor:"pointer",
-                      fontFamily:"'Cairo','Source Sans Pro',system-ui"
-                    }}>{l==="en"?"🇬🇧 English":"🇸🇦 عربي"}</button>
+                  {["ar","en"].map(l=>(
+                    <button key={l} onClick={()=>switchLang(l)} style={{flex:1,background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{l==="ar"?"🇸🇦 عربي":"🇬🇧 English"}</button>
                   ))}
                 </div>
               </div>
             </div>
+            {/* Upgrade button at bottom of menu */}
             {/* Upgrade button at bottom of menu */}
             {!proUser&&(
               <div style={{padding:"0 20px",display:"flex",flexDirection:"column",gap:8}}>
