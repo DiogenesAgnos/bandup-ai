@@ -3651,7 +3651,7 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 
         <div style={card}>
           <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 16px",direction:"ltr",textAlign:"left"}}>{psg.title}</h2>
-          <div style={{background:T.bgGray,borderRadius:8,padding:"24px",marginBottom:20,lineHeight:1.9,...sty,fontSize:15,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto",border:`1px solid ${T.border}`,direction:"ltr",textAlign:"left"}} className="reading-passage"}}>
+          <div style={{background:T.bgGray,borderRadius:8,padding:"24px",marginBottom:20,lineHeight:1.9,...sty,fontSize:15,color:T.textMid,whiteSpace:"pre-line",maxHeight:500,overflowY:"auto",border:`1px solid ${T.border}`,direction:"ltr",textAlign:"left"}} className="reading-passage">
             {psg.text}
           </div>
           <h3 style={{fontFamily:"Georgia,serif",fontSize:17,color:T.text,margin:"0 0 14px",direction:"ltr",textAlign:"left"}}>Questions {globalOffset+1}–{globalOffset+psgQuestions.length}</h3>
