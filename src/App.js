@@ -522,10 +522,11 @@ const MainTab=({label,active,onClick})=>(
   <button onClick={onClick} style={{
     background: "transparent",
     border: "none",
-    borderBottom: active ? `3px solid ${T.primary}` : "3px solid transparent",
-    color: active ? T.primary : "#374151",
-    padding: "0 18px",
-    height: 68,
+    borderBottom: active ? `3px solid ${T.accent}` : "3px solid transparent",
+    borderTop: "3px solid transparent",
+    color: active ? T.accent : "rgba(255,255,255,0.88)",
+    padding: "0 16px",
+    height: 52,
     cursor: "pointer",
     fontSize: 14,
     fontWeight: active ? 700 : 500,
@@ -5145,279 +5146,117 @@ export default function IELTSBot(){
 
 
       {/* NAV BAR 2 */}
-      <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,background:"#ffffff",borderBottom:"2px solid #b91c1c",boxShadow:"0 2px 12px rgba(0,0,0,0.08)"}}>
-        <div className="nav-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",height:68}}>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
+      {/* ── TWO-TIER NAV (ieltsanswers style) ───────────── */}
+      <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,boxShadow:"0 2px 8px rgba(0,0,0,0.1)"}}>
+
+        {/* TIER 1 — White topbar: logo + account */}
+        <div style={{background:"#ffffff",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",height:56}}>
+            {/* Logo */}
             <Logo size={26} style={{cursor:"pointer"}} onClick={()=>switchView("analyze")}/>
-            {/* Mobile Home button — only shows on mobile */}
-            <button className="mobile-home-btn" onClick={()=>switchView("analyze")} style={{display:"none",background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:13,color:T.primary,fontFamily:"'Cairo',system-ui",fontWeight:700,alignItems:"center",gap:5,whiteSpace:"nowrap"}}>🏠 الرئيسية</button>
-            {/* Hamburger — mobile only */}
-            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:`1.5px solid ${T.border}`,borderRadius:10,padding:"8px 12px",cursor:"pointer",fontSize:20,color:T.primary,minWidth:44,minHeight:44,justifyContent:"center",alignItems:"center"}}>☰</button>
-            <div className="nav-tabs" style={{display:"flex",gap:4,alignItems:"center"}}>
-              <MainTab label="✍️ Writing" active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label="🗣️ Speaking" active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
-              <MainTab label="📖 Reading" active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
-              <MainTab label="📚 Toolkit" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label="📈 Progress" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
-              <MainTab label="✉️ Contact" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
-              <MainTab label="🎮 IELTS Game" active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
+            {/* Account */}
+            <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
+              {proUser?(
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:12,color:T.primary,fontWeight:700,fontFamily:"'Cairo',system-ui",background:T.primaryLight,padding:"3px 10px",borderRadius:20,border:`1px solid ${T.primaryBorder}`}}>✓ Pro</span>
+                  <button onClick={()=>setShowManageSub(true)} style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo',system-ui",textDecoration:"underline",cursor:"pointer",background:"none",border:"none",padding:0}}>إدارة الاشتراك</button>
+                </div>
+              ):(
+                <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>🔓 احصل على Pro</button>
+              )}
+              {session?(
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:12,color:T.textMid,fontFamily:"'Cairo',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
+                  <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"5px 10px",fontSize:12,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>Sign Out</button>
+                </div>
+              ):(
+                <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:6,padding:"6px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>Sign In →</button>
+              )}
             </div>
           </div>
-          <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
-            {proUser?(
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:13,color:T.primary,fontWeight:700,fontFamily:"'Cairo','Source Sans Pro',system-ui",background:T.primaryLight,padding:"4px 10px",borderRadius:20,border:`1px solid ${T.primaryBorder}`}}>✓ Pro</span>
-                <button onClick={()=>setShowManageSub(true)} style={{fontSize:11,color:T.primary,fontFamily:"'Cairo','Source Sans Pro',system-ui",textDecoration:"underline",cursor:"pointer",background:"none",border:"none",padding:0}}>إدارة الاشتراك</button>
-              </div>
-            ):(
-              <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 2px 8px ${T.primary}44`,letterSpacing:"0.01em"}}>🔓 احصل على Pro</button>
-            )}
-            <div style={{width:1,height:20,background:T.border}}/>
-            {session?(
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600}}>👤 {session.name||session.email.split("@")[0]}</span>
-                <button onClick={()=>setShowChangePassword(true)} style={{background:"transparent",border:"none",fontSize:12,fontWeight:600,color:T.textMuted,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",padding:0}}>🔑</button>
-                <button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:4,padding:"6px 12px",fontSize:12,fontWeight:600,color:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign Out</button>
-              </div>
-            ):(
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <button onClick={()=>setShowAuth(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign In →</button>
-              </div>
-            )}
+        </div>
+
+        {/* TIER 2 — Red navbar: navigation links */}
+        <div style={{background:T.primary}}>
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center"}}>
+              <MainTab label="✍️ الكتابة" active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label="🗣️ المحادثة" active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              <MainTab label="📖 القراءة" active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
+              <MainTab label="🎮 ألعاب" active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
+              <MainTab label="📚 أدوات" active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label="📈 تقدمي" active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label="✉️ تواصل" active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
+            </div>
+            {/* Hamburger on red bar */}
+            <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontSize:18,color:"white",minWidth:40,minHeight:40,justifyContent:"center",alignItems:"center"}}>☰</button>
           </div>
         </div>
       </div>
 
-      {/* ONBOARDING — first visit only, on analyze page */}
-      {showOnboarding&&mainView==="analyze"&&(
-        <OnboardingBanner
-          onStart={()=>{setShowOnboarding(false);try{localStorage.setItem("ef_onboarded","1");}catch{}window.scrollTo({top:600,behavior:"smooth"});}}
-          onClose={()=>{setShowOnboarding(false);try{localStorage.setItem("ef_onboarded","1");}catch{};}}
-        />
-      )}
-
-      {/* Writing Sub-Nav — shows on writing-related pages */}
+      {/* Writing sub-nav */}
       {["analyze","practice","grammar","exercises"].includes(mainView)&&(
-        <div className="writing-subnav" style={{background:T.bgSurface,borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
-          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"10px 0"}} className="tab-row">
-            {[{v:"analyze",l:"🎓 Analyze"},{v:"practice",l:"🖊️ Practice"},{v:"grammar",l:"✏️ Grammar & Spelling"},{v:"exercises",l:"🏋️ Exercises"}].map(t=>(
-              <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
+        <div className="writing-subnav" style={{background:"#f9fafb",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
+            {[{v:"analyze",l:"🎓 تحليل المقالة"},{v:"practice",l:"🖊️ تدريب"},{v:"grammar",l:"✏️ قواعد وإملاء"},{v:"exercises",l:"🏋️ تمارين"}].map(t=>(
+              <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"7px 16px",fontSize:13,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Mobile Game Strip — replaces writing sub-nav on mobile, only on analyze page */}
+      {/* ── HERO — ieltsanswers style: big + clean + minimal ─── */}
       {mainView==="analyze"&&(
-        <div className="mobile-game-strip" style={{display:"none",background:`linear-gradient(135deg,${T.primary},#7f1d1d)`,borderBottom:"2px solid rgba(212,175,55,0.3)",padding:"14px 20px"}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,direction:"rtl"}}>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:20}}>🎮</span>
-              <div>
-                <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:13,color:"white"}}>IELTS Game</div>
-                <div style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"rgba(255,255,255,0.5)"}}>الإملاء · القواعد · المفردات · الكتابة · القراءة</div>
-              </div>
+        <div style={{background:T.primary,padding:"80px 32px 90px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+          {/* Subtle pattern overlay */}
+          <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
+          <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:"rtl"}}>
+            <div style={{display:"inline-block",background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"5px 18px",fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo',system-ui",fontWeight:600,marginBottom:24}}>
+              🎓 منصة التحضير للآيلتس — بالعربي
             </div>
-            <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"8px 16px",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap"}}>
-              العب 🕹️
-            </button>
+            <h1 style={{fontSize:"clamp(32px,5vw,58px)",fontWeight:900,color:"white",fontFamily:"'Cairo',system-ui",lineHeight:1.2,margin:"0 0 20px",textShadow:"0 2px 20px rgba(0,0,0,0.2)"}}>
+              ارفع درجتك في الآيلتس
+            </h1>
+            <p style={{fontSize:"clamp(16px,2vw,22px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo',system-ui",lineHeight:1.7,margin:"0 0 40px",fontWeight:400}}>
+              تقييم مقالات فوري بمعايير كامبريدج · اختبارات قراءة كاملة · ألعاب تدريبية تفاعلية
+            </p>
+            <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
+              <button onClick={trySampleEssay} style={{background:T.accent,color:"#7f1200",border:"none",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:`0 6px 24px rgba(0,0,0,0.25)`,transition:"transform 0.15s"}}
+                onMouseOver={e=>e.currentTarget.style.transform="translateY(-2px)"}
+                onMouseOut={e=>e.currentTarget.style.transform="translateY(0)"}>
+                ابدأ مجاناً ←
+              </button>
+              {!proUser&&(
+                <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.12)",color:"white",border:"2px solid rgba(255,255,255,0.5)",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"background 0.15s"}}
+                  onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.2)"}
+                  onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.12)"}>
+                  🔓 اشترك بـ $17 / 10 دينار
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      {/* HERO — only on main writing page */}
-      {mainView==="analyze"&&(<>
-      <div style={{background:T.primary,position:"relative"}}>
-        <div className="hero-inner" style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"stretch",minHeight:400}}>
-          <div className="hero-text" style={{flex:"0 0 54%",padding:"52px 48px 52px 0",display:"flex",flexDirection:"column",justifyContent:"center",zIndex:2}}>
-
-            {/* Headline */}
-            <div style={{direction:"rtl",textAlign:"right",marginBottom:24}}>
-              <div style={{fontSize:"clamp(22px,2.8vw,34px)",fontWeight:800,color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.3,marginBottom:10}}>
-                منصة الآيلتس الشاملة
+      {/* ── FEATURES STRIP (below hero, white background) ────── */}
+      {mainView==="analyze"&&(
+        <div style={{background:"white",borderBottom:`1px solid ${T.border}`,padding:"40px 32px"}}>
+          <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:32,textAlign:"center"}} className="features-grid">
+            {[
+              {icon:"🎓",title:"تقييم المقالات",desc:"تقييم فوري وفق معايير كامبريدج الأربعة مع توجيهات لرفع الدرجة"},
+              {icon:"📖",title:"اختبارات القراءة",desc:"٧ اختبارات Academic وGeneral كاملة مع مؤقت رسمي وتصحيح فوري"},
+              {icon:"🗣️",title:"تدريب المحادثة",desc:"نماذج Band 8 لجميع الأجزاء مع مفردات وأخطاء شائعة"},
+              {icon:"🎮",title:"ألعاب تعليمية",desc:"تعلّم الإملاء والقواعد والمفردات من خلال ألعاب تفاعلية ممتعة"},
+            ].map((f,i)=>(
+              <div key={i} style={{padding:"8px 0"}}>
+                <div style={{fontSize:36,marginBottom:14}}>{f.icon}</div>
+                <div style={{fontWeight:700,fontSize:16,color:T.text,fontFamily:"'Cairo',system-ui",marginBottom:8}}>{f.title}</div>
+                <div style={{fontSize:14,color:T.textMuted,fontFamily:"'Cairo',system-ui",lineHeight:1.7,direction:"rtl"}}>{f.desc}</div>
               </div>
-              <div style={{fontSize:"clamp(14px,1.5vw,17px)",color:"rgba(255,255,255,0.65)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:20}}>
-                تقييم فوري · ألعاب تدريب · اختبارات قراءة · محادثة وقواعد
-              </div>
-              {/* Launch offer badges */}
-              <div className="hero-prices" style={{display:"flex",gap:14,justifyContent:"flex-end",flexWrap:"wrap",marginBottom:4}}>
-                <div style={{background:"rgba(255,255,255,0.09)",border:`1.5px solid ${T.accent}66`,borderRadius:14,padding:"14px 24px",textAlign:"center",flex:"0 0 auto"}}>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.55)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:6}}>🇯🇴 داخل الأردن · عرض إطلاق</div>
-                  <div style={{fontFamily:"Inter,sans-serif",fontSize:34,fontWeight:900,color:T.accent,lineHeight:1}}>10 <span style={{fontSize:16,fontWeight:600}}>دينار</span></div>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:5}}>3 أشهر · يجدد بـ ١٥ دينار</div>
-                </div>
-                <div style={{background:"rgba(255,255,255,0.09)",border:`1.5px solid ${T.accent}66`,borderRadius:14,padding:"14px 24px",textAlign:"center",flex:"0 0 auto"}}>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.55)",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:600,marginBottom:6}}>🌍 دولي · عرض إطلاق</div>
-                  <div style={{fontFamily:"Inter,sans-serif",fontSize:34,fontWeight:900,color:T.accent,lineHeight:1}}>$17</div>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:5}}>3 months · renews at $25</div>
-                </div>
-              </div>
-            </div>
-
-            {/* What you get */}
-            <div style={{direction:"rtl",textAlign:"right",marginBottom:24}}>
-              <div style={{fontSize:"clamp(13px,1.4vw,15px)",fontWeight:700,color:"rgba(255,255,255,0.6)",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:14,letterSpacing:"0.08em",textTransform:"uppercase"}}>
-                ماذا ستحصل عليه؟
-              </div>
-              <div style={{display:"flex",flexDirection:"column",gap:11}}>
-                {[
-                  "تقييم فوري لمقالتك وفق معايير كامبريدج الأربعة",
-                  "اختبارات قراءة كاملة مع مؤقت وتصحيح فوري",
-                  "مواضيع محادثة مع نماذج إجابة بمستوى الدرجة ٨",
-                  "تدريبات قواعد ومفردات — أكثر من ١٢٠ تمرين",
-                  "كل غلطة في مقالتك محددة بالألوان مع التصحيح والشرح",
-                  "ترقية مفردات من مقالتك نفسها لمستوى الدرجة ٨",
-                  "نموذج إجابة كامل لنفس سؤالك",
-                  "خطة واضحة لرفع درجتك — ليس تحليلاً فحسب"
-                ].map((item,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,direction:"rtl",fontSize:"clamp(13px,1.3vw,15px)",color:"rgba(255,255,255,0.88)",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>
-                    <span style={{color:T.accent,fontSize:11,flexShrink:0,marginTop:5}}>◆</span>
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA buttons */}
-            <div className="hero-btns" style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:16}}>
-              <button onClick={trySampleEssay} style={{background:T.accent,color:T.primary,border:"none",borderRadius:10,padding:"16px 28px",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.accent}55`,flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
-                onMouseOver={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 6px 20px ${T.accent}66`;}} onMouseOut={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 4px 16px ${T.accent}55`;}}>
-                🎯 قيّم مقالتك مجاناً
-              </button>
-              {!proUser&&(
-                <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.1)",color:"white",border:"1.5px solid rgba(255,255,255,0.35)",borderRadius:10,padding:"16px 28px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flex:1,minWidth:180,display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}}
-                  onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.18)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.1)"}>
-                  🔓 احصل على Pro
-                </button>
-              )}
-            </div>
-            <div style={{fontSize:12,color:"rgba(255,255,255,0.35)",fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl",lineHeight:1.6}}>
-              💡 يجري تطوير المنصة باستمرار لتكون مرجعاً شاملاً للتحضير للآيلتس
-            </div>
-
-            {/* Mobile disclaimer */}
-            <div style={{marginTop:12,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,padding:"10px 16px",display:"none"}} className="mobile-disclaimer">
-              <span style={{fontSize:12,color:"rgba(255,255,255,0.6)",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>📱 للحصول على أفضل تجربة، استخدم جهاز كمبيوتر أو لابتوب.</span>
-            </div>
-          </div>
-          <div className="hero-image" style={{flex:"0 0 45%",position:"relative",display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 0 40px 32px"}}>
-            {(()=>{
-              const tabs=[
-                {icon:"✍️",label:"تحليل الكتابة",color:"#b91c1c",points:["تقييم فوري وفق معايير كامبريدج الأربعة","تحديد كل غلطة بالألوان مع التصحيح","ترقية مفرداتك لمستوى الدرجة ٨","نموذج إجابة كامل لنفس سؤالك"]},
-                {icon:"📖",label:"اختبارات القراءة",color:"#1d4ed8",points:["٧ اختبارات كاملة Academic وGeneral","مؤقت رسمي ٦٠ دقيقة مع تنبيهات","تصحيح فوري وحساب الدرجة","أسئلة T/F/NG، MCQ، وإكمال جمل"]},
-                {icon:"🎤",label:"تدريب المحادثة",color:"#7c3aed",points:["Part 1, 2, 3 مع نماذج Band 8","مواضيع مفصّلة مع إجابات كاملة","مفردات مصنّفة حسب الوظيفة","أخطاء شائعة وكيف تتجنبها"]},
-                {icon:"✏️",label:"قواعد وتدريبات",color:"#065f46",points:["أكثر من ١٢٠ تمرين متنوع","قواعد Grammar وإملاء فوري","تدريبات Paraphrasing وربط الجمل","تتبع تقدمك وتابع تطوّر درجتك"]},
-              ];
-              const t=tabs[heroTab];
-              return(
-                <div style={{width:"100%",direction:"rtl"}}>
-                  {/* Tab headers — 2×2 grid so all 4 fit on mobile */}
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:0}}>
-                    {tabs.map((tb,i)=>{
-                      const active=heroTab===i;
-                      return(
-                        <button key={i} onClick={()=>setHeroTab(i)} style={{
-                          background:active?"white":"rgba(255,255,255,0.15)",
-                          border:active?"2px solid white":"2px solid rgba(255,255,255,0.3)",
-                          borderBottom:active?"2px solid white":"2px solid rgba(255,255,255,0.3)",
-                          borderRadius:active?"10px 10px 0 0":"10px 10px 0 0",
-                          padding:"9px 10px",
-                          cursor:"pointer",
-                          color:active?t.color:"rgba(255,255,255,0.8)",
-                          fontFamily:"'Cairo','Source Sans Pro',system-ui",
-                          fontSize:"clamp(11px,1vw,13px)",
-                          fontWeight:active?800:500,
-                          transition:"all 0.2s",
-                          transform:active?"translateY(3px)":"translateY(0)",
-                          boxShadow:active?"0 -3px 10px rgba(0,0,0,0.15)":"none",
-                          textAlign:"center",
-                          display:"flex",alignItems:"center",justifyContent:"center",gap:5,
-                        }}>
-                          <span>{tb.icon}</span><span>{tb.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {/* Tab content card — white bg, red text */}
-                  <div style={{
-                    background:"white",
-                    border:"2px solid white",
-                    borderTop:"none",
-                    borderRadius:"0 0 16px 16px",
-                    padding:"20px 22px",
-                    boxShadow:"0 8px 32px rgba(0,0,0,0.2)",
-                  }}>
-                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,justifyContent:"flex-end"}}>
-                      <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(14px,1.5vw,17px)",fontWeight:800,color:t.color}}>{t.label}</div>
-                      <div style={{fontSize:26,lineHeight:1}}>{t.icon}</div>
-                    </div>
-
-                    {heroTab===0?(
-                      /* Writing tab — 4 sub-nav buttons */
-                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                        {[
-                          {label:"📝 حلّل مقالتك",action:()=>{switchView("analyze");setTimeout(()=>{if(analyzeRef.current){analyzeRef.current.scrollIntoView({behavior:"smooth",block:"center"});}},300);}},
-                          {label:"🖊️ تدريب",action:()=>switchView("practice")},
-                          {label:"✏️ قواعد وإملاء",action:()=>switchView("grammar")},
-                          {label:"🏋️ تدريبات",action:()=>switchView("exercises")},
-                        ].map((btn,i)=>(
-                          <button key={i} onClick={btn.action} style={{
-                            width:"100%",
-                            background:"white",
-                            border:`2px solid ${t.color}33`,
-                            borderRadius:8,
-                            padding:"11px 16px",
-                            color:t.color,
-                            fontFamily:"'Cairo','Source Sans Pro',system-ui",
-                            fontSize:"clamp(13px,1.2vw,15px)",
-                            fontWeight:700,
-                            cursor:"pointer",
-                            textAlign:"right",
-                            direction:"rtl",
-                            transition:"all 0.18s",
-                          }}
-                          onMouseOver={e=>{e.currentTarget.style.background=t.color;e.currentTarget.style.color="white";}}
-                          onMouseOut={e=>{e.currentTarget.style.background="white";e.currentTarget.style.color=t.color;}}
-                          >{btn.label}</button>
-                        ))}
-                      </div>
-                    ):(
-                      /* Other tabs — bullet points + Try Now button */
-                      <>
-                        <div style={{display:"flex",flexDirection:"column",gap:9}}>
-                          {t.points.map((p,i)=>(
-                            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:8,justifyContent:"flex-end"}}>
-                              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:"clamp(12px,1.2vw,14px)",color:"#1f2937",lineHeight:1.5,textAlign:"right"}}>{p}</div>
-                              <span style={{color:t.color,fontSize:14,flexShrink:0,marginTop:3}}>◆</span>
-                            </div>
-                          ))}
-                        </div>
-                        <button onClick={()=>{
-                          const views=["analyze","reading","speaking","exercises"];
-                          switchView(views[heroTab]);
-                        }} style={{
-                          marginTop:16,width:"100%",
-                          background:t.color,
-                          border:"none",
-                          borderRadius:8,padding:"11px 16px",
-                          color:"white",fontFamily:"'Cairo','Source Sans Pro',system-ui",
-                          fontSize:"clamp(13px,1.2vw,15px)",fontWeight:700,cursor:"pointer",
-                          transition:"opacity 0.2s",
-                        }}
-                        onMouseOver={e=>e.currentTarget.style.opacity="0.85"}
-                        onMouseOut={e=>e.currentTarget.style.opacity="1"}
-                        >
-                          جرّب الآن ←
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })()}
+            ))}
           </div>
         </div>
-      </div>
+      )}
 
       {/* STATS BAR */}
       <div style={{background:T.bgSurface,borderBottom:`1px solid ${T.border}`,padding:"20px 32px"}}>
@@ -5984,40 +5823,44 @@ export default function IELTSBot(){
         @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
+        /* ── Features grid ── */
+        .features-grid { grid-template-columns: repeat(4,1fr) !important; }
+
         @media (max-width: 768px) {
-          /* NAV */
+          /* NAV TIER 1 */
+          .nav-right { display: none !important; }
+          .sticky-nav div[style*="height:56"] { padding: 0 16px !important; }
+
+          /* NAV TIER 2 */
           .hamburger-btn { display: flex !important; }
           .nav-tabs { display: none !important; }
-          .nav-right { display: none !important; }
           .sticky-nav { position: sticky !important; top: 0 !important; }
-          .nav-inner { padding: 0 16px !important; height: 60px !important; }
 
           /* HERO */
-          .hero-inner { flex-direction: column-reverse !important; min-height: auto !important; padding: 24px 20px 32px !important; }
+          .hero-inner { flex-direction: column-reverse !important; min-height: auto !important; padding: 20px 16px 24px !important; }
           .hero-text { flex: none !important; width: 100% !important; padding: 0 !important; }
           .hero-image { display: flex !important; flex: none !important; width: 100% !important; padding: 0 0 20px 0 !important; }
           .hero-btns { flex-direction: column !important; gap: 12px !important; }
-          .hero-btns button { width: 100% !important; padding: 17px 20px !important; font-size: 16px !important; border-radius: 12px !important; min-height: 56px !important; }
-          .hero-prices { justify-content: center !important; gap: 12px !important; }
-          .hero-prices > div { flex: 1 !important; min-width: 140px !important; padding: 14px 18px !important; }
+          .hero-btns button { width: 100% !important; }
+          .hero-prices { justify-content: center !important; }
+
+          /* FEATURES GRID */
+          .features-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
 
           /* STATS BAR */
-          .stats-inner { gap: 18px !important; padding: 14px 20px !important; flex-wrap: wrap !important; justify-content: center !important; }
-          .stats-inner > div { gap: 8px !important; }
-          .stats-inner span:first-child { font-size: 16px !important; }
-          .stats-inner span:last-child { font-size: 12px !important; }
+          .stats-inner { gap: 16px !important; padding: 14px 20px !important; flex-wrap: wrap !important; justify-content: center !important; }
 
           /* CONTENT */
           .content-outer { padding: 0 12px !important; margin: 16px auto 48px !important; }
           .content-card { padding: 20px 16px !important; border-radius: 12px !important; }
           .analyze-box { padding: 18px 14px !important; border-radius: 12px !important; }
-          .task-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
-          .result-header { padding: 18px 16px !important; gap: 12px !important; border-radius: 12px !important; }
+          .task-grid { grid-template-columns: 1fr !important; }
+          .result-header { padding: 18px 16px !important; }
 
-          /* TABS — bigger touch targets on mobile */
+          /* TABS */
           .tab-row { overflow-x: auto !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; scrollbar-width: none !important; gap: 6px !important; padding-bottom: 4px !important; }
           .tab-row::-webkit-scrollbar { display: none !important; }
-          .tab-row button { padding: 11px 16px !important; font-size: 13px !important; border-radius: 8px !important; min-height: 44px !important; }
+          .tab-row button { padding: 10px 14px !important; font-size: 13px !important; min-height: 42px !important; }
 
           /* READING */
           .reading-timer { font-size: 18px !important; }
@@ -6033,18 +5876,17 @@ export default function IELTSBot(){
           /* MOBILE SPECIFIC */
           .mobile-hide { display: none !important; }
           .writing-subnav { display: none !important; }
-          .mobile-game-strip { display: block !important; }
           .desktop-game-strip { display: none !important; }
-          .mobile-home-btn { display: flex !important; }
-          .mobile-disclaimer { display: block !important; }
           .upgrade-btn { display: none !important; }
         }
 
-        /* Extra small phones */
+        @media (max-width: 480px) {
+          .features-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+        }
+
         @media (max-width: 380px) {
-          .hero-inner { padding: 20px 14px 24px !important; }
           .content-card { padding: 14px 12px !important; }
-          .tab-row button { padding: 9px 12px !important; font-size: 12px !important; }
+          .tab-row button { padding: 8px 10px !important; font-size: 12px !important; }
         }
 
         @media (hover: none) and (pointer: coarse) {
