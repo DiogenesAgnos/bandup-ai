@@ -4842,6 +4842,270 @@ function OnboardingBanner({onStart,onClose}){
   );
 }
 
+
+// ── IELTS VOCABULARY PAGE ─────────────────────────────────────────
+const IELTS_VOCAB = {
+  reading:[
+    {w:"albeit",ar:"رغم أن / على الرغم من",en:"although / even though",ex:"The results were positive, albeit inconclusive."},
+    {w:"scrutinise",ar:"يفحص بدقة / يمحّص",en:"to examine closely and critically",ex:"Scientists scrutinised the data before publishing."},
+    {w:"prevalence",ar:"انتشار / شيوع",en:"the fact of being widespread",ex:"The prevalence of obesity has increased globally."},
+    {w:"alleviate",ar:"يخفف / يسكّن",en:"to make something less severe",ex:"Exercise can alleviate symptoms of depression."},
+    {w:"substantiate",ar:"يثبت / يدعم بأدلة",en:"to provide evidence to support",ex:"Researchers could not substantiate the claims."},
+    {w:"proliferation",ar:"تكاثر / انتشار سريع",en:"rapid increase in number",ex:"The proliferation of smartphones changed communication."},
+    {w:"corroborate",ar:"يؤكد / يدعم",en:"to confirm or support a statement",ex:"The second study corroborated the earlier findings."},
+    {w:"ambiguous",ar:"غامض / ذو معنيين",en:"open to more than one interpretation",ex:"The instructions were ambiguous and confusing."},
+    {w:"undermine",ar:"يقوّض / يضعف",en:"to weaken or damage gradually",ex:"Poor sleep undermines cognitive performance."},
+    {w:"contend",ar:"يجادل / يزعم",en:"to assert or argue",ex:"Some researchers contend that diet is the key factor."},
+    {w:"catalyst",ar:"محفّز / عامل تسريع",en:"something that causes change",ex:"The internet was a catalyst for globalisation."},
+    {w:"disparity",ar:"تفاوت / فجوة",en:"a great difference",ex:"There is a significant disparity in income levels."},
+    {w:"feasible",ar:"ممكن / قابل للتنفيذ",en:"possible and practical to achieve",ex:"A four-day work week is increasingly feasible."},
+    {w:"mitigate",ar:"يخفف / يقلل",en:"to make less severe or harmful",ex:"Trees help mitigate the effects of urban heat."},
+    {w:"constitute",ar:"يشكّل / يُكوّن",en:"to be or make up something",ex:"Women constitute 48% of the workforce."},
+    {w:"adverse",ar:"سلبي / ضار",en:"having a harmful effect",ex:"Adverse weather delayed the construction project."},
+    {w:"imperative",ar:"ضروري / لا غنى عنه",en:"of vital importance / essential",ex:"It is imperative to address climate change now."},
+    {w:"subsequent",ar:"لاحق / تالٍ",en:"coming after in time or order",ex:"The initial trial and subsequent analysis took two years."},
+    {w:"analogous",ar:"مماثل / مشابه",en:"comparable in certain respects",ex:"The situation is analogous to what happened in the 1970s."},
+    {w:"concurrent",ar:"متزامن / متوازٍ",en:"existing or happening at the same time",ex:"Two concurrent studies reached similar conclusions."},
+    {w:"contentious",ar:"مثير للجدل",en:"causing disagreement or argument",ex:"Vaccination remains a contentious issue in some communities."},
+    {w:"intrinsic",ar:"جوهري / ذاتي",en:"belonging naturally / essential",ex:"There is intrinsic value in learning for its own sake."},
+    {w:"paradox",ar:"مفارقة / تناقض ظاهري",en:"a seemingly contradictory statement",ex:"The paradox of choice suggests more options reduce satisfaction."},
+    {w:"phenomenon",ar:"ظاهرة",en:"a fact or situation that is observed",ex:"Social media addiction is a modern phenomenon."},
+    {w:"discrepancy",ar:"تناقض / اختلاف",en:"a difference between facts or claims",ex:"There was a discrepancy between the two reports."},
+    {w:"eradicate",ar:"يستأصل / يقضي على",en:"to destroy or remove completely",ex:"Vaccination programmes can eradicate certain diseases."},
+    {w:"notion",ar:"فكرة / مفهوم",en:"a concept or belief",ex:"The notion that money buys happiness is debated."},
+    {w:"premise",ar:"فرضية / مقدمة",en:"an assumption on which an argument is based",ex:"The study was based on the premise that diet affects mood."},
+    {w:"rigorous",ar:"صارم / دقيق",en:"thorough and careful",ex:"The experiment followed a rigorous methodology."},
+    {w:"tangible",ar:"ملموس / محسوس",en:"clear and definite / real",ex:"There are tangible benefits to regular exercise."},
+    {w:"viable",ar:"قابل للحياة / عملي",en:"capable of working successfully",ex:"Solar energy is now a viable alternative to fossil fuels."},
+    {w:"pivotal",ar:"محوري / بالغ الأهمية",en:"of crucial importance",ex:"Education plays a pivotal role in social mobility."},
+    {w:"trajectory",ar:"مسار / اتجاه",en:"the path or course of development",ex:"The trajectory of economic growth has slowed."},
+    {w:"volatile",ar:"متقلب / غير مستقر",en:"liable to change rapidly and unpredictably",ex:"Oil prices have been volatile in recent months."},
+    {w:"refute",ar:"يدحض / يفنّد",en:"to prove wrong / disprove",ex:"The new evidence refutes the earlier hypothesis."},
+    {w:"magnitude",ar:"حجم / ضخامة",en:"the great size or extent of something",ex:"Scientists underestimated the magnitude of the disaster."},
+    {w:"cohesion",ar:"تماسك / ترابط",en:"the action of forming a united whole",ex:"Social cohesion is essential for a stable community."},
+    {w:"elicit",ar:"يستخرج / يستحضر",en:"to draw out a response or reaction",ex:"The survey was designed to elicit honest responses."},
+    {w:"ostensibly",ar:"ظاهرياً / على ما يبدو",en:"apparently but not necessarily actually",ex:"The law was ostensibly designed to protect consumers."},
+    {w:"innate",ar:"فطري / موروث",en:"inborn / natural",ex:"Some researchers argue that language ability is innate."},
+  ],
+  listening:[
+    {w:"adjacent",ar:"مجاور / قريب",en:"next to or adjoining",ex:"The car park is adjacent to the main building."},
+    {w:"prior",ar:"سابق / قبلي",en:"existing or happening before",ex:"Prior booking is required for the tour."},
+    {w:"approximate",ar:"تقريبي",en:"close to the actual but not exact",ex:"The approximate cost is $500."},
+    {w:"vicinity",ar:"محيط / جوار",en:"the area near or surrounding a place",ex:"There are no hotels in the vicinity of the station."},
+    {w:"consult",ar:"يستشير / يراجع",en:"to seek advice or information from",ex:"You should consult a doctor if symptoms persist."},
+    {w:"regulations",ar:"أنظمة / لوائح",en:"official rules or laws",ex:"Health and safety regulations must be followed."},
+    {w:"accommodate",ar:"يستوعب / يأوي",en:"to provide space or facilities for",ex:"The hall can accommodate 200 people."},
+    {w:"retrieve",ar:"يسترجع / يسترد",en:"to get something back or find again",ex:"You can retrieve your bag from reception."},
+    {w:"enquiry",ar:"استفسار / تحقيق",en:"a request for information",ex:"For further enquiries, call the helpdesk."},
+    {w:"clarify",ar:"يوضح / يشرح",en:"to make a statement less confused",ex:"Could you clarify what you mean by that?"},
+    {w:"submit",ar:"يقدّم / يرسل",en:"to present for consideration",ex:"Please submit your application by Friday."},
+    {w:"allocate",ar:"يخصص / يوزّع",en:"to distribute for a particular purpose",ex:"Funds have been allocated for new equipment."},
+    {w:"mandatory",ar:"إلزامي / ضروري",en:"required by law or rules",ex:"Attendance at the induction is mandatory."},
+    {w:"assistance",ar:"مساعدة / دعم",en:"help or support",ex:"Technical assistance is available 24 hours a day."},
+    {w:"brochure",ar:"كتيّب / نشرة",en:"a small booklet with information",ex:"You can find a brochure at the reception desk."},
+    {w:"confirmation",ar:"تأكيد",en:"a statement confirming something",ex:"You will receive email confirmation within 24 hours."},
+    {w:"estimate",ar:"يقدّر / تقدير",en:"an approximate calculation",ex:"The estimate for repairs was £200."},
+    {w:"extension",ar:"امتداد / تمديد",en:"an addition to a building or time period",ex:"The deadline has been given a two-week extension."},
+    {w:"liability",ar:"مسؤولية قانونية",en:"legal responsibility for something",ex:"The company accepts no liability for lost items."},
+    {w:"nominal",ar:"رمزي / بسيط",en:"very small in amount",ex:"There is a nominal fee for parking."},
+    {w:"premises",ar:"مبنى / موقع",en:"a building and its surrounding grounds",ex:"Smoking is not permitted on the premises."},
+    {w:"query",ar:"استفسار / سؤال",en:"a question or doubt",ex:"If you have a query, speak to the manager."},
+    {w:"valid",ar:"صالح / معتمد",en:"legally or officially acceptable",ex:"Your ticket is valid for 30 days."},
+    {w:"waive",ar:"يتنازل / يُسقط الحق",en:"to refrain from insisting on",ex:"The company may waive the fee in exceptional cases."},
+    {w:"affiliated",ar:"مرتبط / تابع",en:"officially connected with a larger organisation",ex:"The college is affiliated with Oxford University."},
+    {w:"coordination",ar:"تنسيق",en:"the organisation of different elements",ex:"Good coordination between departments is essential."},
+    {w:"demonstrate",ar:"يوضح / يثبت",en:"to show or prove clearly",ex:"The results demonstrate the effectiveness of the treatment."},
+    {w:"facilitate",ar:"يسهّل / ييسّر",en:"to make an action easier",ex:"Online platforms facilitate remote learning."},
+    {w:"infrastructure",ar:"بنية تحتية",en:"basic physical systems of a country",ex:"Poor infrastructure is holding back economic growth."},
+    {w:"initiative",ar:"مبادرة",en:"an act to begin something new",ex:"A new initiative was launched to reduce plastic waste."},
+  ],
+  writing1:[
+    {w:"fluctuate",ar:"يتذبذب / يتقلب",en:"to rise and fall irregularly",ex:"Temperatures fluctuated throughout the year."},
+    {w:"plateau",ar:"يستقر / يصل إلى ثبات",en:"to reach a state of little or no change",ex:"Sales plateaued after the initial surge."},
+    {w:"surge",ar:"ارتفاع مفاجئ",en:"a sudden large increase",ex:"There was a surge in online shopping during lockdowns."},
+    {w:"decline",ar:"انخفاض / تراجع",en:"a gradual decrease",ex:"There was a steady decline in manufacturing output."},
+    {w:"overall",ar:"بشكل عام",en:"taking everything into account",ex:"Overall, the trend was upward over the decade."},
+    {w:"proportion",ar:"نسبة / حصة",en:"a part or share of a whole",ex:"A large proportion of respondents preferred option A."},
+    {w:"account for",ar:"يمثّل / يشكّل",en:"to make up a particular amount",ex:"Transport accounted for 30% of carbon emissions."},
+    {w:"marginally",ar:"بهامش ضئيل / بشكل طفيف",en:"to a small extent",ex:"Numbers were marginally higher in the second period."},
+    {w:"dramatic",ar:"حاد / ملحوظ",en:"sudden and striking",ex:"There was a dramatic increase in internet usage."},
+    {w:"gradual",ar:"تدريجي",en:"taking place slowly over time",ex:"There was a gradual improvement in air quality."},
+    {w:"stabilise",ar:"يستقر / يثبت",en:"to make or become stable",ex:"Prices stabilised after the initial drop."},
+    {w:"negligible",ar:"ضئيل / لا يُذكر",en:"so small as to be unimportant",ex:"The difference between the two figures was negligible."},
+    {w:"stark",ar:"صارخ / واضح جداً",en:"severe or sharply clear",ex:"The graph shows a stark contrast between the two groups."},
+    {w:"comparable",ar:"مماثل / قابل للمقارنة",en:"similar in quality or quantity",ex:"The figures are comparable to those of the previous year."},
+    {w:"correspond",ar:"يتوافق / يتطابق",en:"to match or be in agreement",ex:"The data corresponds to national trends."},
+    {w:"depict",ar:"يصوّر / يعرض",en:"to show or represent in a picture or chart",ex:"The bar chart depicts changes in population over 20 years."},
+    {w:"evident",ar:"واضح / جليّ",en:"clearly seen or understood",ex:"It is evident from the chart that sales dropped in 2019."},
+    {w:"notable",ar:"ملحوظ / بارز",en:"worthy of attention",ex:"A notable exception was the UK, which saw an increase."},
+    {w:"pattern",ar:"نمط / نهج",en:"a repeated or regular way",ex:"A clear pattern emerges from the data."},
+    {w:"reveal",ar:"يكشف / يظهر",en:"to make known or visible",ex:"The figures reveal a significant gender gap."},
+    {w:"significant",ar:"ملحوظ / ذو أهمية",en:"important or large enough to be noticed",ex:"There was a significant rise in the birth rate."},
+    {w:"peak",ar:"يبلغ ذروته / يصل إلى القمة",en:"to reach the highest point",ex:"Production peaked in 2015 before declining."},
+    {w:"roughly",ar:"تقريباً / نحو",en:"approximately",ex:"Roughly half of respondents chose option B."},
+    {w:"stark contrast",ar:"تناقض صارخ",en:"a very clear difference",ex:"This is in stark contrast to figures from a decade ago."},
+    {w:"upward trend",ar:"اتجاه تصاعدي",en:"a general increase over time",ex:"There is a clear upward trend in renewable energy use."},
+    {w:"levelled off",ar:"استقر / ثبت",en:"to stop increasing or decreasing",ex:"Growth levelled off by the end of the period."},
+    {w:"interestingly",ar:"ومن المثير للاهتمام",en:"in a way that arouses curiosity",ex:"Interestingly, the pattern reversed after 2010."},
+    {w:"respectively",ar:"على التوالي / بالترتيب",en:"in the order already mentioned",ex:"The figures were 40% and 60% respectively."},
+    {w:"triple",ar:"يتضاعف ثلاث مرات",en:"to become three times as large",ex:"The number of users tripled between 2000 and 2010."},
+    {w:"constitute",ar:"يشكّل / يمثّل",en:"to make up a proportion of",ex:"Renewables now constitute 25% of energy production."},
+  ],
+  writing2:[
+    {w:"advocate",ar:"يدعو / ينادي بـ",en:"to publicly recommend or support",ex:"Many experts advocate a plant-based diet."},
+    {w:"contention",ar:"جدل / محلّ خلاف",en:"heated disagreement / a claim",ex:"It is my contention that education should be free."},
+    {w:"detrimental",ar:"ضار / مُضرّ",en:"causing harm or damage",ex:"Fast food has a detrimental effect on health."},
+    {w:"exacerbate",ar:"يفاقم / يزيد سوءاً",en:"to make worse",ex:"Poor urban planning can exacerbate social inequality."},
+    {w:"foster",ar:"يعزّز / يشجّع",en:"to encourage the development of",ex:"Schools should foster creativity and independent thinking."},
+    {w:"inevitable",ar:"حتمي / لا مفرّ منه",en:"certain to happen",ex:"Technological unemployment may be inevitable."},
+    {w:"proponent",ar:"مؤيد / مدافع",en:"a person who supports an idea",ex:"Proponents of renewable energy argue it creates jobs."},
+    {w:"tackle",ar:"يتصدى / يعالج",en:"to make determined efforts to deal with",ex:"Governments must tackle income inequality urgently."},
+    {w:"warrant",ar:"يستوجب / يبرر",en:"to justify or make necessary",ex:"The issue warrants serious consideration."},
+    {w:"negate",ar:"ينفي / يلغي",en:"to make ineffective / nullify",ex:"Subsidies can negate the advantages of competition."},
+    {w:"perspective",ar:"منظور / وجهة نظر",en:"a particular way of viewing things",ex:"From an economic perspective, this policy makes sense."},
+    {w:"inequality",ar:"عدم المساواة / التفاوت",en:"difference in status or opportunity",ex:"Income inequality continues to grow in many countries."},
+    {w:"sustainable",ar:"مستدام",en:"able to be maintained at a certain rate",ex:"We need a sustainable approach to economic growth."},
+    {w:"compromise",ar:"حل وسط / يتنازل",en:"a settlement by mutual concession",ex:"Both sides must be willing to compromise."},
+    {w:"consent",ar:"موافقة / إذن",en:"permission for something to happen",ex:"Informed consent is essential in medical research."},
+    {w:"consequence",ar:"عاقبة / نتيجة",en:"a result of an action or condition",ex:"The consequences of inaction on climate change will be severe."},
+    {w:"dimension",ar:"بُعد / جانب",en:"an aspect or feature of a situation",ex:"There is an ethical dimension to this issue that cannot be ignored."},
+    {w:"enormous",ar:"هائل / ضخم",en:"very large in size or extent",ex:"The internet has had an enormous impact on society."},
+    {w:"ethical",ar:"أخلاقي",en:"relating to moral principles",ex:"There are serious ethical concerns about genetic engineering."},
+    {w:"fundamental",ar:"جوهري / أساسي",en:"forming a necessary base or core",ex:"Education is a fundamental right."},
+    {w:"globalisation",ar:"العولمة",en:"the process of international integration",ex:"Globalisation has both benefits and drawbacks."},
+    {w:"incentive",ar:"حافز / دافع",en:"something that motivates action",ex:"Tax breaks can act as an incentive for businesses."},
+    {w:"jurisdiction",ar:"اختصاص قانوني / ولاية",en:"the authority to make legal decisions",ex:"International law falls under global jurisdiction."},
+    {w:"meritocracy",ar:"الجدارة / نظام الكفاءات",en:"a system where advancement is based on ability",ex:"True meritocracy requires equal access to education."},
+    {w:"obligation",ar:"التزام / واجب",en:"a duty or commitment",ex:"Governments have an obligation to protect citizens."},
+    {w:"perception",ar:"تصوّر / إدراك",en:"a way of understanding something",ex:"Public perception of immigration has shifted."},
+    {w:"precaution",ar:"احتياط / حذر",en:"a measure taken in advance to prevent harm",ex:"Wearing a seatbelt is a basic safety precaution."},
+    {w:"remedy",ar:"علاج / حلّ",en:"a solution to a problem",ex:"Stricter enforcement is not the only remedy."},
+    {w:"scrutiny",ar:"تدقيق / فحص مكثف",en:"critical observation or examination",ex:"The policy came under intense public scrutiny."},
+    {w:"underestimate",ar:"يستهين / يقلّل من",en:"to fail to appreciate the full magnitude of",ex:"We should not underestimate the power of social media."},
+    {w:"widespread",ar:"واسع الانتشار / منتشر",en:"distributed over a large area",ex:"There is widespread agreement on the need for reform."},
+  ],
+  speaking:[
+    {w:"elaborate",ar:"يوضّح / يفصّل",en:"to add more detail",ex:"Could you elaborate on that point?"},
+    {w:"roughly speaking",ar:"بشكل تقريبي / على وجه التقريب",en:"approximately / in general terms",ex:"Roughly speaking, about half the class failed."},
+    {w:"as far as I'm concerned",ar:"فيما يخصني / من وجهة نظري",en:"in my opinion",ex:"As far as I'm concerned, working from home is more productive."},
+    {w:"on balance",ar:"في المجمل / موازنةً بين",en:"considering everything",ex:"On balance, I think the advantages outweigh the drawbacks."},
+    {w:"to a certain extent",ar:"إلى حدٍ ما",en:"partly / in some ways",ex:"To a certain extent, I agree with that view."},
+    {w:"a pressing issue",ar:"قضية ملحّة",en:"an urgent problem needing attention",ex:"Climate change is arguably the most pressing issue of our time."},
+    {w:"It goes without saying",ar:"من البديهي أن / لا شك في",en:"it is obvious / clearly true",ex:"It goes without saying that education is important."},
+    {w:"from my perspective",ar:"من منظوري / من وجهة نظري",en:"in my view",ex:"From my perspective, the policy needs reform."},
+    {w:"broadly speaking",ar:"بشكل عام / بوجه عام",en:"in a general way",ex:"Broadly speaking, younger people are more tech-savvy."},
+    {w:"stem from",ar:"ينشأ من / يعود إلى",en:"to originate from",ex:"Many social problems stem from inequality."},
+    {w:"give rise to",ar:"يؤدي إلى / ينجم عنه",en:"to cause or produce",ex:"Urbanisation has given rise to new social challenges."},
+    {w:"come to terms with",ar:"يتقبّل / يتعايش مع",en:"to accept something difficult",ex:"It took years to come to terms with the change."},
+    {w:"keep up with",ar:"يواكب / يجاري",en:"to match the pace of",ex:"It is hard to keep up with technological change."},
+    {w:"play a role in",ar:"يؤدي دوراً في",en:"to be involved in or contribute to",ex:"Parenting plays a crucial role in child development."},
+    {w:"on the one hand",ar:"من ناحية",en:"used to introduce one side of a comparison",ex:"On the one hand, technology improves efficiency."},
+    {w:"on the other hand",ar:"من ناحية أخرى",en:"used to introduce an opposing view",ex:"On the other hand, it has led to job losses."},
+    {w:"tend to",ar:"يميل إلى / في العادة",en:"to usually do or be something",ex:"People tend to resist change initially."},
+    {w:"take for granted",ar:"يأخذ كأمر مسلّم به",en:"to fail to appreciate something",ex:"We often take clean water for granted."},
+    {w:"in the long run",ar:"على المدى البعيد",en:"over a long period of time",ex:"In the long run, investing in education pays off."},
+    {w:"pros and cons",ar:"إيجابيات وسلبيات",en:"advantages and disadvantages",ex:"There are clear pros and cons to remote working."},
+    {w:"boils down to",ar:"يتلخص في / يرجع إلى",en:"to be reducible to",ex:"It all boils down to personal choice in the end."},
+    {w:"be aware of",ar:"يدرك / يعي",en:"to know about something",ex:"People need to be more aware of environmental issues."},
+    {w:"draw a distinction",ar:"يُميّز / يفرّق بين",en:"to identify a difference",ex:"It is important to draw a distinction between fact and opinion."},
+    {w:"have an impact on",ar:"يؤثر على / يُحدث أثراً في",en:"to affect something",ex:"Social media has had a huge impact on communication."},
+    {w:"in stark contrast",ar:"في تناقض صارخ مع",en:"very different from",ex:"Rural life is in stark contrast to city life."},
+    {w:"needless to say",ar:"لا حاجة للقول / من البديهي",en:"obviously / it is clear that",ex:"Needless to say, health is our greatest asset."},
+    {w:"without a doubt",ar:"بلا شك / من المؤكد",en:"certainly / definitely",ex:"Climate change is, without a doubt, a global emergency."},
+    {w:"be inclined to",ar:"يميل إلى / يُفضّل",en:"to be likely or willing to",ex:"I'm inclined to think the risks outweigh the benefits."},
+    {w:"the flip side",ar:"الجانب الآخر / الوجه الآخر",en:"the opposite or contrasting aspect",ex:"The flip side of globalisation is cultural homogenisation."},
+    {w:"draw on",ar:"يستند إلى / يستفيد من",en:"to use as a source",ex:"Good speakers draw on personal experiences to connect with the audience."},
+  ],
+};
+
+const VocabularyPage = () => {
+  const CATS=[
+    {key:"reading",  labelAr:"القراءة 📖",      labelEn:"Reading 📖"},
+    {key:"listening",labelAr:"الاستماع 🎧",      labelEn:"Listening 🎧"},
+    {key:"writing1", labelAr:"الكتابة - Task 1 📊",labelEn:"Writing Task 1 📊"},
+    {key:"writing2", labelAr:"الكتابة - Task 2 ✍️",labelEn:"Writing Task 2 ✍️"},
+    {key:"speaking", labelAr:"المحادثة 🗣️",      labelEn:"Speaking 🗣️"},
+  ];
+  const [cat,setCat]=useState("writing2");
+  const [meaningsLang,setMeaningsLang]=useState("ar"); // "ar" | "en"
+  const [search,setSearch]=useState("");
+  const words=(IELTS_VOCAB[cat]||[]).filter(w=>
+    !search||w.w.toLowerCase().includes(search.toLowerCase())||w.ar.includes(search)||w.en.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return(
+    <div style={{maxWidth:900,margin:"0 auto",padding:"24px 20px 80px"}}>
+      {/* Header */}
+      <div style={{marginBottom:24,direction:"rtl"}}>
+        <h1 style={{fontFamily:"'Cairo',system-ui",fontSize:26,fontWeight:800,color:T.primary,margin:"0 0 6px"}}>📝 مفردات الآيلتس الأساسية</h1>
+        <p style={{fontFamily:"'Cairo',system-ui",fontSize:14,color:T.textMuted,margin:0,lineHeight:1.7}}>أهم المفردات والتعابير المستخدمة في الآيلتس — مجاني بالكامل. اختر القسم وحدّد لغة الشرح.</p>
+      </div>
+
+      {/* Controls row */}
+      <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center",marginBottom:20,direction:"rtl"}}>
+        {/* Meaning language toggle */}
+        <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2,flexShrink:0}}>
+          <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo',system-ui",padding:"0 8px",display:"flex",alignItems:"center"}}>شرح بـ:</span>
+          {[{l:"ar",label:"عربي"},{l:"en",label:"English"}].map(o=>(
+            <button key={o.l} onClick={()=>setMeaningsLang(o.l)} style={{background:meaningsLang===o.l?"white":"transparent",border:"none",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:meaningsLang===o.l?700:500,color:meaningsLang===o.l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s",boxShadow:meaningsLang===o.l?T.shadow:"none"}}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+        {/* Search */}
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ابحث عن كلمة... / Search..."
+          style={{flex:1,minWidth:160,background:"white",border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 12px",fontSize:13,fontFamily:"'Cairo',system-ui",outline:"none",direction:"rtl"}}/>
+        <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo',system-ui",flexShrink:0}}>{words.length} كلمة</div>
+      </div>
+
+      {/* Category tabs */}
+      <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:20,paddingBottom:4}} className="tab-row">
+        {CATS.map(c=>(
+          <button key={c.key} onClick={()=>{setCat(c.key);setSearch("");}}
+            style={{background:cat===c.key?T.primaryLight:"white",border:`1.5px solid ${cat===c.key?T.primary:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:cat===c.key?700:500,color:cat===c.key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s"}}>
+            {c.labelAr}
+          </button>
+        ))}
+      </div>
+
+      {/* Word grid */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:12}}>
+        {words.map((w,i)=>(
+          <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"14px 16px",transition:"box-shadow 0.2s",cursor:"default"}}
+            onMouseOver={e=>e.currentTarget.style.boxShadow=T.shadow}
+            onMouseOut={e=>e.currentTarget.style.boxShadow="none"}>
+            {/* Word */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+              <span style={{fontFamily:"Georgia,serif",fontSize:16,fontWeight:700,color:T.primary,direction:"ltr"}}>{w.w}</span>
+            </div>
+            {/* Meaning */}
+            <div style={{fontSize:13,color:T.text,fontFamily:"'Cairo',system-ui",marginBottom:6,direction:meaningsLang==="ar"?"rtl":"ltr",background:T.primaryLight,borderRadius:6,padding:"4px 8px",fontWeight:600}}>
+              {meaningsLang==="ar"?w.ar:w.en}
+            </div>
+            {/* Example */}
+            <div style={{fontSize:12,color:T.textMuted,fontFamily:"Georgia,serif",fontStyle:"italic",lineHeight:1.5,direction:"ltr"}}>
+              &ldquo;{w.ex}&rdquo;
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {words.length===0&&(
+        <div style={{textAlign:"center",padding:"40px 20px",color:T.textMuted,fontFamily:"'Cairo',system-ui",fontSize:14}}>
+          لا توجد نتائج للبحث — جرّب كلمة مختلفة
+        </div>
+      )}
+
+      {/* Footer note */}
+      <div style={{marginTop:32,background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",direction:"rtl"}}>
+        <p style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:T.textMuted,margin:0,lineHeight:1.7}}>
+          💡 <strong style={{color:T.text}}>نصيحة:</strong> لا تحفظ هذه الكلمات منفردة — تعلّمها في سياقها. استخدم كل كلمة في جملة من إنشائك لترسّخ في ذاكرتك.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 // ── FREE CONSULTATION MODAL ──────────────────────
 const FB_PAGE_URL = "https://www.facebook.com/profile.php?id=61579432547860";
 
@@ -5046,7 +5310,7 @@ function ManageSubModal({onClose,email=""}){
 }
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game"};
+const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "home"; };
 
@@ -5054,7 +5318,7 @@ const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$
 const UI = {
   ar:{
     // Nav
-    home:"🏠 الرئيسية", writing:"✍️ الكتابة", speaking:"🗣️ المحادثة",
+    home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات",, speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
     progress:"📈 تقدمي", contact:"✉️ اتصل بنا",
     // Account
@@ -5067,14 +5331,15 @@ const UI = {
     startFree:"جرّب تحليل مقالة — مجاناً ←",
     subscribe:"🔓 اشترك — $35 / 25 دينار",
     // Features grid
-    f1t:"تقييم المقالات",f1d:"تقييم فوري وفق معايير كامبريدج الأربعة مع توجيهات لرفع الدرجة",
-    f2t:"اختبارات القراءة",f2d:"٧ اختبارات Academic وGeneral كاملة مع مؤقت رسمي وتصحيح فوري",
-    f3t:"تدريب المحادثة",f3d:"نماذج Band 8 لجميع الأجزاء مع مفردات وأخطاء شائعة",
-    f4t:"ألعاب تعليمية",f4d:"تعلّم الإملاء والقواعد والمفردات من خلال ألعاب تفاعلية ممتعة",
-    f5t:"قواعد وإملاء",f5d:"فحص فوري للقواعد والإملاء مع شرح تفصيلي وتصحيح مباشر",
-    f6t:"تمارين تدريبية",f6d:"أكثر من ١٢٠ تمرين متنوع في المفردات والقواعد والباراغراف",
-    f7t:"أدوات الآيلتس",f7d:"قوالب الإجابات ومعايير التقييم وكل ما تحتاجه للامتحان",
-    f8t:"تتبع تقدمي",f8d:"راجع تاريخ مقالاتك ودرجاتك وتطوّر أدائك عبر الزمن",
+    f1t:"تقييم المقالات",f1d:"مجاني: تجربة مقالة واحدة · Pro: تحليل غير محدود",
+    f2t:"اختبارات القراءة",f2d:"مجاني: اختبار واحد · Pro: جميع الـ٧ اختبارات",
+    f3t:"تدريب المحادثة",f3d:"Pro فقط · نماذج Band 8 لجميع الأجزاء الثلاثة",
+    f4t:"ألعاب تعليمية",f4d:"مجاني: جميع الألعاب الـ٥ بدون قيود",
+    f5t:"قواعد وإملاء",f5d:"مجاني: ٥ فحوصات · Pro: غير محدود",
+    f6t:"تمارين تدريبية",f6d:"Pro فقط · ١٢٠+ تمرين في المفردات والقواعد والباراغراف",
+    f7t:"أدوات الآيلتس",f7d:"مجاني: الروابط والقواعد · Pro: الأدوات الكاملة",
+    f8t:"تتبع تقدمي",f8d:"Pro فقط · تابع درجاتك وتطورك عبر الزمن",
+    f9t:"مفردات الآيلتس",f9d:"مجاني: أهم مفردات القراءة والكتابة والمحادثة مع المعنى",
     fStart:"← ابدأ",
     // Stats bar
     stat1n:"9",stat1l:"درجات الباند المشمولة",
@@ -5103,7 +5368,7 @@ const UI = {
   },
   en:{
     // Nav
-    home:"🏠 Home", writing:"✍️ Writing", speaking:"🗣️ Speaking",
+    home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary",, speaking:"🗣️ Speaking",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
     progress:"📈 Progress", contact:"✉️ Contact",
     // Account
@@ -5116,14 +5381,15 @@ const UI = {
     startFree:"Try Essay Analysis — Free →",
     subscribe:"🔓 Subscribe — $35 / 25 JOD",
     // Features grid
-    f1t:"Essay Analysis",f1d:"Instant scoring against all four Cambridge criteria with actionable feedback",
-    f2t:"Reading Tests",f2d:"7 full Academic & General tests with official 60-min timer and instant scoring",
-    f3t:"Speaking Practice",f3d:"Band 8 model answers for all three parts with vocabulary and common mistakes",
-    f4t:"Learning Games",f4d:"Practice spelling, grammar and vocabulary through fun interactive games",
-    f5t:"Grammar & Spelling",f5d:"Instant grammar and spelling checker with detailed explanations",
-    f6t:"Practice Exercises",f6d:"120+ exercises covering vocabulary, grammar, paraphrasing and paragraphs",
-    f7t:"IELTS Toolkit",f7d:"Answer templates, band descriptors and everything you need for exam day",
-    f8t:"Track Progress",f8d:"Review your essay history, scores and performance improvement over time",
+    f1t:"Essay Analysis",f1d:"Free: 1 demo analysis · Pro: Unlimited analyses",
+    f2t:"Reading Tests",f2d:"Free: 1 test · Pro: All 7 tests",
+    f3t:"Speaking Practice",f3d:"Pro only · Band 8 model answers for all 3 parts",
+    f4t:"Learning Games",f4d:"Free: All 5 games — no restrictions",
+    f5t:"Grammar & Spelling",f5d:"Free: 5 checks · Pro: Unlimited",
+    f6t:"Practice Exercises",f6d:"Pro only · 120+ exercises across all categories",
+    f7t:"IELTS Toolkit",f7d:"Free: Linking words & Grammar · Pro: Full toolkit",
+    f8t:"Track Progress",f8d:"Pro only · Track your scores and progress over time",
+    f9t:"IELTS Vocabulary",f9d:"Free: Top vocabulary for Reading, Writing & Speaking with meanings",
     fStart:"Start →",
     // Stats bar
     stat1n:"9",stat1l:"Band levels covered",
@@ -5320,7 +5586,7 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {home:"Englishfool — منصة الآيلتس الشاملة",analyze:"Englishfool — منصة الآيلتس الشاملة | تقييم مقالات + ألعاب + اختبارات",practice:"تدريب الكتابة — Englishfool",progress:"متابعة التقدم — Englishfool",toolkit:"أدوات الآيلتس — Englishfool",contact:"تواصل معنا — Englishfool",grammar:"مدقق القواعد والإملاء — Englishfool",exercises:"تمارين الآيلتس — Englishfool",admin:"Admin — Englishfool",terms:"شروط الخدمة — Englishfool",privacy:"سياسة الخصوصية — Englishfool",refund:"سياسة الاسترداد — Englishfool",pricing:"الأسعار — Englishfool",speaking:"تدريب المحادثة — Englishfool",reading:"اختبارات القراءة — Englishfool",game:"ألعاب الآيلتس — Englishfool"};
+  const PAGE_TITLES = {home:"Englishfool — منصة الآيلتس الشاملة",vocabulary:"مفردات الآيلتس — Englishfool",analyze:"Englishfool — منصة الآيلتس الشاملة | تقييم مقالات + ألعاب + اختبارات",practice:"تدريب الكتابة — Englishfool",progress:"متابعة التقدم — Englishfool",toolkit:"أدوات الآيلتس — Englishfool",contact:"تواصل معنا — Englishfool",grammar:"مدقق القواعد والإملاء — Englishfool",exercises:"تمارين الآيلتس — Englishfool",admin:"Admin — Englishfool",terms:"شروط الخدمة — Englishfool",privacy:"سياسة الخصوصية — Englishfool",refund:"سياسة الاسترداد — Englishfool",pricing:"الأسعار — Englishfool",speaking:"تدريب المحادثة — Englishfool",reading:"اختبارات القراءة — Englishfool",game:"ألعاب الآيلتس — Englishfool"};
   const PAGE_DESCS = {analyze:"احصل على تقييم فوري لمقالتك بناءً على معايير كامبريدج الأربعة. مع نماذج إجابة، تصحيح أخطاء، وخطة لرفع درجتك. جرّب مجاناً.",practice:"تدرّب على كتابة الآيلتس مع تغذية راجعة فورية لكل جملة. Task 1 و Task 2 بدعم من معايير Band 8+.",reading:"7 اختبارات قراءة آيلتس كاملة (Academic + General) مع مؤقت رسمي وتصحيح فوري.",speaking:"نماذج إجابة Band 8 لجميع أجزاء الآيلتس Speaking: Part 1, 2, 3 مع مفردات وأخطاء شائعة.",game:"تعلّم الآيلتس من خلال ألعاب تفاعلية: إملاء، قواعد، مفردات، كتابة، وقراءة.",pricing:"اشتراك Pro لمدة 3 أشهر بـ 25 دينار (الأردن) أو $35 (دولي). وصول كامل لجميع الأدوات.",default:"منصة Englishfool للتحضير للآيلتس — تقييم مقالات احترافي، اختبارات قراءة، ألعاب تدريبية، وتمارين قواعد."};
   const PAGE_PATHS = {analyze:"/",practice:"/practice",reading:"/reading",speaking:"/speaking",game:"/game",pricing:"/pricing",grammar:"/grammar",exercises:"/exercises",progress:"/progress",toolkit:"/toolkit",contact:"/contact"};
 
@@ -5508,12 +5774,13 @@ export default function IELTSBot(){
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center"}}>
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
-              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} badge="free" onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} badge="pro" onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
-              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} badge="free" onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
-              <MainTab label={UI[uiLang].game} active={mainView==="game"} badge="free" onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
-              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} badge="pro" onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} badge="pro" onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
+              <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
+              <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
+              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -5997,6 +6264,7 @@ export default function IELTSBot(){
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="vocabulary"&&<VocabularyPage/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView}/>}
         </div>
@@ -6097,6 +6365,7 @@ export default function IELTSBot(){
                 {view:"speaking",icon:"🗣️",label:"تدريب المحادثة",labelEn:"Speaking Practice"},
                 {view:"reading",icon:"📖",label:"اختبارات القراءة",labelEn:"Reading Tests"},
                 {view:"game",icon:"🎮",label:"ألعاب الآيلتس",labelEn:"IELTS Games"},
+                {view:"vocabulary",icon:"📝",label:"مفردات الآيلتس",labelEn:"IELTS Vocabulary"},
                 {view:"toolkit",icon:"📚",label:"أدوات الآيلتس",labelEn:"IELTS Toolkit"},
                 {view:"progress",icon:"📈",label:"تتبع تقدمي",labelEn:"My Progress"},
                 {view:"contact",icon:"✉️",label:"اتصل بنا",labelEn:"Contact"},
