@@ -954,14 +954,32 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
 const ProgressTracker=({onUpgrade,isPro,email})=>{
   const history=getHistory(email);
   if(!isPro) return (
-    <div style={{maxWidth:500,margin:"60px auto",padding:"0 24px",textAlign:"center"}}>
-      <div style={{fontSize:52,marginBottom:16}}>📈</div>
-      <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:12}}>Track Your Progress</h2>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:24}}>See your band score history, track improvement over time, and identify which criteria you need to work on most.</p>
-      <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
-        🔓 Upgrade to Pro — $35 / 25 JOD
-      </button>
-      <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+    <div style={{maxWidth:560,margin:"40px auto",padding:"0 24px"}}>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{fontSize:52,marginBottom:12}}>📈</div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:8}}>Track Your Progress</h2>
+        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>Every essay you analyse is saved. Watch your band score improve over time.</p>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
+        {[
+          {icon:"🎯",title:"Band Score History",desc:"See your overall band across every essay you've submitted"},
+          {icon:"📊",title:"Criteria Breakdown",desc:"Track Task Response, CC, Lexical Resource & Grammar separately"},
+          {icon:"📉",title:"Mistake Trends",desc:"See if your error count is dropping over time"},
+          {icon:"⚡",title:"Biggest Improvement",desc:"Identifies which criterion improved most since your first essay"},
+        ].map((c,i)=>(
+          <div key={i} style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 14px"}}>
+            <div style={{fontSize:22,marginBottom:4}}>{c.icon}</div>
+            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,fontSize:13,color:T.text,marginBottom:4}}>{c.title}</div>
+            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:T.textMuted,lineHeight:1.4}}>{c.desc}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{textAlign:"center"}}>
+        <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
+          🔓 Upgrade to Pro — $35 / 25 JOD
+        </button>
+        <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+      </div>
     </div>
   );
   if(history.length===0) return (
@@ -2001,14 +2019,34 @@ const BAND_QUIZ = [
 // ── ExercisesHub ──────────────────────────────
 const ExercisesHub = ({isPro, onUpgrade}) => {
   if(!isPro) return (
-    <div style={{maxWidth:500,margin:"60px auto",padding:"0 24px",textAlign:"center"}}>
-      <div style={{fontSize:52,marginBottom:16}}>🏋️</div>
-      <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:12}}>Practice Exercises</h2>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:24}}>120+ exercises covering grammar, vocabulary, paraphrasing, error correction, and Band Quiz — all with instant feedback and explanations.</p>
-      <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
-        🔓 Upgrade to Pro — $35 / 25 JOD
-      </button>
-      <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+    <div style={{maxWidth:560,margin:"40px auto",padding:"0 24px"}}>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{fontSize:52,marginBottom:12}}>🏋️</div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:8}}>Practice Exercises</h2>
+        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>120+ exercises across 5 categories — all with instant feedback and detailed explanations.</p>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
+        {[
+          {icon:"📐",title:"Grammar",count:"30+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},
+          {icon:"📚",title:"Vocabulary",count:"25+ questions",desc:"Academic word list, collocations, word formation"},
+          {icon:"✏️",title:"Paraphrasing",count:"20+ questions",desc:"Rewrite sentences using Band 7+ academic language"},
+          {icon:"🔍",title:"Error Correction",count:"25+ questions",desc:"Spot and fix real IELTS-style mistakes"},
+          {icon:"📊",title:"Band Quiz",count:"15 questions",desc:"Self-assess your current writing level by criterion"},
+        ].map((c,i)=>(
+          <div key={i} style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 14px"}}>
+            <div style={{fontSize:22,marginBottom:4}}>{c.icon}</div>
+            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,fontSize:13,color:T.text}}>{c.title}</div>
+            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:T.primary,fontWeight:600,marginBottom:4}}>{c.count}</div>
+            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:T.textMuted,lineHeight:1.4}}>{c.desc}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{textAlign:"center"}}>
+        <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
+          🔓 Upgrade to Pro — $35 / 25 JOD
+        </button>
+        <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+      </div>
     </div>
   );
   const [activeExTab, setActiveExTab] = useState("grammar");
@@ -2920,15 +2958,34 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
   const locked = (free) => !free && !isPro;
 
   if(!isPro) return (
-    <div style={{maxWidth:600,margin:"60px auto",padding:"0 24px",textAlign:"center"}}>
-      <div style={{fontSize:52,marginBottom:16}}>🗣️</div>
-      <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T.text,marginBottom:12}}>IELTS Speaking Practice</h2>
-      <p style={{color:T.textMid,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:8}}>Band 8 model answers for all three parts — Part 1, Part 2, Part 3.</p>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:24}}>Includes vocabulary lists, common mistakes, and tips from experienced IELTS instructors.</p>
-      <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
-        🔓 Upgrade to Pro — $35 / 25 JOD
-      </button>
-      <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+    <div style={{maxWidth:600,margin:"40px auto",padding:"0 24px"}}>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{fontSize:52,marginBottom:12}}>🗣️</div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T.text,marginBottom:8}}>IELTS Speaking Practice</h2>
+        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>Band 8 model answers, vocabulary, tips and common mistakes — for all 3 parts.</p>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10,marginBottom:24}}>
+        {[
+          {icon:"🎤",part:"Part 1 — Introduction & Interview",topics:"Hometown · Work & Studies · Technology · Free Time · Food · Travel · Family",count:"10 topics · 3 questions each = 30 model answers"},
+          {icon:"📋",part:"Part 2 — Long Turn (Cue Cards)",topics:"Describe a person who inspired you · A skill you learnt · A place you visited · An important decision · A book or film...",count:"10 cue cards with full 2-minute model answers"},
+          {icon:"💬",part:"Part 3 — Discussion",topics:"Society & culture · Technology & the future · Education · Environment · Work & economy",count:"8 discussion sets · 4-5 questions each"},
+        ].map((c,i)=>(
+          <div key={i} style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px 16px",display:"flex",gap:12,alignItems:"flex-start"}}>
+            <div style={{fontSize:26,flexShrink:0,marginTop:2}}>{c.icon}</div>
+            <div>
+              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,fontSize:13,color:T.primary,marginBottom:3}}>{c.part}</div>
+              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:T.textMid,marginBottom:3,lineHeight:1.5}}>Topics: {c.topics}</div>
+              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:T.textMuted,fontWeight:600}}>{c.count}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{textAlign:"center"}}>
+        <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
+          🔓 Upgrade to Pro — $35 / 25 JOD
+        </button>
+        <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+      </div>
     </div>
   );
 
@@ -4003,11 +4060,11 @@ const PricingPage = ({onBack, onUpgrade, isPro, onManageSub=()=>{}}) => (
 // IELTS GAME — DATA
 // ─────────────────────────────────────────────────────────────
 const IELTS_GAME_CATS=[
-  {id:"spelling", arabic:"لعبة التهجئة",    emoji:"🔤", free:true,  color:"#059669", bg:"#d1fae5", desc:"هل تعرف كيف تكتب الكلمات الإنجليزية صح؟"},
-  {id:"grammar",  arabic:"لعبة القواعد",    emoji:"📖", free:true,  color:"#2563eb", bg:"#dbeafe", desc:"تحدَّ نفسك في قواعد اللغة الإنجليزية"},
-  {id:"writing",  arabic:"لعبة الكتابة",    emoji:"✍️", free:false, color:"#d97706", bg:"#fef3c7", desc:"مفردات وتعابير الكتابة الأكاديمية"},
-  {id:"reading",  arabic:"لعبة القراءة",    emoji:"📚", free:false, color:"#7c3aed", bg:"#ede9fe", desc:"فهم النصوص والمفردات القرائية"},
-  {id:"vocab",    arabic:"لعبة المفردات",   emoji:"💡", free:false, color:"#dc2626", bg:"#fee2e2", desc:"وسّع قاموسك لمستوى الدرجة 8"},
+  {id:"spelling", arabic:"لعبة التهجئة",  english:"Spelling Game",   emoji:"🔤", free:true, color:"#059669", bg:"#d1fae5", desc:"هل تعرف كيف تكتب الكلمات الإنجليزية صح؟", descEn:"Can you spell English words correctly?"},
+  {id:"grammar",  arabic:"لعبة القواعد",  english:"Grammar Game",    emoji:"📖", free:true, color:"#2563eb", bg:"#dbeafe", desc:"تحدَّ نفسك في قواعد اللغة الإنجليزية", descEn:"Challenge yourself on English grammar rules"},
+  {id:"writing",  arabic:"لعبة الكتابة", english:"Writing Game",    emoji:"✍️", free:true, color:"#d97706", bg:"#fef3c7", desc:"مفردات وتعابير الكتابة الأكاديمية", descEn:"Academic writing vocabulary and expressions"},
+  {id:"reading",  arabic:"لعبة القراءة", english:"Reading Game",    emoji:"📚", free:true, color:"#7c3aed", bg:"#ede9fe", desc:"فهم النصوص والمفردات القرائية", descEn:"Reading comprehension and vocabulary"},
+  {id:"vocab",    arabic:"لعبة المفردات",english:"Vocabulary Game",  emoji:"💡", free:true, color:"#dc2626", bg:"#fee2e2", desc:"وسّع قاموسك لمستوى الدرجة 8", descEn:"Expand your vocabulary to Band 8 level"},
 ];
 const IELTS_GAME_QS={
   spelling:[
@@ -4224,7 +4281,7 @@ const gameAudio={
 // ─────────────────────────────────────────────────────────────
 // IELTS GAME — LOBBY
 // ─────────────────────────────────────────────────────────────
-function IELTSGameLobby({proUser,onSelect}){
+function IELTSGameLobby({proUser,onSelect,uiLang="ar"}){
   return(
     <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0f172a 0%,#431407 50%,#0f172a 100%)",padding:"40px 20px",position:"relative",overflow:"hidden"}}>
       {/* Stars background */}
@@ -4279,13 +4336,13 @@ function IELTSGameLobby({proUser,onSelect}){
               >
                 {locked&&<div style={{position:"absolute",top:12,right:12,fontSize:18}}>🔒</div>}
                 <div style={{fontSize:44,marginBottom:12}}>{cat.emoji}</div>
-                <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:20,color:"white",marginBottom:6,direction:"rtl"}}>{cat.arabic}</div>
-                <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:16,direction:"rtl"}}>{cat.desc}</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:20,color:"white",marginBottom:6,direction:uiLang==="ar"?"rtl":"ltr"}}>{uiLang==="ar"?cat.arabic:cat.english}</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:16,direction:uiLang==="ar"?"rtl":"ltr"}}>{uiLang==="ar"?cat.desc:cat.descEn}</div>
                 <div style={{display:"flex",alignItems:"center",gap:8,direction:"rtl"}}>
                   <span style={{background:cat.free?"#059669":"rgba(255,255,255,0.1)",borderRadius:20,padding:"4px 14px",fontFamily:"'Cairo',system-ui",fontSize:12,fontWeight:700,color:cat.free?"white":"rgba(255,255,255,0.5)"}}>
-                    {cat.free?"✅ مجاني":"👑 Pro"}
+                    {cat.free?(uiLang==="ar"?"✅ مجاني":"✅ Free"):"👑 Pro"}
                   </span>
-                  <span style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.35)"}}>25 سؤال</span>
+                  <span style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.35)"}}>{uiLang==="ar"?"25 سؤال":"25 questions"}</span>
                 </div>
               </div>
             );
@@ -4444,7 +4501,7 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
   );
 }
 
-function IELTSGame({proUser,onNavigate}){
+function IELTSGame({proUser,onNavigate,uiLang="ar"}){
   const [screen,setScreen]=useState("lobby");
   const [cat,setCat]=useState(null);
   const [qIdx,setQIdx]=useState(0);
@@ -4504,7 +4561,7 @@ function IELTSGame({proUser,onNavigate}){
     },1500);
   };
 
-  if(screen==="lobby") return <IELTSGameLobby proUser={proUser} onSelect={startGame}/>;
+  if(screen==="lobby") return <IELTSGameLobby proUser={proUser} onSelect={startGame} uiLang={uiLang}/>;
 
   if(screen==="intro"&&cat) return(
     <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#450a0a,#431407)",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"'Cairo',system-ui"}}>
@@ -6294,7 +6351,7 @@ export default function IELTSBot(){
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang}/>}
         {mainView==="contact"&&<ContactPage/>}
-        {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView}/>}
+        {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
         </div>
       </div>
       )}
