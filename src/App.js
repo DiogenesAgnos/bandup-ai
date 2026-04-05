@@ -5360,14 +5360,23 @@ const PlacementTest = ({uiLang="ar", onNavigate}) => {
         </div>
       </div>
       <TimerBar time={readingTime}/>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:16}}>
-        <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",height:"70vh",overflowY:"auto"}}>
+
+      {/* Mobile notice */}
+      <div className="placement-mobile-notice" style={{display:"none",background:"#fef3c7",border:"1px solid #f59e0b",borderRadius:10,padding:"12px 16px",marginTop:12,marginBottom:4}}>
+        <div style={{...sty,fontSize:13,color:"#92400e",fontWeight:600,textAlign:"center"}}>
+          💻 {uiLang==="ar"?"يُفضَّل أداء قسم القراءة على الحاسوب — الشاشة الأكبر تتيح لك رؤية النص والأسئلة بوضوح":"This section is best taken on a computer — the larger screen lets you read and answer questions more comfortably"}
+        </div>
+      </div>
+
+      {/* Desktop: side by side | Mobile: stacked */}
+      <div className="placement-reading-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:12}}>
+        <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",height:"70vh",overflowY:"auto"}} className="placement-passage">
           <div style={{...sty,fontWeight:700,fontSize:13,color:T.primary,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.05em"}}>{PLACEMENT_READING_PASSAGE.title}</div>
           {PLACEMENT_READING_PASSAGE.text.split("\n\n").map((p,i)=>(
             <p key={i} style={{fontFamily:"Georgia,serif",fontSize:14,lineHeight:1.8,color:T.text,marginBottom:12}}>{p}</p>
           ))}
         </div>
-        <div style={{height:"70vh",overflowY:"auto",display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{height:"70vh",overflowY:"auto",display:"flex",flexDirection:"column",gap:12}} className="placement-questions">
           {PLACEMENT_READING_PASSAGE.questions.map((q,qi)=>(
             <div key={qi} style={{background:"white",border:`1.5px solid ${readingAnswers[qi]!==undefined?T.primaryBorder:T.border}`,borderRadius:10,padding:"14px"}}>
               <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,marginBottom:8,lineHeight:1.5}}>{qi+1}. {q.q}</div>
@@ -6345,6 +6354,7 @@ export default function IELTSBot(){
         <div style={{background:"white",borderBottom:`1px solid ${T.border}`,padding:"40px 32px"}}>
           <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,textAlign:"center"}} className="features-grid">
             {[
+              {icon:"📋",tk:"fat",dk:"fad",view:"placement",free:true},
               {icon:"🎓",tk:"f1t",dk:"f1d",view:"analyze",free:true},
               {icon:"📖",tk:"f2t",dk:"f2d",view:"reading",free:true},
               {icon:"🗣️",tk:"f3t",dk:"f3d",view:"speaking",free:false},
@@ -6353,7 +6363,6 @@ export default function IELTSBot(){
               {icon:"🏋️",tk:"f6t",dk:"f6d",view:"exercises",free:false},
               {icon:"📚",tk:"f7t",dk:"f7d",view:"toolkit",free:false},
               {icon:"📈",tk:"f8t",dk:"f8d",view:"progress",free:false},
-              {icon:"📋",tk:"fat",dk:"fad",view:"placement",free:true},
               {icon:"📝",tk:"f9t",dk:"f9d",view:"vocabulary",free:true},
             ].map((f,i)=>(
               <div key={i} onClick={()=>switchView(f.view)} style={{padding:"20px 16px",cursor:"pointer",borderRadius:12,border:`1px solid transparent`,transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
@@ -6966,6 +6975,12 @@ export default function IELTSBot(){
         .content-card [lang="ar"], .content-card .ar-label { direction: rtl; text-align: right; }
         /* Reading passages and questions */
         .reading-passage { direction: ltr !important; text-align: left !important; font-family: Georgia, serif !important; line-height: 1.9 !important; }
+        @media (max-width: 700px) {
+          .placement-reading-grid { grid-template-columns: 1fr !important; }
+          .placement-passage { height: auto !important; max-height: 280px !important; overflow-y: auto !important; }
+          .placement-questions { height: auto !important; }
+          .placement-mobile-notice { display: block !important; }
+        }
         .reading-question { direction: ltr !important; text-align: left !important; }
         /* Speaking model answers */
         .speaking-answer { direction: ltr !important; text-align: left !important; line-height: 1.8 !important; }
