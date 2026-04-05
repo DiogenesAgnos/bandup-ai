@@ -5298,12 +5298,14 @@ const PlacementTest = ({uiLang="ar", onNavigate}) => {
     savePlacementResult(data);
     setResults(data);
     setScreen("results");
+    setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),50);
   };
 
   const retake = () => {
     clearPlacementResult();
     setScreen("intro"); setReadingAnswers({}); setGrammarAnswers({});
     setReadingTime(600); setGrammarTime(600); setResults(null); setReviewSection(null);
+    window.scrollTo({top:0,behavior:"smooth"});
   };
 
   const TimerBar = ({time, total=600}) => {
