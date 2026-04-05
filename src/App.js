@@ -522,14 +522,14 @@ const TabBtn=({label,active,onClick,badge})=>(
   </button>
 );
 
-const MainTab=({label,active,onClick})=>(
+const MainTab=({label,active,onClick,badge})=>(
   <button onClick={onClick} style={{
     background: "transparent",
     border: "none",
     borderBottom: active ? `3px solid ${T.accent}` : "3px solid transparent",
     borderTop: "3px solid transparent",
     color: active ? T.accent : "rgba(255,255,255,0.88)",
-    padding: "0 16px",
+    padding: "0 14px",
     height: 52,
     cursor: "pointer",
     fontSize: 14,
@@ -539,8 +539,28 @@ const MainTab=({label,active,onClick})=>(
     whiteSpace: "nowrap",
     flexShrink: 0,
     letterSpacing: "0.01em",
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
   }}>
-    {label}
+    <span>{label}</span>
+    {badge&&(
+      <span style={{
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: "0.04em",
+        textTransform: "uppercase",
+        padding: "1px 5px",
+        borderRadius: 4,
+        background: badge==="free" ? "rgba(134,239,172,0.25)" : "rgba(251,191,36,0.25)",
+        color: badge==="free" ? "#86efac" : "#fbbf24",
+        border: badge==="free" ? "1px solid rgba(134,239,172,0.4)" : "1px solid rgba(251,191,36,0.4)",
+        lineHeight: 1.4,
+      }}>{badge==="free" ? "Free" : "Pro"}</span>
+    )}
   </button>
 );
 
@@ -753,7 +773,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
           from_email:cliqForm.email.trim(),
           country:cliqForm.mobile.trim(),
           age_group:"CLIQ Payment",
-          message:`New CLIQ Pro upgrade request:\n\nName: ${cliqForm.name.trim()}\nEmail: ${cliqForm.email.trim()}\nMobile: ${cliqForm.mobile.trim()}\nAmount: 10 JOD\nCLIQ Alias: Efool2026`,
+          message:`New CLIQ Pro upgrade request:\n\nName: ${cliqForm.name.trim()}\nEmail: ${cliqForm.email.trim()}\nMobile: ${cliqForm.mobile.trim()}\nAmount: 25 JOD\nCLIQ Alias: Efool2026`,
           to_email:"diogenes.agnos@gmail.com"
         });
       }catch(emailErr){ console.warn("EmailJS failed (non-critical):",emailErr); }
@@ -859,7 +879,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
                 </div>
                 <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>
                   افتح تطبيق البنك ← كليك ← أرسل أموال<br/>
-                  أرسل <strong style={{color:T.text}}>١٠ دنانير</strong> إلى الاسم المستعار: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:15,direction:"ltr",display:"inline-block"}}>Efool2026</strong>
+                  أرسل <strong style={{color:T.text}}>٢٥ دينار</strong> إلى الاسم المستعار: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:15,direction:"ltr",display:"inline-block"}}>Efool2026</strong>
                 </div>
               </div>
 
@@ -901,8 +921,8 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
         {tab==="international"&&(
           <div style={{textAlign:"center"}}>
             <div style={{background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px",marginBottom:16}}>
-              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$17 <span style={{fontSize:14,color:T.textMuted,fontWeight:400}}>/ 3 أشهر</span></div>
-              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>اشتراك 3 أشهر · يجدد بـ $25 · إلغاء في أي وقت</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>$35 <span style={{fontSize:14,color:T.textMuted,fontWeight:400}}>/ 3 months</span></div>
+              <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Renews at $35 · Cancel anytime</div>
             </div>
             <button onClick={()=>{
               if(window.Paddle){
@@ -915,7 +935,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
                 alert("Payment system is loading. Please try again in a moment.");
               }
             }} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:T.shadowMd}}>
-              💳 احصل على Pro — $17 (3 أشهر)
+              💳 احصل على Pro — $35 (3 months)
             </button>
             <p style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:10,lineHeight:1.5}}>
               Secure payment via Paddle. Accepts Visa, Mastercard, PayPal, Apple Pay, Google Pay and more. Paddle is the Merchant of Record.
@@ -1046,7 +1066,7 @@ const ToolkitContent=({isPro,onUpgrade})=>{
         <div style={{fontSize:36}}>🔒</div>
         <div style={{textAlign:"center"}}>
           <div style={{color:T.text,fontWeight:700,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>Pro Feature</div>
-          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Upgrade to Pro — $17</button>
+          <button onClick={onUpgrade} style={{background:T.gold,color:"white",fontWeight:700,fontSize:13,padding:"9px 20px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Upgrade to Pro — $35</button>
         </div>
       </div>
     </div>
@@ -1301,37 +1321,35 @@ Rules:
 - Each "correction" must be a concrete replacement, never advice.
 - Be thorough but concise in explanations.`;
 
-const GRAMMAR_DAILY_LIMIT = 10;
+const GRAMMAR_TOTAL_LIMIT = 5; // 5 free uses total
+const GRAMMAR_DAILY_LIMIT = GRAMMAR_TOTAL_LIMIT; // kept for backward compat
 const getGrammarUsesToday = () => { 
   try { 
-    const data = JSON.parse(localStorage.getItem("ef_grammar_daily")||"{}");
-    const today = new Date().toDateString();
-    return data.date === today ? data.count : 0;
+    const val = parseInt(localStorage.getItem("ef_grammar_uses")||"0",10);
+    return isNaN(val)?0:val;
   } catch { return 0; }
 };
 const saveGrammarUse = () => {
   try {
-    const today = new Date().toDateString();
-    const data = JSON.parse(localStorage.getItem("ef_grammar_daily")||"{}");
-    const count = data.date === today ? data.count + 1 : 1;
-    localStorage.setItem("ef_grammar_daily", JSON.stringify({ date: today, count }));
+    const current = getGrammarUsesToday();
+    localStorage.setItem("ef_grammar_uses", String(current+1));
   } catch {}
 };
 
-const GrammarChecker = ({isPro}) => {
+const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [dailyUses, setDailyUses] = useState(()=>getGrammarUsesToday());
-  const dailyLeft = GRAMMAR_DAILY_LIMIT - dailyUses;
+  const dailyLeft = GRAMMAR_TOTAL_LIMIT - dailyUses;
 
   const check = async () => {
     if (!input.trim()) { setError("Please enter a word or sentence to check."); return; }
     // Always read fresh from localStorage to avoid stale state
     const freshUses = getGrammarUsesToday();
-    if(freshUses !== dailyUses) setDailyUses(freshUses);
-    if (!isPro && freshUses >= GRAMMAR_DAILY_LIMIT) { setError("لقد استنفدت فحوصاتك المجانية (10 فحوصات). احصل على Pro للفحص غير المحدود."); return; }
+    const currentUses = freshUses; if(freshUses !== dailyUses) setDailyUses(freshUses);
+    if (!isPro && freshUses >= GRAMMAR_TOTAL_LIMIT) { setError("upgrade_needed"); return; }
     setError(""); setLoading(true); setResult(null);
     try {
       const res = await fetch(API_URL, {
@@ -1357,7 +1375,7 @@ const GrammarChecker = ({isPro}) => {
     <div>
       <Card style={{ marginBottom: 20, background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
         <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
-          ✏️ <strong>Grammar & Spell Checker</strong> — Enter any word, phrase, or sentence and get instant corrections with explanations. {isPro?"Unlimited checks with Pro.":(<><strong>{dailyLeft}</strong> of {GRAMMAR_DAILY_LIMIT} free checks remaining.</>)}
+          ✏️ <strong>Grammar & Spell Checker</strong> — {isPro?"Unlimited checks with Pro — enter any text for instant corrections.":dailyLeft>0?(<>Enter any word, phrase, or sentence. <strong>{dailyLeft}</strong> of {GRAMMAR_TOTAL_LIMIT} free {dailyLeft===1?"check":"checks"} remaining.</>):(<span style={{color:T.red}}>You've used all {GRAMMAR_TOTAL_LIMIT} free checks. <button onClick={onUpgrade} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",padding:0,textDecoration:"underline",fontFamily:"inherit",fontSize:"inherit"}}>Upgrade to Pro for unlimited use →</button></span>)}
         </p>
       </Card>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
@@ -2101,7 +2119,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
           <div style={{ fontSize: 32, marginBottom: 8 }}>⏰</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginBottom: 8 }}>Your free 30-minute session has ended</div>
           <p style={{ color: T.textMid, fontSize: 13, fontFamily: "'Cairo','Source Sans Pro',system-ui", margin: "0 0 16px", lineHeight: 1.6 }}>Upgrade to Pro for unlimited practice time — all exercise types, all categories, no restrictions.</p>
-          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>🔓 Upgrade to Pro — $17</button>
+          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>🔓 Upgrade to Pro — $35</button>
         </Card>
       )}
 
@@ -3931,7 +3949,7 @@ const PricingPage = ({onBack, onUpgrade, isPro, onManageSub=()=>{}}) => (
           </div>
         ):(
           <button onClick={onUpgrade} style={{width:"100%",background:T.primary,color:"white",fontWeight:700,fontSize:15,padding:"14px",borderRadius:8,border:"none",cursor:"pointer",boxShadow:T.shadowMd}}>
-            احصل على Pro — $17 (3 أشهر)
+            احصل على Pro — $35 (3 months)
           </button>
         )}
       </div>
@@ -4748,7 +4766,7 @@ function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
       <div style={{maxWidth:900,margin:"0 auto"}}>
         <div style={{textAlign:"center",marginBottom:28}}>
           <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:"clamp(18px,2.5vw,26px)",color:"white",marginBottom:6}}>المجاني مقابل Pro — الفرق في ثانية</div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)"}}>عرض الإطلاق: 3 أشهر بـ 10 دينار / $17 فقط</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)"}}>3 أشهر · $35 دولي / 25 دينار أردني</div>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,direction:"rtl"}}>
           {/* Free */}
@@ -5047,7 +5065,7 @@ const UI = {
     heroTitle:"ارفع درجتك في الآيلتس",
     heroSub:"تقييم مقالات فوري بمعايير كامبريدج · اختبارات قراءة كاملة · ألعاب تدريبية تفاعلية",
     startFree:"جرّب تحليل مقالة — مجاناً ←",
-    subscribe:"🔓 اشترك — $17 / 10 دينار",
+    subscribe:"🔓 اشترك — $35 / 25 دينار",
     // Features grid
     f1t:"تقييم المقالات",f1d:"تقييم فوري وفق معايير كامبريدج الأربعة مع توجيهات لرفع الدرجة",
     f2t:"اختبارات القراءة",f2d:"٧ اختبارات Academic وGeneral كاملة مع مؤقت رسمي وتصحيح فوري",
@@ -5069,7 +5087,7 @@ const UI = {
     gameBtn:"العب الآن 🕹️",
     // Pricing comparison
     pricingTitle:"المجاني مقابل Pro — الفرق في ثانية",
-    pricingSub:"عرض الإطلاق: 3 أشهر بـ 10 دينار / $17 فقط",
+    pricingSub:"3 أشهر · $35 دولي / 25 دينار أردني",
     pricingBtn:"احصل على Pro الآن ←",
     pricingNote:"الإلغاء في أي وقت · دفع آمن عبر Paddle",
     freeLabel:"المجاني", proLabel:"كل شيء مفتوح",
@@ -5096,7 +5114,7 @@ const UI = {
     heroTitle:"Boost Your IELTS Score",
     heroSub:"Instant essay feedback · Full reading tests · Interactive learning games",
     startFree:"Try Essay Analysis — Free →",
-    subscribe:"🔓 Subscribe — $17 / 10 JOD",
+    subscribe:"🔓 Subscribe — $35 / 25 JOD",
     // Features grid
     f1t:"Essay Analysis",f1d:"Instant scoring against all four Cambridge criteria with actionable feedback",
     f2t:"Reading Tests",f2d:"7 full Academic & General tests with official 60-min timer and instant scoring",
@@ -5118,7 +5136,7 @@ const UI = {
     gameBtn:"Play Now 🕹️",
     // Pricing comparison
     pricingTitle:"Free vs Pro — The Difference at a Glance",
-    pricingSub:"Launch offer: 3 months for $17 / 10 JOD only",
+    pricingSub:"3 months · $35 international / 25 JOD Jordan",
     pricingBtn:"Get Pro Now →",
     pricingNote:"Cancel anytime · Secure payment via Paddle",
     freeLabel:"Free", proLabel:"Everything Unlocked",
@@ -5258,7 +5276,9 @@ export default function IELTSBot(){
     switchView("analyze");
   };
 
+  const [isSampleEssay, setIsSampleEssay] = useState(false);
   const trySampleEssay=()=>{
+    setIsSampleEssay(true);
     setTaskType("task2");
     setTopic(SAMPLE_ESSAY_TOPIC);
     setEssay(SAMPLE_ESSAY_TEXT);
@@ -5301,7 +5321,7 @@ export default function IELTSBot(){
     return ()=>clearTimeout(timer);
   }, [loading]);
   const PAGE_TITLES = {home:"Englishfool — منصة الآيلتس الشاملة",analyze:"Englishfool — منصة الآيلتس الشاملة | تقييم مقالات + ألعاب + اختبارات",practice:"تدريب الكتابة — Englishfool",progress:"متابعة التقدم — Englishfool",toolkit:"أدوات الآيلتس — Englishfool",contact:"تواصل معنا — Englishfool",grammar:"مدقق القواعد والإملاء — Englishfool",exercises:"تمارين الآيلتس — Englishfool",admin:"Admin — Englishfool",terms:"شروط الخدمة — Englishfool",privacy:"سياسة الخصوصية — Englishfool",refund:"سياسة الاسترداد — Englishfool",pricing:"الأسعار — Englishfool",speaking:"تدريب المحادثة — Englishfool",reading:"اختبارات القراءة — Englishfool",game:"ألعاب الآيلتس — Englishfool"};
-  const PAGE_DESCS = {analyze:"احصل على تقييم فوري لمقالتك بناءً على معايير كامبريدج الأربعة. مع نماذج إجابة، تصحيح أخطاء، وخطة لرفع درجتك. جرّب مجاناً.",practice:"تدرّب على كتابة الآيلتس مع تغذية راجعة فورية لكل جملة. Task 1 و Task 2 بدعم من معايير Band 8+.",reading:"7 اختبارات قراءة آيلتس كاملة (Academic + General) مع مؤقت رسمي وتصحيح فوري.",speaking:"نماذج إجابة Band 8 لجميع أجزاء الآيلتس Speaking: Part 1, 2, 3 مع مفردات وأخطاء شائعة.",game:"تعلّم الآيلتس من خلال ألعاب تفاعلية: إملاء، قواعد، مفردات، كتابة، وقراءة.",pricing:"اشتراك Pro لمدة 3 أشهر بـ 10 دينار (الأردن) أو $17 (دولي). وصول كامل لجميع الأدوات.",default:"منصة Englishfool للتحضير للآيلتس — تقييم مقالات احترافي، اختبارات قراءة، ألعاب تدريبية، وتمارين قواعد."};
+  const PAGE_DESCS = {analyze:"احصل على تقييم فوري لمقالتك بناءً على معايير كامبريدج الأربعة. مع نماذج إجابة، تصحيح أخطاء، وخطة لرفع درجتك. جرّب مجاناً.",practice:"تدرّب على كتابة الآيلتس مع تغذية راجعة فورية لكل جملة. Task 1 و Task 2 بدعم من معايير Band 8+.",reading:"7 اختبارات قراءة آيلتس كاملة (Academic + General) مع مؤقت رسمي وتصحيح فوري.",speaking:"نماذج إجابة Band 8 لجميع أجزاء الآيلتس Speaking: Part 1, 2, 3 مع مفردات وأخطاء شائعة.",game:"تعلّم الآيلتس من خلال ألعاب تفاعلية: إملاء، قواعد، مفردات، كتابة، وقراءة.",pricing:"اشتراك Pro لمدة 3 أشهر بـ 25 دينار (الأردن) أو $35 (دولي). وصول كامل لجميع الأدوات.",default:"منصة Englishfool للتحضير للآيلتس — تقييم مقالات احترافي، اختبارات قراءة، ألعاب تدريبية، وتمارين قواعد."};
   const PAGE_PATHS = {analyze:"/",practice:"/practice",reading:"/reading",speaking:"/speaking",game:"/game",pricing:"/pricing",grammar:"/grammar",exercises:"/exercises",progress:"/progress",toolkit:"/toolkit",contact:"/contact"};
 
   const updateSEO=(view)=>{
@@ -5487,13 +5507,13 @@ export default function IELTSBot(){
         <div style={{background:T.primary}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center"}}>
-              <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
-              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
-              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
-              <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
-              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label={UI[uiLang].home} active={mainView==="home"} badge="free" onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
+              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} badge="free" onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} badge="pro" onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} badge="free" onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
+              <MainTab label={UI[uiLang].game} active={mainView==="game"} badge="free" onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
+              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} badge="pro" onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} badge="pro" onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -5551,7 +5571,7 @@ export default function IELTSBot(){
                 <button onClick={()=>setShowPaywall(true)} style={{background:"rgba(255,255,255,0.12)",color:"white",border:"2px solid rgba(255,255,255,0.5)",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"background 0.15s"}}
                   onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.2)"}
                   onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.12)"}>
-                  {uiLang==="ar"?"🔓 اشترك — $17 / 10 دينار":"🔓 Subscribe — $17 / 10 JOD"}
+                  {uiLang==="ar"?"🔓 اشترك — $35 / 25 دينار":"🔓 Subscribe — $35 / 25 JOD"}
                 </button>
               )}
             </div>
@@ -5564,19 +5584,24 @@ export default function IELTSBot(){
         <div style={{background:"white",borderBottom:`1px solid ${T.border}`,padding:"40px 32px"}}>
           <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,textAlign:"center"}} className="features-grid">
             {[
-              {icon:"🎓",tk:"f1t",dk:"f1d",view:"analyze"},
-              {icon:"📖",tk:"f2t",dk:"f2d",view:"reading"},
-              {icon:"🗣️",tk:"f3t",dk:"f3d",view:"speaking"},
-              {icon:"🎮",tk:"f4t",dk:"f4d",view:"game"},
-              {icon:"✏️",tk:"f5t",dk:"f5d",view:"grammar"},
-              {icon:"🏋️",tk:"f6t",dk:"f6d",view:"exercises"},
-              {icon:"📚",tk:"f7t",dk:"f7d",view:"toolkit"},
-              {icon:"📈",tk:"f8t",dk:"f8d",view:"progress"},
+              {icon:"🎓",tk:"f1t",dk:"f1d",view:"analyze",free:true},
+              {icon:"📖",tk:"f2t",dk:"f2d",view:"reading",free:true},
+              {icon:"🗣️",tk:"f3t",dk:"f3d",view:"speaking",free:false},
+              {icon:"🎮",tk:"f4t",dk:"f4d",view:"game",free:true},
+              {icon:"✏️",tk:"f5t",dk:"f5d",view:"grammar",free:true},
+              {icon:"🏋️",tk:"f6t",dk:"f6d",view:"exercises",free:false},
+              {icon:"📚",tk:"f7t",dk:"f7d",view:"toolkit",free:false},
+              {icon:"📈",tk:"f8t",dk:"f8d",view:"progress",free:false},
             ].map((f,i)=>(
               <div key={i} onClick={()=>switchView(f.view)} style={{padding:"20px 16px",cursor:"pointer",borderRadius:12,border:`1px solid transparent`,transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
                 onMouseOver={e=>{e.currentTarget.style.background=T.primaryLight;e.currentTarget.style.borderColor=T.primaryBorder;}}
                 onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
-                <div style={{fontSize:36,marginBottom:12}}>{f.icon}</div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                  <span style={{fontSize:36}}>{f.icon}</span>
+                  <span style={{fontSize:10,fontWeight:700,padding:"2px 7px",borderRadius:4,background:f.free?"#dcfce7":"#fef3c7",color:f.free?"#166534":"#92400e",border:f.free?"1px solid #86efac":"1px solid #fbbf24"}}>
+                    {f.free?(uiLang==="ar"?"مجاني":"Free"):(uiLang==="ar"?"Pro 🔒":"Pro 🔒")}
+                  </span>
+                </div>
                 <div style={{fontWeight:700,fontSize:16,color:T.primary,fontFamily:"'Cairo',system-ui",marginBottom:6}}>{UI[uiLang][f.tk]}</div>
                 <div style={{fontSize:14,color:T.textMuted,fontFamily:"'Cairo',system-ui",lineHeight:1.7}}>{UI[uiLang][f.dk]}</div>
                 <div style={{marginTop:10,fontSize:13,color:T.primary,fontWeight:600,fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].fStart}</div>
@@ -5631,7 +5656,7 @@ export default function IELTSBot(){
                 {UI[uiLang].unlimitedBanner}
               </span>
               <span style={{background:`${T.accent}22`,border:`1px solid ${T.accent}66`,borderRadius:20,padding:"2px 12px",fontSize:12,color:T.accent,fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
-                {uiLang==="ar"?"🇯🇴 CLIQ — 10 دينار (3 أشهر)":"🇯🇴 Jordan: 10 JOD via CLIQ"}
+                {uiLang==="ar"?"🇯🇴 CLIQ — 25 دينار (3 أشهر)":"🇯🇴 Jordan: 25 JOD via CLIQ"}
               </span>
             </div>
             <button onClick={()=>setShowPaywall(true)}
@@ -5670,7 +5695,7 @@ export default function IELTSBot(){
               <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 18px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
                 <div>
                   <div style={{fontSize:14,fontWeight:700,color:T.green,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>🎯 First time? See it in action!</div>
-                  <div style={{fontSize:12,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:2}}>Load a sample Band 6 essay and watch the AI analyze it — completely free.</div>
+                  <div style={{fontSize:12,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginTop:2}}>Load a sample essay — contains intentional mistakes to show you how the analysis works.</div>
                 </div>
                 <button onClick={trySampleEssay} style={{background:T.green,color:"white",border:"none",borderRadius:8,padding:"9px 18px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",flexShrink:0,boxShadow:"0 2px 6px rgba(0,120,90,0.3)"}}>
                   Load Sample Essay →
@@ -5706,6 +5731,14 @@ export default function IELTSBot(){
                   style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               <div>
+                {isSampleEssay&&(
+                  <div style={{background:"#fefce8",border:"1px solid #fbbf24",borderRadius:10,padding:"10px 14px",marginBottom:12,direction:"ltr"}}>
+                    <div style={{fontSize:12,color:"#92400e",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6}}>
+                      <span style={{fontWeight:700}}>⚠️ Demo Essay: </span>
+                      This essay contains intentional mistakes — it's here to show you exactly how the analysis works. Replace it with your own essay to get your real score.
+                    </div>
+                  </div>
+                )}
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7,flexWrap:"wrap",gap:6}}>
                   <label style={{fontSize:11,color:T.textMid,letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700}}>
                     Student's Response
@@ -5954,7 +5987,7 @@ export default function IELTSBot(){
         {mainView==="practice"&&<PracticeMode isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="progress"&&<ProgressTracker isPro={proUser} onUpgrade={()=>setShowPaywall(true)} email={session?.email}/>}
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="grammar"&&<GrammarChecker isPro={proUser}/>}
+        {mainView==="grammar"&&<GrammarChecker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
@@ -6093,12 +6126,12 @@ export default function IELTSBot(){
                   width:"100%",background:T.primary,color:"white",border:"none",
                   borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,
                   cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:"0 2px 8px rgba(0,86,210,0.35)"
-                }}>🔓 Upgrade to Pro — $17</button>
+                }}>🔓 Upgrade to Pro — $35</button>
                 <button onClick={()=>{setShowPaywall(true);setMenuOpen(false);}} style={{
                   width:"100%",background:"#f0fdf4",color:T.green,border:`1px solid ${T.greenBorder}`,
                   borderRadius:8,padding:"10px",fontSize:13,fontWeight:700,
                   cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui"
-                }}>🇯🇴 Jordan: Pay 10 JOD via CLIQ</button>
+                }}>🇯🇴 Jordan: Pay 25 JOD via CLIQ</button>
               </div>
             )}
             {proUser&&(
