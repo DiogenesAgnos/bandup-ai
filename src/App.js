@@ -754,7 +754,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
   const [codeErr,setCodeErr]=useState("");
   const [codeSuccess,setCodeSuccess]=useState(false);
 
-  const FEATURES=["Unlimited essay analyses — Task 1 & 2","Complete mistake & spelling detection","Inline annotated essay corrections","Band Booster + vocabulary upgrades","Full IELTS Toolkit (templates, model essays)","Practice Mode with live AI coaching","Unlimited Grammar & Spelling Checker","Progress tracker","Unlimited exercises — all categories"];
+  const FEATURES=["Unlimited essay analyses — Task 1 & 2","Complete mistake detection with corrections","Band Booster + vocabulary upgrades to Band 8","Full IELTS Toolkit (templates, model essays)","Speaking practice — Parts 1, 2 & 3","All 7 reading tests","Unlimited exercises — 5 categories","Progress tracker with score history","Unlimited grammar checker"];
 
   const submitCliq=async()=>{
     if(!cliqForm.name.trim()||!cliqForm.email.trim()||!cliqForm.mobile.trim()){setCliqStatus("error");return;}
@@ -1815,7 +1815,7 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
                   </div>
                   {!timeExpired && (
                     <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginTop: 1 }}>
-                      Free plan: 30 minutes of practice time · Pause anytime and pick up where you left off · Go Pro for unlimited access
+                      Pro feature · Upgrade for unlimited access to all exercises
                     </div>
                   )}
                 </div>
@@ -2122,7 +2122,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
                   </div>
                   {!timeExpired && (
                     <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginTop: 2 }}>
-                      Free plan: 30 minutes total · Pause at any time and resume later · Pro members get unlimited access
+                      Pro feature · Upgrade for unlimited access to all exercises
                     </div>
                   )}
                 </div>
@@ -3966,7 +3966,7 @@ const TermsPage = ({onBack}) => (
   <PolicyPage title="Terms of Service" onBack={onBack}>
     <Section title="1. Acceptance of Terms"><p style={{margin:"0 0 12px"}}>By accessing or using Englishfool ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service. Englishfool is operated by Ahmad Sartawi ("we", "us", "our").</p></Section>
     <Section title="2. Description of Service"><p style={{margin:"0 0 12px"}}>Englishfool is a smart IELTS Writing examination tool that provides automated band score assessment based on official IELTS band descriptors, mistake detection, vocabulary feedback, and model essay generation for IELTS Writing Tasks 1 and 2. The Service is intended for educational purposes only.</p></Section>
-    <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro plan at $17 USD (one-time payment). Payments are processed securely by Paddle.com as our Merchant of Record.</p><p style={{margin:"0 0 12px"}}>Pro access is granted permanently after a one-time payment.</p><p style={{margin:"0 0 12px"}}>Buyers are entitled to a full refund within 14 days of purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
+    <Section title="3. User Accounts and Subscriptions"><p style={{margin:"0 0 12px"}}>The Service offers a free tier with limited analyses and a Pro plan at $35 USD / 25 JOD (3-month subscription). Payments are processed securely by Paddle.com as our Merchant of Record.</p><p style={{margin:"0 0 12px"}}>Pro access is granted for 3 months per subscription period.</p><p style={{margin:"0 0 12px"}}>Buyers are entitled to a full refund within 14 days of purchase, in accordance with Paddle's Buyer Terms. See our Refund Policy for full details.</p></Section>
     <Section title="4. Acceptable Use"><p style={{margin:"0 0 12px"}}>You agree to use Englishfool only for lawful educational purposes. You must not: (a) attempt to reverse engineer or copy our systems; (b) submit content that is harmful, offensive, or violates any laws; (c) share account access with others; (d) use the Service in any way that could damage or overburden our systems.</p></Section>
     <Section title="5. Accuracy Disclaimer"><p style={{margin:"0 0 12px"}}>Englishfool uses advanced technology to provide IELTS writing feedback. While we strive for accuracy, scores and feedback are for guidance only and do not constitute official IELTS examination results. Actual IELTS scores are determined solely by certified IELTS examiners appointed by the British Council, IDP, or Cambridge Assessment English.</p></Section>
     <Section title="6. Intellectual Property"><p style={{margin:"0 0 12px"}}>All content, design, software, and materials on Englishfool are the property of Ahmad Sartawi and are protected by applicable intellectual property laws. Essays submitted by users remain the property of the user. We do not claim ownership over user-submitted content.</p></Section>
@@ -4840,10 +4840,10 @@ function TestimonialsSection({uiLang="ar"}){
 
 // ── FREE VS PRO COMPARISON ────────────────────────
 function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
-  const FREE_AR=["تقييم مقالة واحدة مجاناً (مقالتان بعد التسجيل)","اختبار قراءة واحد فقط","لعبتا الإملاء والقواعد","30 دقيقة تدريب إجمالية (غير متجددة)","10 فحوصات قواعد"];
-  const FREE_EN=["1 free sample essay analysis (demo only)","1 reading test only","2 spelling & grammar games","30 total practice minutes (non-renewable)","5 grammar checks"];
-  const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ 7","جميع الألعاب الـ 5 مفتوحة","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقية مقالتك لـ Band 8","نماذج إجابة Band 8+ كاملة","متابعة التقدم أسبوعياً","فحص قواعد غير محدود"];
-  const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","All 5 games unlocked","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Weekly progress tracking","Unlimited grammar checker"];
+  const FREE_AR=["تجربة تحليل مقالة واحدة (ديمو)","اختبار قراءة واحد مجاناً","جميع الألعاب الـ٥ مجاناً","مفردات الآيلتس الأساسية كاملة","الكلمات الرابطة ومرجع القواعد","٥ فحوصات قواعد مجاناً"];
+  const FREE_EN=["1 demo essay analysis (sample only)","1 reading test free","All 5 games — completely free","Full IELTS vocabulary list (150+ words)","Linking words & grammar reference","5 grammar checks free"];
+  const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ ٧","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقيات Band 8","نماذج إجابة Band 8+ كاملة","تدريب المحادثة — الأجزاء ١ و٢ و٣","متابعة التقدم وتاريخ الدرجات","فحص قواعد غير محدود"];
+  const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Speaking practice — Parts 1, 2 & 3","Progress tracker with score history","Unlimited grammar checker"];
   const free=uiLang==="ar"?FREE_AR:FREE_EN;
   const pro=uiLang==="ar"?PRO_AR:PRO_EN;
   return(
