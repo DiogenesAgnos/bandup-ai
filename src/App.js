@@ -5318,7 +5318,7 @@ const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$
 const UI = {
   ar:{
     // Nav
-    home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات",, speaking:"🗣️ المحادثة",
+    home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
     progress:"📈 تقدمي", contact:"✉️ اتصل بنا",
     // Account
@@ -5368,7 +5368,7 @@ const UI = {
   },
   en:{
     // Nav
-    home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary",, speaking:"🗣️ Speaking",
+    home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", speaking:"🗣️ Speaking",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
     progress:"📈 Progress", contact:"✉️ Contact",
     // Account
