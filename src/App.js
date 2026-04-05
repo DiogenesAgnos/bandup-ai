@@ -5252,13 +5252,21 @@ const CEFR_LEVELS = [
   {min:88, max:100, cefr:"C2", label:"Proficient",         ielts:"8.5 – 9.0", color:"#dc2626", bg:"#fee2e2", advice:"Near-native level. Focus entirely on IELTS exam technique, timing, and Band 9 model answers."},
 ];
 
-const PlacementTest = ({uiLang="ar"}) => {
-  const [screen, setScreen] = useState("intro"); // intro | reading | grammar | results
-  const [readingAnswers, setReadingAnswers] = useState({});
-  const [grammarAnswers, setGrammarAnswers] = useState({});
+const PLACEMENT_STORAGE_KEY = "ef_placement_result";
+
+const savePlacementResult = (data) => { try { localStorage.setItem(PLACEMENT_STORAGE_KEY, JSON.stringify({...data, date: new Date().toISOString()})); } catch {} };
+const loadPlacementResult = () => { try { const d=localStorage.getItem(PLACEMENT_STORAGE_KEY); return d?JSON.parse(d):null; } catch { return null; } };
+const clearPlacementResult = () => { try { localStorage.removeItem(PLACEMENT_STORAGE_KEY); } catch {} };
+
+const PlacementTest = ({uiLang="ar", onNavigate}) => {
+  const saved = loadPlacementResult();
+  const [screen, setScreen] = useState(saved?"results":"intro");
+  const [readingAnswers, setReadingAnswers] = useState(saved?.readingAnswers||{});
+  const [grammarAnswers, setGrammarAnswers] = useState(saved?.grammarAnswers||{});
   const [readingTime, setReadingTime] = useState(600);
   const [grammarTime, setGrammarTime] = useState(600);
-  const [results, setResults] = useState(null);
+  const [results, setResults] = useState(saved||null);
+  const [reviewSection, setReviewSection] = useState(null); // null | "reading" | "grammar"
   const timerRef = useRef(null);
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
@@ -5276,30 +5284,26 @@ const PlacementTest = ({uiLang="ar"}) => {
 
   const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
 
-  const startReading = () => {
-    setScreen("reading");
-    startTimer(setReadingTime, finishReading);
-  };
+  const startReading = () => { setScreen("reading"); startTimer(setReadingTime, finishReading); };
+  const finishReading = () => { if(timerRef.current) clearInterval(timerRef.current); setScreen("grammar"); startTimer(setGrammarTime, finishGrammar); };
+  const finishGrammar = () => { if(timerRef.current) clearInterval(timerRef.current); calcResults(); };
 
-  const finishReading = () => {
-    if(timerRef.current) clearInterval(timerRef.current);
-    setScreen("grammar");
-    startTimer(setGrammarTime, finishGrammar);
-  };
-
-  const finishGrammar = () => {
-    if(timerRef.current) clearInterval(timerRef.current);
-    calcResults();
-  };
-
-  const calcResults = () => {
-    const rScore = PLACEMENT_READING_PASSAGE.questions.reduce((s,q,i)=> s+(readingAnswers[i]===q.a?1:0),0);
-    const gScore = PLACEMENT_GRAMMAR_VOCAB.reduce((s,q,i)=> s+(grammarAnswers[i]===q.a?1:0),0);
+  const calcResults = (rAns=readingAnswers, gAns=grammarAnswers) => {
+    const rScore = PLACEMENT_READING_PASSAGE.questions.reduce((s,q,i)=> s+(rAns[i]===q.a?1:0),0);
+    const gScore = PLACEMENT_GRAMMAR_VOCAB.reduce((s,q,i)=> s+(gAns[i]===q.a?1:0),0);
     const total = rScore+gScore;
     const pct = Math.round((total/32)*100);
     const level = CEFR_LEVELS.find(l=>pct>=l.min&&pct<=l.max)||CEFR_LEVELS[0];
-    setResults({rScore,gScore,total,pct,level});
+    const data = {rScore,gScore,total,pct,level,readingAnswers:rAns,grammarAnswers:gAns};
+    savePlacementResult(data);
+    setResults(data);
     setScreen("results");
+  };
+
+  const retake = () => {
+    clearPlacementResult();
+    setScreen("intro"); setReadingAnswers({}); setGrammarAnswers({});
+    setReadingTime(600); setGrammarTime(600); setResults(null); setReviewSection(null);
   };
 
   const TimerBar = ({time, total=600}) => {
@@ -5318,13 +5322,8 @@ const PlacementTest = ({uiLang="ar"}) => {
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{fontSize:56,marginBottom:12}}>📋</div>
         <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 8px"}}>{uiLang==="ar"?"اختبار تحديد المستوى":"Placement Test"}</h1>
-        <p style={{...sty,fontSize:15,color:T.textMid,lineHeight:1.7,marginBottom:0}}>
-          {uiLang==="ar"
-            ?"اكتشف مستواك في الإنجليزية وتقديرك في الآيلتس — مجاني بالكامل"
-            :"Discover your English level and estimated IELTS band — completely free"}
-        </p>
+        <p style={{...sty,fontSize:15,color:T.textMid,lineHeight:1.7,marginBottom:0}}>{uiLang==="ar"?"اكتشف مستواك في الإنجليزية وتقديرك في الآيلتس — مجاني بالكامل":"Discover your English level and estimated IELTS band — completely free"}</p>
       </div>
-
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:28}}>
         {[
           {icon:"📖",label:uiLang==="ar"?"القراءة":"Reading",time:uiLang==="ar"?"١٠ دقائق":"10 minutes",count:uiLang==="ar"?"١٢ سؤالاً":"12 questions",desc:uiLang==="ar"?"فقرة أكاديمية + أسئلة فهم":"Academic passage + comprehension questions"},
@@ -5338,27 +5337,19 @@ const PlacementTest = ({uiLang="ar"}) => {
           </div>
         ))}
       </div>
-
       <div style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px 16px",marginBottom:24,direction:uiLang==="ar"?"rtl":"ltr"}}>
-        <div style={{...sty,fontSize:13,color:T.textMid,lineHeight:1.7}}>
-          {uiLang==="ar"
-            ?"✅ ستحصل على: مستواك في الإطار الأوروبي (A1–C2) · تقدير درجة الآيلتس · نقاط قوتك وضعفك · خطة تعلم مخصصة"
-            :"✅ You'll get: CEFR level (A1–C2) · Estimated IELTS band · Strengths & weaknesses · Personalised learning plan"}
-        </div>
+        <div style={{...sty,fontSize:13,color:T.textMid,lineHeight:1.7}}>{uiLang==="ar"?"✅ ستحصل على: مستواك في الإطار الأوروبي (A1–C2) · تقدير درجة الآيلتس · مراجعة إجاباتك الخاطئة · خطة تعلم مخصصة":"✅ You'll get: CEFR level (A1–C2) · Estimated IELTS band · Full answer review with corrections · Personalised learning plan"}</div>
       </div>
-
       <div style={{textAlign:"center"}}>
         <button onClick={startReading} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 40px",fontSize:16,fontWeight:700,cursor:"pointer",...sty,boxShadow:`0 4px 16px ${T.primary}44`}}>
           {uiLang==="ar"?"ابدأ الاختبار ←":"Start Test →"}
         </button>
-        <div style={{...sty,fontSize:12,color:T.textMuted,marginTop:8}}>
-          {uiLang==="ar"?"مجاني · لا يتطلب تسجيلاً · ٢٠ دقيقة فقط":"Free · No sign-up required · 20 minutes"}
-        </div>
+        <div style={{...sty,fontSize:12,color:T.textMuted,marginTop:8}}>{uiLang==="ar"?"مجاني · لا يتطلب تسجيلاً · ٢٠ دقيقة فقط":"Free · No sign-up required · 20 minutes"}</div>
       </div>
     </div>
   );
 
-  // ── READING SECTION ──
+  // ── READING ──
   if(screen==="reading") return(
     <div style={{maxWidth:900,margin:"0 auto",padding:"24px 20px 80px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:8}}>
@@ -5369,16 +5360,13 @@ const PlacementTest = ({uiLang="ar"}) => {
         </div>
       </div>
       <TimerBar time={readingTime}/>
-
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:16}}>
-        {/* Passage */}
         <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",height:"70vh",overflowY:"auto"}}>
           <div style={{...sty,fontWeight:700,fontSize:13,color:T.primary,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.05em"}}>{PLACEMENT_READING_PASSAGE.title}</div>
           {PLACEMENT_READING_PASSAGE.text.split("\n\n").map((p,i)=>(
             <p key={i} style={{fontFamily:"Georgia,serif",fontSize:14,lineHeight:1.8,color:T.text,marginBottom:12}}>{p}</p>
           ))}
         </div>
-        {/* Questions */}
         <div style={{height:"70vh",overflowY:"auto",display:"flex",flexDirection:"column",gap:12}}>
           {PLACEMENT_READING_PASSAGE.questions.map((q,qi)=>(
             <div key={qi} style={{background:"white",border:`1.5px solid ${readingAnswers[qi]!==undefined?T.primaryBorder:T.border}`,borderRadius:10,padding:"14px"}}>
@@ -5393,7 +5381,6 @@ const PlacementTest = ({uiLang="ar"}) => {
           ))}
         </div>
       </div>
-
       <div style={{textAlign:"center",marginTop:16}}>
         <button onClick={finishReading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
           {uiLang==="ar"?"إنهاء القراءة · الانتقال للقسم الثاني →":"Finish Reading · Next Section →"}
@@ -5402,7 +5389,7 @@ const PlacementTest = ({uiLang="ar"}) => {
     </div>
   );
 
-  // ── GRAMMAR & VOCAB SECTION ──
+  // ── GRAMMAR ──
   if(screen==="grammar") return(
     <div style={{maxWidth:680,margin:"0 auto",padding:"24px 20px 80px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:8}}>
@@ -5413,7 +5400,6 @@ const PlacementTest = ({uiLang="ar"}) => {
         </div>
       </div>
       <TimerBar time={grammarTime}/>
-
       <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:16}}>
         {PLACEMENT_GRAMMAR_VOCAB.map((q,qi)=>(
           <div key={qi} style={{background:"white",border:`1.5px solid ${grammarAnswers[qi]!==undefined?T.primaryBorder:T.border}`,borderRadius:10,padding:"14px"}}>
@@ -5429,7 +5415,6 @@ const PlacementTest = ({uiLang="ar"}) => {
           </div>
         ))}
       </div>
-
       <div style={{textAlign:"center",marginTop:20}}>
         <button onClick={finishGrammar} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
           {uiLang==="ar"?"أنهِ الاختبار واعرض نتيجتك →":"Finish & See Results →"}
@@ -5440,7 +5425,7 @@ const PlacementTest = ({uiLang="ar"}) => {
 
   // ── RESULTS ──
   if(screen==="results"&&results) {
-    const {rScore,gScore,total,pct,level} = results;
+    const {rScore,gScore,total,pct,level,readingAnswers:rAns,grammarAnswers:gAns} = results;
     const nextSteps = {
       A1:[{icon:"📝",text:uiLang==="ar"?"ابدأ بمفردات الآيلتس الأساسية":"Start with IELTS core vocabulary",view:"vocabulary"},{icon:"🎮",text:uiLang==="ar"?"العب لعبة الإملاء والقواعد يومياً":"Play spelling & grammar games daily",view:"game"},{icon:"📐",text:uiLang==="ar"?"مارس تمارين القواعد":"Practice grammar exercises",view:"exercises"}],
       A2:[{icon:"📝",text:uiLang==="ar"?"ادرس مفردات الآيلتس الأساسية":"Study IELTS vocabulary list",view:"vocabulary"},{icon:"🎮",text:uiLang==="ar"?"العب ألعاب المفردات والكتابة":"Play vocabulary & writing games",view:"game"},{icon:"✍️",text:uiLang==="ar"?"جرّب تحليل مقالة مجانية":"Try a free essay analysis",view:"analyze"}],
@@ -5450,25 +5435,32 @@ const PlacementTest = ({uiLang="ar"}) => {
       C2:[{icon:"✍️",text:uiLang==="ar"?"اتقن أسلوب Band 8-9":"Master Band 8-9 writing style",view:"analyze"},{icon:"🗣️",text:uiLang==="ar"?"راجع نماذج Band 8 للمحادثة":"Review Band 8 speaking models",view:"speaking"},{icon:"📖",text:uiLang==="ar"?"ابقَ حاداً مع اختبارات القراءة":"Stay sharp with reading tests",view:"reading"}],
     };
     const steps = nextSteps[level.cefr]||nextSteps.B1;
+    const dateStr = results.date ? new Date(results.date).toLocaleDateString(uiLang==="ar"?"ar-JO":"en-GB",{day:"numeric",month:"short",year:"numeric"}) : "";
 
     return(
-      <div style={{maxWidth:680,margin:"0 auto",padding:"32px 20px 80px"}}>
+      <div style={{maxWidth:720,margin:"0 auto",padding:"32px 20px 80px"}}>
+
+        {/* Saved badge */}
+        {results.date&&(
+          <div style={{...sty,fontSize:12,color:T.textMuted,textAlign:"center",marginBottom:12}}>
+            {uiLang==="ar"?`✅ نتيجة محفوظة · أجريت في ${dateStr}`:`✅ Saved result · Taken on ${dateStr}`}
+          </div>
+        )}
+
         {/* Level badge */}
-        <div style={{textAlign:"center",marginBottom:28}}>
-          <div style={{display:"inline-flex",flexDirection:"column",alignItems:"center",background:level.bg,border:`2px solid ${level.color}`,borderRadius:20,padding:"20px 40px",marginBottom:16}}>
+        <div style={{textAlign:"center",marginBottom:24}}>
+          <div style={{display:"inline-flex",flexDirection:"column",alignItems:"center",background:level.bg,border:`2px solid ${level.color}`,borderRadius:20,padding:"20px 40px",marginBottom:12}}>
             <div style={{fontFamily:"Georgia,serif",fontSize:60,fontWeight:900,color:level.color,lineHeight:1}}>{level.cefr}</div>
             <div style={{...sty,fontSize:16,fontWeight:700,color:level.color,marginTop:4}}>{level.label}</div>
           </div>
           <div style={{...sty,fontSize:15,color:T.text,fontWeight:600,marginBottom:4}}>
             {uiLang==="ar"?"تقدير درجة الآيلتس:":"Estimated IELTS Band:"} <span style={{color:T.primary}}>{level.ielts}</span>
           </div>
-          <div style={{...sty,fontSize:13,color:T.textMuted}}>
-            {uiLang==="ar"?"نتيجتك:":"Your score:"} {total}/32 ({pct}%)
-          </div>
+          <div style={{...sty,fontSize:13,color:T.textMuted}}>{uiLang==="ar"?"نتيجتك:":"Your score:"} {total}/32 ({pct}%)</div>
         </div>
 
         {/* Score breakdown */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
           {[
             {icon:"📖",label:uiLang==="ar"?"القراءة":"Reading",score:rScore,max:12},
             {icon:"📐",label:uiLang==="ar"?"القواعد والمفردات":"Grammar & Vocab",score:gScore,max:20},
@@ -5489,30 +5481,114 @@ const PlacementTest = ({uiLang="ar"}) => {
           <div style={{...sty,fontSize:13,color:T.text,lineHeight:1.7}}>💡 {level.advice}</div>
         </div>
 
+        {/* Answer review toggle buttons */}
+        <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap"}}>
+          <button onClick={()=>setReviewSection(reviewSection==="reading"?null:"reading")}
+            style={{...sty,fontSize:13,fontWeight:600,padding:"9px 18px",borderRadius:8,cursor:"pointer",background:reviewSection==="reading"?T.primaryLight:"white",border:`1.5px solid ${reviewSection==="reading"?T.primary:T.border}`,color:reviewSection==="reading"?T.primary:T.textMid,transition:"all 0.2s"}}>
+            📖 {uiLang==="ar"?"مراجعة القراءة":"Review Reading"} ({rScore}/12)
+          </button>
+          <button onClick={()=>setReviewSection(reviewSection==="grammar"?null:"grammar")}
+            style={{...sty,fontSize:13,fontWeight:600,padding:"9px 18px",borderRadius:8,cursor:"pointer",background:reviewSection==="grammar"?T.primaryLight:"white",border:`1.5px solid ${reviewSection==="grammar"?T.primary:T.border}`,color:reviewSection==="grammar"?T.primary:T.textMid,transition:"all 0.2s"}}>
+            📐 {uiLang==="ar"?"مراجعة القواعد":"Review Grammar"} ({gScore}/20)
+          </button>
+        </div>
+
+        {/* Answer review: Reading */}
+        {reviewSection==="reading"&&(
+          <div style={{marginBottom:20,display:"flex",flexDirection:"column",gap:10}}>
+            {PLACEMENT_READING_PASSAGE.questions.map((q,qi)=>{
+              const userAns=rAns?.[qi];
+              const correct=userAns===q.a;
+              return(
+                <div key={qi} style={{background:"white",border:`1.5px solid ${correct?"#86efac":"#fca5a5"}`,borderRadius:10,padding:"14px",borderLeft:`4px solid ${correct?T.green:T.red}`}}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:8}}>
+                    <span style={{fontSize:16,flexShrink:0}}>{correct?"✅":"❌"}</span>
+                    <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,lineHeight:1.5}}>{qi+1}. {q.q}</div>
+                  </div>
+                  <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                    {q.options.map((opt,oi)=>{
+                      const isCorrect=oi===q.a;
+                      const isUser=oi===userAns;
+                      let bg="transparent",border=T.border,color=T.textMid;
+                      if(isCorrect){bg="#d1fae5";border="#86efac";color="#065f46";}
+                      else if(isUser&&!isCorrect){bg="#fee2e2";border="#fca5a5";color="#991b1b";}
+                      return(
+                        <div key={oi} style={{...sty,fontSize:12,padding:"6px 10px",borderRadius:6,background:bg,border:`1px solid ${border}`,color,fontWeight:isCorrect||isUser?600:400}}>
+                          {String.fromCharCode(65+oi)}. {opt}
+                          {isCorrect&&<span style={{marginLeft:8,fontSize:11}}>✓ {uiLang==="ar"?"الإجابة الصحيحة":"Correct answer"}</span>}
+                          {isUser&&!isCorrect&&<span style={{marginLeft:8,fontSize:11}}>← {uiLang==="ar"?"إجابتك":"Your answer"}</span>}
+                        </div>
+                      );
+                    })}
+                    {userAns===undefined&&<div style={{...sty,fontSize:12,color:T.textMuted,fontStyle:"italic"}}>{uiLang==="ar"?"لم تجب على هذا السؤال":"Not answered"}</div>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Answer review: Grammar */}
+        {reviewSection==="grammar"&&(
+          <div style={{marginBottom:20,display:"flex",flexDirection:"column",gap:10}}>
+            {PLACEMENT_GRAMMAR_VOCAB.map((q,qi)=>{
+              const userAns=gAns?.[qi];
+              const correct=userAns===q.a;
+              return(
+                <div key={qi} style={{background:"white",border:`1.5px solid ${correct?"#86efac":"#fca5a5"}`,borderRadius:10,padding:"14px",borderLeft:`4px solid ${correct?T.green:T.red}`}}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:8}}>
+                    <span style={{fontSize:16,flexShrink:0}}>{correct?"✅":"❌"}</span>
+                    <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,lineHeight:1.5}}>{qi+1}. {q.q}</div>
+                  </div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+                    {q.options.map((opt,oi)=>{
+                      const isCorrect=oi===q.a;
+                      const isUser=oi===userAns;
+                      let bg="transparent",border=T.border,color=T.textMid;
+                      if(isCorrect){bg="#d1fae5";border="#86efac";color="#065f46";}
+                      else if(isUser&&!isCorrect){bg="#fee2e2";border="#fca5a5";color="#991b1b";}
+                      return(
+                        <div key={oi} style={{...sty,fontSize:12,padding:"6px 10px",borderRadius:6,background:bg,border:`1px solid ${border}`,color,fontWeight:isCorrect||isUser?600:400,lineHeight:1.4}}>
+                          {String.fromCharCode(65+oi)}. {opt}
+                          {isCorrect&&<div style={{fontSize:10,marginTop:2}}>✓ {uiLang==="ar"?"صحيح":"Correct"}</div>}
+                          {isUser&&!isCorrect&&<div style={{fontSize:10,marginTop:2,color:"#991b1b"}}>← {uiLang==="ar"?"إجابتك":"Yours"}</div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {userAns===undefined&&<div style={{...sty,fontSize:12,color:T.textMuted,fontStyle:"italic",marginTop:4}}>{uiLang==="ar"?"لم تجب":"Not answered"}</div>}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {/* Next steps */}
-        <div style={{marginBottom:24}}>
+        <div style={{marginBottom:20}}>
           <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:10,direction:uiLang==="ar"?"rtl":"ltr"}}>
             {uiLang==="ar"?"🗺️ خطواتك القادمة في Englishfool:":"🗺️ Your next steps on Englishfool:"}
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {steps.map((s,i)=>(
-              <button key={i} onClick={()=>window.dispatchEvent(new CustomEvent("ef-navigate",{detail:s.view}))}
+              <button key={i} onClick={()=>onNavigate&&onNavigate(s.view)}
                 style={{display:"flex",alignItems:"center",gap:12,background:"white",border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",textAlign:"left",transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
                 onMouseOver={e=>{e.currentTarget.style.borderColor=T.primary;e.currentTarget.style.background=T.primaryLight;}}
                 onMouseOut={e=>{e.currentTarget.style.borderColor=T.border;e.currentTarget.style.background="white";}}>
                 <span style={{fontSize:20}}>{s.icon}</span>
-                <span style={{...sty,fontSize:13,color:T.text,fontWeight:500}}>{s.text}</span>
-                <span style={{marginLeft:"auto",color:T.primary,fontSize:14}}>→</span>
+                <span style={{...sty,fontSize:13,color:T.text,fontWeight:500,flex:1}}>{s.text}</span>
+                <span style={{color:T.primary,fontSize:14}}>→</span>
               </button>
             ))}
+          </div>
+          <div style={{...sty,fontSize:12,color:T.textMuted,marginTop:8,direction:uiLang==="ar"?"rtl":"ltr"}}>
+            💾 {uiLang==="ar"?"نتيجتك محفوظة — ستجدها هنا في كل مرة تعود فيها":"Your result is saved — it will be here every time you return"}
           </div>
         </div>
 
         {/* Retake */}
         <div style={{textAlign:"center"}}>
-          <button onClick={()=>{setScreen("intro");setReadingAnswers({});setGrammarAnswers({});setReadingTime(600);setGrammarTime(600);setResults(null);}}
-            style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 24px",fontSize:13,...sty,color:T.textMid,cursor:"pointer"}}>
-            {uiLang==="ar"?"🔄 أعد الاختبار":"🔄 Retake Test"}
+          <button onClick={retake} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 24px",fontSize:13,...sty,color:T.textMid,cursor:"pointer"}}>
+            {uiLang==="ar"?"🔄 أعد الاختبار (سيمسح نتيجتك الحالية)":"🔄 Retake Test (clears your saved result)"}
           </button>
         </div>
       </div>
@@ -6045,12 +6121,6 @@ export default function IELTSBot(){
       el.content=content;
     });
   };
-
-  useEffect(()=>{
-    const handler=(e)=>switchView(e.detail);
-    window.addEventListener("ef-navigate",handler);
-    return ()=>window.removeEventListener("ef-navigate",handler);
-  },[]);
 
   const switchView=(view)=>{ 
     setMainView(view); 
@@ -6691,7 +6761,7 @@ export default function IELTSBot(){
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang}/>}
-        {mainView==="placement"&&<PlacementTest uiLang={uiLang}/>}
+        {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
         </div>
