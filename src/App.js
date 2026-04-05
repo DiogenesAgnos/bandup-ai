@@ -848,7 +848,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
           <div>
             <div style={{background:"#f0fdf4",border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"14px 16px",marginBottom:16,textAlign:"center"}}>
               <div style={{fontSize:11,fontWeight:700,color:T.green,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:4}}>🇯🇴 دفع عن طريق كليك</div>
-              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>10 <span style={{fontSize:20,fontWeight:700}}>دينار</span></div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:40,fontWeight:900,color:T.text,lineHeight:1}}>25 <span style={{fontSize:20,fontWeight:700}}>دينار</span></div>
               <div style={{color:T.textMuted,fontSize:12,marginTop:4,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>اشتراك لمدة 3 أشهر · الإلغاء في أي وقت</div>
             </div>
 
@@ -875,7 +875,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
               <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:10}}>
                 <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
                   <span style={{background:T.amber,color:"white",borderRadius:"50%",width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:900,flexShrink:0}}>٢</span>
-                  <span style={{fontSize:14,fontWeight:700,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>حوّل ١٠ دنانير عن طريق كليك</span>
+                  <span style={{fontSize:14,fontWeight:700,color:T.amber,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>حوّل ٢٥ دينار عن طريق كليك</span>
                 </div>
                 <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>
                   افتح تطبيق البنك ← كليك ← أرسل أموال<br/>
@@ -1452,7 +1452,7 @@ const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
       </div>
       <Card style={{ marginTop: 20, background: T.primaryLight, border: `1px solid ${T.primaryBorder}` }}>
         <p style={{ color: T.primary, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
-          🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — 1 free analysis, no sign-up needed.
+          🎓 Want a full essay scored with band levels, vocabulary upgrades, and a model response? Try our <strong>Essay Analyzer</strong> — start with our free sample, then upgrade to Pro.
         </p>
       </Card>
       <Card style={{ marginTop: 16, background: T.amberBg, border: `1px solid ${T.amberBorder}` }}>
@@ -3923,7 +3923,7 @@ const PricingPage = ({onBack, onUpgrade, isPro, onManageSub=()=>{}}) => (
         <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:T.text,lineHeight:1,marginBottom:8}}>$0</div>
         <div style={{color:T.textMuted,fontSize:13,marginBottom:20}}>Get started — no credit card required</div>
         <ul style={{listStyle:"none",padding:0,textAlign:"left",display:"flex",flexDirection:"column",gap:8}}>
-          {["1 free essay analysis (1 more after sign-up)","Task 1 & Task 2 support","Band scores for all 4 criteria","Basic mistake detection","Linking Words toolkit","Grammar reference guide","Grammar & Spell Checker (10/day)"].map((f,i)=>(
+          {["1 free sample essay analysis (demo only)","Task 1 & Task 2 support","Band scores for all 4 criteria","Basic mistake detection","Linking Words toolkit","Grammar reference guide","Grammar & Spell Checker (5 free checks)"].map((f,i)=>(
             <li key={i} style={{fontSize:13,color:T.textMid,display:"flex",gap:8}}><span style={{color:T.green,fontWeight:700,flexShrink:0}}>✓</span>{f}</li>
           ))}
         </ul>
@@ -4756,7 +4756,7 @@ function TestimonialsSection({uiLang="ar"}){
 // ── FREE VS PRO COMPARISON ────────────────────────
 function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
   const FREE_AR=["تقييم مقالة واحدة مجاناً (مقالتان بعد التسجيل)","اختبار قراءة واحد فقط","لعبتا الإملاء والقواعد","30 دقيقة تدريب إجمالية (غير متجددة)","10 فحوصات قواعد"];
-  const FREE_EN=["1 free essay analysis (2 after sign-up)","1 reading test only","2 spelling & grammar games","30 total practice minutes (non-renewable)","10 grammar checks"];
+  const FREE_EN=["1 free sample essay analysis (demo only)","1 reading test only","2 spelling & grammar games","30 total practice minutes (non-renewable)","5 grammar checks"];
   const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ 7","جميع الألعاب الـ 5 مفتوحة","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقية مقالتك لـ Band 8","نماذج إجابة Band 8+ كاملة","متابعة التقدم أسبوعياً","فحص قواعد غير محدود"];
   const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","All 5 games unlocked","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Weekly progress tracking","Unlimited grammar checker"];
   const free=uiLang==="ar"?FREE_AR:FREE_EN;
@@ -5507,7 +5507,7 @@ export default function IELTSBot(){
         <div style={{background:T.primary}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center"}}>
-              <MainTab label={UI[uiLang].home} active={mainView==="home"} badge="free" onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
+              <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
               <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} badge="free" onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} badge="pro" onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
               <MainTab label={UI[uiLang].reading} active={mainView==="reading"} badge="free" onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
@@ -5760,25 +5760,31 @@ export default function IELTSBot(){
                   style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.8,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               {error&&<Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`}}><p style={{color:T.red,fontSize:14,margin:0,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>{error}</p></Card>}
-              {!proUser&&usesLeft===1&&!session&&(
-                <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center"}}>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ This is your free analysis. </span>
-                  <button onClick={()=>setShowAuth(true)} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Sign up for 1 more</button>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}> or </span>
-                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>upgrade to Pro</button>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}> for unlimited access.</span>
+              {!proUser&&usesLeft===1&&(
+                <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center",direction:lang==="ar"?"rtl":"ltr"}}>
+                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+                    {lang==="ar"
+                      ?"⚠️ هذا هو تحليلك المجاني الوحيد — شاهد كيف يعمل الموقع. "
+                      :"⚠️ This is your 1 free analysis — see exactly how the platform works. "}
+                  </span>
+                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+                    {lang==="ar"?"احصل على Pro للتحليل غير المحدود →":"Get Pro for unlimited analyses →"}
+                  </button>
                 </Card>
               )}
-              {!proUser&&usesLeft===1&&session&&(
-                <Card style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,textAlign:"center"}}>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>⚠️ Last free analysis! </span>
-                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.gold,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Upgrade to Pro</button>
-                  <span style={{color:T.amber,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}> for unlimited access.</span>
+              {!proUser&&usesLeft===0&&(
+                <Card style={{background:T.redBg,border:`1px solid ${T.redBorder}`,textAlign:"center",direction:lang==="ar"?"rtl":"ltr"}}>
+                  <span style={{color:T.red,fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+                    {lang==="ar"?"🔒 لقد استخدمت تحليلك المجاني. ":"🔒 You've used your free analysis. "}
+                  </span>
+                  <button onClick={()=>setShowPaywall(true)} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontSize:13,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>
+                    {lang==="ar"?"احصل على Pro للتحليل غير المحدود ←":"Upgrade to Pro for unlimited access →"}
+                  </button>
                 </Card>
               )}
               <button ref={analyzeRef} onClick={analyze} disabled={loading}
                 style={{background:loading?T.bgGray:T.primary,border:"none",borderRadius:4,color:loading?T.textMuted:"#fff",fontSize:15,fontWeight:700,padding:"14px 32px",cursor:loading?"not-allowed":"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",transition:"background 0.15s",display:"flex",alignItems:"center",gap:10,justifyContent:"center",letterSpacing:"0.01em"}}>
-                {loading?"⏳ Examining...":!proUser&&usesLeft<=0?(session?"🔓 Upgrade to Continue":"🔓 Sign Up for 1 More Free"):`Analyze ${TASK_TYPES[taskType].label} →`}
+                {loading?"⏳ Examining...":!proUser&&usesLeft<=0?`🔒 ${lang==="ar"?"احصل على Pro":"Upgrade to Pro"}`:`Analyze ${TASK_TYPES[taskType].label} →`}
               </button>
 
               {/* Language Selector */}
