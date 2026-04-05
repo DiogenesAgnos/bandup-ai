@@ -5856,8 +5856,8 @@ export default function IELTSBot(){
 
         {/* TIER 2 — Red navbar: navigation links */}
         <div style={{background:T.primary}}>
-          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",direction:uiLang==="ar"?"rtl":"ltr"}}>
+            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr"}}>
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
               <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
@@ -5944,6 +5944,7 @@ export default function IELTSBot(){
               {icon:"🏋️",tk:"f6t",dk:"f6d",view:"exercises",free:false},
               {icon:"📚",tk:"f7t",dk:"f7d",view:"toolkit",free:false},
               {icon:"📈",tk:"f8t",dk:"f8d",view:"progress",free:false},
+              {icon:"📝",tk:"f9t",dk:"f9d",view:"vocabulary",free:true},
             ].map((f,i)=>(
               <div key={i} onClick={()=>switchView(f.view)} style={{padding:"20px 16px",cursor:"pointer",borderRadius:12,border:`1px solid transparent`,transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
                 onMouseOver={e=>{e.currentTarget.style.background=T.primaryLight;e.currentTarget.style.borderColor=T.primaryBorder;}}
