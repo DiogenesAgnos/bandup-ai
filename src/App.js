@@ -5191,6 +5191,336 @@ const VocabularyPage = ({uiLang="ar"}) => {
   );
 };
 
+
+// ── PLACEMENT TEST ──────────────────────────────────────────────
+const PLACEMENT_READING_PASSAGE = {
+  title: "The Rise of Urban Farming",
+  text: `Urban farming — the practice of growing food within cities — has seen remarkable growth over the past two decades. Once dismissed as a niche hobby, it is now recognised as a serious response to food security concerns, environmental challenges, and the disconnect many city dwellers feel from natural food systems.
+
+The appeal is practical as well as philosophical. Community gardens and rooftop farms reduce the distance food travels from farm to table, cutting carbon emissions associated with transport. In cities like Singapore and Tokyo, vertical farms use artificial lighting and hydroponic systems to grow vegetables in stacked layers, producing yields many times greater per square metre than conventional agriculture. Singapore, which imports over 90% of its food, has set a national target to produce 30% of its nutritional needs locally by 2030.
+
+Critics, however, point to significant limitations. The energy required to power indoor lighting and climate control systems can exceed the environmental savings from reduced transport. A 2022 study found that some indoor vertical farms produce more carbon emissions per kilogram of lettuce than conventional outdoor farms, once the full energy lifecycle is accounted for. Furthermore, urban farms currently produce mainly high-value, low-calorie crops like salad leaves and herbs — not the staple grains and proteins that constitute the majority of human diets.
+
+Proponents argue that the technology is still maturing and that energy costs will fall as renewable sources become more widespread. They also highlight benefits that go beyond food production: urban farms have been shown to reduce urban heat, improve mental health among participants, and build community cohesion in areas that lack green space.
+
+The debate ultimately reflects a broader tension in environmental policy — between embracing imperfect solutions now versus waiting for more efficient alternatives that may take decades to develop.`,
+  questions: [
+    {q:"What is the main purpose of this passage?",options:["To argue that urban farming is always superior to conventional farming","To present a balanced overview of urban farming's benefits and limitations","To persuade readers to start their own urban farm","To explain how hydroponic technology works"],a:1},
+    {q:"According to the passage, what is Singapore's food production goal by 2030?",options:["To export food to other countries","To stop importing food entirely","To produce 30% of its nutritional needs locally","To build 100 vertical farms"],a:2},
+    {q:"The word 'niche' in the first paragraph most closely means:",options:["Popular and widespread","Expensive and impractical","Specialised and not mainstream","Modern and technological"],a:2},
+    {q:"What does the 2022 study mentioned in the passage suggest?",options:["Urban farming always reduces carbon emissions","Some indoor farms may produce more emissions than outdoor farms","Vertical farms are more efficient than all outdoor farms","Energy costs for urban farms are falling rapidly"],a:1},
+    {q:"Why do critics say urban farms have limited impact on food security?",options:["They are too expensive to build","They mainly produce low-calorie crops, not staple foods","They only work in warm climates","They require too much water"],a:1},
+    {q:"The word 'proponents' in the fourth paragraph means:",options:["People who oppose something","Scientists who study something","People who support and advocate for something","Government officials who regulate something"],a:2},
+    {q:"Which benefit of urban farming is NOT mentioned in the passage?",options:["Reducing urban heat","Improving mental health","Creating employment opportunities","Building community cohesion"],a:2},
+    {q:"What does the final paragraph suggest about environmental policy?",options:["Imperfect solutions should always be rejected","There is a difficult choice between acting now with imperfect solutions or waiting for better ones","Urban farming is not worth pursuing","Renewable energy will solve all problems"],a:1},
+    {q:"The phrase 'once the full energy lifecycle is accounted for' suggests that:",options:["Energy costs are always hidden","You need to consider total energy use, not just one aspect","Lifecycle costs are too complex to calculate","Transport emissions are the biggest factor"],a:1},
+    {q:"What can be inferred about conventional outdoor farming compared to some indoor vertical farms?",options:["It is always less sustainable","It may sometimes produce lower carbon emissions per kilogram of crop","It is more expensive","It cannot produce salad crops"],a:1},
+    {q:"Which best describes the overall tone of the passage?",options:["Strongly critical of urban farming","Enthusiastically supportive of urban farming","Balanced and analytical","Uncertain and confused"],a:2},
+    {q:"The passage implies that the future of urban farming depends mainly on:",options:["Government funding","Improvements in renewable energy and technology maturity","Consumer demand for locally grown food","International cooperation"],a:1},
+  ]
+};
+
+const PLACEMENT_GRAMMAR_VOCAB = [
+  {q:"She has been working at this company __ five years.",options:["since","for","during","from"],a:1},
+  {q:"The results of the experiment __ announced tomorrow.",options:["will be","are being","have been","were"],a:0},
+  {q:"Choose the correct sentence:",options:["The informations were useful.","The information was useful.","The informations was useful.","The information were useful."],a:1},
+  {q:"If I __ more time, I would study abroad.",options:["have","had","would have","will have"],a:1},
+  {q:"The report highlighted __ need for further research.",options:["a","an","the","—"],a:2},
+  {q:"Scientists have found a strong __ between diet and mental health.",options:["link","linked","linking","links"],a:0},
+  {q:"The policy was __ by the government last year.",options:["implement","implemented","implementing","to implement"],a:1},
+  {q:"She is known for her __ attention to detail.",options:["meticulous","mediocre","merciful","menacing"],a:0},
+  {q:"Not only __ the project delayed, but it also exceeded its budget.",options:["was","is","were","has"],a:0},
+  {q:"The new regulations are designed to __ pollution levels.",options:["reduce","reducing","reduced","reduction"],a:0},
+  {q:"He gave a __ argument that convinced most of the committee.",options:["persuasive","persuaded","persuading","persuasion"],a:0},
+  {q:"The number of people affected by the disease __ risen sharply.",options:["have","has","are","were"],a:1},
+  {q:"Despite __ hard, she did not pass the exam.",options:["studied","studying","to study","having study"],a:1},
+  {q:"The study concluded that exercise has a __ effect on cognitive function.",options:["beneficial","benefited","benefiting","benefit"],a:0},
+  {q:"Which word means 'to make a problem worse'?",options:["alleviate","mitigate","exacerbate","resolve"],a:2},
+  {q:"The findings were __ with previous research in the field.",options:["consistent","consisting","consisted","consistency"],a:0},
+  {q:"By the time she arrived, the meeting __ already started.",options:["has","had","was","would"],a:1},
+  {q:"Which sentence uses 'however' correctly?",options:["I like coffee, however tea.","I like coffee. However, I prefer tea.","However I like coffee and tea.","I like coffee however, I prefer tea."],a:1},
+  {q:"The word 'prevalent' most closely means:",options:["rare and unusual","widely common","strictly controlled","recently discovered"],a:1},
+  {q:"The government allocated __ funds to healthcare than to education.",options:["more","less","fewer","much"],a:0},
+];
+
+const CEFR_LEVELS = [
+  {min:0,  max:25,  cefr:"A1", label:"Beginner",           ielts:"1.0 – 2.5", color:"#6b7280", bg:"#f3f4f6", advice:"Focus on building core vocabulary and basic grammar. The Vocabulary and Grammar sections of Englishfool are your starting point."},
+  {min:26, max:40,  cefr:"A2", label:"Elementary",         ielts:"2.5 – 3.5", color:"#2563eb", bg:"#dbeafe", advice:"Work on expanding vocabulary and basic sentence structures. Try the IELTS Games and Vocabulary page to build confidence."},
+  {min:41, max:56,  cefr:"B1", label:"Intermediate",       ielts:"4.0 – 5.0", color:"#7c3aed", bg:"#ede9fe", advice:"You have a foundation. Now focus on IELTS-specific writing structure, cohesive devices, and reading practice."},
+  {min:57, max:72,  cefr:"B2", label:"Upper Intermediate",  ielts:"5.5 – 6.5", color:"#d97706", bg:"#fef3c7", advice:"You are in IELTS range. Focus on essay structure, vocabulary precision, and error reduction. The Essay Analyzer is your most valuable tool."},
+  {min:73, max:87,  cefr:"C1", label:"Advanced",           ielts:"7.0 – 8.0", color:"#059669", bg:"#d1fae5", advice:"Strong English level. Work on sophisticated vocabulary, complex sentence variety, and exam technique to reach Band 7+."},
+  {min:88, max:100, cefr:"C2", label:"Proficient",         ielts:"8.5 – 9.0", color:"#dc2626", bg:"#fee2e2", advice:"Near-native level. Focus entirely on IELTS exam technique, timing, and Band 9 model answers."},
+];
+
+const PlacementTest = ({uiLang="ar"}) => {
+  const [screen, setScreen] = useState("intro"); // intro | reading | grammar | results
+  const [readingAnswers, setReadingAnswers] = useState({});
+  const [grammarAnswers, setGrammarAnswers] = useState({});
+  const [readingTime, setReadingTime] = useState(600);
+  const [grammarTime, setGrammarTime] = useState(600);
+  const [results, setResults] = useState(null);
+  const timerRef = useRef(null);
+  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+
+  const startTimer = (setTime, onExpire) => {
+    if(timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(()=>{
+      setTime(prev=>{
+        if(prev<=1){ clearInterval(timerRef.current); onExpire(); return 0; }
+        return prev-1;
+      });
+    },1000);
+  };
+
+  useEffect(()=>{ return ()=>{ if(timerRef.current) clearInterval(timerRef.current); }; },[]);
+
+  const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+
+  const startReading = () => {
+    setScreen("reading");
+    startTimer(setReadingTime, finishReading);
+  };
+
+  const finishReading = () => {
+    if(timerRef.current) clearInterval(timerRef.current);
+    setScreen("grammar");
+    startTimer(setGrammarTime, finishGrammar);
+  };
+
+  const finishGrammar = () => {
+    if(timerRef.current) clearInterval(timerRef.current);
+    calcResults();
+  };
+
+  const calcResults = () => {
+    const rScore = PLACEMENT_READING_PASSAGE.questions.reduce((s,q,i)=> s+(readingAnswers[i]===q.a?1:0),0);
+    const gScore = PLACEMENT_GRAMMAR_VOCAB.reduce((s,q,i)=> s+(grammarAnswers[i]===q.a?1:0),0);
+    const total = rScore+gScore;
+    const pct = Math.round((total/32)*100);
+    const level = CEFR_LEVELS.find(l=>pct>=l.min&&pct<=l.max)||CEFR_LEVELS[0];
+    setResults({rScore,gScore,total,pct,level});
+    setScreen("results");
+  };
+
+  const TimerBar = ({time, total=600}) => {
+    const pct=(time/total)*100;
+    const color=time<120?T.red:time<240?T.amber:T.green;
+    return(
+      <div style={{background:T.bgGray,borderRadius:4,height:6,overflow:"hidden",marginBottom:4}}>
+        <div style={{width:`${pct}%`,height:"100%",background:color,transition:"width 1s linear,background 0.5s"}}/>
+      </div>
+    );
+  };
+
+  // ── INTRO ──
+  if(screen==="intro") return(
+    <div style={{maxWidth:680,margin:"0 auto",padding:"32px 20px 80px"}}>
+      <div style={{textAlign:"center",marginBottom:32}}>
+        <div style={{fontSize:56,marginBottom:12}}>📋</div>
+        <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 8px"}}>{uiLang==="ar"?"اختبار تحديد المستوى":"Placement Test"}</h1>
+        <p style={{...sty,fontSize:15,color:T.textMid,lineHeight:1.7,marginBottom:0}}>
+          {uiLang==="ar"
+            ?"اكتشف مستواك في الإنجليزية وتقديرك في الآيلتس — مجاني بالكامل"
+            :"Discover your English level and estimated IELTS band — completely free"}
+        </p>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:28}}>
+        {[
+          {icon:"📖",label:uiLang==="ar"?"القراءة":"Reading",time:uiLang==="ar"?"١٠ دقائق":"10 minutes",count:uiLang==="ar"?"١٢ سؤالاً":"12 questions",desc:uiLang==="ar"?"فقرة أكاديمية + أسئلة فهم":"Academic passage + comprehension questions"},
+          {icon:"📐",label:uiLang==="ar"?"القواعد والمفردات":"Grammar & Vocabulary",time:uiLang==="ar"?"١٠ دقائق":"10 minutes",count:uiLang==="ar"?"٢٠ سؤالاً":"20 questions",desc:uiLang==="ar"?"زمن، مفردات، هيكل الجملة":"Tenses, vocabulary, sentence structure"},
+        ].map((s,i)=>(
+          <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"16px"}}>
+            <div style={{fontSize:28,marginBottom:6}}>{s.icon}</div>
+            <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:2}}>{s.label}</div>
+            <div style={{...sty,fontSize:12,color:T.primary,fontWeight:600,marginBottom:4}}>{s.time} · {s.count}</div>
+            <div style={{...sty,fontSize:12,color:T.textMuted,lineHeight:1.4}}>{s.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px 16px",marginBottom:24,direction:uiLang==="ar"?"rtl":"ltr"}}>
+        <div style={{...sty,fontSize:13,color:T.textMid,lineHeight:1.7}}>
+          {uiLang==="ar"
+            ?"✅ ستحصل على: مستواك في الإطار الأوروبي (A1–C2) · تقدير درجة الآيلتس · نقاط قوتك وضعفك · خطة تعلم مخصصة"
+            :"✅ You'll get: CEFR level (A1–C2) · Estimated IELTS band · Strengths & weaknesses · Personalised learning plan"}
+        </div>
+      </div>
+
+      <div style={{textAlign:"center"}}>
+        <button onClick={startReading} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 40px",fontSize:16,fontWeight:700,cursor:"pointer",...sty,boxShadow:`0 4px 16px ${T.primary}44`}}>
+          {uiLang==="ar"?"ابدأ الاختبار ←":"Start Test →"}
+        </button>
+        <div style={{...sty,fontSize:12,color:T.textMuted,marginTop:8}}>
+          {uiLang==="ar"?"مجاني · لا يتطلب تسجيلاً · ٢٠ دقيقة فقط":"Free · No sign-up required · 20 minutes"}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── READING SECTION ──
+  if(screen==="reading") return(
+    <div style={{maxWidth:900,margin:"0 auto",padding:"24px 20px 80px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:8}}>
+        <div style={{...sty,fontWeight:700,fontSize:15,color:T.text}}>📖 {uiLang==="ar"?"القسم الأول: القراءة":"Section 1: Reading"}</div>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{...sty,fontSize:13,color:T.textMuted}}>{Object.keys(readingAnswers).length}/12 {uiLang==="ar"?"مجاب":"answered"}</div>
+          <div style={{...sty,fontWeight:700,fontSize:15,color:readingTime<120?T.red:readingTime<240?T.amber:T.text,fontVariantNumeric:"tabular-nums",minWidth:40}}>⏱ {fmt(readingTime)}</div>
+        </div>
+      </div>
+      <TimerBar time={readingTime}/>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:16}}>
+        {/* Passage */}
+        <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",height:"70vh",overflowY:"auto"}}>
+          <div style={{...sty,fontWeight:700,fontSize:13,color:T.primary,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.05em"}}>{PLACEMENT_READING_PASSAGE.title}</div>
+          {PLACEMENT_READING_PASSAGE.text.split("\n\n").map((p,i)=>(
+            <p key={i} style={{fontFamily:"Georgia,serif",fontSize:14,lineHeight:1.8,color:T.text,marginBottom:12}}>{p}</p>
+          ))}
+        </div>
+        {/* Questions */}
+        <div style={{height:"70vh",overflowY:"auto",display:"flex",flexDirection:"column",gap:12}}>
+          {PLACEMENT_READING_PASSAGE.questions.map((q,qi)=>(
+            <div key={qi} style={{background:"white",border:`1.5px solid ${readingAnswers[qi]!==undefined?T.primaryBorder:T.border}`,borderRadius:10,padding:"14px"}}>
+              <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,marginBottom:8,lineHeight:1.5}}>{qi+1}. {q.q}</div>
+              {q.options.map((opt,oi)=>(
+                <button key={oi} onClick={()=>setReadingAnswers(p=>({...p,[qi]:oi}))}
+                  style={{display:"block",width:"100%",textAlign:"left",background:readingAnswers[qi]===oi?T.primaryLight:"transparent",border:`1px solid ${readingAnswers[qi]===oi?T.primaryBorder:T.border}`,borderRadius:7,padding:"7px 10px",marginBottom:4,cursor:"pointer",...sty,fontSize:12,color:readingAnswers[qi]===oi?T.primary:T.textMid,fontWeight:readingAnswers[qi]===oi?600:400,transition:"all 0.15s"}}>
+                  {String.fromCharCode(65+oi)}. {opt}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{textAlign:"center",marginTop:16}}>
+        <button onClick={finishReading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+          {uiLang==="ar"?"إنهاء القراءة · الانتقال للقسم الثاني →":"Finish Reading · Next Section →"}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── GRAMMAR & VOCAB SECTION ──
+  if(screen==="grammar") return(
+    <div style={{maxWidth:680,margin:"0 auto",padding:"24px 20px 80px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:8}}>
+        <div style={{...sty,fontWeight:700,fontSize:15,color:T.text}}>📐 {uiLang==="ar"?"القسم الثاني: القواعد والمفردات":"Section 2: Grammar & Vocabulary"}</div>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{...sty,fontSize:13,color:T.textMuted}}>{Object.keys(grammarAnswers).length}/20 {uiLang==="ar"?"مجاب":"answered"}</div>
+          <div style={{...sty,fontWeight:700,fontSize:15,color:grammarTime<120?T.red:grammarTime<240?T.amber:T.text,fontVariantNumeric:"tabular-nums",minWidth:40}}>⏱ {fmt(grammarTime)}</div>
+        </div>
+      </div>
+      <TimerBar time={grammarTime}/>
+
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:16}}>
+        {PLACEMENT_GRAMMAR_VOCAB.map((q,qi)=>(
+          <div key={qi} style={{background:"white",border:`1.5px solid ${grammarAnswers[qi]!==undefined?T.primaryBorder:T.border}`,borderRadius:10,padding:"14px"}}>
+            <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,marginBottom:8,lineHeight:1.5}}>{qi+1}. {q.q}</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+              {q.options.map((opt,oi)=>(
+                <button key={oi} onClick={()=>setGrammarAnswers(p=>({...p,[qi]:oi}))}
+                  style={{textAlign:"left",background:grammarAnswers[qi]===oi?T.primaryLight:"transparent",border:`1px solid ${grammarAnswers[qi]===oi?T.primaryBorder:T.border}`,borderRadius:7,padding:"7px 10px",cursor:"pointer",...sty,fontSize:12,color:grammarAnswers[qi]===oi?T.primary:T.textMid,fontWeight:grammarAnswers[qi]===oi?600:400,transition:"all 0.15s"}}>
+                  {String.fromCharCode(65+oi)}. {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{textAlign:"center",marginTop:20}}>
+        <button onClick={finishGrammar} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+          {uiLang==="ar"?"أنهِ الاختبار واعرض نتيجتك →":"Finish & See Results →"}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── RESULTS ──
+  if(screen==="results"&&results) {
+    const {rScore,gScore,total,pct,level} = results;
+    const nextSteps = {
+      A1:[{icon:"📝",text:uiLang==="ar"?"ابدأ بمفردات الآيلتس الأساسية":"Start with IELTS core vocabulary",view:"vocabulary"},{icon:"🎮",text:uiLang==="ar"?"العب لعبة الإملاء والقواعد يومياً":"Play spelling & grammar games daily",view:"game"},{icon:"📐",text:uiLang==="ar"?"مارس تمارين القواعد":"Practice grammar exercises",view:"exercises"}],
+      A2:[{icon:"📝",text:uiLang==="ar"?"ادرس مفردات الآيلتس الأساسية":"Study IELTS vocabulary list",view:"vocabulary"},{icon:"🎮",text:uiLang==="ar"?"العب ألعاب المفردات والكتابة":"Play vocabulary & writing games",view:"game"},{icon:"✍️",text:uiLang==="ar"?"جرّب تحليل مقالة مجانية":"Try a free essay analysis",view:"analyze"}],
+      B1:[{icon:"📖",text:uiLang==="ar"?"ابدأ اختبارات القراءة":"Start reading tests",view:"reading"},{icon:"✍️",text:uiLang==="ar"?"حلّل مقالتك الأولى":"Analyse your first essay",view:"analyze"},{icon:"📚",text:uiLang==="ar"?"راجع أدوات الآيلتس":"Review IELTS toolkit",view:"toolkit"}],
+      B2:[{icon:"✍️",text:uiLang==="ar"?"ركّز على تحليل المقالات":"Focus on essay analysis",view:"analyze"},{icon:"📖",text:uiLang==="ar"?"أكمل جميع اختبارات القراءة":"Complete all reading tests",view:"reading"},{icon:"🏋️",text:uiLang==="ar"?"مارس تمارين الباراغراف":"Practice paraphrasing exercises",view:"exercises"}],
+      C1:[{icon:"✍️",text:uiLang==="ar"?"ارفع درجتك من ٦.٥ إلى ٧+":"Push from 6.5 to Band 7+",view:"analyze"},{icon:"🗣️",text:uiLang==="ar"?"درّب مهارة المحادثة":"Practise speaking skills",view:"speaking"},{icon:"🏋️",text:uiLang==="ar"?"تمارين متقدمة وتصحيح الأخطاء":"Advanced exercises & error correction",view:"exercises"}],
+      C2:[{icon:"✍️",text:uiLang==="ar"?"اتقن أسلوب Band 8-9":"Master Band 8-9 writing style",view:"analyze"},{icon:"🗣️",text:uiLang==="ar"?"راجع نماذج Band 8 للمحادثة":"Review Band 8 speaking models",view:"speaking"},{icon:"📖",text:uiLang==="ar"?"ابقَ حاداً مع اختبارات القراءة":"Stay sharp with reading tests",view:"reading"}],
+    };
+    const steps = nextSteps[level.cefr]||nextSteps.B1;
+
+    return(
+      <div style={{maxWidth:680,margin:"0 auto",padding:"32px 20px 80px"}}>
+        {/* Level badge */}
+        <div style={{textAlign:"center",marginBottom:28}}>
+          <div style={{display:"inline-flex",flexDirection:"column",alignItems:"center",background:level.bg,border:`2px solid ${level.color}`,borderRadius:20,padding:"20px 40px",marginBottom:16}}>
+            <div style={{fontFamily:"Georgia,serif",fontSize:60,fontWeight:900,color:level.color,lineHeight:1}}>{level.cefr}</div>
+            <div style={{...sty,fontSize:16,fontWeight:700,color:level.color,marginTop:4}}>{level.label}</div>
+          </div>
+          <div style={{...sty,fontSize:15,color:T.text,fontWeight:600,marginBottom:4}}>
+            {uiLang==="ar"?"تقدير درجة الآيلتس:":"Estimated IELTS Band:"} <span style={{color:T.primary}}>{level.ielts}</span>
+          </div>
+          <div style={{...sty,fontSize:13,color:T.textMuted}}>
+            {uiLang==="ar"?"نتيجتك:":"Your score:"} {total}/32 ({pct}%)
+          </div>
+        </div>
+
+        {/* Score breakdown */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+          {[
+            {icon:"📖",label:uiLang==="ar"?"القراءة":"Reading",score:rScore,max:12},
+            {icon:"📐",label:uiLang==="ar"?"القواعد والمفردات":"Grammar & Vocab",score:gScore,max:20},
+          ].map((s,i)=>(
+            <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:10,padding:"14px",textAlign:"center"}}>
+              <div style={{fontSize:24,marginBottom:4}}>{s.icon}</div>
+              <div style={{...sty,fontSize:12,color:T.textMuted,marginBottom:4}}>{s.label}</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:28,fontWeight:700,color:T.primary}}>{s.score}<span style={{fontSize:14,color:T.textMuted}}>/{s.max}</span></div>
+              <div style={{background:T.bgGray,borderRadius:4,height:6,marginTop:8,overflow:"hidden"}}>
+                <div style={{width:`${(s.score/s.max)*100}%`,height:"100%",background:T.primary,transition:"width 1s"}}/>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Advice */}
+        <div style={{background:level.bg,border:`1px solid ${level.color}40`,borderRadius:10,padding:"14px 16px",marginBottom:20,direction:uiLang==="ar"?"rtl":"ltr"}}>
+          <div style={{...sty,fontSize:13,color:T.text,lineHeight:1.7}}>💡 {level.advice}</div>
+        </div>
+
+        {/* Next steps */}
+        <div style={{marginBottom:24}}>
+          <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:10,direction:uiLang==="ar"?"rtl":"ltr"}}>
+            {uiLang==="ar"?"🗺️ خطواتك القادمة في Englishfool:":"🗺️ Your next steps on Englishfool:"}
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {steps.map((s,i)=>(
+              <button key={i} onClick={()=>window.dispatchEvent(new CustomEvent("ef-navigate",{detail:s.view}))}
+                style={{display:"flex",alignItems:"center",gap:12,background:"white",border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",textAlign:"left",transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
+                onMouseOver={e=>{e.currentTarget.style.borderColor=T.primary;e.currentTarget.style.background=T.primaryLight;}}
+                onMouseOut={e=>{e.currentTarget.style.borderColor=T.border;e.currentTarget.style.background="white";}}>
+                <span style={{fontSize:20}}>{s.icon}</span>
+                <span style={{...sty,fontSize:13,color:T.text,fontWeight:500}}>{s.text}</span>
+                <span style={{marginLeft:"auto",color:T.primary,fontSize:14}}>→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Retake */}
+        <div style={{textAlign:"center"}}>
+          <button onClick={()=>{setScreen("intro");setReadingAnswers({});setGrammarAnswers({});setReadingTime(600);setGrammarTime(600);setResults(null);}}
+            style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 24px",fontSize:13,...sty,color:T.textMid,cursor:"pointer"}}>
+            {uiLang==="ar"?"🔄 أعد الاختبار":"🔄 Retake Test"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+// ── END PLACEMENT TEST ───────────────────────────────────────────
 // ── FREE CONSULTATION MODAL ──────────────────────
 const FB_PAGE_URL = "https://www.facebook.com/profile.php?id=61579432547860";
 
@@ -5395,7 +5725,7 @@ function ManageSubModal({onClose,email=""}){
 }
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary"};
+const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary","/placement":"placement"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "home"; };
 
@@ -5403,7 +5733,7 @@ const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$
 const UI = {
   ar:{
     // Nav
-    home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", speaking:"🗣️ المحادثة",
+    home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
     progress:"📈 تقدمي", contact:"✉️ اتصل بنا",
     // Account
@@ -5424,6 +5754,7 @@ const UI = {
     f6t:"تمارين تدريبية",f6d:"Pro فقط · ١٢٠+ تمرين في المفردات والقواعد والباراغراف",
     f7t:"أدوات الآيلتس",f7d:"مجاني: الروابط والقواعد · Pro: الأدوات الكاملة",
     f8t:"تتبع تقدمي",f8d:"Pro فقط · تابع درجاتك وتطورك عبر الزمن",
+    fat:"اختبار تحديد المستوى",fad:"مجاني: اكتشف مستواك من A1 إلى C2 وتقدير درجة الآيلتس",
     f9t:"مفردات الآيلتس",f9d:"مجاني: أهم مفردات القراءة والكتابة والمحادثة مع المعنى",
     fStart:"← ابدأ",
     // Stats bar
@@ -5453,7 +5784,7 @@ const UI = {
   },
   en:{
     // Nav
-    home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", speaking:"🗣️ Speaking",
+    home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", placement:"📋 Placement Test", speaking:"🗣️ Speaking",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
     progress:"📈 Progress", contact:"✉️ Contact",
     // Account
@@ -5474,6 +5805,7 @@ const UI = {
     f6t:"Practice Exercises",f6d:"Pro only · 120+ exercises across all categories",
     f7t:"IELTS Toolkit",f7d:"Free: Linking words & Grammar · Pro: Full toolkit",
     f8t:"Track Progress",f8d:"Pro only · Track your scores and progress over time",
+    fat:"Placement Test",fad:"Free: Discover your level from A1 to C2 with an IELTS band estimate",
     f9t:"IELTS Vocabulary",f9d:"Free: Top vocabulary for Reading, Writing & Speaking with meanings",
     fStart:"Start →",
     // Stats bar
@@ -5714,6 +6046,12 @@ export default function IELTSBot(){
     });
   };
 
+  useEffect(()=>{
+    const handler=(e)=>switchView(e.detail);
+    window.addEventListener("ef-navigate",handler);
+    return ()=>window.removeEventListener("ef-navigate",handler);
+  },[]);
+
   const switchView=(view)=>{ 
     setMainView(view); 
     const path = VIEW_TO_PATH[view] || "/";
@@ -5859,6 +6197,7 @@ export default function IELTSBot(){
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",direction:uiLang==="ar"?"rtl":"ltr"}}>
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr"}}>
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
+              <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
               <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
               <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
@@ -5944,6 +6283,7 @@ export default function IELTSBot(){
               {icon:"🏋️",tk:"f6t",dk:"f6d",view:"exercises",free:false},
               {icon:"📚",tk:"f7t",dk:"f7d",view:"toolkit",free:false},
               {icon:"📈",tk:"f8t",dk:"f8d",view:"progress",free:false},
+              {icon:"📋",tk:"fat",dk:"fad",view:"placement",free:true},
               {icon:"📝",tk:"f9t",dk:"f9d",view:"vocabulary",free:true},
             ].map((f,i)=>(
               <div key={i} onClick={()=>switchView(f.view)} style={{padding:"20px 16px",cursor:"pointer",borderRadius:12,border:`1px solid transparent`,transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
@@ -6351,6 +6691,7 @@ export default function IELTSBot(){
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang}/>}
+        {mainView==="placement"&&<PlacementTest uiLang={uiLang}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
         </div>
@@ -6451,6 +6792,7 @@ export default function IELTSBot(){
                 {view:"speaking",icon:"🗣️",label:"تدريب المحادثة",labelEn:"Speaking Practice"},
                 {view:"reading",icon:"📖",label:"اختبارات القراءة",labelEn:"Reading Tests"},
                 {view:"game",icon:"🎮",label:"ألعاب الآيلتس",labelEn:"IELTS Games"},
+                {view:"placement",icon:"📋",label:"تحديد المستوى",labelEn:"Placement Test"},
                 {view:"vocabulary",icon:"📝",label:"مفردات الآيلتس",labelEn:"IELTS Vocabulary"},
                 {view:"toolkit",icon:"📚",label:"أدوات الآيلتس",labelEn:"IELTS Toolkit"},
                 {view:"progress",icon:"📈",label:"تتبع تقدمي",labelEn:"My Progress"},
