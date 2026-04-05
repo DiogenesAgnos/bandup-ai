@@ -953,12 +953,16 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
 // ── Progress Tracker ──────────────────────────
 const ProgressTracker=({onUpgrade,isPro,email})=>{
   const history=getHistory(email);
-  if(!isPro&&history.length===0) return (
-    <Card style={{textAlign:"center",padding:"40px 24px"}}>
-      <div style={{fontSize:40,marginBottom:16}}>📈</div>
-      <h3 style={{fontFamily:"Georgia,serif",color:T.text,fontSize:20,marginBottom:8}}>Track Your Progress</h3>
-      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",marginBottom:20,lineHeight:1.6}}>Complete your first essay analysis to start tracking your band score improvement over time.</p>
-    </Card>
+  if(!isPro) return (
+    <div style={{maxWidth:500,margin:"60px auto",padding:"0 24px",textAlign:"center"}}>
+      <div style={{fontSize:52,marginBottom:16}}>📈</div>
+      <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:12}}>Track Your Progress</h2>
+      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:24}}>See your band score history, track improvement over time, and identify which criteria you need to work on most.</p>
+      <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
+        🔓 Upgrade to Pro — $35 / 25 JOD
+      </button>
+      <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+    </div>
   );
   if(history.length===0) return (
     <Card style={{textAlign:"center",padding:"40px 24px"}}>
@@ -1996,8 +2000,19 @@ const BAND_QUIZ = [
 
 // ── ExercisesHub ──────────────────────────────
 const ExercisesHub = ({isPro, onUpgrade}) => {
+  if(!isPro) return (
+    <div style={{maxWidth:500,margin:"60px auto",padding:"0 24px",textAlign:"center"}}>
+      <div style={{fontSize:52,marginBottom:16}}>🏋️</div>
+      <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:12}}>Practice Exercises</h2>
+      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:24}}>120+ exercises covering grammar, vocabulary, paraphrasing, error correction, and Band Quiz — all with instant feedback and explanations.</p>
+      <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
+        🔓 Upgrade to Pro — $35 / 25 JOD
+      </button>
+      <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+    </div>
+  );
   const [activeExTab, setActiveExTab] = useState("grammar");
-  const [timeLeft, setTimeLeft] = useState(()=> isPro ? Infinity : getExerciseTimer());
+  const [timeLeft, setTimeLeft] = useState(Infinity);
   const [paused, setPaused] = useState(true);
   const timerRef = useRef(null);
 
@@ -2903,6 +2918,19 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const card = {background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",marginBottom:16,boxShadow:T.shadow};
   const locked = (free) => !free && !isPro;
+
+  if(!isPro) return (
+    <div style={{maxWidth:600,margin:"60px auto",padding:"0 24px",textAlign:"center"}}>
+      <div style={{fontSize:52,marginBottom:16}}>🗣️</div>
+      <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T.text,marginBottom:12}}>IELTS Speaking Practice</h2>
+      <p style={{color:T.textMid,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:8}}>Band 8 model answers for all three parts — Part 1, Part 2, Part 3.</p>
+      <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7,marginBottom:24}}>Includes vocabulary lists, common mistakes, and tips from experienced IELTS instructors.</p>
+      <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
+        🔓 Upgrade to Pro — $35 / 25 JOD
+      </button>
+      <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
+    </div>
+  );
 
   return (
     <div style={{maxWidth:900,margin:"0 auto",padding:"36px 24px 80px"}}>
@@ -5018,7 +5046,7 @@ const IELTS_VOCAB = {
   ],
 };
 
-const VocabularyPage = () => {
+const VocabularyPage = ({uiLang="ar"}) => {
   const CATS=[
     {key:"reading",  labelAr:"القراءة 📖",      labelEn:"Reading 📖"},
     {key:"listening",labelAr:"الاستماع 🎧",      labelEn:"Listening 🎧"},
@@ -5037,7 +5065,7 @@ const VocabularyPage = () => {
     <div style={{maxWidth:900,margin:"0 auto",padding:"24px 20px 80px"}}>
       {/* Header */}
       <div style={{marginBottom:24,direction:"rtl"}}>
-        <h1 style={{fontFamily:"'Cairo',system-ui",fontSize:26,fontWeight:800,color:T.primary,margin:"0 0 6px"}}>📝 مفردات الآيلتس الأساسية</h1>
+        <h1 style={{fontFamily:"'Cairo',system-ui",fontSize:26,fontWeight:800,color:T.primary,margin:"0 0 6px"}}>{uiLang==="ar"?"📝 مفردات الآيلتس الأساسية":"📝 IELTS Core Vocabulary"}</h1>
         <p style={{fontFamily:"'Cairo',system-ui",fontSize:14,color:T.textMuted,margin:0,lineHeight:1.7}}>أهم المفردات والتعابير المستخدمة في الآيلتس — مجاني بالكامل. اختر القسم وحدّد لغة الشرح.</p>
       </div>
 
@@ -5045,7 +5073,7 @@ const VocabularyPage = () => {
       <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center",marginBottom:20,direction:"rtl"}}>
         {/* Meaning language toggle */}
         <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2,flexShrink:0}}>
-          <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo',system-ui",padding:"0 8px",display:"flex",alignItems:"center"}}>شرح بـ:</span>
+          <span style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo',system-ui",padding:"0 8px",display:"flex",alignItems:"center"}}>{uiLang==="ar"?"شرح بـ:":"Meaning:"}</span>
           {[{l:"ar",label:"عربي"},{l:"en",label:"English"}].map(o=>(
             <button key={o.l} onClick={()=>setMeaningsLang(o.l)} style={{background:meaningsLang===o.l?"white":"transparent",border:"none",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:meaningsLang===o.l?700:500,color:meaningsLang===o.l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s",boxShadow:meaningsLang===o.l?T.shadow:"none"}}>
               {o.label}
@@ -5055,7 +5083,7 @@ const VocabularyPage = () => {
         {/* Search */}
         <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ابحث عن كلمة... / Search..."
           style={{flex:1,minWidth:160,background:"white",border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 12px",fontSize:13,fontFamily:"'Cairo',system-ui",outline:"none",direction:"rtl"}}/>
-        <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo',system-ui",flexShrink:0}}>{words.length} كلمة</div>
+        <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo',system-ui",flexShrink:0}}>{words.length} {uiLang==="ar"?"كلمة":"words"}</div>
       </div>
 
       {/* Category tabs */}
@@ -5063,7 +5091,7 @@ const VocabularyPage = () => {
         {CATS.map(c=>(
           <button key={c.key} onClick={()=>{setCat(c.key);setSearch("");}}
             style={{background:cat===c.key?T.primaryLight:"white",border:`1.5px solid ${cat===c.key?T.primary:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:cat===c.key?700:500,color:cat===c.key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s"}}>
-            {c.labelAr}
+            {uiLang==="ar"?c.labelAr:c.labelEn}
           </button>
         ))}
       </div>
@@ -6264,7 +6292,7 @@ export default function IELTSBot(){
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="vocabulary"&&<VocabularyPage/>}
+        {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView}/>}
         </div>
