@@ -4813,8 +4813,8 @@ function TestimonialsSection({uiLang="ar"}){
 
 // ── FREE VS PRO COMPARISON ────────────────────────
 function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
-  const FREE_AR=["تحليلان كاملان مجاناً — بدون تسجيل","اختبار قراءة واحد مجاناً","جميع الألعاب الـ٥ مجاناً","مفردات الآيلتس الأساسية كاملة","الكلمات الرابطة ومرجع القواعد","٥ فحوصات قواعد مجاناً"];
-  const FREE_EN=["2 full essay analyses free — no sign-up","1 reading test free","All 5 games — completely free","Full IELTS vocabulary list (150+ words)","Linking words & grammar reference","5 grammar checks free"];
+  const FREE_AR=["تحليلان كاملان مجاناً — بدون تسجيل","اختبار قراءة واحد مجاناً","جميع الألعاب الـ٥ مجاناً","قائمة مفردات آيلتس كاملة (٤٠٠+ كلمة)","الكلمات الرابطة ومرجع القواعد","٥ فحوصات قواعد مجاناً"];
+  const FREE_EN=["2 full essay analyses free — no sign-up","1 reading test free","All 5 games — completely free","Full IELTS vocabulary list (400+ words)","Linking words & grammar reference","5 grammar checks free"];
   const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ ٧","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقيات Band 8","نماذج إجابة Band 8+ كاملة","تدريب المحادثة — الأجزاء ١ و٢ و٣","متابعة التقدم وتاريخ الدرجات","فحص قواعد غير محدود"];
   const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Speaking practice — Parts 1, 2 & 3","Progress tracker with score history","Unlimited grammar checker"];
   const free=uiLang==="ar"?FREE_AR:FREE_EN;
@@ -5073,10 +5073,94 @@ const IELTS_VOCAB = {
     {w:"be inclined to",ar:"يميل إلى / يُفضّل",en:"to be likely or willing to",ex:"I'm inclined to think the risks outweigh the benefits."},
     {w:"the flip side",ar:"الجانب الآخر / الوجه الآخر",en:"the opposite or contrasting aspect",ex:"The flip side of globalisation is cultural homogenisation."},
     {w:"draw on",ar:"يستند إلى / يستفيد من",en:"to use as a source",ex:"Good speakers draw on personal experiences to connect with the audience."},
+    {w:"weigh up",ar:"يوازن بين / يقيّم",en:"to consider the pros and cons",ex:"You need to weigh up the options before deciding."},
+    {w:"highlight",ar:"يسلّط الضوء على / يبرز",en:"to emphasise something",ex:"I'd like to highlight three key points."},
+    {w:"increasingly",ar:"بشكل متزايد",en:"more and more over time",ex:"People are increasingly relying on digital services."},
+    {w:"compelling",ar:"مقنع / جذاب",en:"strongly persuasive",ex:"She made a compelling case for reform."},
+    {w:"nuanced",ar:"دقيق / متشعّب",en:"having subtle distinctions",ex:"The issue requires a more nuanced discussion."},
+    {w:"frankly",ar:"بصراحة",en:"honestly and directly",ex:"Frankly, I think the policy has failed."},
+    {w:"it's worth noting",ar:"تجدر الإشارة إلى أن",en:"it is important to mention",ex:"It's worth noting that this trend is not universal."},
+    {w:"in my experience",ar:"في تجربتي",en:"based on personal experience",ex:"In my experience, consistency matters more than intensity."},
+    {w:"overstated",ar:"مبالَغ فيه",en:"exaggerated beyond the truth",ex:"The risks of AI have been somewhat overstated."},
+  ],
+  reading_extra:[
+    {w:"infer",ar:"يستنتج / يستخلص",en:"to draw a conclusion from evidence",ex:"From the data, we can infer that demand is rising."},
+    {w:"explicit",ar:"صريح / واضح",en:"stated clearly and directly",ex:"The report was explicit about the need for change."},
+    {w:"implicit",ar:"ضمني",en:"suggested without being directly stated",ex:"There is an implicit assumption in the argument."},
+    {w:"convey",ar:"يُوصل / يعبّر عن",en:"to communicate or express",ex:"The graph conveys a clear upward trend."},
+    {w:"assertion",ar:"ادّعاء / تأكيد",en:"a confident statement of fact",ex:"The assertion that technology creates jobs is debated."},
+    {w:"contradict",ar:"يتناقض مع",en:"to assert the opposite of",ex:"The second paragraph contradicts the first claim."},
+    {w:"substantiate",ar:"يدعم بأدلة",en:"to provide evidence for a claim",ex:"The study substantiates the link between sleep and memory."},
+    {w:"plausible",ar:"معقول / محتمل",en:"seeming reasonable or probable",ex:"The most plausible explanation is a change in climate."},
+    {w:"excerpt",ar:"مقتطف",en:"a short extract from a text",ex:"Read the excerpt and answer the questions below."},
+    {w:"chronological",ar:"زمني / مرتّب تاريخياً",en:"arranged in order of time",ex:"The events are described in chronological order."},
+    {w:"elaborate",ar:"يفصّل / يوسّع",en:"to explain in more detail",ex:"The author elaborates on this point in paragraph three."},
+    {w:"paraphrase",ar:"يُعيد الصياغة",en:"to restate in different words",ex:"Paraphrase the key points in your own words."},
+    {w:"summarise",ar:"يلخّص",en:"to give a brief account of",ex:"Summarise the main argument of the passage."},
+    {w:"perspective",ar:"منظور / وجهة نظر",en:"a point of view",ex:"The author presents a historical perspective on the issue."},
+    {w:"valid",ar:"صحيح / مبرَّر",en:"based on sound reasoning",ex:"This is a valid criticism of the current system."},
+  ],
+  listening_extra:[
+    {w:"clarify",ar:"يوضّح / يشرح",en:"to make something less confusing",ex:"Could you clarify what you mean by that?"},
+    {w:"agenda",ar:"جدول أعمال",en:"a list of items to be discussed",ex:"The agenda for today includes three main topics."},
+    {w:"approximately",ar:"تقريباً",en:"close to but not exactly",ex:"The lecture lasts approximately 90 minutes."},
+    {w:"deadline",ar:"موعد نهائي",en:"the latest time something must be done",ex:"The deadline for submissions is Friday."},
+    {w:"eligible",ar:"مؤهّل / مستحق",en:"meeting the necessary conditions",ex:"Students with a 3.0 GPA are eligible for the scholarship."},
+    {w:"register",ar:"يسجّل / يلتحق",en:"to sign up officially",ex:"You must register before the end of the week."},
+    {w:"verify",ar:"يتحقق من",en:"to check the truth of",ex:"I need to verify the information before presenting it."},
+    {w:"scheme",ar:"خطة / مشروع",en:"a plan or system",ex:"The government introduced a new housing scheme."},
+    {w:"brief",ar:"موجز / مختصر",en:"short and to the point",ex:"Let me give you a brief overview of the project."},
+    {w:"notify",ar:"يُخطر / يُعلم",en:"to formally inform someone",ex:"Please notify us if your contact details change."},
+    {w:"enquiry",ar:"استفسار",en:"a request for information",ex:"For enquiries, call the main office."},
+    {w:"capacity",ar:"طاقة / سعة",en:"the maximum amount that can be contained",ex:"The hall has a capacity of 200 people."},
+    {w:"schedule",ar:"جدول زمني / يُجدول",en:"a plan of things to be done at set times",ex:"The schedule has been revised for next term."},
+    {w:"duration",ar:"مدة / فترة",en:"the length of time something lasts",ex:"The course has a duration of six months."},
+    {w:"available",ar:"متاح / موجود",en:"able to be used or obtained",ex:"Rooms are available from Monday to Friday."},
+  ],
+  writing1_extra:[
+    {w:"axis",ar:"محور",en:"a reference line on a graph",ex:"The vertical axis shows temperature in degrees Celsius."},
+    {w:"interval",ar:"فاصل زمني",en:"a space between two points in time",ex:"Data was collected at five-year intervals."},
+    {w:"percentage",ar:"نسبة مئوية",en:"a proportion per hundred",ex:"The percentage of female graduates increased sharply."},
+    {w:"steady",ar:"ثابت / منتظم",en:"regular without sudden changes",ex:"There was a steady rise in temperatures over the decade."},
+    {w:"sharp",ar:"حاد / مفاجئ",en:"sudden and steep",ex:"A sharp increase in prices was recorded in 2018."},
+    {w:"category",ar:"فئة / تصنيف",en:"a class or division",ex:"The data is broken into three age categories."},
+    {w:"column",ar:"عمود / خانة",en:"a vertical section in a table",ex:"The second column shows data for 2020."},
+    {w:"compare",ar:"يقارن بين",en:"to examine similarities and differences",ex:"We can compare figures from 2010 and 2020."},
+    {w:"represent",ar:"يُمثّل",en:"to stand for or show",ex:"The blue bars represent annual rainfall."},
+    {w:"distribution",ar:"توزيع",en:"how something is spread across a range",ex:"The chart shows the distribution of income by age group."},
+    {w:"constant",ar:"ثابت / مستمر",en:"remaining the same over time",ex:"Output remained constant throughout the period."},
+    {w:"variable",ar:"متغيّر",en:"something that changes",ex:"Temperature is the key variable in this experiment."},
+    {w:"rate",ar:"معدّل / نسبة",en:"the speed or frequency at which something happens",ex:"The unemployment rate fell to 4% last year."},
+    {w:"sector",ar:"قطاع",en:"a distinct part of an economy or society",ex:"The service sector accounts for 70% of GDP."},
+    {w:"figure",ar:"رقم / بيانات",en:"a number or statistical value",ex:"The figures show a clear decline in manufacturing."},
+  ],
+  writing2_extra:[
+    {w:"thesis",ar:"أطروحة / موقف رئيسي",en:"the main argument of an essay",ex:"Your thesis should be stated clearly in the introduction."},
+    {w:"concede",ar:"يُقرّ / يسلّم بـ",en:"to acknowledge something is true",ex:"I concede that there are some benefits to the policy."},
+    {w:"advocate",ar:"يدعو إلى",en:"to publicly support a cause",ex:"Many experts advocate for stricter environmental laws."},
+    {w:"address",ar:"يتناول / يعالج",en:"to deal with an issue",ex:"The essay must address all parts of the question."},
+    {w:"illustrate",ar:"يوضّح بمثال",en:"to explain with examples",ex:"This example illustrates the impact of poverty on health."},
+    {w:"whereas",ar:"في حين أن",en:"used to contrast two facts",ex:"Some prefer urban life, whereas others prefer rural areas."},
+    {w:"thus",ar:"وبذلك / ومن ثَمّ",en:"therefore / as a result",ex:"The data was incomplete; thus, no conclusion was drawn."},
+    {w:"implication",ar:"تداعية / مضمون",en:"a likely consequence",ex:"The implications of this policy are far-reaching."},
+    {w:"critique",ar:"نقد / تحليل نقدي",en:"a detailed analysis and assessment",ex:"The report offers a thorough critique of the system."},
+    {w:"stance",ar:"موقف / اتجاه",en:"a position taken on an issue",ex:"The government's stance on immigration has shifted."},
+    {w:"obligation",ar:"التزام / واجب",en:"a duty or commitment",ex:"Governments have an obligation to protect citizens."},
+    {w:"impartial",ar:"محايد / غير منحاز",en:"treating all sides equally",ex:"The judge must remain impartial throughout the trial."},
+    {w:"rational",ar:"عقلاني / منطقي",en:"based on reason, not emotion",ex:"A rational approach to the problem is needed."},
+    {w:"bias",ar:"تحيّز / انحياز",en:"an unfair preference for one side",ex:"Media bias can influence public opinion significantly."},
+    {w:"hypothesis",ar:"فرضية",en:"a proposed explanation to be tested",ex:"The hypothesis was supported by the experimental data."},
   ],
 };
 
 const VocabularyPage = ({uiLang="ar"}) => {
+  const MERGED_VOCAB = {
+    reading: [...IELTS_VOCAB.reading, ...(GENERAL_VOCAB_EXTRA.reading_extra||[])],
+    listening: [...IELTS_VOCAB.listening, ...(GENERAL_VOCAB_EXTRA.listening_extra||[])],
+    writing1: [...IELTS_VOCAB.writing1, ...(GENERAL_VOCAB_EXTRA.writing1_extra||[])],
+    writing2: [...IELTS_VOCAB.writing2, ...(GENERAL_VOCAB_EXTRA.writing2_extra||[])],
+    speaking: [...IELTS_VOCAB.speaking, ...(GENERAL_VOCAB_EXTRA.speaking||[])],
+  };
   const CATS=[
     {key:"reading",  labelAr:"القراءة 📖",      labelEn:"Reading 📖"},
     {key:"listening",labelAr:"الاستماع 🎧",      labelEn:"Listening 🎧"},
@@ -5800,9 +5884,10 @@ const UI = {
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
     // Hero
-    heroPill:"🎓 تعلّم الإنجليزية بشكل صحيح — وتتبع تقدمك",
-    heroTitle:"تعلّم الإنجليزية بشكل صحيح",
-    heroSub:"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · ليس مجرد روبوت محادثة",
+    heroPill:"🎓 تعلّم الإنجليزية وتحضير الآيلتس",
+    heroTitle:"تعلّم الإنجليزية بشكل صحيح.",
+    heroSub:"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · تحضير منهجي للآيلتس — وليس مجرد روبوت محادثة",
+    heroIelts:"✅ مثالي لمن يستهدف رفع درجة الآيلتس",
     startFree:"اكتشف مستواك — مجاناً ←",
     startFree2:"حلّل مقالتك الأولى مجاناً →",
     subscribe:"🔓 اشترك — $35 / 25 دينار",
@@ -5816,7 +5901,7 @@ const UI = {
     f7t:"أدوات الآيلتس",f7d:"مجاني: الروابط والقواعد · Pro: الأدوات الكاملة",
     f8t:"تتبع تقدمي",f8d:"Pro فقط · تابع درجاتك وتطورك عبر الزمن",
     fat:"اختبار تحديد المستوى",fad:"مجاني: اكتشف مستواك من A1 إلى C2 وتقدير درجة الآيلتس",
-    f9t:"مفردات الآيلتس",f9d:"مجاني: أهم مفردات القراءة والكتابة والمحادثة مع المعنى",
+    f9t:"مفردات الآيلتس",f9d:"مجاني: ٤٠٠+ كلمة آيلتس مع المعنى بالعربي وأمثلة",
     fStart:"← ابدأ",
     // Stats bar
     stat1n:"20 min",stat1l:"اختبار تحديد المستوى المجاني",
@@ -5853,9 +5938,10 @@ const UI = {
     signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
     manageSubscription:"Manage Subscription",
     // Hero
-    heroPill:"🎓 Learn English properly. Track how far you've come.",
+    heroPill:"🎓 English learning & IELTS preparation",
     heroTitle:"Learn English properly.",
     heroSub:"A placement test, real writing feedback, and structured practice — not a chatbot.",
+    heroIelts:"✅ Ideal if you're also targeting a specific IELTS band",
     startFree:"Find your level — free, no sign-up",
     startFree2:"Analyse your first essay free →",
     subscribe:"🔓 Subscribe — $35 / 25 JOD",
@@ -5869,7 +5955,7 @@ const UI = {
     f7t:"IELTS Toolkit",f7d:"Free: Linking words & Grammar · Pro: Full toolkit",
     f8t:"Track Progress",f8d:"Pro only · Track your scores and progress over time",
     fat:"Placement Test",fad:"Free: Discover your level from A1 to C2 with an IELTS band estimate",
-    f9t:"IELTS Vocabulary",f9d:"Free: Top vocabulary for Reading, Writing & Speaking with meanings",
+    f9t:"IELTS Vocabulary",f9d:"Free: 400+ IELTS vocabulary words with Arabic meanings and examples",
     fStart:"Start →",
     // Stats bar
     stat1n:"20 min",stat1l:"Free placement test",
@@ -6308,8 +6394,11 @@ export default function IELTSBot(){
 {uiLang==="ar"?"تعلّم الإنجليزية بشكل صحيح":"Learn English properly."}
             </h1>
             <p style={{fontSize:"clamp(16px,2vw,22px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo',system-ui",lineHeight:1.7,margin:"0 0 40px",fontWeight:400,direction:uiLang==="ar"?"rtl":"ltr"}}>
-{uiLang==="ar"?"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · ليس مجرد روبوت محادثة":"A placement test, real writing feedback, and structured practice — not a chatbot."}
+{uiLang==="ar"?"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · تحضير منهجي للآيلتس":"A placement test, real writing feedback, and structured practice — not a chatbot."}
             </p>
+            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"6px 16px",marginBottom:32,fontSize:13,color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo',system-ui"}}>
+              {uiLang==="ar"?"✅ مثالي لمن يستهدف رفع درجة الآيلتس":"✅ Ideal if you're also targeting a specific IELTS band"}
+            </div>
             <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
               <button onClick={()=>{switchView("analyze");setTimeout(()=>{const el=document.getElementById("essay-input-area");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});},300);}} style={{background:T.accent,color:"#7f1200",border:"none",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:`0 6px 24px rgba(0,0,0,0.25)`,transition:"transform 0.15s"}}
                 onMouseOver={e=>e.currentTarget.style.transform="translateY(-2px)"}
@@ -6328,6 +6417,33 @@ export default function IELTSBot(){
         </div>
       )}
 
+
+      {/* VALUE PROPOSITION STRIP — 4 bullets */}
+      {mainView==="home"&&(
+        <div style={{background:"#fafafa",borderBottom:"1px solid #e2e8f0",padding:"40px 32px"}}>
+          <div style={{maxWidth:1060,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:24}}>
+            {(uiLang==="ar"?[
+              {icon:"📍",title:"اعرف مستواك بدقة",desc:"اختبار 20 دقيقة يحدد مستواك من A1 إلى C2 مع تقدير لدرجة الآيلتس المتوقعة."},
+              {icon:"📝",title:"تغذية راجعة تعليمية حقيقية",desc:"مقالتك تُقيَّم على أربعة معايير محددة — كل خطأ يُحدَّد ويُشرح ويُصحَّح. ليس تلخيصاً."},
+              {icon:"📚",title:"تدريب يقودك إلى الأمام",desc:"اختبارات قراءة وتمارين قواعد وألعاب — مرتبطة بمستواك وما تحتاج التحسين فيه."},
+              {icon:"📈",title:"شاهد تقدمك بالأرقام",desc:"كل مقالة تُحفظ. سجل درجاتك يُظهر هل أنت تتحسن أم تراوح مكانك."},
+            ]:[
+              {icon:"📍",title:"Know where you stand",desc:"A 20-minute placement test gives you your exact level — A1 to C2 — with an estimated IELTS band."},
+              {icon:"📝",title:"Writing feedback that actually teaches",desc:"Your essay gets scored on four specific criteria, with every mistake identified, explained, and corrected — not summarised."},
+              {icon:"📚",title:"Practice that goes somewhere",desc:"Reading tests, vocabulary, grammar exercises, and games — all connected to your level and what you need to work on."},
+              {icon:"📈",title:"See your improvement in numbers",desc:"Every essay you submit is saved. Your band score history shows whether you're improving or plateauing."},
+            ]).map((item,i)=>(
+              <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start",direction:uiLang==="ar"?"rtl":"ltr"}}>
+                <div style={{fontSize:28,flexShrink:0,marginTop:2}}>{item.icon}</div>
+                <div>
+                  <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:15,color:"#1e293b",marginBottom:5}}>{item.title}</div>
+                  <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#64748b",lineHeight:1.6}}>{item.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {/* ── FEATURES STRIP (below hero, white background) ────── */}
       {mainView==="home"&&(
         <div style={{background:"white",borderBottom:`1px solid ${T.border}`,padding:"40px 32px"}}>
@@ -6378,12 +6494,12 @@ export default function IELTSBot(){
       {/* WHY NOT CHATGPT — homepage only */}
       {mainView==="home"&&(
         <div style={{background:"white",borderTop:"1px solid #e2e8f0",padding:"56px 32px"}}>
-          <div style={{maxWidth:860,margin:"0 auto"}}>
-            <div style={{textAlign:"center",marginBottom:36}}>
-              <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(20px,2.5vw,28px)",color:"#1e293b",margin:"0 0 10px",fontWeight:700}}>
+          <div style={{maxWidth:860,margin:"0 auto",direction:uiLang==="ar"?"rtl":"ltr"}}>
+            <div style={{textAlign:uiLang==="ar"?"center":"left",marginBottom:36}}>
+              <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(20px,2.5vw,28px)",color:"#1e293b",margin:"0 0 10px",fontWeight:700,textAlign:"center"}}>
                 {uiLang==="ar"?"ChatGPT يعطيك إجابات. هذا يعطيك تحسناً.":"ChatGPT gives you answers. This gives you improvement."}
               </h2>
-              <p style={{fontFamily:"'Cairo',system-ui",fontSize:15,color:"#64748b",margin:0,lineHeight:1.7}}>
+              <p style={{fontFamily:"'Cairo',system-ui",fontSize:15,color:"#64748b",margin:"0 auto",lineHeight:1.7,textAlign:"center",maxWidth:620}}>
                 {uiLang==="ar"?"ChatGPT مفيد للصياغة والشرح. لكنه لم يُصمَّم لتعليم الإنجليزية بشكل منهجي أو لإخبارك إذا كنت مستعداً للامتحان.":"ChatGPT is useful for drafting and explaining. It is not designed to teach you English systematically or tell you whether you're ready for an exam."}
               </p>
             </div>
@@ -6399,15 +6515,15 @@ export default function IELTSBot(){
                 {icon:"📈",title:"Tracks your progress",ef:"Score history saved automatically every essay",gpt:"No memory between sessions"},
                 {icon:"🗺️",title:"Structured learning path",ef:"Based on your placement result — you know what to do first",gpt:"You decide what to ask"},
               ]).map((item,i)=>(
-                <div key={i} style={{background:"#f8fafc",borderRadius:12,padding:"20px",border:"1px solid #e2e8f0"}}>
+                <div key={i} style={{background:"#f8fafc",borderRadius:12,padding:"20px",border:"1px solid #e2e8f0",direction:uiLang==="ar"?"rtl":"ltr",textAlign:uiLang==="ar"?"right":"left"}}>
                   <div style={{fontSize:24,marginBottom:8}}>{item.icon}</div>
                   <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:15,color:"#1e293b",marginBottom:12}}>{item.title}</div>
                   <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                    <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                    <div style={{display:"flex",gap:10,alignItems:"flex-start",flexDirection:uiLang==="ar"?"row-reverse":"row"}}>
                       <span style={{fontSize:12,fontWeight:700,color:"#059669",background:"#d1fae5",borderRadius:4,padding:"2px 7px",flexShrink:0,marginTop:1}}>EF</span>
                       <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#1e293b",lineHeight:1.5}}>{item.ef}</span>
                     </div>
-                    <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                    <div style={{display:"flex",gap:10,alignItems:"flex-start",flexDirection:uiLang==="ar"?"row-reverse":"row"}}>
                       <span style={{fontSize:12,fontWeight:700,color:"#6b7280",background:"#f3f4f6",borderRadius:4,padding:"2px 7px",flexShrink:0,marginTop:1}}>GPT</span>
                       <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#6b7280",lineHeight:1.5}}>{item.gpt}</span>
                     </div>
@@ -6421,7 +6537,7 @@ export default function IELTSBot(){
       {/* GAME PROMO STRIP — desktop only, always visible on homepage */}
       {mainView==="home"&&(
         <div className="desktop-game-strip" style={{background:`linear-gradient(135deg,${T.primary} 0%,#7f1d1d 100%)`,borderTop:"1px solid rgba(212,175,55,0.2)",padding:"16px 32px"}}>
-          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10,direction:"rtl"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10,direction:uiLang==="ar"?"rtl":"ltr"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
               <span style={{fontSize:22}}>🎮</span>
               <div>
