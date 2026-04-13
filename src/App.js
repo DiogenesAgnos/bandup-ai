@@ -4361,16 +4361,25 @@ function IELTSGameLobby({proUser,onSelect,uiLang="ar"}){
 // ─────────────────────────────────────────────────────────────
 // IELTS GAME — COMPLETE SCREEN
 // ─────────────────────────────────────────────────────────────
-function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],reviewIdx,setReviewIdx}){
+function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],reviewIdx,setReviewIdx,uiLang="ar"}){
   useEffect(()=>{ gameAudio.stopBg(); setTimeout(()=>gameAudio.complete(),200); },[]);
   const pct=Math.round((score/25)*100);
-  const band=
-    score===25?{medal:"🏆",title:"أنت البطل الحقيقي!",sub:"درجة كاملة! أنت أكثر من جاهز للايلتس 🔥",color:"#d4af37"}:
-    score>=20?{medal:"🌟",title:"أداء رائع جداً!",sub:"مستوى ممتاز! خطوة صغيرة وتصبح البطل",color:"#10b981"}:
-    score>=15?{medal:"💪",title:"تقريباً!",sub:"مستوى جيد — لكن يجب مراجعة المزيد قبل الامتحان",color:"#3b82f6"}:
-    score>=10?{medal:"📚",title:"تحتاج إلى مزيد من التدريب",sub:"ما شاء الله على البداية — كرّر اللعبة ولاحظ الفرق",color:"#f97316"}:
-    score>=7?{medal:"😅",title:"أنت في بداية الطريق!",sub:"جهد جيد — لكن الطريق لا يزال طويلاً، استمر!",color:"#8b5cf6"}:
-    {medal:"😢",title:"لم تنجح هذه المرة!",sub:"لا تيأس! كل بطل بدأ من الصفر — العب مرةً أخرى 💪",color:"#ef4444"};
+  const BANDS_AR={
+    25:{medal:"🏆",title:"أنت البطل الحقيقي!",sub:"درجة كاملة! أنت أكثر من جاهز للايلتس 🔥",color:"#d4af37"},
+    20:{medal:"🌟",title:"أداء رائع جداً!",sub:"مستوى ممتاز! خطوة صغيرة وتصبح البطل",color:"#10b981"},
+    15:{medal:"💪",title:"تقريباً!",sub:"مستوى جيد — لكن يجب مراجعة المزيد قبل الامتحان",color:"#3b82f6"},
+    10:{medal:"📚",title:"تحتاج إلى مزيد من التدريب",sub:"ما شاء الله على البداية — كرّر اللعبة ولاحظ الفرق",color:"#f97316"},
+    7:{medal:"😅",title:"أنت في بداية الطريق!",sub:"جهد جيد — لكن الطريق لا يزال طويلاً، استمر!",color:"#8b5cf6"},
+  };
+  const BANDS_EN={
+    25:{medal:"🏆",title:"Perfect Score!",sub:"You got everything right — you're more than ready for IELTS 🔥",color:"#d4af37"},
+    20:{medal:"🌟",title:"Excellent Performance!",sub:"Outstanding level! One small step to become the champion",color:"#10b981"},
+    15:{medal:"💪",title:"Almost There!",sub:"Good level — but review more before the exam",color:"#3b82f6"},
+    10:{medal:"📚",title:"Needs More Practice",sub:"Great start — replay the game and notice the improvement",color:"#f97316"},
+    7:{medal:"😅",title:"Just Getting Started!",sub:"Good effort — the journey continues, keep going!",color:"#8b5cf6"},
+  };
+  const getBand=(s,dict)=>s===25?dict[25]:s>=20?dict[20]:s>=15?dict[15]:s>=10?dict[10]:s>=7?dict[7]:{medal:"😢",title:uiLang==="ar"?"لم تنجح هذه المرة!":"Better Luck Next Time!",sub:uiLang==="ar"?"لا تيأس! كل بطل بدأ من الصفر — العب مرةً أخرى 💪":"Don't give up! Every champion started from zero — play again 💪",color:"#ef4444"};
+  const band=getBand(score,uiLang==="ar"?BANDS_AR:BANDS_EN);
   const [tab,setTab]=useState("review"); // review | history
   // For answer review: navigate between questions
   const [ri,setRi]=useState(0);
@@ -4392,7 +4401,7 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
         </div>
         {/* Stats */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:18}}>
-          {[[`${score}✅`,"صحيح"],[`${25-score}❌`,"خطأ"],[`${pct}%`,"نسبتك"]].map(([val,lbl])=>(
+          {[[`${score}✅`,uiLang==="ar"?"صحيح":"Correct"],[`${25-score}❌`,uiLang==="ar"?"خطأ":"Wrong"],[`${pct}%`,uiLang==="ar"?"نسبتك":"Score"]].map(([val,lbl])=>(
             <div key={lbl} style={{background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"12px 8px",textAlign:"center",border:"1px solid rgba(255,255,255,0.08)"}}>
               <div style={{fontWeight:900,fontSize:18,color:"white",marginBottom:3}}>{val}</div>
               <div style={{fontSize:11,color:"rgba(255,255,255,0.4)"}}>{lbl}</div>
@@ -4401,7 +4410,7 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
         </div>
         {/* Tabs: Review / History */}
         <div style={{display:"flex",gap:6,marginBottom:14}}>
-          {[["review","📋 مراجعة الإجابات"],["history","📈 سجل تقدمك"]].map(([t,l])=>(
+          {[["review",uiLang==="ar"?"📋 مراجعة الإجابات":"📋 Answer Review"],["history",uiLang==="ar"?"📈 سجل تقدمك":"📈 Your History"]].map(([t,l])=>(
             <button key={t} onClick={()=>setTab(t)} style={{flex:1,background:tab===t?"rgba(212,175,55,0.2)":"rgba(255,255,255,0.04)",border:tab===t?"1.5px solid #d4af37":"1px solid rgba(255,255,255,0.1)",borderRadius:10,padding:"10px",fontFamily:"'Cairo',system-ui",fontWeight:tab===t?700:500,fontSize:13,color:tab===t?"#d4af37":"rgba(255,255,255,0.5)",cursor:"pointer",direction:"rtl"}}>{l}</button>
           ))}
         </div>
@@ -4438,7 +4447,7 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
                     else if(oi===ra.chosen&&!ra.ok){bg="rgba(239,68,68,0.15)";border="1.5px solid #ef4444";col="#fca5a5";}
                     return(
                       <div key={oi} style={{background:bg,border,borderRadius:8,padding:"8px 12px",display:"flex",gap:8,alignItems:"center"}}>
-                        <span style={{color:"#d4af37",fontSize:11,fontWeight:700,width:16,flexShrink:0}}>{["أ","ب","ج","د"][oi]}</span>
+                        <span style={{color:"#d4af37",fontSize:11,fontWeight:700,width:16,flexShrink:0}}>{uiLang==="ar"?["أ","ب","ج","د"][oi]:["A","B","C","D"][oi]}</span>
                         <span style={{fontSize:"clamp(11px,1.3vw,13px)",color:col,fontWeight:oi===ra.correct?700:400}}>{opt}</span>
                         {oi===ra.correct&&<span style={{marginRight:"auto",fontSize:12}}>✓</span>}
                         {oi===ra.chosen&&!ra.ok&&<span style={{marginRight:"auto",fontSize:12}}>✗</span>}
@@ -4453,8 +4462,8 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
             )}
             {/* Prev / Next buttons */}
             <div style={{display:"flex",gap:8,marginTop:12,justifyContent:"center"}}>
-              <button onClick={()=>setRi(r=>Math.max(0,r-1))} disabled={ri===0} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:10,padding:"9px 20px",color:ri===0?"rgba(255,255,255,0.2)":"white",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:13,cursor:ri===0?"not-allowed":"pointer"}}>→ السابق</button>
-              <button onClick={()=>setRi(r=>Math.min(answers.length-1,r+1))} disabled={ri===answers.length-1} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:10,padding:"9px 20px",color:ri===answers.length-1?"rgba(255,255,255,0.2)":"white",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:13,cursor:ri===answers.length-1?"not-allowed":"pointer"}}>← التالي</button>
+              <button onClick={()=>setRi(r=>Math.max(0,r-1))} disabled={ri===0} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:10,padding:"9px 20px",color:ri===0?"rgba(255,255,255,0.2)":"white",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:13,cursor:ri===0?"not-allowed":"pointer"}}>{uiLang==="ar"?"→ السابق":"← Previous"}</button>
+              <button onClick={()=>setRi(r=>Math.min(answers.length-1,r+1))} disabled={ri===answers.length-1} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:10,padding:"9px 20px",color:ri===answers.length-1?"rgba(255,255,255,0.2)":"white",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:13,cursor:ri===answers.length-1?"not-allowed":"pointer"}}>{uiLang==="ar"?"← التالي":"Next →"}</button>
             </div>
           </div>
         )}
@@ -4463,10 +4472,10 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
         {tab==="history"&&(
           <div style={{background:"rgba(255,255,255,0.05)",borderRadius:16,padding:"16px",border:"1px solid rgba(255,255,255,0.08)",marginBottom:18,maxHeight:300,overflowY:"auto"}}>
             {history.length===0?(
-              <div style={{textAlign:"center",color:"rgba(255,255,255,0.3)",padding:"24px",direction:"rtl"}}>لم تلعب أي لعبة بعد — هذه هي أولى جلساتك! 🎮</div>
+              <div style={{textAlign:"center",color:"rgba(255,255,255,0.3)",padding:"24px"}}>{uiLang==="ar"?"لم تلعب أي لعبة بعد — هذه هي أولى جلساتك! 🎮":"No games played yet — this is your first session! 🎮"}</div>
             ):(
               <>
-                <div style={{fontWeight:700,color:"rgba(255,255,255,0.6)",fontSize:12,marginBottom:10,direction:"rtl",textAlign:"center"}}>آخر {history.length} جلسة</div>
+                <div style={{fontWeight:700,color:"rgba(255,255,255,0.6)",fontSize:12,marginBottom:10,textAlign:"center"}}>{uiLang==="ar"?`آخر ${history.length} جلسة`:`Last ${history.length} sessions`}</div>
                 {history.map((h,i)=>(
                   <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px",background:"rgba(255,255,255,0.04)",borderRadius:10,marginBottom:7,border:"1px solid rgba(255,255,255,0.06)",direction:"rtl"}}>
                     <div>
@@ -4488,11 +4497,11 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
         <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
           <button onClick={onReplay} style={{background:band.color,border:"none",borderRadius:14,padding:"13px 24px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:14,color:band.color==="#d4af37"?"#0f172a":"white",cursor:"pointer",boxShadow:`0 4px 14px ${band.color}44`,transition:"opacity 0.2s"}}
             onMouseOver={e=>e.currentTarget.style.opacity="0.85"} onMouseOut={e=>e.currentTarget.style.opacity="1"}>
-            🔄 العب مرةً أخرى
+            {uiLang==="ar"?"🔄 العب مرةً أخرى":"🔄 Play Again"}
           </button>
           <button onClick={onLobby} style={{background:"rgba(255,255,255,0.08)",border:"1.5px solid rgba(255,255,255,0.18)",borderRadius:14,padding:"13px 24px",fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:14,color:"white",cursor:"pointer",transition:"background 0.2s"}}
             onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.15)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.08)"}>
-            🎮 اختر لعبةً أخرى
+            {uiLang==="ar"?"🎮 اختر لعبةً أخرى":"🎮 Choose Another Game"}
           </button>
         </div>
       </div>
@@ -4553,7 +4562,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
       setChosen(null); setCorrect(null);
       if(qIdx+1>=25||newLives<=0){
         const finalScore=(ok?score+1:score);
-        const entry={cat:cat.id,catName:cat.arabic,score:finalScore,total:qIdx+1,date:new Date().toLocaleDateString("ar-SA"),ts:Date.now()};
+        const entry={cat:cat.id,catName:uiLang==="ar"?cat.arabic:cat.english,score:finalScore,total:qIdx+1,date:new Date().toLocaleDateString(uiLang==="ar"?"ar-SA":"en-GB"),ts:Date.now()};
         const h=getHistory(); h.unshift(entry);
         try{localStorage.setItem("ef_game_history",JSON.stringify(h.slice(0,50)));}catch{}
         setScreen("complete");
@@ -4567,10 +4576,10 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
     <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#450a0a,#431407)",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"'Cairo',system-ui"}}>
       <div style={{maxWidth:480,width:"100%",background:"rgba(255,255,255,0.07)",border:`2px solid ${cat.color}55`,borderRadius:24,padding:"36px 32px",textAlign:"center",boxShadow:`0 0 60px ${cat.color}22`}}>
         <div style={{fontSize:56,marginBottom:12}}>{cat.emoji}</div>
-        <div style={{fontWeight:900,fontSize:"clamp(20px,3vw,28px)",color:"white",marginBottom:6,direction:"rtl"}}>{cat.arabic}</div>
-        <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",marginBottom:28,direction:"rtl"}}>هل أنت مستعد؟ إليك القواعد:</div>
-        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:28,direction:"rtl"}}>
-          {[["🎯","25 سؤال في كل لعبة"],["❤️","3 أخطاء فقط — بعدها Game Over"],["🏃","اللوحة تأتي إليك تلقائياً"],["🔇","يمكنك كتم الموسيقى في أي وقت"],["⏸️","يمكنك إيقاف اللعبة مؤقتاً والعودة لها"],["💡","شرح الإجابات الخاطئة في النهاية"]].map(([ic,txt])=>(
+        <div style={{fontWeight:900,fontSize:"clamp(20px,3vw,28px)",color:"white",marginBottom:6,direction:uiLang==="ar"?"rtl":"ltr"}}>{uiLang==="ar"?cat.arabic:cat.english}</div>
+        <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",marginBottom:28,direction:uiLang==="ar"?"rtl":"ltr"}}>{uiLang==="ar"?"هل أنت مستعد؟ إليك القواعد:":"Ready? Here are the rules:"}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:28,direction:uiLang==="ar"?"rtl":"ltr"}}>
+          {(uiLang==="ar"?[["🎯","25 سؤال في كل لعبة"],["❤️","3 أخطاء فقط — بعدها Game Over"],["🏃","اللوحة تأتي إليك تلقائياً"],["🔇","يمكنك كتم الموسيقى في أي وقت"],["⏸️","يمكنك إيقاف اللعبة مؤقتاً والعودة لها"],["💡","شرح الإجابات الخاطئة في النهاية"]]:[["🎯","25 questions per game"],["❤️","3 wrong answers = Game Over"],["🏃","The question wall comes to you automatically"],["🔇","Mute music anytime"],["⏸️","Pause and resume the game anytime"],["💡","Wrong answer explanations shown at the end"]]).map(([ic,txt])=>(
             <div key={txt} style={{display:"flex",alignItems:"center",gap:12,background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"10px 14px"}}>
               <span style={{fontSize:18,flexShrink:0}}>{ic}</span>
               <span style={{fontWeight:600,fontSize:13,color:"rgba(255,255,255,0.85)"}}>{txt}</span>
@@ -4579,14 +4588,14 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
         </div>
         <button onClick={beginPlaying} style={{width:"100%",background:cat.color,border:"none",borderRadius:14,padding:"16px",fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:17,color:"white",cursor:"pointer",boxShadow:`0 6px 20px ${cat.color}55`,transition:"transform 0.15s"}}
           onMouseOver={e=>e.currentTarget.style.transform="scale(1.03)"} onMouseOut={e=>e.currentTarget.style.transform="scale(1)"}>
-          🚀 ابدأ اللعبة!
+          {uiLang==="ar"?"🚀 ابدأ اللعبة!":"🚀 Start Game!"}
         </button>
-        <button onClick={()=>setScreen("lobby")} style={{marginTop:10,background:"transparent",border:"none",color:"rgba(255,255,255,0.35)",fontSize:13,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>← رجوع</button>
+        <button onClick={()=>setScreen("lobby")} style={{marginTop:10,background:"transparent",border:"none",color:"rgba(255,255,255,0.35)",fontSize:13,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{uiLang==="ar"?"← رجوع":"← Back"}</button>
       </div>
     </div>
   );
 
-  if(screen==="complete") return <IELTSGameComplete answers={answers} score={score} category={cat} reviewIdx={reviewIdx} setReviewIdx={setReviewIdx} onReplay={()=>{setCat(cat);setScreen("intro");}} onLobby={()=>setScreen("lobby")} history={getHistory()}/>;
+  if(screen==="complete") return <IELTSGameComplete answers={answers} score={score} category={cat} reviewIdx={reviewIdx} setReviewIdx={setReviewIdx} onReplay={()=>{setCat(cat);setScreen("intro");}} onLobby={()=>setScreen("lobby")} history={getHistory()} uiLang={uiLang}/>;
 
   const stars=Array.from({length:55},(_,i)=>({x:(i*37+13)%100,y:(i*53+7)%55,r:i%7===0?3.5:i%3===0?2.5:1.5,dur:2+(i%4)*0.7,delay:i%5*0.4}));
 
@@ -4638,7 +4647,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
       {/* Character */}
       <div style={{position:"absolute",bottom:72,left:"18%",zIndex:10,animation:paused?"none":gState==="running"?"charBob 0.45s ease-in-out infinite":"charThink 1.2s ease-in-out infinite",filter:gState==="question"?"drop-shadow(0 0 12px #d4af37)":"none",transition:"filter 0.3s"}}>
         <div style={{position:"relative",display:"flex",flexDirection:"column",alignItems:"center",gap:0}}>
-          {gState==="question"&&<div style={{position:"absolute",top:-44,left:"50%",transform:"translateX(-50%)",background:"white",borderRadius:12,padding:"4px 10px",fontSize:16,fontWeight:900,color:cat.color,border:`2px solid ${cat.color}`,animation:"qBubble 0.8s ease-in-out infinite",whiteSpace:"nowrap",boxShadow:"0 4px 12px rgba(0,0,0,0.3)"}}>؟</div>}
+          {gState==="question"&&<div style={{position:"absolute",top:-44,left:"50%",transform:"translateX(-50%)",background:"white",borderRadius:12,padding:"4px 10px",fontSize:16,fontWeight:900,color:cat.color,border:`2px solid ${cat.color}`,animation:"qBubble 0.8s ease-in-out infinite",whiteSpace:"nowrap",boxShadow:"0 4px 12px rgba(0,0,0,0.3)"}}>{uiLang==="ar"?"؟":"?"}</div>}
           {correct===true&&<div style={{position:"absolute",top:-20,left:"50%",transform:"translateX(-50%)",fontSize:20,animation:"coinBurst 0.5s ease-out forwards"}}>⭐</div>}
           <div style={{fontSize:0,lineHeight:0}}>
             <div style={{width:28,height:10,background:cat?cat.color:"#b91c1c",borderRadius:"4px 4px 0 0",margin:"0 auto",marginBottom:-2}}/>
@@ -4662,7 +4671,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
             {Array.from({length:3}).map((_,i)=><span key={i} style={{fontSize:16,opacity:i<lives?1:0.2}}>❤️</span>)}
           </div>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,flex:1,padding:"0 8px"}}>
-            <div style={{color:"rgba(255,255,255,0.85)",fontWeight:700,fontSize:"clamp(9px,1.2vw,11px)",direction:"rtl"}}>{cat.arabic} · {qIdx+1}/25</div>
+            <div style={{color:"rgba(255,255,255,0.85)",fontWeight:700,fontSize:"clamp(9px,1.2vw,11px)",direction:uiLang==="ar"?"rtl":"ltr"}}>{uiLang==="ar"?cat.arabic:cat.english} · {qIdx+1}/25</div>
             <div style={{width:"min(180px,38vw)",height:3,background:"rgba(255,255,255,0.1)",borderRadius:50,overflow:"hidden"}}>
               <div style={{height:"100%",background:"#d4af37",width:`${(qIdx/25)*100}%`,transition:"width 0.5s",borderRadius:50}}/>
             </div>
@@ -4676,7 +4685,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
         {/* Prev question button — full width strip below main row, only after Q1 */}
         {answers.length>0&&(
           <button onClick={()=>setShowPrev(p=>!p)} style={{width:"100%",background:showPrev?"rgba(212,175,55,0.25)":"rgba(255,255,255,0.05)",border:"none",borderTop:"1px solid rgba(255,255,255,0.08)",padding:"5px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontFamily:"'Cairo',system-ui",fontSize:12,color:showPrev?"#d4af37":"rgba(255,255,255,0.45)",fontWeight:showPrev?700:400,transition:"all 0.2s"}}>
-            {showPrev?"🔼 إخفاء السؤال السابق":"🔽 السؤال السابق — للمراجعة فقط"}
+            {uiLang==="ar"?(showPrev?"🔼 إخفاء السؤال السابق":"🔽 السؤال السابق — للمراجعة فقط"):(showPrev?"🔼 Hide previous question":"🔽 Previous question — review only")}
           </button>
         )}
       </div>
@@ -4685,10 +4694,10 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
         <div style={{position:"absolute",inset:0,zIndex:50,background:"rgba(69,10,10,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{background:"rgba(255,255,255,0.07)",border:"2px solid rgba(212,175,55,0.4)",borderRadius:24,padding:"40px 32px",textAlign:"center",maxWidth:300}}>
             <div style={{fontSize:48,marginBottom:12}}>⏸️</div>
-            <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:22,color:"white",marginBottom:8,direction:"rtl"}}>اللعبة متوقفة مؤقتاً</div>
-            <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:24,direction:"rtl"}}>سؤال {qIdx+1} من ٢٥ · نقاط: {score}</div>
-            <button onClick={togglePause} style={{width:"100%",background:"#d4af37",border:"none",borderRadius:12,padding:"14px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"#0f172a",cursor:"pointer",marginBottom:10}}>▶ متابعة اللعبة</button>
-            <button onClick={()=>{gameAudio.stopBg();setScreen("lobby");}} style={{width:"100%",background:"transparent",border:"1px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"11px",fontFamily:"'Cairo',system-ui",fontWeight:600,fontSize:14,color:"rgba(255,255,255,0.6)",cursor:"pointer"}}>🏠 رجوع للقائمة</button>
+            <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:22,color:"white",marginBottom:8}}>{uiLang==="ar"?"اللعبة متوقفة مؤقتاً":"Game Paused"}</div>
+            <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:24}}>Q{qIdx+1}/25 · ⭐{score}</div>
+            <button onClick={togglePause} style={{width:"100%",background:"#d4af37",border:"none",borderRadius:12,padding:"14px",fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"#0f172a",cursor:"pointer",marginBottom:10}}>{uiLang==="ar"?"▶ متابعة اللعبة":"▶ Resume Game"}</button>
+            <button onClick={()=>{gameAudio.stopBg();setScreen("lobby");}} style={{width:"100%",background:"transparent",border:"1px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"11px",fontFamily:"'Cairo',system-ui",fontWeight:600,fontSize:14,color:"rgba(255,255,255,0.6)",cursor:"pointer"}}>{uiLang==="ar"?"🏠 رجوع للقائمة":"🏠 Back to Menu"}</button>
           </div>
         </div>
       )}
@@ -4699,7 +4708,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
         return(
           <div style={{position:"absolute",top:52,left:"3%",right:"3%",zIndex:40,background:"rgba(80,10,10,0.98)",border:"1.5px solid rgba(212,175,55,0.5)",borderRadius:16,padding:"14px 16px",boxShadow:"0 8px 32px rgba(0,0,0,0.7)",animation:"feedbackPop 0.25s ease-out"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,direction:"rtl"}}>
-              <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,fontWeight:700,color:"#d4af37"}}>👁 السؤال السابق — للمراجعة فقط</div>
+              <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,fontWeight:700,color:"#d4af37"}}>{uiLang==="ar"?"👁 السؤال السابق — للمراجعة فقط":"👁 Previous question — review only"}</div>
               <button onClick={()=>setShowPrev(false)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:18,cursor:"pointer",lineHeight:1}}>✕</button>
             </div>
             <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(12px,1.5vw,14px)",fontWeight:700,color:"white",direction:"rtl",marginBottom:10,lineHeight:1.4}}>{pq.q}</div>
@@ -4710,7 +4719,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
                 else if(oi===prev.chosen&&!prev.ok){bg="rgba(239,68,68,0.15)";border="1.5px solid #ef4444";col="#fca5a5";}
                 return(
                   <div key={oi} style={{background:bg,border,borderRadius:8,padding:"7px 12px",display:"flex",alignItems:"center",gap:8,direction:"rtl"}}>
-                    <span style={{color:"#d4af37",fontSize:10,fontWeight:700,width:14,flexShrink:0}}>{["أ","ب","ج","د"][oi]}</span>
+                    <span style={{color:"#d4af37",fontSize:10,fontWeight:700,width:14,flexShrink:0}}>{uiLang==="ar"?["أ","ب","ج","د"][oi]:["A","B","C","D"][oi]}</span>
                     <span style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(11px,1.2vw,13px)",color:col,flex:1}}>{opt}</span>
                     {oi===prev.correct&&<span style={{fontSize:12,flexShrink:0}}>✓</span>}
                     {oi===prev.chosen&&!prev.ok&&<span style={{fontSize:12,flexShrink:0}}>✗</span>}
@@ -4745,7 +4754,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
                   onMouseOver={e=>{if(chosen===null) e.currentTarget.style.background="rgba(212,175,55,0.15)";}}
                   onMouseOut={e=>{if(chosen===null) e.currentTarget.style.background="rgba(255,255,255,0.07)";}}
                 >
-                  <span style={{background:"rgba(212,175,55,0.2)",color:"#d4af37",borderRadius:50,width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:11,flexShrink:0}}>{["أ","ب","ج","د"][i]}</span>
+                  <span style={{background:"rgba(212,175,55,0.2)",color:"#d4af37",borderRadius:50,width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:11,flexShrink:0}}>{uiLang==="ar"?["أ","ب","ج","د"][i]:["A","B","C","D"][i]}</span>
                   <span style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(11px,1.3vw,13px)",fontWeight:600,color:col,lineHeight:1.3,flex:1}}>{opt}</span>
                 </button>
               );
@@ -4754,7 +4763,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
           {chosen!==null&&(
             <div style={{marginTop:10,direction:"rtl",animation:"feedbackPop 0.3s cubic-bezier(0.16,1,0.3,1)"}}>
               <div style={{textAlign:"center",fontWeight:800,fontSize:"clamp(12px,1.6vw,14px)",color:correct?"#10b981":"#ef4444",marginBottom:(!correct&&cq.exp)?5:0}}>
-                {correct?"🎉 ممتاز! إجابة صحيحة!":"❌ الإجابة الصحيحة: "+cq.opts[cq.a]}
+                {uiLang==="ar"?(correct?"🎉 ممتاز! إجابة صحيحة!":"❌ الإجابة الصحيحة: "+cq.opts[cq.a]):(correct?"🎉 Correct!":"❌ Correct answer: "+cq.opts[cq.a])}
               </div>
               {!correct&&cq.exp&&(
                 <div style={{background:"rgba(251,191,36,0.1)",border:"1px solid rgba(251,191,36,0.3)",borderRadius:8,padding:"7px 12px",fontSize:"clamp(11px,1.2vw,12px)",color:"#fde68a",fontWeight:600,textAlign:"right",lineHeight:1.5}}>💡 {cq.exp}</div>
