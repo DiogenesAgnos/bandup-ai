@@ -2957,39 +2957,7 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
   const card = {background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",marginBottom:16,boxShadow:T.shadow};
   const locked = (free) => !free && !isPro;
 
-  if(!isPro) return (
-    <div style={{maxWidth:600,margin:"40px auto",padding:"0 24px"}}>
-      <div style={{textAlign:"center",marginBottom:24}}>
-        <div style={{fontSize:52,marginBottom:12}}>🗣️</div>
-        <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T.text,marginBottom:8}}>IELTS Speaking Practice</h2>
-        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>Band 8 model answers, vocabulary, tips and common mistakes — for all 3 parts.</p>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10,marginBottom:24}}>
-        {[
-          {icon:"🎤",part:"Part 1 — Introduction & Interview",topics:"Hometown · Work & Studies · Technology · Free Time · Food · Travel · Family",count:"10 topics · 3 questions each = 30 model answers"},
-          {icon:"📋",part:"Part 2 — Long Turn (Cue Cards)",topics:"Describe a person who inspired you · A skill you learnt · A place you visited · An important decision · A book or film...",count:"10 cue cards with full 2-minute model answers"},
-          {icon:"💬",part:"Part 3 — Discussion",topics:"Society & culture · Technology & the future · Education · Environment · Work & economy",count:"8 discussion sets · 4-5 questions each"},
-        ].map((c,i)=>(
-          <div key={i} style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px 16px",display:"flex",gap:12,alignItems:"flex-start"}}>
-            <div style={{fontSize:26,flexShrink:0,marginTop:2}}>{c.icon}</div>
-            <div>
-              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,fontSize:13,color:T.primary,marginBottom:3}}>{c.part}</div>
-              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:T.textMid,marginBottom:3,lineHeight:1.5}}>Topics: {c.topics}</div>
-              <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:T.textMuted,fontWeight:600}}>{c.count}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div style={{textAlign:"center"}}>
-        <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
-          🔓 Upgrade to Pro — $35 / 25 JOD
-        </button>
-        <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
-      </div>
-    </div>
-  );
-
-  return (
+    return (
     <div style={{maxWidth:900,margin:"0 auto",padding:"36px 24px 80px"}}>
       <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px",direction:"ltr",textAlign:"left"}}>🗣️ IELTS Speaking</h1>
       <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}></p>
@@ -5171,7 +5139,7 @@ const VocabularyPage = ({uiLang="ar"}) => {
   const [cat,setCat]=useState("writing2");
   const [meaningsLang,setMeaningsLang]=useState("ar"); // "ar" | "en"
   const [search,setSearch]=useState("");
-  const words=(IELTS_VOCAB[cat]||[]).filter(w=>
+  const words=(MERGED_VOCAB[cat]||[]).filter(w=>
     !search||w.w.toLowerCase().includes(search.toLowerCase())||w.ar.includes(search)||w.en.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -5884,9 +5852,10 @@ const UI = {
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
     // Hero
-    heroPill:"🎓 تعلّم الإنجليزية وتحضير الآيلتس",
-    heroTitle:"تعلّم الإنجليزية — بالطريقة الصحيحة.",
-    heroSub:"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · تحضير منهجي للآيلتس — وليس مجرد روبوت محادثة",
+    heroPill:"🎓 تعلّم الإنجليزية  ·  تحضير الآيلتس",
+    heroTitle:"تعلّم الإنجليزية. ارفع درجة الآيلتس.",
+    heroSub:"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · مبني للآيلتس والأهداف الأكبر",
+    heroIelts:"✅ مثالي لمن يستهدف رفع درجة الآيلتس",
     heroIelts:"✅ مثالي لمن يستهدف رفع درجة الآيلتس",
     startFree:"اكتشف مستواك — مجاناً ←",
     startFree2:"حلّل مقالتك الأولى مجاناً →",
@@ -5938,9 +5907,10 @@ const UI = {
     signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
     manageSubscription:"Manage Subscription",
     // Hero
-    heroPill:"🎓 English learning & IELTS preparation",
-    heroTitle:"Learn English the right way.",
-    heroSub:"A placement test, real writing feedback, and structured practice — not a chatbot.",
+    heroPill:"🎓 English Learning  ·  IELTS Preparation",
+    heroTitle:"Learn English. Ace your IELTS.",
+    heroSub:"A placement test, real writing feedback, and structured practice — built for IELTS and beyond.",
+    heroIelts:"✅ Ideal if you're also targeting a specific IELTS band",
     heroIelts:"✅ Ideal if you're also targeting a specific IELTS band",
     startFree:"Find your level — free, no sign-up",
     startFree2:"Analyse your first essay free →",
@@ -6388,13 +6358,13 @@ export default function IELTSBot(){
           <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
           <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:uiLang==="ar"?"rtl":"ltr",textAlign:"center"}}>
             <div style={{display:"inline-block",background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"5px 18px",fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo',system-ui",fontWeight:600,marginBottom:24}}>
-              {uiLang==="ar"?"🎓 تعلّم الإنجليزية بشكل صحيح — وتتبع تقدمك":"🎓 Learn English properly. Track how far you've come."}
+              {uiLang==="ar"?"🎓 تعلّم الإنجليزية  ·  تحضير الآيلتس":"🎓 English Learning  ·  IELTS Preparation"}
             </div>
             <h1 style={{fontSize:"clamp(32px,5vw,58px)",fontWeight:900,color:"white",fontFamily:"'Cairo',system-ui",lineHeight:1.2,margin:"0 0 20px",textShadow:"0 2px 20px rgba(0,0,0,0.2)"}}>
 {uiLang==="ar"?"تعلّم الإنجليزية بشكل صحيح":"Learn English properly."}
             </h1>
             <p style={{fontSize:"clamp(16px,2vw,22px)",color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo',system-ui",lineHeight:1.7,margin:"0 0 40px",fontWeight:400,direction:uiLang==="ar"?"rtl":"ltr"}}>
-{uiLang==="ar"?"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · تحضير منهجي للآيلتس":"A placement test, real writing feedback, and structured practice — not a chatbot."}
+{uiLang==="ar"?"اختبار تحديد مستوى · تغذية راجعة حقيقية · مبني للآيلتس والأهداف الأكبر":"A placement test, real writing feedback, and structured practice — built for IELTS and beyond."}
             </p>
             <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"6px 16px",marginBottom:32,fontSize:13,color:"rgba(255,255,255,0.85)",fontFamily:"'Cairo',system-ui"}}>
               {uiLang==="ar"?"✅ مثالي لمن يستهدف رفع درجة الآيلتس":"✅ Ideal if you're also targeting a specific IELTS band"}
