@@ -4068,34 +4068,34 @@ const IELTS_GAME_CATS=[
 ];
 const IELTS_GAME_QS={
   spelling:[
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["accommodate","accomodate","acommodate","accomadate"],a:0},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["neccessary","necessary","necesary","necessery"],a:1},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["definately","definitly","definitely","defenitely"],a:2},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["separate","seperate","separrate","seperrate"],a:0},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["occurence","occurrance","occurance","occurrence"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["begining","beggining","beginning","beginnning"],a:2},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["environment","enviornment","enviroment","environement"],a:0},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["goverment","governement","govenment","government"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["knowlege","knoweldge","knolwedge","knowledge"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["immediately","immediatly","imediately","immeditley"],a:0},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["particullary","particularly","particulerly","partucularly"],a:1},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["succesfully","successfuly","successefully","successfully"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["opportunites","oppertunities","opportunities","opportunittes"],a:2},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["comunication","communicaton","communication","communicaiton"],a:2},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["responsability","responsibilty","responsibiliy","responsibility"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["aproximately","approximatly","approximately","approximatley"],a:2},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["developement","devlopment","devellopment","development"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["internatonal","internatioanl","internationel","international"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["signifcant","signifigant","significant","significent"],a:2},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["acheivment","achievment","achevement","achievement"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["assesment","assessement","assesement","assessment"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["recomended","recommened","reccommended","recommended"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["througout","throuought","throughut","throughout"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["disadavantage","disadvantege","disadvntage","disadvantage"],a:3},
-    {q:"أي كلمة مكتوبة بشكل صحيح؟",opts:["concluson","conclussion","conclusoin","conclusion"],a:3},
+    {q:"Which word is spelled correctly?",opts:["accommodate","accomodate","acommodate","accomadate"],a:0},
+    {q:"Which word is spelled correctly?",opts:["neccessary","necessary","necesary","necessery"],a:1},
+    {q:"Which word is spelled correctly?",opts:["definately","definitly","definitely","defenitely"],a:2},
+    {q:"Which word is spelled correctly?",opts:["separate","seperate","separrate","seperrate"],a:0},
+    {q:"Which word is spelled correctly?",opts:["occurence","occurrance","occurance","occurrence"],a:3},
+    {q:"Which word is spelled correctly?",opts:["begining","beggining","beginning","beginnning"],a:2},
+    {q:"Which word is spelled correctly?",opts:["environment","enviornment","enviroment","environement"],a:0},
+    {q:"Which word is spelled correctly?",opts:["goverment","governement","govenment","government"],a:3},
+    {q:"Which word is spelled correctly?",opts:["knowlege","knoweldge","knolwedge","knowledge"],a:3},
+    {q:"Which word is spelled correctly?",opts:["immediately","immediatly","imediately","immeditley"],a:0},
+    {q:"Which word is spelled correctly?",opts:["particullary","particularly","particulerly","partucularly"],a:1},
+    {q:"Which word is spelled correctly?",opts:["succesfully","successfuly","successefully","successfully"],a:3},
+    {q:"Which word is spelled correctly?",opts:["opportunites","oppertunities","opportunities","opportunittes"],a:2},
+    {q:"Which word is spelled correctly?",opts:["comunication","communicaton","communication","communicaiton"],a:2},
+    {q:"Which word is spelled correctly?",opts:["responsability","responsibilty","responsibiliy","responsibility"],a:3},
+    {q:"Which word is spelled correctly?",opts:["aproximately","approximatly","approximately","approximatley"],a:2},
+    {q:"Which word is spelled correctly?",opts:["developement","devlopment","devellopment","development"],a:3},
+    {q:"Which word is spelled correctly?",opts:["internatonal","internatioanl","internationel","international"],a:3},
+    {q:"Which word is spelled correctly?",opts:["signifcant","signifigant","significant","significent"],a:2},
+    {q:"Which word is spelled correctly?",opts:["acheivment","achievment","achevement","achievement"],a:3},
+    {q:"Which word is spelled correctly?",opts:["assesment","assessement","assesement","assessment"],a:3},
+    {q:"Which word is spelled correctly?",opts:["recomended","recommened","reccommended","recommended"],a:3},
+    {q:"Which word is spelled correctly?",opts:["througout","throuought","throughut","throughout"],a:3},
+    {q:"Which word is spelled correctly?",opts:["disadavantage","disadvantege","disadvntage","disadvantage"],a:3},
+    {q:"Which word is spelled correctly?",opts:["concluson","conclussion","conclusoin","conclusion"],a:3},
   ],
   grammar:[
-    {q:"اختر الجملة الصحيحة:",opts:["She don't like studying","She doesn't like studying","She not like studying","She isn't like studying"],a:1,exp:"مع he/she/it نستخدم doesn't وليس don't"},
+    {q:"Choose the correct sentence:",opts:["She don't like studying","She doesn't like studying","She not like studying","She isn't like studying"],a:1,exp:"مع he/she/it نستخدم doesn't وليس don't"},
     {q:"The number of students ___ increasing.",opts:["are","were","is","have been"],a:2,exp:"'The number of' تُعامل كمفرد دائماً → is"},
     {q:"Despite ___ tired, she kept studying.",opts:["to be","be","been","being"],a:3,exp:"بعد Despite/preposition نستخدم الـ gerund (being)"},
     {q:"He suggested that she ___ more carefully.",opts:["reads","read","reading","to read"],a:1,exp:"بعد suggest/recommend نستخدم المصدر البسيط (subjunctive) بدون s → read وليس reads"},
@@ -4117,55 +4117,55 @@ const IELTS_GAME_QS={
     {q:"The evidence ___ that diets affect mood.",opts:["suggest","suggests","suggesting","suggested"],a:1,exp:"The evidence = مفرد → suggests"},
     {q:"It is ___ that students revise regularly.",opts:["advise","advised","advisable","advisory"],a:2,exp:"It is + صفة + that... → advisable (مستحسن)"},
     {q:"The solution ___ by the team last week.",opts:["discover","was discovered","discovered","has discovered"],a:1,exp:"last week = Past Simple Passive → was discovered"},
-    {q:"She has been living here ___ five years.",opts:["since","for","during","while"],a:1,exp:"for + مدة زمنية → for five years. since + نقطة زمنية"},
+    {q:"She has been living here ___ five years.",opts:["since","for","during","while"],a:1,exp:"for + time period → for five years. since + نقطة زمنية"},
     {q:"The majority of students ___ passed the exam.",opts:["has","is","have","was"],a:2,exp:"'the majority of' + اسم جمع → have"},
     {q:"He works ___ a teacher in a local school.",opts:["like","as","for","with"],a:1,exp:"as = بصفته وظيفة. like = يشبه → works as a teacher"},
   ],
   writing:[
-    {q:"أي كلمة تعبّر عن التناقض؟",opts:["Furthermore","Therefore","However","Consequently"],a:2},
-    {q:"'To what extent do you agree?' تعني:",opts:["وافق أو اعترض فقط","اعطِ الجانبين فقط","أبدِ رأيك وبرّره","ناقش المشكلات والحلول"],a:2},
-    {q:"أفضل paraphrase لـ 'Cities are becoming overcrowded':",opts:["Cities have people","Urban areas are experiencing population growth","People live in cities","Cities are big"],a:1},
-    {q:"أي كلمة أكثر رسمية؟",opts:["big","large","huge","enormous"],a:1},
-    {q:"'Coherent essay' يعني:",opts:["يستخدم مفردات كثيرة","الأفكار مترابطة ومنظمة","يحتوي فقرات كثيرة","طويل جداً"],a:1},
-    {q:"أي جملة تستخدم cohesive device بشكل صحيح؟",opts:["In addition, however, some disagree","Furthermore, this trend has led to social problems","Despite, the situation is improving","Although however, both sides have merit"],a:1},
-    {q:"'The graph shows an upward trend.' يعني:",opts:["البيانات تنخفض","تبقى ثابتة","ترتفع","غير منتظمة"],a:2},
-    {q:"أفضل عبارة لتقديم رأي:",opts:["In my humble opinion I think","It is widely argued that","I believe that personally","From my personal individual opinion"],a:1},
-    {q:"Lexical resource تعني:",opts:["دقة القواعد","نطاق ودقة المفردات","تنظيم المقالة","الإملاء فقط"],a:1},
-    {q:"أفضل بديل لكلمة 'show' في الكتابة الأكاديمية:",opts:["demonstrate","tell","say","prove"],a:0},
-    {q:"أي نوع ليس من أنواع Task 2؟",opts:["Opinion essay","Discussion essay","Narrative essay","Problem-solution essay"],a:2},
-    {q:"'Despite the challenges, solutions exist.' هذا مثال على:",opts:["Topic sentence","Concession statement","Thesis statement","Conclusion"],a:1},
-    {q:"Task 2 يتطلب حداً أدنى من الكلمات:",opts:["150","200","250","300"],a:2},
-    {q:"أفضل عبارة لخاتمة:",opts:["In a nutshell basically","In conclusion, it is clear that","To sum it all up finally","At the end of everything"],a:1},
-    {q:"أي جملة أكثر تعقيداً؟",opts:["People work hard","Although work can be stressful, it provides financial stability","Working is good","People need jobs"],a:1},
-    {q:"'Affluent' تعني:",opts:["فقير","غني","ريفي","متعلم"],a:1},
-    {q:"أي كلمة تشير إلى مثال؟",opts:["However","Therefore","For instance","In contrast"],a:2},
-    {q:"'The data indicates a gradual ___.' أي كلمة تناسب؟",opts:["increase","increased","increasing","increases"],a:0},
-    {q:"أفضل topic sentence لفقرة opinion essay:",opts:["There are many reasons","One significant reason is the impact on public health","I will discuss this","People have opinions"],a:1},
-    {q:"Coherence في الكتابة تعني:",opts:["استخدام جمل طويلة","تدفق الأفكار بشكل منطقي","وجود مفردات كثيرة","الكتابة بسرعة"],a:1},
-    {q:"'Pollution ___ a major threat.' الفعل الصحيح:",opts:["make","poses","do","creates a"],a:1},
-    {q:"فقرة الحجة المضادة يجب أن:",opts:["تتجاهل الآراء المعارضة","تطرح الرأي المعارض ثم تردّ عليه","توافق الحجة الرئيسية فقط","تكون أطول من الحجة الأساسية"],a:1},
-    {q:"أي جملة compound sentence؟",opts:["She studied hard.","She studied hard and passed the exam.","Although she studied hard, she failed.","Having studied hard, she passed."],a:1},
-    {q:"'Mitigate' تعني:",opts:["يجعل أسوأ","يتجاهل","يخفف من حدة","يمنع كلياً"],a:2},
-    {q:"Task 1 Academic يتطلب:",opts:["حجة","وصف بيانات مرئية","رسالة","رأي شخصي"],a:1},
+    {q:"Which word expresses contrast?",opts:["Furthermore","Therefore","However","Consequently"],a:2},
+    {q:"'To what extent do you agree?' means:",opts:["وافق أو اعترض فقط","اعطِ الجانبين فقط","أبدِ رأيك وبرّره","ناقش المشكلات والحلول"],a:2},
+    {q:"Best paraphrase for 'Cities are becoming overcrowded':",opts:["Cities have people","Urban areas are experiencing population growth","People live in cities","Cities are big"],a:1},
+    {q:"Which word is more formal?",opts:["big","large","huge","enormous"],a:1},
+    {q:"'Coherent essay' means:",opts:["يستخدم مفردات كثيرة","الأفكار مترابطة ومنظمة","يحتوي فقرات كثيرة","طويل جداً"],a:1},
+    {q:"Which sentence uses a cohesive device correctly?",opts:["In addition, however, some disagree","Furthermore, this trend has led to social problems","Despite, the situation is improving","Although however, both sides have merit"],a:1},
+    {q:"'The graph shows an upward trend.' means:",opts:["البيانات تنخفض","تبقى ثابتة","ترتفع","غير منتظمة"],a:2},
+    {q:"Best phrase to introduce an opinion:",opts:["In my humble opinion I think","It is widely argued that","I believe that personally","From my personal individual opinion"],a:1},
+    {q:"Lexical resource means:",opts:["دقة القواعد","نطاق ودقة المفردات","تنظيم المقالة","الإملاء فقط"],a:1},
+    {q:"Best academic alternative for 'show':",opts:["demonstrate","tell","say","prove"],a:0},
+    {q:"Which is NOT a type of Task 2?",opts:["Opinion essay","Discussion essay","Narrative essay","Problem-solution essay"],a:2},
+    {q:"'Despite the challenges, solutions exist.' is an example of:",opts:["Topic sentence","Concession statement","Thesis statement","Conclusion"],a:1},
+    {q:"Task 2 requires a minimum word count of:",opts:["150","200","250","300"],a:2},
+    {q:"Best phrase for a conclusion:",opts:["In a nutshell basically","In conclusion, it is clear that","To sum it all up finally","At the end of everything"],a:1},
+    {q:"Which sentence is more complex?",opts:["People work hard","Although work can be stressful, it provides financial stability","Working is good","People need jobs"],a:1},
+    {q:"'Affluent' means:",opts:["فقير","غني","ريفي","متعلم"],a:1},
+    {q:"Which word signals an example?",opts:["However","Therefore","For instance","In contrast"],a:2},
+    {q:"'The data indicates a gradual ___.' Which word fits?",opts:["increase","increased","increasing","increases"],a:0},
+    {q:"Best topic sentence for an opinion essay paragraph:",opts:["There are many reasons","One significant reason is the impact on public health","I will discuss this","People have opinions"],a:1},
+    {q:"Coherence in writing means:",opts:["استخدام جمل طويلة","تدفق الأفكار بشكل منطقي","وجود مفردات كثيرة","الكتابة بسرعة"],a:1},
+    {q:"'Pollution ___ a major threat.' Correct verb:",opts:["make","poses","do","creates a"],a:1},
+    {q:"A counter-argument paragraph should:",opts:["تتجاهل الآراء المعارضة","تطرح الرأي المعارض ثم تردّ عليه","توافق الحجة الرئيسية فقط","تكون أطول من الحجة الأساسية"],a:1},
+    {q:"Which is a compound sentence?",opts:["She studied hard.","She studied hard and passed the exam.","Although she studied hard, she failed.","Having studied hard, she passed."],a:1},
+    {q:"'Mitigate' means:",opts:["يجعل أسوأ","يتجاهل","يخفف من حدة","يمنع كلياً"],a:2},
+    {q:"Task 1 Academic requires:",opts:["حجة","وصف بيانات مرئية","رسالة","رأي شخصي"],a:1},
   ],
   reading:[
-    {q:"'The author implies...' — 'implies' تعني:",opts:["يصرّح مباشرة","يشير ضمنياً","يجادل ضد","يثبت"],a:1},
-    {q:"الفكرة الرئيسية للفقرة توجد في:",opts:["الجملة الأخيرة","أي جملة","عادةً الجملة الموضوعية","التفاصيل الداعمة"],a:2},
-    {q:"'Ubiquitous' تعني:",opts:["نادر","موجود في كل مكان","خطير","مكلف"],a:1},
-    {q:"في أسئلة True/False/Not Given، 'Not Given' تعني:",opts:["العبارة خاطئة","المعلومة غير موجودة في النص","العبارة صحيحة جزئياً","الكاتب يعارض"],a:1},
-    {q:"'Despite rapid urbanisation, rural traditions persist.' العلاقة بين الجملتين:",opts:["سبب ونتيجة","تناقض","تسلسل","مثال"],a:1},
-    {q:"Skimming يعني:",opts:["قراءة كل كلمة بعناية","قراءة سريعة للمعنى العام","البحث عن معلومة محددة","تجاهل النص"],a:1},
-    {q:"'The study corroborates earlier findings.' — 'corroborates' تعني:",opts:["يتناقض مع","يؤكد","يتحدى","يتجاهل"],a:1},
-    {q:"Scanning يعني:",opts:["قراءة بطيئة كلمة بكلمة","قراءة للمعنى العام","البحث عن معلومة محددة","تلخيص النص"],a:2},
-    {q:"'The government's stance on immigration' — 'stance' تعني:",opts:["قانون","موقف/اتجاه","سياسة","ميزانية"],a:1},
-    {q:"كم قسماً في اختبار IELTS Reading؟",opts:["2","3","4","5"],a:1},
-    {q:"'Empirical evidence' تشير إلى:",opts:["حجج نظرية","أدلة مبنية على الملاحظة/التجربة","آراء شخصية","سجلات تاريخية"],a:1},
-    {q:"'The author's tone is sceptical' يعني:",opts:["المؤلف يوافق تماماً","المؤلف متشكك أو غير متأكد","المؤلف متحمس","المؤلف محايد"],a:1},
-    {q:"'Furthermore' تشير إلى:",opts:["تناقض","نقطة إضافية","خاتمة","سبب"],a:1},
-    {q:"'Detrimental effects' تعني:",opts:["تأثيرات إيجابية","محايدة","ضارة","مؤقتة"],a:2},
-    {q:"'Rhetorical question' في نص:",opts:["تتطلب إجابة مكتوبة","تُطرح للتأثير وليس للإجابة الحرفية","سؤال بحثي","دائماً في النهاية"],a:1},
-    {q:"'The policy was implemented gradually.' — 'gradually' تعني:",opts:["فجأة","خطوة بخطوة","فوراً","عشوائياً"],a:1},
-    {q:"'Controversial' تعني:",opts:["مقبول على نطاق واسع","يسبب خلافاً","مثبت علمياً","قديم"],a:1},
+    {q:"'implies' means:",opts:["يصرّح مباشرة","يشير ضمنياً","يجادل ضد","يثبت"],a:1},
+    {q:"The main idea of a paragraph is found in:",opts:["الجملة الأخيرة","أي جملة","عادةً الجملة الموضوعية","التفاصيل الداعمة"],a:2},
+    {q:"'Ubiquitous' means:",opts:["نادر","موجود في كل مكان","خطير","مكلف"],a:1},
+    {q:"In True/False/Not Given questions, 'Not Given' means:",opts:["العبارة خاطئة","المعلومة غير موجودة في النص","العبارة صحيحة جزئياً","الكاتب يعارض"],a:1},
+    {q:"'Despite rapid urbanisation, rural traditions persist.' The relationship is:",opts:["سبب ونتيجة","تناقض","تسلسل","مثال"],a:1},
+    {q:"Skimming means:",opts:["قراءة كل كلمة بعناية","قراءة سريعة للمعنى العام","البحث عن معلومة محددة","تجاهل النص"],a:1},
+    {q:"'corroborates' means:",opts:["يتناقض مع","يؤكد","يتحدى","يتجاهل"],a:1},
+    {q:"Scanning means:",opts:["قراءة بطيئة كلمة بكلمة","قراءة للمعنى العام","البحث عن معلومة محددة","تلخيص النص"],a:2},
+    {q:"'stance' means:",opts:["قانون","موقف/اتجاه","سياسة","ميزانية"],a:1},
+    {q:"How many sections are in IELTS Reading?",opts:["2","3","4","5"],a:1},
+    {q:"'Empirical evidence' refers to:",opts:["حجج نظرية","أدلة مبنية على الملاحظة/التجربة","آراء شخصية","سجلات تاريخية"],a:1},
+    {q:"'The author's tone is sceptical' means:",opts:["المؤلف يوافق تماماً","المؤلف متشكك أو غير متأكد","المؤلف متحمس","المؤلف محايد"],a:1},
+    {q:"'Furthermore' indicates:",opts:["تناقض","نقطة إضافية","خاتمة","سبب"],a:1},
+    {q:"'Detrimental effects' means:",opts:["تأثيرات إيجابية","محايدة","ضارة","مؤقتة"],a:2},
+    {q:"A 'rhetorical question' in a text:",opts:["تتطلب إجابة مكتوبة","تُطرح للتأثير وليس للإجابة الحرفية","سؤال بحثي","دائماً في النهاية"],a:1},
+    {q:"'gradually' means:",opts:["فجأة","خطوة بخطوة","فوراً","عشوائياً"],a:1},
+    {q:"'Controversial' means:",opts:["مقبول على نطاق واسع","يسبب خلافاً","مثبت علمياً","قديم"],a:1},
     {q:"في 'matching headings'، تقيس قدرتك على:",opts:["إيجاد أرقام محددة","تحديد الفكرة الرئيسية للفقرات","مطابقة المترادفات","القراءة السريعة"],a:1},
     {q:"'The research is inconclusive.' تعني:",opts:["النتائج واضحة جداً","النتائج لا تثبت شيئاً محدداً","البحث خاطئ","البحث ممتاز"],a:1},
     {q:"'Predominantly' تعني:",opts:["بالتساوي","في معظمه","جزئياً","نادراً"],a:1},
@@ -4301,11 +4301,11 @@ function IELTSGameLobby({proUser,onSelect,uiLang="ar"}){
           <div style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:"clamp(26px,4vw,44px)",color:"white",marginBottom:10,letterSpacing:"-0.5px"}}>
             IELTS Game
           </div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(14px,2vw,18px)",color:"rgba(255,255,255,0.6)",direction:"rtl"}}>
-            تعلّم وتمرّن على الآيلتس بطريقة ممتعة وتفاعلية 🌟
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(14px,2vw,18px)",color:"rgba(255,255,255,0.6)"}}>
+            {uiLang==="ar"?"تعلّم وتمرّن على الآيلتس بطريقة ممتعة وتفاعلية 🌟":"Learn and practise IELTS in a fun, interactive way 🌟"}
           </div>
           <div style={{marginTop:12,display:"inline-flex",gap:16,background:"rgba(255,255,255,0.06)",borderRadius:20,padding:"8px 20px",border:"1px solid rgba(255,255,255,0.12)"}}>
-            {[["25","سؤالاً في كل لعبة"],["🏆","نقاط وتقييم"],["🔊","موسيقى تفاعلية"]].map(([ic,lb])=>(
+            {(uiLang==="ar"?[["25","سؤالاً في كل لعبة"],["🏆","نقاط وتقييم"],["🔊","موسيقى تفاعلية"]]:[["25","questions per game"],["🏆","points & scoring"],["🔊","interactive music"]]).map(([ic,lb])=>(
               <div key={lb} style={{textAlign:"center"}}>
                 <div style={{fontSize:18,fontWeight:900,color:"#fbbf24",fontFamily:"'Cairo',system-ui"}}>{ic}</div>
                 <div style={{fontSize:11,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui"}}>{lb}</div>
@@ -4859,13 +4859,13 @@ function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
     <div style={{background:"#b91c1c",padding:"56px 32px"}}>
       <div style={{maxWidth:900,margin:"0 auto"}}>
         <div style={{textAlign:"center",marginBottom:28}}>
-          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:"clamp(18px,2.5vw,26px)",color:"white",marginBottom:6}}>المجاني مقابل Pro — الفرق في ثانية</div>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)"}}>3 أشهر · $35 دولي / 25 دينار أردني</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:"clamp(18px,2.5vw,26px)",color:"white",marginBottom:6}}>{uiLang==="ar"?"المجاني مقابل Pro — الفرق في ثانية":"Free vs Pro — The Difference at a Glance"}</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.5)"}}>{uiLang==="ar"?"3 أشهر · $35 دولي / 25 دينار أردني":"3 months · $35 international / 25 JOD Jordan"}</div>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,direction:"rtl"}}>
           {/* Free */}
           <div style={{background:"rgba(255,255,255,0.06)",borderRadius:12,padding:"20px 20px",border:"1px solid rgba(255,255,255,0.12)"}}>
-            <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"rgba(255,255,255,0.6)",marginBottom:16}}>المجاني</div>
+            <div style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"rgba(255,255,255,0.6)",marginBottom:16}}>{uiLang==="ar"?"المجاني":"Free"}</div>
             {free.map((f,i)=>(
               <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:10,direction:"rtl"}}>
                 <span style={{color:"#94a3b8",fontSize:13,flexShrink:0,marginTop:2}}>✗</span>
@@ -4877,7 +4877,7 @@ function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
           <div style={{background:"rgba(212,175,55,0.12)",borderRadius:12,padding:"20px 20px",border:"1.5px solid rgba(212,175,55,0.4)"}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
               <span style={{background:"#d4af37",color:"#b91c1c",borderRadius:6,padding:"2px 10px",fontSize:12,fontWeight:800,fontFamily:"'Cairo',system-ui"}}>Pro</span>
-              <span style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"#d4af37"}}>كل شيء مفتوح</span>
+              <span style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:16,color:"#d4af37"}}>{uiLang==="ar"?"كل شيء مفتوح":"Everything Unlocked"}</span>
             </div>
             {pro.map((f,i)=>(
               <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:10,direction:"rtl"}}>
@@ -4889,9 +4889,9 @@ function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
         </div>
         <div style={{textAlign:"center",marginTop:24}}>
           <button onClick={onUpgrade} style={{background:"#d4af37",color:"#b91c1c",border:"none",borderRadius:10,padding:"14px 40px",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:"0 4px 16px rgba(212,175,55,0.4)"}}>
-            احصل على Pro الآن ←
+            {uiLang==="ar"?"احصل على Pro الآن ←":"Get Pro Now →"}
           </button>
-          <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.35)",marginTop:8}}>الإلغاء في أي وقت · دفع آمن عبر Paddle</div>
+          <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"rgba(255,255,255,0.35)",marginTop:8}}>{uiLang==="ar"?"الإلغاء في أي وقت · دفع آمن عبر Paddle":"Cancel anytime · Secure payment via Paddle"}</div>
         </div>
       </div>
     </div>
@@ -5808,7 +5808,7 @@ function ManageSubModal({onClose,email=""}){
         {/* Didn't get email? */}
         <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"10px 14px",marginBottom:20,direction:"rtl"}}>
           <div style={{fontSize:12,color:"#713f12",lineHeight:1.5}}>
-            <strong>إذا لم تجد البريد الإلكتروني؟</strong> تحقق من مجلد Spam، أو تواصل معنا عبر صفحة <strong>Contact</strong> وسنساعدك في الإلغاء خلال 24 ساعة.
+            <strong>Can't find the email?</strong> Check your Spam folder, or contact us via the <strong>Contact</strong> page and we'll helدك في الإلغاء خلال 24 ساعة.
           </div>
         </div>
 
@@ -6418,7 +6418,7 @@ export default function IELTSBot(){
               </div>
             </div>
             <button onClick={()=>switchView("game")} style={{background:T.accent,color:T.primary,border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 2px 8px ${T.accent}44`,whiteSpace:"nowrap"}}>
-              العب الآن 🕹️
+              {uiLang==="ar"?"العب الآن 🕹️":"Play Now 🕹️"}
             </button>
           </div>
         </div>
@@ -6629,7 +6629,7 @@ export default function IELTSBot(){
                       <div style={{fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl",textAlign:"right",marginBottom:8}}>اضغط على أي كلمة تحتها خط لرؤية التصحيح والشرح.</div>
                     </div>
                     <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-                      {[["major",T.red,"Major — خطأ كبير"],["moderate",T.amber,"Moderate — خطأ متوسط"],["minor",T.blue,"Minor — خطأ بسيط"]].map(([s,c,l])=>(
+                      {[["major",T.red,"Major"],["moderate",T.amber,"Moderate"],["minor",T.blue,"Minor"]].map(([s,c,l])=>(
                         <span key={s} style={{fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui",display:"flex",alignItems:"center",gap:4}}>
                           <span style={{display:"inline-block",width:20,height:2,background:c,borderRadius:1}}/><span style={{color:c,fontWeight:600}}>{l}</span>
                         </span>
@@ -6808,7 +6808,7 @@ export default function IELTSBot(){
           <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:16,display:"flex",flexDirection:"column",gap:8}}>
             <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
               <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>© 2025 Englishfool. All rights reserved.</span>
-              <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>منصة احترافية للتحضير لامتحان الآيلتس</span>
+              <span style={{color:"rgba(255,255,255,0.35)",fontSize:12,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Professional IELTS preparation platform — Essay Aة للتحضير لامتحان الآيلتس</span>
             </div>
             <span style={{color:"rgba(255,255,255,0.25)",fontSize:11,fontFamily:"'Cairo','Source Sans Pro',system-ui",direction:"rtl"}}>منصة Englishfool غير تابعة لـ Cambridge أو British Council أو IDP</span>
           </div>
