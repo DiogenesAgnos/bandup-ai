@@ -4781,7 +4781,7 @@ function TestimonialsSection({uiLang="ar"}){
 
 // ── FREE VS PRO COMPARISON ────────────────────────
 function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
-  const FREE_AR=["تحليلان كاملان مجاناً — بدون تسجيل","اختبار قراءة واحد مجاناً","جميع الألعاب الـ٥ مجاناً","قائمة مفردات آيلتس كاملة (٤٠٠+ كلمة)","الكلمات الرابطة ومرجع القواعد","٥ فحوصات قواعد مجاناً"];
+  const FREE_AR=["تحليلان كاملان مجاناً — بدون تسجيل","اختبار قراءة واحد مجاناً","جميع الألعاب الـ٥ مجاناً","تدريب المحادثة — نماذج Band 8 لجميع الأجزاء","قائمة مفردات آيلتس كاملة (٤٠٠+ كلمة)","الكلمات الرابطة ومرجع القواعد","٥ فحوصات قواعد مجاناً"];
   const FREE_EN=["2 full essay analyses free — no sign-up","1 reading test free","All 5 games — completely free","Speaking practice — Band 8 answers for Parts 1, 2 & 3","400+ word vocabulary list","Linking words & grammar reference","5 grammar checks free"];
   const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ ٧","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقيات Band 8","نماذج إجابة Band 8+ كاملة","متابعة التقدم وتاريخ الدرجات","فحص قواعد غير محدود"];
   const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Progress tracker with score history","Unlimited grammar checker"];
@@ -5051,6 +5051,9 @@ const IELTS_VOCAB = {
     {w:"in my experience",ar:"في تجربتي",en:"based on personal experience",ex:"In my experience, consistency matters more than intensity."},
     {w:"overstated",ar:"مبالَغ فيه",en:"exaggerated beyond the truth",ex:"The risks of AI have been somewhat overstated."},
   ],
+};
+
+const GENERAL_VOCAB_EXTRA = {
   reading_extra:[
     {w:"infer",ar:"يستنتج / يستخلص",en:"to draw a conclusion from evidence",ex:"From the data, we can infer that demand is rising."},
     {w:"explicit",ar:"صريح / واضح",en:"stated clearly and directly",ex:"The report was explicit about the need for change."},
@@ -5120,6 +5123,7 @@ const IELTS_VOCAB = {
     {w:"hypothesis",ar:"فرضية",en:"a proposed explanation to be tested",ex:"The hypothesis was supported by the experimental data."},
   ],
 };
+
 
 const VocabularyPage = ({uiLang="ar"}) => {
   const MERGED_VOCAB = {
