@@ -1708,8 +1708,144 @@ const GRAMMAR_EXERCISES = [
       { sentence: "Choose the correct sentence:", options: ["The number of road accidents have decreased.","The number of road accidents has decreased.","A number of road accidents has decreased."], correct: 1, explanation: "'THE number of' = singular = 'HAS decreased.' ('A number of accidents HAVE occurred' = plural.)" }
     ]
   }
+,
+  {
+    category: "Modal Verbs",
+    icon: "🔧",
+    color: "#7c3aed",
+    exercises: [
+      {sentence:"You ___ finish this by Friday — it's mandatory.",options:["should","must","might"],correct:1,explanation:"'Must' expresses obligation with no alternative. 'Should' is advice. 'Might' is possibility."},
+      {sentence:"She ___ be at home — her car is outside.",options:["must","should","can"],correct:0,explanation:"'Must' expresses logical deduction. Evidence (car outside) leads to a certain conclusion."},
+      {sentence:"You ___ smoke in a hospital. It's prohibited.",options:["mustn't","don't have to","shouldn't"],correct:0,explanation:"'Mustn't' = prohibition (forbidden). 'Don't have to' = no obligation but it's allowed. These are opposite meanings."},
+      {sentence:"I ___ speak French fluently when I was young.",options:["could","was able to","would"],correct:0,explanation:"'Could' expresses general ability in the past. 'Was able to' is used for a single specific achievement ('I was able to escape')."},
+      {sentence:"The students ___ wear uniforms — the school doesn't require it.",options:["mustn't","needn't","shouldn't"],correct:1,explanation:"'Needn't' (don't need to) = no obligation. 'Mustn't' = forbidden. The school doesn't require it — so it's simply not necessary."},
+      {sentence:"He ___ be tired — he's been working for 16 hours.",options:["can","must","might"],correct:1,explanation:"'Must' for logical deduction based on strong evidence. 16-hour shift makes tiredness a near-certain conclusion."},
+      {sentence:"___ I open the window? It's quite hot in here.",options:["Should","Could","Must"],correct:1,explanation:"'Could' is the most polite form for requests/permission. 'Can' also works but is less formal. 'Must' is not used for requests."},
+      {sentence:"You ___ have told me earlier — I could have helped.",options:["should","must","would"],correct:0,explanation:"'Should have + past participle' = criticism of a past action that didn't happen. 'You should have told me' = it was the right thing but you didn't do it."},
+      {sentence:"The bridge ___ collapse at any moment — stay back.",options:["may","might","could"],correct:2,explanation:"'Could' with an extreme situation implies real danger/possibility. All three work here, but 'could' is most direct for warnings."},
+      {sentence:"This room ___ have been a bedroom originally.",options:["must","can","will"],correct:0,explanation:"'Must have been' = past deduction (logical conclusion about the past). Evidence suggests something was true in the past."},
+    ]
+  },
+  {
+    category: "Reported Speech",
+    icon: "💬",
+    color: "#0891b2",
+    exercises: [
+      {sentence:"She said she ___ come to the meeting.",options:["will","would","can"],correct:1,explanation:"Backshift rule: 'will' → 'would' in reported speech. 'She said she WOULD come.'"},
+      {sentence:"He told me he ___ finished the report.",options:["has","had","have"],correct:1,explanation:"'Has finished' → 'had finished' (present perfect → past perfect in reported speech)."},
+      {sentence:"The manager said the project ___ be delayed.",options:["will","would","could"],correct:1,explanation:"'Will be delayed' → 'WOULD be delayed' in reported speech. The backshift applies to all future forms."},
+      {sentence:"She asked me ___ I could help her.",options:["that","if","what"],correct:1,explanation:"Reported yes/no questions use 'if' or 'whether'. 'She asked IF I could help.' Not 'that' — that's for statements."},
+      {sentence:"He told the students ___ talk during the exam.",options:["don't","not to","to not"],correct:1,explanation:"Reported imperatives (orders, requests): tell/ask + object + NOT TO + infinitive. 'He told them NOT TO talk.'"},
+      {sentence:"The doctor said I ___ eat more vegetables.",options:["should","ought","must"],correct:0,explanation:"'Should' in reported speech doesn't backshift. 'He said you SHOULD eat more vegetables' (advice reported directly)."},
+      {sentence:"She asked where ___ going.",options:["am I","I was","was I"],correct:1,explanation:"In reported questions, the word order becomes statement-order (subject + verb), not question-order. 'She asked where I WAS going.'"},
+      {sentence:"He said he ___ the film the previous night.",options:["watched","has watched","had watched"],correct:2,explanation:"Simple past → past perfect in reported speech. 'I watched' → 'He said he HAD WATCHED the film the night before.'"},
+      {sentence:"The sign read: 'Visitors ___ not enter without ID.'",options:["do","can","must"],correct:2,explanation:"Prohibition signs use 'must not'. 'Must not enter without ID' — a firm rule/prohibition, not simply inability."},
+      {sentence:"She told me that she ___ working there for five years.",options:["is","was","has been"],correct:1,explanation:"Backshift: present continuous → past continuous. 'She IS working' → 'She told me she WAS working.'"},
+    ]
+  },
+  {
+    category: "Comparatives & Superlatives",
+    icon: "📊",
+    color: "#059669",
+    exercises: [
+      {sentence:"This essay is ___ than my previous one.",options:["more good","better","gooder"],correct:1,explanation:"'Good' is irregular: good → better → best. Never 'more good' or 'gooder'."},
+      {sentence:"The ___ you practise, the ___ you improve.",options:["more / more","most / most","more / better"],correct:0,explanation:"Double comparative structure: 'The more X, the more Y'. Both parts use the same comparative pattern."},
+      {sentence:"She is ___ student in the class.",options:["most intelligent","the most intelligent","more intelligent"],correct:1,explanation:"Superlatives need 'the'. 'She is THE MOST INTELLIGENT student.' Multi-syllable adjectives use 'most'."},
+      {sentence:"This is ___ problem I've ever encountered.",options:["the most difficult","a most difficult","most difficult"],correct:0,explanation:"Superlatives require 'the'. 'THE most difficult problem I've ever encountered.' The article is not optional."},
+      {sentence:"The new model is ___ efficient than the old one.",options:["far more","much most","very more"],correct:0,explanation:"'Far more' and 'much more' are correct intensifiers for comparatives. 'Very' does NOT modify comparatives."},
+      {sentence:"His accent is ___ mine.",options:["similar than","similar to","similar as"],correct:1,explanation:"'Similar' always takes 'to'. 'Similar TO mine.' Common error: 'similar than' doesn't exist in English."},
+      {sentence:"The film was ___ disappointing ___ I expected.",options:["more / that","more / than","as / than"],correct:1,explanation:"Comparative adjective: 'more + adjective + THAN'. 'More disappointing THAN I expected.'"},
+      {sentence:"The two methods are ___ effective.",options:["equally","equal","equalling"],correct:0,explanation:"Use 'equally' (adverb) to modify adjectives. 'Equally effective.' 'Equal' is an adjective and cannot modify another adjective."},
+      {sentence:"This is ___ expensive item in the shop.",options:["the most","the more","most"],correct:0,explanation:"Superlative with 'the': 'THE most expensive item.' You must include 'the' before superlatives."},
+      {sentence:"He speaks English ___ than his brother.",options:["more fluent","more fluently","fluenter"],correct:1,explanation:"'More fluently' — comparative of adverb. Add 'more' before adverbs. 'Fluenter' doesn't exist. 'Fluent' is an adjective."},
+    ]
+  },
+  {
+    category: "Word Formation",
+    icon: "🔤",
+    color: "#d97706",
+    exercises: [
+      {sentence:"The company needs to ___ its marketing strategy. (BROAD)",options:["broaden","broadness","broad"],correct:0,explanation:"BROADEN = verb (to make broader). Suffixes: -en makes adjectives into verbs (wide→widen, deep→deepen, broad→broaden)."},
+      {sentence:"The policy was ___ criticised by experts. (WIDE)",options:["widely","wideness","widened"],correct:0,explanation:"WIDELY = adverb (modifies the verb 'criticised'). Form: adjective + -ly. 'The policy was WIDELY criticised.'"},
+      {sentence:"There has been a significant ___ in crime rates. (REDUCE)",options:["reduce","reduction","reducing"],correct:1,explanation:"REDUCTION = noun (nominalisation of 'reduce'). 'A significant REDUCTION' — noun phrase needed after 'a'."},
+      {sentence:"Her ___ of the situation was impressive. (ANALYSE)",options:["analytical","analyst","analysis"],correct:2,explanation:"ANALYSIS = noun form of 'analyse'. 'Her analysis WAS impressive.' (noun after possessive). Analyst = a person. Analytical = adjective."},
+      {sentence:"The results were highly ___. (ENCOURAGE)",options:["encouraging","encouraged","encouragement"],correct:0,explanation:"ENCOURAGING = adjective (present participle used as adjective). 'The results were highly ENCOURAGING.' Encouragement is a noun."},
+      {sentence:"Environmental ___ is now a key policy priority. (SUSTAIN)",options:["sustained","sustainable","sustainability"],correct:2,explanation:"SUSTAINABILITY = noun (the state of being sustainable). '-ity' suffix creates abstract nouns from adjectives."},
+      {sentence:"He made a ___ decision to resign. (CONTROVERSY)",options:["controversy","controversial","controversially"],correct:1,explanation:"CONTROVERSIAL = adjective (modifies 'decision'). From controversy (noun) → controversial (adjective) → controversially (adverb)."},
+      {sentence:"The research ___ several important patterns. (IDENTIFY)",options:["identification","identified","identifying"],correct:1,explanation:"IDENTIFIED = past tense verb. 'The research IDENTIFIED patterns' — past simple active, no article needed."},
+      {sentence:"There is growing ___ about climate policy. (AGREE)",options:["disagreement","disagreeing","disagree"],correct:0,explanation:"DISAGREEMENT = noun. Prefix 'dis-' creates the opposite. '-ment' suffix creates nouns. 'Growing disagreement' = noun phrase."},
+      {sentence:"The ___ of the experiment were unexpected. (FIND)",options:["find","findings","finder"],correct:1,explanation:"FINDINGS = plural noun (research results). 'The FINDINGS of the experiment' — academic term for results/conclusions."},
+    ]
+  },
+  {
+    category: "Sentence Transformation",
+    icon: "🔄",
+    color: "#be185d",
+    exercises: [
+      {sentence:"Active → Passive: 'Scientists discovered a new planet.'",options:["A new planet was discovered by scientists.","A new planet discovered by scientists.","A new planet has been discovered by scientists."],correct:0,explanation:"Past simple passive: was/were + past participle. 'Was discovered' for past simple. Keep 'by scientists' at the end."},
+      {sentence:"Rewrite using 'Despite': 'Although she studied hard, she failed.'",options:["Despite studying hard, she failed.","Despite she studied hard, she failed.","Despite to study hard, she failed."],correct:0,explanation:"'Despite' + gerund (-ing). NEVER 'Despite + clause (subject+verb)'. 'Despite STUDYING hard, she failed.'"},
+      {sentence:"Rewrite using 'It is argued': 'Many people believe AI will replace jobs.'",options:["It is argued that AI will replace jobs.","It is argued AI replacing jobs.","It is argued for AI replacing jobs."],correct:0,explanation:"'It is argued that + full clause.' This is a formal passive reporting structure. The 'that' is mandatory here."},
+      {sentence:"Combine: 'The man is tall. He plays basketball.'",options:["The man, who is tall, plays basketball.","The man which is tall plays basketball.","The tall man, he plays basketball."],correct:0,explanation:"Use 'who' for people in relative clauses. Non-defining clause needs commas: 'The man, WHO IS TALL, plays basketball.' 'Which' is for things."},
+      {sentence:"Rewrite using 'Not only': 'Exercise improves health. It also boosts mood.'",options:["Not only does exercise improve health, but it also boosts mood.","Not only exercise improves health, but it also boosts mood.","Not only exercise improves health but also boosts mood."],correct:0,explanation:"'Not only' causes inversion: NOT ONLY + auxiliary + subject + verb. 'Not only DOES exercise IMPROVE health, but it also boosts mood.'"},
+      {sentence:"Change to conditional: 'He doesn't have money, so he can't travel.'",options:["If he had money, he could travel.","If he has money, he can travel.","If he would have money, he could travel."],correct:0,explanation:"Second conditional for hypothetical present/future: If + past simple, would/could + infinitive. 'If he HAD money, he COULD travel.'"},
+      {sentence:"Rewrite using 'Having': 'After he finished the exam, he left.'",options:["Having finished the exam, he left.","Having finishing the exam, he left.","Having been finish the exam, he left."],correct:0,explanation:"Perfect participle clause: 'Having + past participle' replaces 'After + subject + past simple'. 'HAVING FINISHED the exam, he left.'"},
+      {sentence:"Rewrite using passive reporting: 'People say he is the best.'",options:["He is said to be the best.","He is said that he is the best.","It is said he is the best."],correct:0,explanation:"Both 'He is said to be' AND 'It is said that he is' are correct. The first (personal passive) is more elegant for IELTS."},
+      {sentence:"Combine with relative clause: 'The book won the prize. I recommended it.'",options:["The book that I recommended won the prize.","The book which I recommended it won the prize.","The book, I recommended, won the prize."],correct:0,explanation:"Object relative clause: 'The book THAT I recommended.' Do NOT include the pronoun 'it' — it's already replaced by 'that'."},
+      {sentence:"Rewrite using causative: 'My phone was repaired by a technician.'",options:["I had my phone repaired.","I made my phone repaired.","I got my phone repair."],correct:0,explanation:"Causative have: have + object + past participle. 'I HAD my phone REPAIRED.' 'Get' also works: 'I got my phone repaired.'"},
+    ]
+  },
+  {
+    category: "Collocations",
+    icon: "🤝",
+    color: "#1d4ed8",
+    exercises: [
+      {sentence:"She ___ a suggestion during the meeting.",options:["did","made","had"],correct:1,explanation:"MAKE a suggestion (not do). Key collocations: make a decision, make a mistake, make progress, make an effort."},
+      {sentence:"The company ___ a loss of £2 million last year.",options:["made","did","had"],correct:0,explanation:"MAKE a loss/profit. Also: make a difference, make an impression, make ends meet."},
+      {sentence:"He ___ the blame for the project's failure.",options:["took","made","got"],correct:0,explanation:"TAKE the blame (accept responsibility). Also: take responsibility, take action, take pride, take part."},
+      {sentence:"The researchers ___ a thorough investigation.",options:["made","conducted","did"],correct:1,explanation:"CONDUCT a study/investigation/survey/experiment. More formal and academic than 'do' or 'make'."},
+      {sentence:"The charity ___ awareness about mental health.",options:["made","raised","grew"],correct:1,explanation:"RAISE awareness (not make). Also: raise concerns, raise funds, raise the issue, raise standards."},
+      {sentence:"We need to ___ a compromise between the two views.",options:["make","reach","find"],correct:1,explanation:"REACH a compromise/agreement/conclusion/decision. All these 'arrival at a result' concepts use 'reach'."},
+      {sentence:"She ___ her ambition to become a doctor.",options:["reached","achieved","made"],correct:1,explanation:"ACHIEVE an ambition/goal/objective/aim. REACH a destination/agreement. These are different."},
+      {sentence:"The country ___ significant economic growth last decade.",options:["made","experienced","did"],correct:1,explanation:"EXPERIENCE growth/decline/difficulties/changes. Also: undergo changes, witness growth."},
+      {sentence:"The policy ___ little effect on crime rates.",options:["had","made","did"],correct:0,explanation:"HAVE an effect/impact/influence ON something. 'The policy HAD little effect.' Not 'made an effect' — that doesn't exist."},
+      {sentence:"She ___ a conclusion after reviewing all the evidence.",options:["made","reached","took"],correct:1,explanation:"REACH a conclusion (arrived at after reasoning). DRAW a conclusion (also correct). 'Make a conclusion' is not standard."},
+    ]
+  },
+  {
+    category: "Tense Review (Mixed)",
+    icon: "⏱️",
+    color: "#dc2626",
+    exercises: [
+      {sentence:"By the time she arrives, we ___ waiting for two hours.",options:["will have been","will be","are"],correct:0,explanation:"Future perfect continuous: will have been + -ing. Emphasises duration up to a future point. 'Will HAVE BEEN WAITING for two hours.'"},
+      {sentence:"The company ___ in 1995 by two engineers.",options:["founded","was founded","has been founded"],correct:1,explanation:"Passive past simple for a specific past year. '1995' is a definite past time marker → past simple passive: WAS FOUNDED."},
+      {sentence:"I wish I ___ harder at school.",options:["studied","had studied","would study"],correct:1,explanation:"'I wish + past perfect' = regret about the past. 'I wish I HAD STUDIED harder.' (It's too late now.)"},
+      {sentence:"She ___ this company for 20 years when she finally retired.",options:["ran","has run","had been running"],correct:2,explanation:"Past perfect continuous: duration of activity up to a past point. She retired (past) — before that, 20 years of running = HAD BEEN RUNNING."},
+      {sentence:"The results will be announced as soon as they ___ ready.",options:["will be","are","be"],correct:1,explanation:"After time conjunctions (as soon as, when, until, before, after), use present simple for future reference. NOT 'will be'."},
+      {sentence:"It ___ heavily since this morning — the streets are flooded.",options:["rained","has been raining","had rained"],correct:1,explanation:"Present perfect continuous: action that started in the past and continues now, with a visible present result. Streets are flooded NOW."},
+      {sentence:"He acted as if he ___ the answer.",options:["knows","knew","had known"],correct:1,explanation:"'As if/as though' + past simple = unreal comparison in the present. 'He acted AS IF he KNEW' — he probably doesn't know."},
+      {sentence:"___ you ever ___ sushi before you went to Japan?",options:["Did you eat","Had you eaten","Have you eaten"],correct:1,explanation:"Past perfect for an experience before another past event. 'HAD you EATEN sushi before you WENT to Japan?' Both past, one before the other."},
+      {sentence:"The bridge ___ for repairs next month.",options:["closes","is closing","will be closed"],correct:2,explanation:"Passive future: will be + past participle. 'Will be closed for repairs' — it will be closed BY someone. All three could work but passive is most formal."},
+      {sentence:"She ___ her keys. She's looking everywhere.",options:["lost","has lost","had lost"],correct:1,explanation:"Present perfect: past action with current relevance (she can't get in NOW). 'HAS LOST her keys' — the result affects the present moment."},
+    ]
+  },
+  {
+    category: "Discourse Markers & Cohesion",
+    icon: "🔗",
+    color: "#0f766e",
+    exercises: [
+      {sentence:"The proposal is expensive. ___, it may not work.",options:["Furthermore","Moreover","What is more"],correct:1,explanation:"'Moreover' adds a stronger, more important point. All three are correct here, but 'moreover' is the most formal and elegant."},
+      {sentence:"___ her lack of experience, she performed excellently.",options:["Despite","Although","However"],correct:0,explanation:"'Despite' + noun/gerund. 'Despite HER LACK OF experience.' 'Although' + clause (subject + verb). 'However' connects two sentences."},
+      {sentence:"He worked extremely hard. ___, he failed the exam.",options:["Consequently","Nevertheless","Therefore"],correct:1,explanation:"'Nevertheless' = despite that / even so. Hard work (expected to help) but failed anyway = surprising contrast. 'Consequently' would mean work CAUSED failure."},
+      {sentence:"The diet had no effect. ___, the exercise regime proved transformative.",options:["In contrast","On the contrary","However"],correct:0,explanation:"'In contrast' compares two different things. 'On the contrary' contradicts the previous statement ('It didn't work — in fact, the opposite is true')."},
+      {sentence:"___ economists, growth will slow next year.",options:["According to","Referring to","Based to"],correct:0,explanation:"'According to' + source = reporting another's view. 'According to ECONOMISTS.' 'Based on' is also possible but 'based to' doesn't exist."},
+      {sentence:"___ a result of the recession, unemployment rose sharply.",options:["As","Because","Due"],correct:0,explanation:"'As a result of + noun' = because of. 'AS A RESULT OF the recession.' 'Due to' also works. 'Because of' works too. 'Because' alone needs a clause."},
+      {sentence:"The data is limited. ___, some conclusions can be drawn.",options:["Even so","Even though","Even if"],correct:0,explanation:"'Even so' = despite that / nevertheless (connector between sentences). 'Even though' + clause. 'Even if' + hypothetical condition."},
+      {sentence:"She is both intelligent ___ hardworking.",options:["as well as","and","but also"],correct:1,explanation:"'Both X AND Y' is the correct correlative conjunction. 'Both intelligent AND hardworking.' 'Both... as well as' is redundant."},
+      {sentence:"The solution is simple; ___, it is rarely applied.",options:["yet","but","so"],correct:0,explanation:"After a semicolon, conjunctive adverbs like 'yet' (= however, despite this) connect contrasting independent clauses."},
+      {sentence:"___ the rain, we continued the outdoor event.",options:["In spite of","In spite","Despite of"],correct:0,explanation:"'In spite of' = despite. 'Despite OF' does not exist. 'In spite OF + noun'. Both 'despite the rain' and 'in spite of the rain' are correct."},
+    ]
+  },
 ];
-
 const EXERCISE_TIMER_KEY = "ef_exercise_timer";
 const EXERCISE_TIMER_LIMIT = 1800; // 30 minutes in seconds
 
@@ -1945,6 +2081,15 @@ const PARAPHRASE_EXERCISES = [
   { original: "Technology has changed the way people communicate with each other.", options: ["Technology has made communication between people very different.", "Technological advancements have fundamentally transformed interpersonal communication.", "People now communicate differently because of technology."], correct: 1, explanation: "'Technological advancements' is a better noun phrase. 'Fundamentally transformed' is stronger than 'changed'. 'Interpersonal communication' is academic and precise." },
   { original: "Some countries have a problem with obesity because people eat too much unhealthy food.", options: ["Several nations face an escalating obesity crisis, attributable in part to the widespread consumption of nutritionally poor diets.", "Some places have fat people because of bad food habits.", "Obesity is a problem in certain countries where unhealthy food is eaten."], correct: 0, explanation: "'Escalating obesity crisis' shows problem awareness. 'Attributable in part to' is formal causative language. 'Nutritionally poor diets' replaces 'unhealthy food'." },
 ];
+
+  { original: "The government needs to spend more money on public transport.", options: ["Authorities should make more financial investment in public infrastructure.", "The authorities ought to allocate greater resources to public transport infrastructure.", "More money is needed by the government for buses and trains."], correct: 1, explanation: "'Ought to allocate greater resources' is formal. 'Public transport infrastructure' upgrades 'public transport'. 'Authorities' replaces 'the government'." },
+  { original: "Many young people find it difficult to get a job.", options: ["A significant proportion of young people face considerable challenges in securing employment.", "Lots of youth struggle to find jobs these days.", "Young persons have difficulty in job-getting situations."], correct: 0, explanation: "'A significant proportion' replaces 'many'. 'Face considerable challenges' is more academic. 'Securing employment' replaces 'get a job'." },
+  { original: "The internet has made it easier to access information.", options: ["Online connectivity has simplified the process of information retrieval.", "The internet has made information more easy to access.", "People can get information easier because of the internet."], correct: 0, explanation: "'Online connectivity' is a sophisticated subject. 'Simplified the process of' replaces 'made it easier to'. 'Information retrieval' is academic." },
+  { original: "Poverty causes many social problems.", options: ["Economic deprivation underlies a wide range of societal issues.", "Poverty is the reason for a lot of problems in society.", "Being poor makes many social things become problems."], correct: 0, explanation: "'Economic deprivation' elevates 'poverty'. 'Underlies' is more academic than 'causes'. 'Societal issues' upgrades 'social problems'." },
+  { original: "Schools should teach students about health and fitness.", options: ["Educational institutions ought to incorporate health and fitness education into their curricula.", "Schools need to teach kids about how to be healthy and fit.", "Health education should be teached in schools."], correct: 0, explanation: "'Educational institutions' elevates 'schools'. 'Incorporate into curricula' is academic. 'Fitness education' nominalises the concept." },
+  { original: "People are living longer than they used to.", options: ["Life expectancy has increased significantly in recent decades.", "People are now older when they die than before.", "Humans are currently living for more years than they were previously."], correct: 0, explanation: "'Life expectancy has increased' — nominalisation. 'Significantly' adds precision. 'In recent decades' specifies timeframe." },
+  { original: "Air pollution is getting worse in most cities.", options: ["Atmospheric pollution is deteriorating in the majority of urban centres.", "Air is becoming more polluted in most cities around the world.", "City air quality is becoming worser in many places."], correct: 0, explanation: "'Atmospheric pollution is deteriorating' is fully formal. 'Urban centres' replaces 'cities'. 'The majority of' replaces 'most'." },
+  { original: "Exercise is good for both physical and mental health.", options: ["Physical activity yields benefits for both somatic and psychological wellbeing.", "Doing exercise is helpful for the body and the mind.", "Exercise benefits your physical body as well as your mental mindset."], correct: 0, explanation: "'Physical activity yields benefits' uses a strong academic verb. 'Somatic and psychological wellbeing' is the highest register, though 'physical and mental wellbeing' is also excellent." },
 
 // ── Linking Words Quiz ────────────────────────
 const LINKING_QUIZ = [
@@ -6022,7 +6167,7 @@ function ManageSubModal({onClose,email=""}){
 }
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary","/placement":"placement"};
+const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary","/placement":"placement","/exercises":"exercises"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "home"; };
 
@@ -6051,7 +6196,7 @@ const UI = {
     f3t:"تدريب المحادثة",f3d:"مجاني: نماذج Band 8 للأجزاء ١ و٢ و٣ — بدون قيود",
     f4t:"ألعاب تعليمية",f4d:"مجاني: جميع الألعاب الـ٥ بدون قيود",
     f5t:"قواعد وإملاء",f5d:"مجاني: ٥ فحوصات · Pro: غير محدود",
-    f6t:"تمارين تدريبية",f6d:"Pro فقط · ١٢٠+ تمرين في المفردات والقواعد والباراغراف",
+    f6t:"تمارين تدريبية",f6d:"Pro فقط · ٣٠٠+ تمرين شامل — قواعد، مفردات، تعبير، وتصحيح أخطاء",
     f7t:"أدوات الآيلتس",f7d:"مجاني: الروابط والقواعد · Pro: الأدوات الكاملة",
     f8t:"تتبع تقدمي",f8d:"Pro فقط · تابع درجاتك وتطورك عبر الزمن",
     fat:"اختبار تحديد المستوى",fad:"مجاني: اكتشف مستواك من A1 إلى C2 وتقدير درجة الآيلتس",
@@ -6074,6 +6219,7 @@ const UI = {
     pricingNote:"الإلغاء في أي وقت · دفع آمن عبر Paddle",
     freeLabel:"المجاني", proLabel:"كل شيء مفتوح",
     // Writing sub-nav
+    exercises:"🏋️ تمارين",
     wAnalyze:"🎓 تحليل المقالة",wPractice:"🖊️ تدريب",wGrammar:"✏️ قواعد وإملاء",wExercises:"🏋️ تمارين",
     // Mobile hamburger
     siteLang:"لغة الموقع",
@@ -6106,7 +6252,7 @@ const UI = {
     f3t:"Speaking Practice",f3d:"Free: Band 8 model answers for Parts 1, 2 & 3 — no restrictions",
     f4t:"Learning Games",f4d:"Free: All 5 games — no restrictions",
     f5t:"Grammar & Spelling",f5d:"Free: 5 checks · Pro: Unlimited",
-    f6t:"Practice Exercises",f6d:"Pro only · 120+ exercises across all categories",
+    f6t:"Practice Exercises",f6d:"Pro only · 300+ exercises — grammar, vocabulary, paraphrasing, and error correction",
     f7t:"IELTS Toolkit",f7d:"Free: Linking words & Grammar · Pro: Full toolkit",
     f8t:"Track Progress",f8d:"Pro only · Track your scores and progress over time",
     fat:"Placement Test",fad:"Free: Discover your level from A1 to C2 with an IELTS band estimate",
@@ -6129,6 +6275,7 @@ const UI = {
     pricingNote:"Cancel anytime · Secure payment via Paddle",
     freeLabel:"Free", proLabel:"Everything Unlocked",
     // Writing sub-nav
+    exercises:"🏋️ Exercises",
     wAnalyze:"🎓 Analyze Essay",wPractice:"🖊️ Practice",wGrammar:"✏️ Grammar",wExercises:"🏋️ Exercises",
     // Mobile hamburger
     siteLang:"Website Language",
@@ -6497,8 +6644,9 @@ export default function IELTSBot(){
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr"}}>
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
               <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
-              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar","exercises"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              <MainTab label={UI[uiLang].exercises} active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
               <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
               <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
               <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
@@ -6526,10 +6674,10 @@ export default function IELTSBot(){
       </div>
 
       {/* Writing sub-nav */}
-      {["analyze","practice","grammar","exercises"].includes(mainView)&&(
+      {["analyze","practice","grammar"].includes(mainView)&&(
         <div className="writing-subnav" style={{background:"#f9fafb",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
           <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
-            {[{v:"analyze",l:UI[uiLang].wAnalyze},{v:"practice",l:UI[uiLang].wPractice},{v:"grammar",l:UI[uiLang].wGrammar},{v:"exercises",l:UI[uiLang].wExercises}].map(t=>(
+            {[{v:"analyze",l:UI[uiLang].wAnalyze},{v:"practice",l:UI[uiLang].wPractice},{v:"grammar",l:UI[uiLang].wGrammar}].map(t=>(
               <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"7px 16px",fontSize:13,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
             ))}
           </div>
@@ -7062,6 +7210,7 @@ export default function IELTSBot(){
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang}/>}
+        {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
@@ -7164,6 +7313,7 @@ export default function IELTSBot(){
                 {view:"reading",icon:"📖",label:"اختبارات القراءة",labelEn:"Reading Tests"},
                 {view:"game",icon:"🎮",label:"ألعاب الآيلتس",labelEn:"IELTS Games"},
                 {view:"placement",icon:"📋",label:"تحديد المستوى",labelEn:"Placement Test"},
+                {view:"exercises",icon:"🏋️",label:"تمارين",labelEn:"Exercises"},
                 {view:"vocabulary",icon:"📝",label:"مفردات الآيلتس",labelEn:"IELTS Vocabulary"},
                 {view:"toolkit",icon:"📚",label:"أدوات الآيلتس",labelEn:"IELTS Toolkit"},
                 {view:"progress",icon:"📈",label:"تتبع تقدمي",labelEn:"My Progress"},
