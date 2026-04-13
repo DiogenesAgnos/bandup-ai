@@ -2147,6 +2147,32 @@ const ERROR_PASSAGES = [
       { wrong: "more better", right: "better", explanation: "Never double comparatives. 'Better' is already comparative. 'More better' is always wrong." },
     ]
   },
+  { weak: "more and more", options: ["increasingly more", "an escalating number", "a growing number of people"], correct: 2, tip: "'A growing number of' or 'an increasing number of' — avoid 'more and more' in IELTS writing." },
+  { weak: "use", options: ["utilise", "employ", "make use of"], correct: 1, tip: "'Employ' (for methods/strategies) or 'utilise' — both are more formal than 'use'." },
+  { weak: "help", options: ["assist", "facilitate", "aid"], correct: 1, tip: "'Facilitate' is the strongest academic choice when you mean 'make easier'. 'Assist' for people." },
+  { weak: "get better", options: ["improve", "enhance", "develop"], correct: 0, tip: "'Improve' is the standard academic verb. 'Enhance' implies adding quality. Both are correct." },
+  { weak: "get worse", options: ["deteriorate", "worsen", "decline"], correct: 0, tip: "'Deteriorate' is the most academic — used for conditions, situations, and quality." },
+  { weak: "show", options: ["indicate", "demonstrate", "illustrate"], correct: 1, tip: "'Demonstrate' (prove through evidence), 'indicate' (suggest), 'illustrate' (clarify with examples)." },
+  { weak: "very big", options: ["enormous", "substantial", "significant"], correct: 2, tip: "'Significant' is preferred in academic writing — it implies importance, not just size." },
+  { weak: "very small", options: ["minimal", "marginal", "negligible"], correct: 2, tip: "'Negligible' means too small to matter. 'Minimal' means the least possible." },
+  { weak: "important", options: ["crucial", "vital", "significant"], correct: 0, tip: "'Crucial' implies that without it, something fails — the strongest of these three." },
+  { weak: "think", options: ["consider", "argue", "contend"], correct: 1, tip: "'Argue' when making a case. 'Consider' for reflecting. 'Contend' for asserting a debated claim." },
+  { weak: "say", options: ["state", "assert", "claim"], correct: 0, tip: "'State' is neutral. 'Assert' shows confidence. 'Claim' implies the speaker may be wrong." },
+  { weak: "start", options: ["initiate", "implement", "introduce"], correct: 0, tip: "'Initiate' (begin a process), 'implement' (put into action), 'introduce' (bring something new)." },
+  { weak: "end", options: ["conclude", "terminate", "cease"], correct: 0, tip: "'Conclude' (finish naturally), 'terminate' (end abruptly), 'cease' (stop an ongoing activity)." },
+  { weak: "need", options: ["require", "necessitate", "demand"], correct: 1, tip: "'Necessitate' implies that something makes something else unavoidable — very academic." },
+  { weak: "because of", options: ["due to", "as a result of", "owing to"], correct: 0, tip: "'Due to' after 'be' verbs. 'Owing to' is more formal and can start sentences." },
+  { weak: "deal with", options: ["address", "tackle", "resolve"], correct: 0, tip: "'Address' (acknowledge and discuss), 'tackle' (take action), 'resolve' (find a final solution)." },
+  { weak: "find out", options: ["determine", "establish", "identify"], correct: 1, tip: "'Establish' implies certainty. 'Determine' (reach a conclusion through analysis)." },
+  { weak: "make sure", options: ["ensure", "guarantee", "verify"], correct: 0, tip: "'Ensure' is the academic standard. 'Guarantee' is too absolute. 'Verify' means to check." },
+  { weak: "affect", options: ["impact", "influence", "alter"], correct: 1, tip: "'Influence' suggests a softer effect. 'Impact' as a verb is common in IELTS writing." },
+  { weak: "keep", options: ["maintain", "sustain", "preserve"], correct: 0, tip: "'Maintain' (keep at same level), 'sustain' (keep going over time), 'preserve' (protect from change)." },
+  { weak: "change", options: ["transform", "alter", "modify"], correct: 0, tip: "'Transform' implies radical change. 'Alter' is moderate. 'Modify' means small adjustments." },
+  { weak: "try to", options: ["seek to", "aim to", "attempt to"], correct: 0, tip: "'Seek to' is the most formal. 'Aim to' shows intention. 'Attempt to' implies possible failure." },
+  { weak: "stop", options: ["prevent", "prohibit", "restrict"], correct: 0, tip: "'Prevent' (stop from happening), 'prohibit' (ban by law), 'restrict' (limit but not fully stop)." },
+  { weak: "agree", options: ["concur", "advocate", "endorse"], correct: 0, tip: "'Concur' means formally agree with someone's view — strong in academic arguments." },
+  { weak: "disagree", options: ["refute", "dispute", "challenge"], correct: 1, tip: "'Dispute' (question validity), 'refute' (disprove), 'challenge' (question without disproving)." },
+
 ];
 
 // ── Band Score Self-Check Quiz ────────────────
@@ -2170,15 +2196,15 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       <div style={{textAlign:"center",marginBottom:24}}>
         <div style={{fontSize:52,marginBottom:12}}>🏋️</div>
         <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:8}}>Practice Exercises</h2>
-        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>120+ exercises across 5 categories — all with instant feedback and detailed explanations.</p>
+        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>190+ exercises across 5 categories — all with instant feedback and detailed explanations.</p>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
         {[
-          {icon:"📐",title:"Grammar",count:"30+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},
-          {icon:"📚",title:"Vocabulary",count:"25+ questions",desc:"Academic word list, collocations, word formation"},
-          {icon:"✏️",title:"Paraphrasing",count:"20+ questions",desc:"Rewrite sentences using Band 7+ academic language"},
+          {icon:"📐",title:"Grammar",count:"130+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},
+          {icon:"📚",title:"Vocabulary",count:"33 questions",desc:"Academic word list, collocations, word formation"},
+          {icon:"✏️",title:"Paraphrasing",count:"18 questions",desc:"Rewrite sentences using Band 7+ academic language"},
           {icon:"🔍",title:"Error Correction",count:"25+ questions",desc:"Spot and fix real IELTS-style mistakes"},
-          {icon:"📊",title:"Band Quiz",count:"15 questions",desc:"Self-assess your current writing level by criterion"},
+          {icon:"📊",title:"Band Quiz",count:"10 questions",desc:"Self-assess your current writing level by criterion"},
         ].map((c,i)=>(
           <div key={i} style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 14px"}}>
             <div style={{fontSize:22,marginBottom:4}}>{c.icon}</div>
