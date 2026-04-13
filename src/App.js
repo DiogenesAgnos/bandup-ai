@@ -754,7 +754,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
   const [codeErr,setCodeErr]=useState("");
   const [codeSuccess,setCodeSuccess]=useState(false);
 
-  const FEATURES=["Unlimited essay analyses — Task 1 & 2","Complete mistake detection with corrections","Band Booster + vocabulary upgrades to Band 8","Full IELTS Toolkit (templates, model essays)","Speaking practice — Parts 1, 2 & 3","All 7 reading tests","Unlimited exercises — 5 categories","Progress tracker with score history","Unlimited grammar checker"];
+  const FEATURES=["Unlimited essay analyses — Task 1 & 2","Complete mistake detection with corrections","Band Booster + vocabulary upgrades to Band 8","Full IELTS Toolkit (templates, model essays)","All 7 reading tests","Unlimited exercises — 5 categories","Progress tracker with score history","Unlimited grammar checker"];
 
   const submitCliq=async()=>{
     if(!cliqForm.name.trim()||!cliqForm.email.trim()||!cliqForm.mobile.trim()){setCliqStatus("error");return;}
@@ -4814,9 +4814,9 @@ function TestimonialsSection({uiLang="ar"}){
 // ── FREE VS PRO COMPARISON ────────────────────────
 function PricingComparisonStrip({onUpgrade,uiLang="ar"}){
   const FREE_AR=["تحليلان كاملان مجاناً — بدون تسجيل","اختبار قراءة واحد مجاناً","جميع الألعاب الـ٥ مجاناً","قائمة مفردات آيلتس كاملة (٤٠٠+ كلمة)","الكلمات الرابطة ومرجع القواعد","٥ فحوصات قواعد مجاناً"];
-  const FREE_EN=["2 full essay analyses free — no sign-up","1 reading test free","All 5 games — completely free","Full IELTS vocabulary list (400+ words)","Linking words & grammar reference","5 grammar checks free"];
-  const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ ٧","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقيات Band 8","نماذج إجابة Band 8+ كاملة","تدريب المحادثة — الأجزاء ١ و٢ و٣","متابعة التقدم وتاريخ الدرجات","فحص قواعد غير محدود"];
-  const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Speaking practice — Parts 1, 2 & 3","Progress tracker with score history","Unlimited grammar checker"];
+  const FREE_EN=["2 full essay analyses free — no sign-up","1 reading test free","All 5 games — completely free","Speaking practice — Band 8 answers for Parts 1, 2 & 3","400+ word vocabulary list","Linking words & grammar reference","5 grammar checks free"];
+  const PRO_AR=["تقييم غير محدود — Task 1 و Task 2","جميع اختبارات القراءة الـ ٧","تدريبات غير محدودة — كل الفئات","تحليل مفردات مع ترقيات Band 8","نماذج إجابة Band 8+ كاملة","متابعة التقدم وتاريخ الدرجات","فحص قواعد غير محدود"];
+  const PRO_EN=["Unlimited essay analysis — Task 1 & Task 2","All 7 reading tests","Unlimited exercises — all categories","Vocabulary analysis with Band 8 upgrades","Full Band 8+ model answers","Progress tracker with score history","Unlimited grammar checker"];
   const free=uiLang==="ar"?FREE_AR:FREE_EN;
   const pro=uiLang==="ar"?PRO_AR:PRO_EN;
   return(
@@ -5885,7 +5885,7 @@ const UI = {
     manageSubscription:"إدارة الاشتراك",
     // Hero
     heroPill:"🎓 تعلّم الإنجليزية وتحضير الآيلتس",
-    heroTitle:"تعلّم الإنجليزية بشكل صحيح.",
+    heroTitle:"تعلّم الإنجليزية — بالطريقة الصحيحة.",
     heroSub:"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · تحضير منهجي للآيلتس — وليس مجرد روبوت محادثة",
     heroIelts:"✅ مثالي لمن يستهدف رفع درجة الآيلتس",
     startFree:"اكتشف مستواك — مجاناً ←",
@@ -5894,7 +5894,7 @@ const UI = {
     // Features grid
     f1t:"تقييم المقالات",f1d:"مجاني: تحليلان كاملان · Pro: تحليل غير محدود",
     f2t:"اختبارات القراءة",f2d:"مجاني: اختبار واحد · Pro: جميع الـ٧ اختبارات",
-    f3t:"تدريب المحادثة",f3d:"Pro فقط · نماذج Band 8 لجميع الأجزاء الثلاثة",
+    f3t:"تدريب المحادثة",f3d:"مجاني: نماذج Band 8 للأجزاء ١ و٢ و٣ — بدون قيود",
     f4t:"ألعاب تعليمية",f4d:"مجاني: جميع الألعاب الـ٥ بدون قيود",
     f5t:"قواعد وإملاء",f5d:"مجاني: ٥ فحوصات · Pro: غير محدود",
     f6t:"تمارين تدريبية",f6d:"Pro فقط · ١٢٠+ تمرين في المفردات والقواعد والباراغراف",
@@ -5939,7 +5939,7 @@ const UI = {
     manageSubscription:"Manage Subscription",
     // Hero
     heroPill:"🎓 English learning & IELTS preparation",
-    heroTitle:"Learn English properly.",
+    heroTitle:"Learn English the right way.",
     heroSub:"A placement test, real writing feedback, and structured practice — not a chatbot.",
     heroIelts:"✅ Ideal if you're also targeting a specific IELTS band",
     startFree:"Find your level — free, no sign-up",
@@ -5948,7 +5948,7 @@ const UI = {
     // Features grid
     f1t:"Essay Analysis",f1d:"Free: 2 full analyses · Pro: Unlimited",
     f2t:"Reading Tests",f2d:"Free: 1 test · Pro: All 7 tests",
-    f3t:"Speaking Practice",f3d:"Pro only · Band 8 model answers for all 3 parts",
+    f3t:"Speaking Practice",f3d:"Free: Band 8 model answers for Parts 1, 2 & 3 — no restrictions",
     f4t:"Learning Games",f4d:"Free: All 5 games — no restrictions",
     f5t:"Grammar & Spelling",f5d:"Free: 5 checks · Pro: Unlimited",
     f6t:"Practice Exercises",f6d:"Pro only · 120+ exercises across all categories",
@@ -6400,18 +6400,16 @@ export default function IELTSBot(){
               {uiLang==="ar"?"✅ مثالي لمن يستهدف رفع درجة الآيلتس":"✅ Ideal if you're also targeting a specific IELTS band"}
             </div>
             <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
-              <button onClick={()=>{switchView("analyze");setTimeout(()=>{const el=document.getElementById("essay-input-area");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});},300);}} style={{background:T.accent,color:"#7f1200",border:"none",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:`0 6px 24px rgba(0,0,0,0.25)`,transition:"transform 0.15s"}}
+              <button onClick={()=>switchView("placement")} style={{background:T.accent,color:"#7f1200",border:"none",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",boxShadow:`0 6px 24px rgba(0,0,0,0.25)`,transition:"transform 0.15s"}}
                 onMouseOver={e=>e.currentTarget.style.transform="translateY(-2px)"}
                 onMouseOut={e=>e.currentTarget.style.transform="translateY(0)"}>
-{uiLang==="ar"?UI["ar"].startFree:UI["en"].startFree}
+                {uiLang==="ar"?UI["ar"].startFree:UI["en"].startFree}
               </button>
-              {!proUser&&(
-                <button onClick={()=>switchView("analyze")} style={{background:"rgba(255,255,255,0.12)",color:"white",border:"2px solid rgba(255,255,255,0.5)",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"background 0.15s"}}
-                  onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.2)"}
-                  onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.12)"}>
-{uiLang==="ar"?UI["ar"].startFree2:UI["en"].startFree2}
-                </button>
-              )}
+              <button onClick={()=>{switchView("analyze");setTimeout(()=>{const el=document.getElementById("essay-input-area");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});},300);}} style={{background:"rgba(255,255,255,0.12)",color:"white",border:"2px solid rgba(255,255,255,0.5)",borderRadius:10,padding:"18px 40px",fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"background 0.15s"}}
+                onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,0.2)"}
+                onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.12)"}>
+                {uiLang==="ar"?UI["ar"].startFree2:UI["en"].startFree2}
+              </button>
             </div>
           </div>
         </div>
@@ -6452,7 +6450,7 @@ export default function IELTSBot(){
               {icon:"📋",tk:"fat",dk:"fad",view:"placement",free:true},
               {icon:"🎓",tk:"f1t",dk:"f1d",view:"analyze",free:true},
               {icon:"📖",tk:"f2t",dk:"f2d",view:"reading",free:true},
-              {icon:"🗣️",tk:"f3t",dk:"f3d",view:"speaking",free:false},
+              {icon:"🗣️",tk:"f3t",dk:"f3d",view:"speaking",free:true},
               {icon:"🎮",tk:"f4t",dk:"f4d",view:"game",free:true},
               {icon:"✏️",tk:"f5t",dk:"f5d",view:"grammar",free:true},
               {icon:"🏋️",tk:"f6t",dk:"f6d",view:"exercises",free:false},
