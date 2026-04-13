@@ -2091,7 +2091,7 @@ const PARAPHRASE_EXERCISES = [
   { original: "People are living longer than they used to.", options: ["Life expectancy has increased significantly in recent decades.", "People are now older when they die than before.", "Humans are currently living for more years than they were previously."], correct: 0, explanation: "'Life expectancy has increased' — nominalisation. 'Significantly' adds precision. 'In recent decades' specifies timeframe." },
   { original: "Air pollution is getting worse in most cities.", options: ["Atmospheric pollution is deteriorating in the majority of urban centres.", "Air is becoming more polluted in most cities around the world.", "City air quality is becoming worser in many places."], correct: 0, explanation: "'Atmospheric pollution is deteriorating' is fully formal. 'Urban centres' replaces 'cities'. 'The majority of' replaces 'most'." },
   { original: "Exercise is good for both physical and mental health.", options: ["Physical activity yields benefits for both somatic and psychological wellbeing.", "Doing exercise is helpful for the body and the mind.", "Exercise benefits your physical body as well as your mental mindset."], correct: 0, explanation: "'Physical activity yields benefits' uses a strong academic verb. 'Somatic and psychological wellbeing' is the highest register, though 'physical and mental wellbeing' is also excellent." },
-;
+];
 
 // ── Linking Words Quiz ────────────────────────
 const LINKING_QUIZ = [
