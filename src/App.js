@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -2764,8 +2765,32 @@ const SelfCorrectMode = ({isPro,onUpgrade}) => {
   const [stage,setStage]=useState("write");
   const [result,setResult]=useState(null);
   const [loading,setLoading]=useState(false);
+  const [hints,setHints]=useState(null); // {count, wrongPhrases, categories}
+  const [hintLoading,setHintLoading]=useState(false);
+  const [showPhrases,setShowPhrases]=useState(false);
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
+  // Stage 1→2: get hint count + problem locations (no corrections)
+  const getHints=async(originalText)=>{
+    setHintLoading(true);
+    try{
+      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:400,
+          system:`You are an English error detector. Find errors in the text and return ONLY JSON — no markdown:
+{"count":3,"wrongPhrases":["exact phrase 1","exact phrase 2"],"categories":["grammar","word choice"]}
+wrongPhrases: the exact incorrect words/phrases from the text (no corrections, just the problematic parts).
+categories: types of errors found from: grammar, spelling, word choice, punctuation, structure, tense, article.
+If no errors: {"count":0,"wrongPhrases":[],"categories":[]}`,
+          messages:[{role:"user",content:originalText.trim()}]})});
+      const data=await res.json();
+      const txt=data.content?.map(b=>b.text||"").join("")||"";
+      const parsed=JSON.parse(txt.replace(/```json|```/g,"").trim());
+      setHints(parsed);
+    }catch(e){console.error(e);setHints({count:0,wrongPhrases:[],categories:[]});}
+    finally{setHintLoading(false);}
+  };
+
+  // Stage 2→3: get full corrections
   const analyse=async()=>{
     setLoading(true);
     try{
@@ -2784,13 +2809,43 @@ score is 0-10. If no errors, return {"errors":[],"overall":"No errors found.","s
     finally{setLoading(false);}
   };
 
-  const reset=()=>{setText("");setSelfText("");setStage("write");setResult(null);};
+  const goToCorrect=async(originalText)=>{
+    setSelfText(originalText);
+    setStage("correct");
+    await getHints(originalText);
+  };
+
+  const reset=()=>{setText("");setSelfText("");setStage("write");setResult(null);setHints(null);setShowPhrases(false);};
   const sevColor={major:"#dc2626",moderate:"#d97706",minor:"#2563eb"};
+
+  // Highlight wrong phrases in a display-only div
+  const renderHighlighted=(txt,phrases)=>{
+    if(!phrases||phrases.length===0) return <span style={{...sty,fontSize:14,color:"#1e293b",lineHeight:1.8,whiteSpace:"pre-wrap"}}>{txt}</span>;
+    let parts=[];
+    let remaining=txt;
+    let key=0;
+    // Sort phrases by position of first occurrence
+    const sorted=[...phrases].sort((a,b)=>txt.indexOf(a)-txt.indexOf(b));
+    sorted.forEach(phrase=>{
+      const pos=remaining.indexOf(phrase);
+      if(pos===-1)return;
+      if(pos>0)parts.push(<span key={key++} style={{...sty,fontSize:14,color:"#1e293b",lineHeight:1.8,whiteSpace:"pre-wrap"}}>{remaining.slice(0,pos)}</span>);
+      parts.push(
+        <span key={key++} title="Possible error — find and fix this"
+          style={{...sty,fontSize:14,background:"#fef3c7",borderBottom:"2px solid #f59e0b",borderRadius:"2px",color:"#92400e",fontWeight:600,lineHeight:1.8,cursor:"help",padding:"0 1px"}}>
+          {phrase}
+        </span>
+      );
+      remaining=remaining.slice(pos+phrase.length);
+    });
+    if(remaining)parts.push(<span key={key++} style={{...sty,fontSize:14,color:"#1e293b",lineHeight:1.8,whiteSpace:"pre-wrap"}}>{remaining}</span>);
+    return parts;
+  };
 
   return(
     <div>
       <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"12px 16px",marginBottom:16}}>
-        <p style={{...sty,color:"#166534",fontSize:13,margin:0}}>🔎 <strong>Self-Correct Mode</strong> — Write freely, then edit your own mistakes before seeing AI feedback. Trains error-spotting independently.</p>
+        <p style={{...sty,color:"#166534",fontSize:13,margin:0}}>🔎 <strong>Self-Correct Mode</strong> — Write freely, then find and fix your own mistakes before seeing the full AI feedback. Trains error-spotting independently.</p>
       </div>
 
       {/* Stage pills */}
@@ -2814,7 +2869,7 @@ score is 0-10. If no errors, return {"errors":[],"overall":"No errors found.","s
           <label style={{...sty,fontSize:12,fontWeight:700,color:"#64748b",display:"block",marginBottom:6}}>Write anything — a sentence, paragraph, or argument. Don't worry about errors.</label>
           <textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Start writing here..."
             style={{...sty,width:"100%",minHeight:140,padding:"12px",border:"1px solid #e2e8f0",borderRadius:8,fontSize:14,color:"#1e293b",resize:"vertical",boxSizing:"border-box",marginBottom:12}}/>
-          <button onClick={()=>{setSelfText(text);setStage("correct");}} disabled={text.trim().length<10}
+          <button onClick={()=>goToCorrect(text)} disabled={text.trim().length<10}
             style={{...sty,background:text.trim().length>=10?"#b91c1c":"#e2e8f0",color:text.trim().length>=10?"white":"#94a3b8",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:text.trim().length>=10?"pointer":"default"}}>
             Done — now find your own errors →
           </button>
@@ -2823,15 +2878,73 @@ score is 0-10. If no errors, return {"errors":[],"overall":"No errors found.","s
 
       {stage==="correct"&&(
         <div>
-          <label style={{...sty,fontSize:12,fontWeight:700,color:"#d97706",display:"block",marginBottom:6}}>Now correct your own mistakes — edit the text below before checking.</label>
+          {/* Hint banner */}
+          {hintLoading&&(
+            <div style={{...sty,background:"#fef3c7",border:"1px solid #fbbf24",borderRadius:8,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#92400e"}}>
+              ⏳ Scanning your text for issues...
+            </div>
+          )}
+          {!hintLoading&&hints&&hints.count>0&&(
+            <div style={{background:"#fff7ed",border:"1px solid #fed7aa",borderRadius:10,padding:"14px 16px",marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8,marginBottom:hints.categories.length>0?8:0}}>
+                <div>
+                  <span style={{...sty,fontSize:14,fontWeight:700,color:"#9a3412"}}>
+                    ⚠️ Found <strong>{hints.count}</strong> {hints.count===1?"issue":"issues"} in your text
+                  </span>
+                  {hints.categories.length>0&&(
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:6}}>
+                      {hints.categories.map((cat,i)=>(
+                        <span key={i} style={{...sty,fontSize:11,fontWeight:700,color:"#9a3412",background:"#fee2e2",border:"1px solid #fca5a5",borderRadius:4,padding:"2px 8px",textTransform:"capitalize"}}>
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {hints.wrongPhrases.length>0&&(
+                  <button onClick={()=>setShowPhrases(p=>!p)}
+                    style={{...sty,background:"white",border:"1px solid #fed7aa",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600,color:"#d97706",cursor:"pointer",flexShrink:0}}>
+                    {showPhrases?"Hide locations":"Show me where"}
+                  </button>
+                )}
+              </div>
+              <div style={{...sty,fontSize:12,color:"#9a3412",lineHeight:1.5}}>
+                Can you find and fix {hints.count===1?"it":"all of them"}? Edit the text below, then click Check.
+              </div>
+            </div>
+          )}
+          {!hintLoading&&hints&&hints.count===0&&(
+            <div style={{...sty,background:"#f0fdf4",border:"1px solid #86efac",borderRadius:8,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#166534",fontWeight:600}}>
+              ✅ No obvious errors detected in your original text — but try editing it and check anyway.
+            </div>
+          )}
+
+          {/* Highlighted original (shown when "Show me where" is clicked) */}
+          {showPhrases&&hints?.wrongPhrases?.length>0&&(
+            <div style={{marginBottom:12}}>
+              <div style={{...sty,fontSize:11,fontWeight:700,color:"#94a3b8",marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>
+                Your original — problems underlined in amber (hover for tooltip)
+              </div>
+              <div style={{background:"#fffbeb",border:"2px solid #fbbf24",borderRadius:8,padding:"14px 16px",lineHeight:1.9,fontSize:14}}>
+                {renderHighlighted(text,hints.wrongPhrases)}
+              </div>
+              <div style={{...sty,fontSize:11,color:"#92400e",marginTop:5}}>
+                ⚠️ Locations are shown — corrections are hidden. Fix them yourself in the editor below.
+              </div>
+            </div>
+          )}
+
+          <label style={{...sty,fontSize:12,fontWeight:700,color:"#d97706",display:"block",marginBottom:6}}>
+            Edit your text below — fix the errors you can find:
+          </label>
           <textarea value={selfText} onChange={e=>setSelfText(e.target.value)}
             style={{...sty,width:"100%",minHeight:140,padding:"12px",border:"2px solid #f59e0b",borderRadius:8,fontSize:14,color:"#1e293b",resize:"vertical",boxSizing:"border-box",background:"#fffbeb",marginBottom:12}}/>
-          <div style={{display:"flex",gap:8}}>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             <button onClick={analyse} disabled={loading}
               style={{...sty,background:"#b91c1c",color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:"pointer"}}>
-              {loading?"⏳ Analysing...":"Show me the errors →"}
+              {loading?"⏳ Analysing...":"Check my corrections →"}
             </button>
-            <button onClick={()=>setStage("write")}
+            <button onClick={()=>{setStage("write");setHints(null);setShowPhrases(false);}}
               style={{...sty,background:"white",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px 16px",fontSize:13,color:"#64748b",cursor:"pointer"}}>← Back</button>
           </div>
         </div>
