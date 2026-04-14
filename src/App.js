@@ -2144,7 +2144,8 @@ const VOCAB_EXERCISES = [
   { weak: "disagree", options: ["refute", "dispute", "challenge"], correct: 1, tip: "'Dispute' (question validity), 'refute' (disprove), 'challenge' (question without disproving)." },
 ];
 
-// ── Error Correction Passages ─────────────────const ERROR_PASSAGES = [
+// ── Error Correction Passages ─────────────────
+const ERROR_PASSAGES = [
   {
     title: "Urban Development",
     text: "In many countries, the number of people who lives in cities have risen dramatically over the past few decades. This phenomena has led to a variety of social and environmental challenges. Governments must to address these issues if they want reduce urban poverty. Furthermore, the lack of affordable accommodation are a major concern for low-income families.",
