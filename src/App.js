@@ -7336,15 +7336,33 @@ const ClassReelPage=({isPro,onUpgrade,session,uiLang="ar"})=>{
   const generateReel=async()=>{
     if(!canUse){onUpgrade();return;}
     setPhase("generating");setError("");
+    const langInstruction=language==="ar"?"in Arabic (Modern Standard Arabic)"
+      :language==="en"?"in English"
+      :"alternating Arabic and English lines";
+    const numScenes=images.length;
+    const middleCount=Math.max(numScenes-2,0);
+    const prompt=`Generate a social media reel script ${langInstruction} for: "${description}".
+There are ${numScenes} scenes. Provide ${middleCount} middle scene texts.
+Rules: max 10 words per line, no hashtags, no emojis, punchy and direct.
+Return ONLY valid JSON, no markdown, no extra text:
+{"hook":"opening line","scenes":[${Array(middleCount).fill('"scene text"').join(",")}],"cta":"call to action"}`;
     try{
-      const res=await fetch("/api/reel-script",{
+      const res=await fetch("/api/analyze",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({description,language,numScenes:images.length}),
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",
+          max_tokens:400,
+          messages:[{role:"user",content:prompt}],
+        }),
       });
-      if(!res.ok)throw new Error("API error");
-      const data=await res.json();
-      if(data.error)throw new Error(data.error);
+      if(!res.ok)throw new Error("API error "+res.status);
+      const raw=await res.json();
+      // /api/analyze returns the full Anthropic response object
+      const text=(raw?.content?.[0]?.text||raw?.text||JSON.stringify(raw));
+      const clean=text.replace(/```json|```/g,"").trim();
+      const data=JSON.parse(clean);
+      if(!data.hook)throw new Error("Bad JSON");
       setReelData(data);
       const newCount=reelUses+1;
       setReelUses(newCount);
