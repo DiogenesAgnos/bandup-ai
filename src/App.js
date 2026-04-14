@@ -2117,10 +2117,34 @@ const VOCAB_EXERCISES = [
   { weak: "nowadays", options: ["in today's world", "in contemporary society", "currently in this day and age"], correct: 1, tip: "'In contemporary society' or 'In the modern era' — 'Nowadays' is an IELTS cliché that lowers your Lexical Resource score." },
   { weak: "important", options: ["crucial / paramount / indispensable", "really needed and significant", "very necessary indeed"], correct: 0, tip: "Upgrade ladder: important → significant → crucial → paramount → indispensable. Each step raises your band." },
   { weak: "rise in crime", options: ["escalation in criminal activity", "going up of lawbreaking", "increase in bad behaviour"], correct: 0, tip: "'Escalation in criminal activity' uses nominalisation — a key IELTS skill. Also: 'surge in offences', 'proliferation of antisocial behaviour'." },
+    { weak: "more and more", options: ["increasingly more", "an escalating number", "a growing number of people"], correct: 2, tip: "'A growing number of' or 'an increasing number of' — avoid 'more and more' in IELTS writing." },
+  { weak: "use", options: ["utilise", "employ", "make use of"], correct: 1, tip: "'Employ' (for methods/strategies) or 'utilise' — both are more formal than 'use'." },
+  { weak: "help", options: ["assist", "facilitate", "aid"], correct: 1, tip: "'Facilitate' is the strongest academic choice when you mean 'make easier'. 'Assist' for people." },
+  { weak: "get better", options: ["improve", "enhance", "develop"], correct: 0, tip: "'Improve' is the standard academic verb. 'Enhance' implies adding quality. Both are correct." },
+  { weak: "get worse", options: ["deteriorate", "worsen", "decline"], correct: 0, tip: "'Deteriorate' is the most academic — used for conditions, situations, and quality." },
+  { weak: "show", options: ["indicate", "demonstrate", "illustrate"], correct: 1, tip: "'Demonstrate' (prove through evidence), 'indicate' (suggest), 'illustrate' (clarify with examples)." },
+  { weak: "very big", options: ["enormous", "substantial", "significant"], correct: 2, tip: "'Significant' is preferred in academic writing — it implies importance, not just size." },
+  { weak: "very small", options: ["minimal", "marginal", "negligible"], correct: 2, tip: "'Negligible' means too small to matter. 'Minimal' means the least possible." },
+  { weak: "important", options: ["crucial", "vital", "significant"], correct: 0, tip: "'Crucial' implies that without it, something fails — the strongest of these three." },
+  { weak: "think", options: ["consider", "argue", "contend"], correct: 1, tip: "'Argue' when making a case. 'Consider' for reflecting. 'Contend' for asserting a debated claim." },
+  { weak: "say", options: ["state", "assert", "claim"], correct: 0, tip: "'State' is neutral. 'Assert' shows confidence. 'Claim' implies the speaker may be wrong." },
+  { weak: "start", options: ["initiate", "implement", "introduce"], correct: 0, tip: "'Initiate' (begin a process), 'implement' (put into action), 'introduce' (bring something new)." },
+  { weak: "end", options: ["conclude", "terminate", "cease"], correct: 0, tip: "'Conclude' (finish naturally), 'terminate' (end abruptly), 'cease' (stop an ongoing activity)." },
+  { weak: "need", options: ["require", "necessitate", "demand"], correct: 1, tip: "'Necessitate' implies that something makes something else unavoidable — very academic." },
+  { weak: "because of", options: ["due to", "as a result of", "owing to"], correct: 0, tip: "'Due to' after 'be' verbs. 'Owing to' is more formal and can start sentences." },
+  { weak: "deal with", options: ["address", "tackle", "resolve"], correct: 0, tip: "'Address' (acknowledge and discuss), 'tackle' (take action), 'resolve' (find a final solution)." },
+  { weak: "find out", options: ["determine", "establish", "identify"], correct: 1, tip: "'Establish' implies certainty. 'Determine' (reach a conclusion through analysis)." },
+  { weak: "make sure", options: ["ensure", "guarantee", "verify"], correct: 0, tip: "'Ensure' is the academic standard. 'Guarantee' is too absolute. 'Verify' means to check." },
+  { weak: "affect", options: ["impact", "influence", "alter"], correct: 1, tip: "'Influence' suggests a softer effect. 'Impact' as a verb is common in IELTS writing." },
+  { weak: "keep", options: ["maintain", "sustain", "preserve"], correct: 0, tip: "'Maintain' (keep at same level), 'sustain' (keep going over time), 'preserve' (protect from change)." },
+  { weak: "change", options: ["transform", "alter", "modify"], correct: 0, tip: "'Transform' implies radical change. 'Alter' is moderate. 'Modify' means small adjustments." },
+  { weak: "try to", options: ["seek to", "aim to", "attempt to"], correct: 0, tip: "'Seek to' is the most formal. 'Aim to' shows intention. 'Attempt to' implies possible failure." },
+  { weak: "stop", options: ["prevent", "prohibit", "restrict"], correct: 0, tip: "'Prevent' (stop from happening), 'prohibit' (ban by law), 'restrict' (limit but not fully stop)." },
+  { weak: "agree", options: ["concur", "advocate", "endorse"], correct: 0, tip: "'Concur' means formally agree with someone's view — strong in academic arguments." },
+  { weak: "disagree", options: ["refute", "dispute", "challenge"], correct: 1, tip: "'Dispute' (question validity), 'refute' (disprove), 'challenge' (question without disproving)." },
 ];
 
-// ── Error Correction Passages ─────────────────
-const ERROR_PASSAGES = [
+// ── Error Correction Passages ─────────────────const ERROR_PASSAGES = [
   {
     title: "Urban Development",
     text: "In many countries, the number of people who lives in cities have risen dramatically over the past few decades. This phenomena has led to a variety of social and environmental challenges. Governments must to address these issues if they want reduce urban poverty. Furthermore, the lack of affordable accommodation are a major concern for low-income families.",
@@ -2147,35 +2171,9 @@ const ERROR_PASSAGES = [
       { wrong: "more better", right: "better", explanation: "Never double comparatives. 'Better' is already comparative. 'More better' is always wrong." },
     ]
   },
-  { weak: "more and more", options: ["increasingly more", "an escalating number", "a growing number of people"], correct: 2, tip: "'A growing number of' or 'an increasing number of' — avoid 'more and more' in IELTS writing." },
-  { weak: "use", options: ["utilise", "employ", "make use of"], correct: 1, tip: "'Employ' (for methods/strategies) or 'utilise' — both are more formal than 'use'." },
-  { weak: "help", options: ["assist", "facilitate", "aid"], correct: 1, tip: "'Facilitate' is the strongest academic choice when you mean 'make easier'. 'Assist' for people." },
-  { weak: "get better", options: ["improve", "enhance", "develop"], correct: 0, tip: "'Improve' is the standard academic verb. 'Enhance' implies adding quality. Both are correct." },
-  { weak: "get worse", options: ["deteriorate", "worsen", "decline"], correct: 0, tip: "'Deteriorate' is the most academic — used for conditions, situations, and quality." },
-  { weak: "show", options: ["indicate", "demonstrate", "illustrate"], correct: 1, tip: "'Demonstrate' (prove through evidence), 'indicate' (suggest), 'illustrate' (clarify with examples)." },
-  { weak: "very big", options: ["enormous", "substantial", "significant"], correct: 2, tip: "'Significant' is preferred in academic writing — it implies importance, not just size." },
-  { weak: "very small", options: ["minimal", "marginal", "negligible"], correct: 2, tip: "'Negligible' means too small to matter. 'Minimal' means the least possible." },
-  { weak: "important", options: ["crucial", "vital", "significant"], correct: 0, tip: "'Crucial' implies that without it, something fails — the strongest of these three." },
-  { weak: "think", options: ["consider", "argue", "contend"], correct: 1, tip: "'Argue' when making a case. 'Consider' for reflecting. 'Contend' for asserting a debated claim." },
-  { weak: "say", options: ["state", "assert", "claim"], correct: 0, tip: "'State' is neutral. 'Assert' shows confidence. 'Claim' implies the speaker may be wrong." },
-  { weak: "start", options: ["initiate", "implement", "introduce"], correct: 0, tip: "'Initiate' (begin a process), 'implement' (put into action), 'introduce' (bring something new)." },
-  { weak: "end", options: ["conclude", "terminate", "cease"], correct: 0, tip: "'Conclude' (finish naturally), 'terminate' (end abruptly), 'cease' (stop an ongoing activity)." },
-  { weak: "need", options: ["require", "necessitate", "demand"], correct: 1, tip: "'Necessitate' implies that something makes something else unavoidable — very academic." },
-  { weak: "because of", options: ["due to", "as a result of", "owing to"], correct: 0, tip: "'Due to' after 'be' verbs. 'Owing to' is more formal and can start sentences." },
-  { weak: "deal with", options: ["address", "tackle", "resolve"], correct: 0, tip: "'Address' (acknowledge and discuss), 'tackle' (take action), 'resolve' (find a final solution)." },
-  { weak: "find out", options: ["determine", "establish", "identify"], correct: 1, tip: "'Establish' implies certainty. 'Determine' (reach a conclusion through analysis)." },
-  { weak: "make sure", options: ["ensure", "guarantee", "verify"], correct: 0, tip: "'Ensure' is the academic standard. 'Guarantee' is too absolute. 'Verify' means to check." },
-  { weak: "affect", options: ["impact", "influence", "alter"], correct: 1, tip: "'Influence' suggests a softer effect. 'Impact' as a verb is common in IELTS writing." },
-  { weak: "keep", options: ["maintain", "sustain", "preserve"], correct: 0, tip: "'Maintain' (keep at same level), 'sustain' (keep going over time), 'preserve' (protect from change)." },
-  { weak: "change", options: ["transform", "alter", "modify"], correct: 0, tip: "'Transform' implies radical change. 'Alter' is moderate. 'Modify' means small adjustments." },
-  { weak: "try to", options: ["seek to", "aim to", "attempt to"], correct: 0, tip: "'Seek to' is the most formal. 'Aim to' shows intention. 'Attempt to' implies possible failure." },
-  { weak: "stop", options: ["prevent", "prohibit", "restrict"], correct: 0, tip: "'Prevent' (stop from happening), 'prohibit' (ban by law), 'restrict' (limit but not fully stop)." },
-  { weak: "agree", options: ["concur", "advocate", "endorse"], correct: 0, tip: "'Concur' means formally agree with someone's view — strong in academic arguments." },
-  { weak: "disagree", options: ["refute", "dispute", "challenge"], correct: 1, tip: "'Dispute' (question validity), 'refute' (disprove), 'challenge' (question without disproving)." },
-
 ];
 
-// ── Band Score Self-Check Quiz ────────────────
+
 const BAND_QUIZ = [
   { q: "Do you consistently write over 250 words for Task 2?", yes: 0.5, no: 0, tip: "Under 250 words = Task Achievement capped at Band 5. This is one of the most common mistakes." },
   { q: "Do you paraphrase the question in your introduction (no copying)?", yes: 0.5, no: 0, tip: "Copying the question is penalised under Lexical Resource. Always rephrase." },
@@ -7238,7 +7236,6 @@ export default function IELTSBot(){
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang}/>}
-        {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
