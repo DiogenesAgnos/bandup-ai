@@ -7189,6 +7189,7 @@ const ClassReelPage=({isPro,onUpgrade,session,uiLang="ar"})=>{
   const [reelData,setReelData]=useState(null);
   const [error,setError]=useState("");
   const [isRecording,setIsRecording]=useState(false);
+  const [countdown,setCountdown]=useState(0);
   const [recordedBlob,setRecordedBlob]=useState(null);
   const [reelUses,setReelUses]=useState(()=>getReelUses(session?.email));
   const canvasRef=useRef(null);
@@ -7197,6 +7198,8 @@ const ClassReelPage=({isPro,onUpgrade,session,uiLang="ar"})=>{
   const chunksRef=useRef([]);
   const imgElemsRef=useRef([]);
   const startTimeRef=useRef(null);
+  const blobUrlRef=useRef(null);
+  const audioCtxRef=useRef(null);
   const email=session?.email;
   const canUse=isPro||reelUses<FREE_REEL_LIMIT;
   const SCENE_DUR=4000;
@@ -7374,25 +7377,103 @@ Return ONLY valid JSON, no markdown, no extra text:
     }
   };
 
+  const buildMusic=(ctx,style,duration)=>{
+    const dest=ctx.createMediaStreamDestination();
+    const master=ctx.createGain();
+    master.gain.value=0.28;
+    master.connect(dest);
+    const pats={
+      upbeat:{notes:[523,659,784,1047,784,659,523,659,784,523,659,784],tempo:0.32,wave:"triangle"},
+      calm:  {notes:[261,329,392,440,392,329,261,294,329,392,261,329],tempo:0.58,wave:"sine"},
+      corporate:{notes:[330,392,494,440,392,330,294,330,392,494,330,392],tempo:0.44,wave:"sine"},
+    };
+    const p=pats[style]||pats.upbeat;
+    const totalNotes=Math.ceil((duration/1000)/p.tempo)+4;
+    for(let i=0;i<totalNotes;i++){
+      const t=ctx.currentTime+i*p.tempo;
+      const osc=ctx.createOscillator();
+      const g=ctx.createGain();
+      osc.type=p.wave;
+      osc.frequency.value=p.notes[i%p.notes.length];
+      osc.connect(g);g.connect(master);
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.35,t+0.04);
+      g.gain.linearRampToValueAtTime(0,t+p.tempo*0.75);
+      osc.start(t);osc.stop(t+p.tempo);
+    }
+    return dest.stream;
+  };
+
+  const downloadReel=(blob)=>{
+    try{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url;
+      a.download="classreel.webm";
+      a.style.display="none";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},2000);
+    }catch(e){
+      // fallback: open in new tab
+      const url=blobUrlRef.current;
+      if(url)window.open(url,"_blank");
+    }
+  };
+
   const startRecording=()=>{
     if(!canvasRef.current||!reelData)return;
-    chunksRef.current=[];
-    setRecordedBlob(null);
-    setIsRecording(true);
-    startTimeRef.current=null;
     const allScenes=[reelData.hook,...(reelData.scenes||[]),reelData.cta];
     const duration=allScenes.length*SCENE_DUR;
-    const stream=canvasRef.current.captureStream(30);
-    const mimeType=MediaRecorder.isTypeSupported("video/webm;codecs=vp9")?"video/webm;codecs=vp9":"video/webm";
-    recorderRef.current=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:4000000});
-    recorderRef.current.ondataavailable=e=>{if(e.data?.size>0)chunksRef.current.push(e.data);};
-    recorderRef.current.onstop=()=>{
-      const blob=new Blob(chunksRef.current,{type:mimeType});
-      setRecordedBlob(blob);
-      setIsRecording(false);
-    };
-    recorderRef.current.start(200);
-    setTimeout(()=>{if(recorderRef.current?.state==="recording")recorderRef.current.stop();},duration);
+    // 3-second countdown then record
+    setCountdown(3);
+    let c=3;
+    const tick=setInterval(()=>{
+      c--;
+      if(c>0){setCountdown(c);}
+      else{
+        clearInterval(tick);
+        setCountdown(0);
+        setIsRecording(true);
+        setRecordedBlob(null);
+        chunksRef.current=[];
+        startTimeRef.current=null;
+        // Audio
+        try{
+          audioCtxRef.current=new (window.AudioContext||window.webkitAudioContext)();
+          const audioStream=buildMusic(audioCtxRef.current,music,duration);
+          const videoStream=canvasRef.current.captureStream(30);
+          const combined=new MediaStream([...videoStream.getTracks(),...audioStream.getTracks()]);
+          const mimeType=MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")?"video/webm;codecs=vp9,opus":MediaRecorder.isTypeSupported("video/webm;codecs=vp9")?"video/webm;codecs=vp9":"video/webm";
+          recorderRef.current=new MediaRecorder(combined,{mimeType,videoBitsPerSecond:4000000});
+          recorderRef.current.ondataavailable=e=>{if(e.data?.size>0)chunksRef.current.push(e.data);};
+          recorderRef.current.onstop=()=>{
+            const blob=new Blob(chunksRef.current,{type:"video/webm"});
+            if(blobUrlRef.current)URL.revokeObjectURL(blobUrlRef.current);
+            blobUrlRef.current=URL.createObjectURL(blob);
+            setRecordedBlob(blob);
+            setIsRecording(false);
+            if(audioCtxRef.current){audioCtxRef.current.close();audioCtxRef.current=null;}
+          };
+          recorderRef.current.start(100);
+        }catch(err){
+          // Audio failed, record video only
+          const stream=canvasRef.current.captureStream(30);
+          const mimeType=MediaRecorder.isTypeSupported("video/webm;codecs=vp9")?"video/webm;codecs=vp9":"video/webm";
+          recorderRef.current=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:4000000});
+          recorderRef.current.ondataavailable=e=>{if(e.data?.size>0)chunksRef.current.push(e.data);};
+          recorderRef.current.onstop=()=>{
+            const blob=new Blob(chunksRef.current,{type:"video/webm"});
+            if(blobUrlRef.current)URL.revokeObjectURL(blobUrlRef.current);
+            blobUrlRef.current=URL.createObjectURL(blob);
+            setRecordedBlob(blob);
+            setIsRecording(false);
+          };
+          recorderRef.current.start(100);
+        }
+        setTimeout(()=>{if(recorderRef.current?.state==="recording")recorderRef.current.stop();},duration);
+      }
+    },1000);
   };
 
   const isAr=uiLang==="ar";
@@ -7546,15 +7627,26 @@ Return ONLY valid JSON, no markdown, no extra text:
             ))}
           </div>
           {!recordedBlob&&(
-            <button onClick={startRecording} disabled={isRecording}
-              style={{width:"100%",padding:"14px",background:isRecording?T.border:T.primary,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:isRecording?"not-allowed":"pointer",...sty}}>
-              {isRecording?`⏺ ${isAr?"جاري التسجيل":"Recording"} — ${totalSec}s...`:`⏺ ${isAr?`تسجيل الريلز (${totalSec} ثانية)`:`Record Reel (${totalSec}s)`}`}
+            <button onClick={()=>{if(!isRecording&&countdown===0)startRecording();}}
+              disabled={isRecording||countdown>0}
+              style={{width:"100%",padding:"14px",background:isRecording?T.red:countdown>0?T.amber:T.primary,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:(isRecording||countdown>0)?"not-allowed":"pointer",...sty,transition:"background 0.3s"}}>
+              {countdown>0?`${isAr?"يبدأ التسجيل خلال":"Recording starts in"} ${countdown}...`:isRecording?`⏺ ${isAr?"جاري التسجيل...":"Recording..."} ${totalSec}s`:`⏺ ${isAr?`تسجيل الريلز (${totalSec} ثانية)`:`Record Reel (${totalSec}s)`}`}
             </button>
           )}
           {recordedBlob&&(
-            <div style={{width:"100%",display:"flex",flexDirection:"column",gap:12,alignItems:"center"}}>
-              <video src={URL.createObjectURL(recordedBlob)} controls width={340} style={{borderRadius:16,border:`1px solid ${T.border}`,maxWidth:"100%"}}/>
-              <div style={{fontSize:12,color:T.textMuted,direction:dir}}>{isAr?"انقر بالزر الأيمن على الفيديو ← حفظ الفيديو باسم...":"Right-click the video → Save video as..."}</div>
+            <div style={{width:"100%",display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
+              <video src={blobUrlRef.current} controls width={340} style={{borderRadius:16,border:`1px solid ${T.border}`,maxWidth:"100%"}}/>
+              <button onClick={()=>downloadReel(recordedBlob)}
+                style={{width:"100%",padding:"13px",background:T.green,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
+                ⬇️ {isAr?"تحميل الريلز (.webm)":"Download Reel (.webm)"}
+              </button>
+              <button onClick={()=>{if(blobUrlRef.current)window.open(blobUrlRef.current,"_blank");}}
+                style={{width:"100%",padding:"11px",background:"white",border:`1px solid ${T.border}`,borderRadius:10,fontSize:14,cursor:"pointer",color:T.text,...sty}}>
+                🔗 {isAr?"فتح الفيديو في تبويب جديد":"Open video in new tab"}
+              </button>
+              <div style={{fontSize:11,color:T.textMuted,direction:dir,textAlign:"center"}}>
+                {isAr?"ملاحظة: صيغة .webm تعمل على جميع المتصفحات وأندرويد. لتحويلها MP4 استخدم cloudconvert.com":"Note: .webm works on all browsers and Android. To convert to MP4 use cloudconvert.com"}
+              </div>
               <button onClick={()=>{setRecordedBlob(null);}} style={{padding:"10px 24px",background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,fontSize:13,cursor:"pointer",color:T.text,...sty}}>
                 🔄 {isAr?"تسجيل مرة أخرى":"Record Again"}
               </button>
