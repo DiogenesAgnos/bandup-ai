@@ -1493,6 +1493,7 @@ const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
           🏋️ Looking to practise grammar, paraphrasing, linking words, and more? Head over to the <strong>Exercises</strong> tab — 100+ questions with a 30-minute free session timer.
         </p>
       </Card>
+      </div>}
     </div>
   );
 };
