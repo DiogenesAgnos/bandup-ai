@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -7062,7 +7061,7 @@ const UI = {
     // Nav
     home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
-    progress:"📈 تقدمي", contact:"✉️ اتصل بنا",
+    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", reel:"🎬 ClassReel",
     // Account
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
@@ -7118,7 +7117,7 @@ const UI = {
     // Nav
     home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", placement:"📋 Placement Test", speaking:"🗣️ Speaking",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
-    progress:"📈 Progress", contact:"✉️ Contact",
+    progress:"📈 Progress", contact:"✉️ Contact", reel:"🎬 ClassReel",
     // Account
     signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
     manageSubscription:"Manage Subscription",
@@ -7172,6 +7171,387 @@ const UI = {
   }
 };
 
+
+// ── CLASSREEL ─────────────────────────────────
+const REEL_USES_KEY="ef_reel_uses";
+const FREE_REEL_LIMIT=3;
+const getReelUses=(email)=>{try{return parseInt(localStorage.getItem(REEL_USES_KEY+(email||""))||"0");}catch{return 0;}};
+const saveReelUses=(n,email)=>{try{localStorage.setItem(REEL_USES_KEY+(email||""),String(n));}catch{}};
+
+const ClassReelPage=({isPro,onUpgrade,session,uiLang="ar"})=>{
+  const [images,setImages]=useState([]);
+  const [description,setDescription]=useState("");
+  const [language,setLanguage]=useState("ar");
+  const [style,setStyle]=useState("quick");
+  const [filter,setFilter]=useState("none");
+  const [music,setMusic]=useState("upbeat");
+  const [phase,setPhase]=useState("upload");
+  const [reelData,setReelData]=useState(null);
+  const [error,setError]=useState("");
+  const [isRecording,setIsRecording]=useState(false);
+  const [recordedBlob,setRecordedBlob]=useState(null);
+  const [reelUses,setReelUses]=useState(()=>getReelUses(session?.email));
+  const canvasRef=useRef(null);
+  const animRef=useRef(null);
+  const recorderRef=useRef(null);
+  const chunksRef=useRef([]);
+  const imgElemsRef=useRef([]);
+  const startTimeRef=useRef(null);
+  const email=session?.email;
+  const canUse=isPro||reelUses<FREE_REEL_LIMIT;
+  const SCENE_DUR=4000;
+  const CW=360,CH=640;
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+  const FILTERS=[
+    {id:"none",label:"Original",css:""},
+    {id:"warm",label:"🔆 Warm",css:"sepia(0.3) saturate(1.4) brightness(1.05)"},
+    {id:"cool",label:"❄️ Cool",css:"hue-rotate(20deg) saturate(1.2) brightness(0.95)"},
+    {id:"dramatic",label:"🎬 Cinematic",css:"contrast(1.3) brightness(0.85) saturate(0.8)"},
+    {id:"bw",label:"⬛ B&W",css:"grayscale(1) contrast(1.1)"},
+  ];
+
+  useEffect(()=>{
+    imgElemsRef.current=[];
+    images.forEach(img=>{
+      const el=new Image();
+      el.src=img.url;
+      imgElemsRef.current.push(el);
+    });
+  },[images]);
+
+  useEffect(()=>{
+    if(phase!=="preview"||!reelData||!canvasRef.current)return;
+    const canvas=canvasRef.current;
+    const ctx=canvas.getContext("2d");
+    const allScenes=[
+      {text:reelData.hook,type:"hook"},
+      ...(reelData.scenes||[]).map(t=>({text:t,type:"feature"})),
+      {text:reelData.cta,type:"cta"},
+    ];
+    const TOTAL=SCENE_DUR*allScenes.length;
+    startTimeRef.current=null;
+    const filterCss=(FILTERS.find(f=>f.id===filter)||FILTERS[0]).css;
+
+    const wrapText=(ctx,text,maxW)=>{
+      const words=String(text||"").split(" ");
+      const lines=[];let line="";
+      words.forEach(w=>{
+        const test=line?line+" "+w:w;
+        if(ctx.measureText(test).width>maxW){lines.push(line);line=w;}
+        else line=test;
+      });
+      if(line)lines.push(line);
+      return lines;
+    };
+
+    const draw=(ts)=>{
+      if(!startTimeRef.current)startTimeRef.current=ts;
+      const elapsed=(ts-startTimeRef.current)%TOTAL;
+      const si=Math.floor(elapsed/SCENE_DUR);
+      const sc=allScenes[si];
+      const t=(elapsed%SCENE_DUR)/SCENE_DUR;
+      const imgEl=imgElemsRef.current[si%Math.max(imgElemsRef.current.length,1)];
+      ctx.clearRect(0,0,CW,CH);
+      // Background image with Ken Burns
+      if(imgEl&&imgEl.complete&&imgEl.naturalWidth>0){
+        ctx.save();
+        if(filterCss)ctx.filter=filterCss;
+        const scale=1+0.06*t;
+        const iw=imgEl.naturalWidth,ih=imgEl.naturalHeight;
+        const ar=iw/ih,car=CW/CH;
+        let dw,dh;
+        if(ar>car){dh=CH*scale;dw=dh*ar;}else{dw=CW*scale;dh=dw/ar;}
+        ctx.drawImage(imgEl,(CW-dw)/2,(CH-dh)/2,dw,dh);
+        ctx.filter="none";
+        ctx.restore();
+      }else{
+        ctx.fillStyle="#1a1a2e";
+        ctx.fillRect(0,0,CW,CH);
+      }
+      // Overlay gradient
+      const grad=ctx.createLinearGradient(0,0,0,CH);
+      grad.addColorStop(0,"rgba(0,0,0,0.15)");
+      grad.addColorStop(0.5,"rgba(0,0,0,0.4)");
+      grad.addColorStop(1,"rgba(0,0,0,0.7)");
+      ctx.fillStyle=grad;
+      ctx.fillRect(0,0,CW,CH);
+      // Gold accent line
+      const lineW=CW*0.55*Math.min(t*3,1);
+      ctx.fillStyle="#d4af37";
+      ctx.fillRect((CW-lineW)/2,CH*0.4,lineW,2.5);
+      // Text
+      const alpha=Math.min(t*3,1);
+      ctx.globalAlpha=alpha;
+      ctx.fillStyle="#ffffff";
+      const fontSize=sc.type==="hook"?36:28;
+      ctx.font=`bold ${fontSize}px 'Cairo','Noto Sans Arabic',sans-serif`;
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      const lines=wrapText(ctx,sc.text,CW*0.82);
+      const lineH=fontSize+10;
+      lines.forEach((ln,i)=>{ctx.fillText(ln,CW/2,CH/2+(i-(lines.length-1)/2)*lineH);});
+      // CTA button style
+      if(sc.type==="cta"){
+        ctx.globalAlpha=alpha*0.9;
+        ctx.fillStyle="#d4af37";
+        ctx.beginPath();
+        ctx.roundRect(CW/2-85,CH*0.66,170,38,8);
+        ctx.fill();
+        ctx.fillStyle="#1a1a2e";
+        ctx.font="bold 13px 'Cairo',sans-serif";
+        ctx.fillText(language==="ar"?"ابدأ الآن ←":"Start Now →",CW/2,CH*0.66+19);
+      }
+      // Scene dots
+      ctx.globalAlpha=0.85;
+      allScenes.forEach((_,i)=>{
+        const x=CW/2+(i-(allScenes.length-1)/2)*16;
+        ctx.fillStyle=i===si?"#d4af37":"rgba(255,255,255,0.3)";
+        ctx.beginPath();
+        ctx.arc(x,CH*0.91,i===si?5:3,0,Math.PI*2);
+        ctx.fill();
+      });
+      // Progress bar
+      ctx.globalAlpha=0.6;
+      ctx.fillStyle="rgba(255,255,255,0.2)";
+      ctx.fillRect(0,CH-3,CW,3);
+      ctx.fillStyle="#d4af37";
+      ctx.fillRect(0,CH-3,CW*t,3);
+      ctx.globalAlpha=1;
+      animRef.current=requestAnimationFrame(draw);
+    };
+    animRef.current=requestAnimationFrame(draw);
+    return()=>{if(animRef.current)cancelAnimationFrame(animRef.current);};
+  },[phase,reelData,filter,language]);
+
+  const handleImageUpload=(files)=>{
+    Array.from(files).forEach(file=>{
+      if(!file.type.startsWith("image/"))return;
+      if(images.length>=6)return;
+      const reader=new FileReader();
+      reader.onload=(e)=>setImages(prev=>prev.length<6?[...prev,{url:e.target.result,name:file.name}]:prev);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const generateReel=async()=>{
+    if(!canUse){onUpgrade();return;}
+    setPhase("generating");setError("");
+    try{
+      const res=await fetch("/api/reel-script",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({description,language,numScenes:images.length}),
+      });
+      if(!res.ok)throw new Error("API error");
+      const data=await res.json();
+      if(data.error)throw new Error(data.error);
+      setReelData(data);
+      const newCount=reelUses+1;
+      setReelUses(newCount);
+      saveReelUses(newCount,email);
+      setPhase("preview");
+    }catch(e){
+      setError("فشل توليد النص. حاول مرة أخرى.");
+      setPhase("configure");
+    }
+  };
+
+  const startRecording=()=>{
+    if(!canvasRef.current||!reelData)return;
+    chunksRef.current=[];
+    setRecordedBlob(null);
+    setIsRecording(true);
+    startTimeRef.current=null;
+    const allScenes=[reelData.hook,...(reelData.scenes||[]),reelData.cta];
+    const duration=allScenes.length*SCENE_DUR;
+    const stream=canvasRef.current.captureStream(30);
+    const mimeType=MediaRecorder.isTypeSupported("video/webm;codecs=vp9")?"video/webm;codecs=vp9":"video/webm";
+    recorderRef.current=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:4000000});
+    recorderRef.current.ondataavailable=e=>{if(e.data?.size>0)chunksRef.current.push(e.data);};
+    recorderRef.current.onstop=()=>{
+      const blob=new Blob(chunksRef.current,{type:mimeType});
+      setRecordedBlob(blob);
+      setIsRecording(false);
+    };
+    recorderRef.current.start(200);
+    setTimeout(()=>{if(recorderRef.current?.state==="recording")recorderRef.current.stop();},duration);
+  };
+
+  const isAr=uiLang==="ar";
+  const dir=isAr?"rtl":"ltr";
+
+  // UPLOAD PHASE
+  if(phase==="upload")return(
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 16px",...sty,direction:dir}}>
+      <h1 style={{fontFamily:"Georgia,serif",fontSize:26,color:T.text,marginBottom:4,textAlign:"center"}}>🎬 ClassReel</h1>
+      <p style={{textAlign:"center",color:T.textMuted,fontSize:14,marginBottom:4}}>
+        {isAr?"حوّل صورك إلى ريلز احترافي للترويج لصفك أو دوراتك":"Turn your photos into a professional reel for your classes"}
+      </p>
+      <p style={{textAlign:"center",fontSize:13,marginBottom:24,color:isPro?T.green:T.amber}}>
+        {isPro?(isAr?"Pro — ريلز غير محدود ✓":"Pro — Unlimited reels ✓"):(isAr?`${FREE_REEL_LIMIT-reelUses} ريلز مجاني متبقي`:`${FREE_REEL_LIMIT-reelUses} free reels remaining`)}
+      </p>
+      <div onDrop={e=>{e.preventDefault();handleImageUpload(e.dataTransfer.files);}} onDragOver={e=>e.preventDefault()}
+        onClick={()=>document.getElementById("reel-file-input").click()}
+        style={{border:`2px dashed ${T.borderMid}`,borderRadius:16,padding:"40px 20px",textAlign:"center",cursor:"pointer",background:T.bgMuted,marginBottom:20}}>
+        <div style={{fontSize:40,marginBottom:10}}>📸</div>
+        <div style={{fontWeight:700,fontSize:16,color:T.text,marginBottom:4}}>{isAr?"اسحب صورك هنا أو اضغط للاختيار":"Drag photos here or click to choose"}</div>
+        <div style={{fontSize:13,color:T.textMuted}}>{isAr?"3 إلى 6 صور · JPG أو PNG":"3 to 6 images · JPG or PNG"}</div>
+        <input id="reel-file-input" type="file" multiple accept="image/*" style={{display:"none"}} onChange={e=>handleImageUpload(e.target.files)}/>
+      </div>
+      {images.length>0&&(
+        <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}}>
+          {images.map((img,i)=>(
+            <div key={i} style={{position:"relative"}}>
+              <img src={img.url} alt="" style={{width:80,height:80,objectFit:"cover",borderRadius:10,border:`1px solid ${T.border}`}}/>
+              <button onClick={()=>setImages(prev=>prev.filter((_,j)=>j!==i))}
+                style={{position:"absolute",top:-6,right:-6,width:20,height:20,borderRadius:"50%",background:T.red,border:"none",color:"white",fontSize:11,cursor:"pointer",fontWeight:700}}>×</button>
+            </div>
+          ))}
+          {images.length<6&&(
+            <div onClick={()=>document.getElementById("reel-file-input").click()}
+              style={{width:80,height:80,border:`2px dashed ${T.borderMid}`,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:T.textMuted,fontSize:28}}>+</div>
+          )}
+        </div>
+      )}
+      <button disabled={images.length<3} onClick={()=>setPhase("configure")}
+        style={{width:"100%",padding:"14px",background:images.length>=3?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:16,fontWeight:700,cursor:images.length>=3?"pointer":"not-allowed",...sty}}>
+        {images.length<3?(isAr?`أضف ${3-images.length} صورة على الأقل`:`Add ${3-images.length} more image(s)`):(isAr?"التالي — ضبط الريلز →":"Next — Configure Reel →")}
+      </button>
+    </div>
+  );
+
+  // CONFIGURE PHASE
+  if(phase==="configure")return(
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 16px",...sty,direction:dir}}>
+      <button onClick={()=>setPhase("upload")} style={{background:"none",border:"none",color:T.textMuted,fontSize:13,cursor:"pointer",marginBottom:16}}>← {isAr?"رجوع":"Back"}</button>
+      <h2 style={{fontSize:22,color:T.text,marginBottom:20}}>⚙️ {isAr?"ضبط الريلز":"Configure Reel"}</h2>
+      <div style={{marginBottom:20}}>
+        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:6}}>{isAr?"موضوع الريلز (جملة واحدة)":"What is this reel about? (one sentence)"}</label>
+        <textarea value={description} onChange={e=>setDescription(e.target.value)}
+          placeholder={isAr?"مثال: كورس تحضير آيلتس للمعلم أحمد — نتائج مضمونة":"e.g. Ahmad's IELTS prep course — guaranteed results"} rows={3}
+          style={{width:"100%",padding:"12px",borderRadius:10,border:`1px solid ${T.borderMid}`,fontSize:14,resize:"vertical",...sty,direction:dir,boxSizing:"border-box"}}/>
+      </div>
+      <div style={{marginBottom:20}}>
+        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"لغة الريلز":"Reel Language"}</label>
+        <div style={{display:"flex",gap:8}}>
+          {[{id:"ar",label:"🇸🇦 عربي"},{id:"en",label:"🇬🇧 English"},{id:"bilingual",label:"🔀 ثنائي"}].map(l=>(
+            <button key={l.id} onClick={()=>setLanguage(l.id)}
+              style={{flex:1,padding:"10px 8px",borderRadius:8,border:`1px solid ${language===l.id?T.primary:T.border}`,background:language===l.id?T.primaryLight:"white",color:language===l.id?T.primary:T.textMid,fontWeight:language===l.id?700:500,fontSize:13,cursor:"pointer",...sty}}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{marginBottom:20}}>
+        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"نوع الريلز":"Reel Style"}</label>
+        <div style={{display:"flex",gap:8}}>
+          {[{id:"quick",label:isAr?"⚡ سريع":"⚡ Quick",desc:isAr?"نص + تأثيرات بسيطة":"Text + simple effects"},{id:"enhanced",label:isAr?"✨ متقدم":"✨ Enhanced",desc:isAr?"فلاتر احترافية":"Pro filters",pro:true}].map(s=>(
+            <button key={s.id} onClick={()=>isPro||s.id==="quick"?setStyle(s.id):onUpgrade()}
+              style={{flex:1,padding:"12px 8px",borderRadius:8,border:`1px solid ${style===s.id?T.primary:T.border}`,background:style===s.id?T.primaryLight:"white",color:style===s.id?T.primary:T.textMid,fontWeight:style===s.id?700:500,fontSize:13,cursor:"pointer",...sty,textAlign:"center",position:"relative"}}>
+              {s.pro&&!isPro&&<span style={{position:"absolute",top:-8,right:-8,background:T.accent,color:"#7f1200",fontSize:10,fontWeight:800,padding:"2px 6px",borderRadius:6}}>Pro</span>}
+              <div>{s.label}</div><div style={{fontSize:11,color:T.textMuted,marginTop:2}}>{s.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+      {style==="enhanced"&&isPro&&(
+        <div style={{marginBottom:20}}>
+          <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"فلتر الصورة":"Image Filter"}</label>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {FILTERS.map(f=>(
+              <button key={f.id} onClick={()=>setFilter(f.id)}
+                style={{padding:"8px 14px",borderRadius:8,border:`1px solid ${filter===f.id?T.primary:T.border}`,background:filter===f.id?T.primaryLight:"white",color:filter===f.id?T.primary:T.textMid,fontWeight:filter===f.id?700:500,fontSize:12,cursor:"pointer",...sty}}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{marginBottom:24}}>
+        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"الموسيقى":"Music"}</label>
+        <div style={{display:"flex",gap:8}}>
+          {[{id:"upbeat",label:isAr?"🎵 نشيط":"🎵 Upbeat"},{id:"calm",label:isAr?"🎵 هادئ":"🎵 Calm"},{id:"corporate",label:isAr?"🎵 احترافي":"🎵 Corporate"}].map(m=>(
+            <button key={m.id} onClick={()=>setMusic(m.id)}
+              style={{flex:1,padding:"10px 8px",borderRadius:8,border:`1px solid ${music===m.id?T.primary:T.border}`,background:music===m.id?T.primaryLight:"white",color:music===m.id?T.primary:T.textMid,fontWeight:music===m.id?700:500,fontSize:13,cursor:"pointer",...sty}}>
+              {m.label}
+            </button>
+          ))}
+        </div>
+        <div style={{fontSize:11,color:T.textMuted,marginTop:6}}>* {isAr?"الموسيقى ستُضاف في التحديث القادم":"Music will be added in the next update"}</div>
+      </div>
+      {error&&<div style={{padding:"12px",background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,color:T.red,fontSize:13,marginBottom:16}}>{error}</div>}
+      {!canUse&&(
+        <div style={{padding:"14px",background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,marginBottom:16,textAlign:"center"}}>
+          <div style={{fontWeight:700,color:T.amber,marginBottom:6}}>{isAr?"استنفدت ريلزاتك المجانية الـ3":"You've used all 3 free reels"}</div>
+          <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontWeight:700,cursor:"pointer",...sty}}>
+            🔓 {isAr?"احصل على Pro — ريلز غير محدود":"Get Pro — Unlimited Reels"}
+          </button>
+        </div>
+      )}
+      <button disabled={!description.trim()||!canUse} onClick={generateReel}
+        style={{width:"100%",padding:"14px",background:description.trim()&&canUse?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:16,fontWeight:700,cursor:description.trim()&&canUse?"pointer":"not-allowed",...sty}}>
+        🎬 {isAr?"توليد الريلز بالذكاء الاصطناعي":"Generate Reel with AI"}
+      </button>
+    </div>
+  );
+
+  // GENERATING PHASE
+  if(phase==="generating")return(
+    <div style={{maxWidth:560,margin:"60px auto",textAlign:"center",padding:"32px 16px",...sty}}>
+      <div style={{fontSize:48,marginBottom:16}}>🎬</div>
+      <div style={{fontSize:18,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"جاري توليد ريلزك...":"Generating your reel..."}</div>
+      <div style={{fontSize:14,color:T.textMuted}}>{isAr?"الذكاء الاصطناعي يكتب النصوص الآن":"AI is writing your scenes now"}</div>
+    </div>
+  );
+
+  // PREVIEW PHASE
+  if(phase==="preview"&&reelData){
+    const allScenes=[reelData.hook,...(reelData.scenes||[]),reelData.cta];
+    const totalSec=allScenes.length*(SCENE_DUR/1000);
+    return(
+      <div style={{maxWidth:560,margin:"0 auto",padding:"24px 16px",...sty,direction:dir}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+          <button onClick={()=>{setPhase("configure");setReelData(null);if(animRef.current)cancelAnimationFrame(animRef.current);}}
+            style={{background:"none",border:"none",color:T.textMuted,fontSize:13,cursor:"pointer"}}>← {isAr?"رجوع":"Back"}</button>
+          <h2 style={{fontSize:20,color:T.text,margin:0,flex:1}}>🎬 {isAr?"معاينة الريلز":"Reel Preview"}</h2>
+          <span style={{fontSize:12,color:T.textMuted}}>{totalSec}s</span>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+          <canvas ref={canvasRef} width={CW} height={CH} style={{borderRadius:16,border:`1px solid ${T.border}`,maxWidth:"100%",maxHeight:500}}/>
+          <div style={{width:"100%",background:T.bgMuted,borderRadius:12,padding:"16px",border:`1px solid ${T.border}`}}>
+            <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:10}}>{isAr?"النصوص المُولَّدة:":"Generated Scenes:"}</div>
+            {allScenes.map((text,i)=>(
+              <div key={i} style={{padding:"8px 12px",marginBottom:6,background:"white",borderRadius:8,border:`1px solid ${T.border}`,fontSize:13,color:T.text,direction:dir,display:"flex",gap:8,alignItems:"flex-start"}}>
+                <span style={{color:T.textMuted,flexShrink:0}}>{i===0?"🪝":i===allScenes.length-1?"🔗":`${i}.`}</span>
+                <span style={{flex:1}}>{text}</span>
+              </div>
+            ))}
+          </div>
+          {!recordedBlob&&(
+            <button onClick={startRecording} disabled={isRecording}
+              style={{width:"100%",padding:"14px",background:isRecording?T.border:T.primary,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:isRecording?"not-allowed":"pointer",...sty}}>
+              {isRecording?`⏺ ${isAr?"جاري التسجيل":"Recording"} — ${totalSec}s...`:`⏺ ${isAr?`تسجيل الريلز (${totalSec} ثانية)`:`Record Reel (${totalSec}s)`}`}
+            </button>
+          )}
+          {recordedBlob&&(
+            <div style={{width:"100%",display:"flex",flexDirection:"column",gap:12,alignItems:"center"}}>
+              <video src={URL.createObjectURL(recordedBlob)} controls width={340} style={{borderRadius:16,border:`1px solid ${T.border}`,maxWidth:"100%"}}/>
+              <div style={{fontSize:12,color:T.textMuted,direction:dir}}>{isAr?"انقر بالزر الأيمن على الفيديو ← حفظ الفيديو باسم...":"Right-click the video → Save video as..."}</div>
+              <button onClick={()=>{setRecordedBlob(null);}} style={{padding:"10px 24px",background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,fontSize:13,cursor:"pointer",color:T.text,...sty}}>
+                🔄 {isAr?"تسجيل مرة أخرى":"Record Again"}
+              </button>
+            </div>
+          )}
+          <button onClick={()=>{setPhase("upload");setImages([]);setReelData(null);setRecordedBlob(null);if(animRef.current)cancelAnimationFrame(animRef.current);}}
+            style={{width:"100%",padding:"12px",background:"white",border:`1px solid ${T.border}`,borderRadius:10,fontSize:14,cursor:"pointer",color:T.text,...sty}}>
+            🎬 {isAr?"إنشاء ريلز جديد":"Create New Reel"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
@@ -7538,6 +7918,7 @@ export default function IELTSBot(){
               <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
               <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
+              <MainTab label={UI[uiLang].reel} active={mainView==="reel"} onClick={()=>{switchView("reel");trackEvent("nav_click",{page:"reel"});}}/>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               {/* Mobile consultation button */}
@@ -8114,6 +8495,7 @@ export default function IELTSBot(){
         {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
+        {mainView==="reel"&&<ClassReelPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} session={session} uiLang={uiLang}/>}
         </div>
       </div>
       )}
