@@ -7061,7 +7061,7 @@ const UI = {
     // Nav
     home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
-    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", reel:"🎬 ClassReel",
+    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق",
     // Account
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
@@ -7117,7 +7117,7 @@ const UI = {
     // Nav
     home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", placement:"📋 Placement Test", speaking:"🗣️ Speaking",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
-    progress:"📈 Progress", contact:"✉️ Contact", reel:"🎬 ClassReel",
+    progress:"📈 Progress", contact:"✉️ Contact", pronunciation:"🔊 Pronunciation",
     // Account
     signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
     manageSubscription:"Manage Subscription",
@@ -7172,495 +7172,424 @@ const UI = {
 };
 
 
-// ── CLASSREEL ─────────────────────────────────
-const REEL_USES_KEY="ef_reel_uses";
-const FREE_REEL_LIMIT=3;
-const getReelUses=(email)=>{try{return parseInt(localStorage.getItem(REEL_USES_KEY+(email||""))||"0");}catch{return 0;}};
-const saveReelUses=(n,email)=>{try{localStorage.setItem(REEL_USES_KEY+(email||""),String(n));}catch{}};
+// ── PRONUNCIATION PAGE ─────────────────────────
+const PRON_WORDS=[
+  // Academic & IELTS Core
+  {w:"albeit",ph:"/ɔːlˈbiːɪt/",ar:"وإن كان / رغم أن",cat:"academic"},
+  {w:"ambiguous",ph:"/æmˈbɪɡjuəs/",ar:"غامض / ملتبس",cat:"academic"},
+  {w:"anachronism",ph:"/əˈnækrənɪzəm/",ar:"مفارقة تاريخية",cat:"academic"},
+  {w:"anomaly",ph:"/əˈnɒməli/",ar:"شذوذ / استثناء",cat:"academic"},
+  {w:"arbitrary",ph:"/ˈɑːbɪtrəri/",ar:"تعسفي / اعتباطي",cat:"academic"},
+  {w:"articulate",ph:"/ɑːˈtɪkjulət/",ar:"واضح التعبير",cat:"academic"},
+  {w:"autonomous",ph:"/ɔːˈtɒnəməs/",ar:"مستقل / ذاتي",cat:"academic"},
+  {w:"catastrophic",ph:"/ˌkætəˈstrɒfɪk/",ar:"كارثي",cat:"academic"},
+  {w:"coherent",ph:"/kəʊˈhɪərənt/",ar:"متماسك / منسجم",cat:"academic"},
+  {w:"comprehensive",ph:"/ˌkɒmprɪˈhensɪv/",ar:"شامل / مستوعب",cat:"academic"},
+  {w:"controversial",ph:"/ˌkɒntrəˈvɜːʃəl/",ar:"مثير للجدل",cat:"academic"},
+  {w:"deteriorate",ph:"/dɪˈtɪəriəreɪt/",ar:"يتدهور / يسوء",cat:"academic"},
+  {w:"dichotomy",ph:"/daɪˈkɒtəmi/",ar:"ثنائية / تناقض",cat:"academic"},
+  {w:"dilemma",ph:"/dɪˈlemə/",ar:"معضلة / مأزق",cat:"academic"},
+  {w:"empirical",ph:"/ɪmˈpɪrɪkəl/",ar:"تجريبي / استنتاجي",cat:"academic"},
+  {w:"exacerbate",ph:"/ɪɡˈzæsəbeɪt/",ar:"يفاقم / يزيد سوءاً",cat:"academic"},
+  {w:"exhaustive",ph:"/ɪɡˈzɔːstɪv/",ar:"شامل / مستنفِد",cat:"academic"},
+  {w:"explicit",ph:"/ɪkˈsplɪsɪt/",ar:"صريح / واضح",cat:"academic"},
+  {w:"fundamental",ph:"/ˌfʌndəˈmentəl/",ar:"جوهري / أساسي",cat:"academic"},
+  {w:"hypothesis",ph:"/haɪˈpɒθəsɪs/",ar:"فرضية",cat:"academic"},
+  {w:"implicit",ph:"/ɪmˈplɪsɪt/",ar:"ضمني / مفهوم",cat:"academic"},
+  {w:"indigenous",ph:"/ɪnˈdɪdʒənəs/",ar:"أصلي / محلي",cat:"academic"},
+  {w:"inevitable",ph:"/ɪnˈevɪtəbəl/",ar:"حتمي / لا مفرّ منه",cat:"academic"},
+  {w:"infrastructure",ph:"/ˈɪnfrəstrʌktʃə/",ar:"بنية تحتية",cat:"academic"},
+  {w:"inherent",ph:"/ɪnˈhɪərənt/",ar:"متأصّل / جوهري",cat:"academic"},
+  {w:"innovative",ph:"/ˈɪnəveɪtɪv/",ar:"مبتكر / ريادي",cat:"academic"},
+  {w:"integrity",ph:"/ɪnˈteɡrɪti/",ar:"نزاهة / سلامة",cat:"academic"},
+  {w:"jurisdiction",ph:"/ˌdʒʊərɪsˈdɪkʃən/",ar:"اختصاص قانوني",cat:"academic"},
+  {w:"legitimate",ph:"/lɪˈdʒɪtɪmət/",ar:"شرعي / مشروع",cat:"academic"},
+  {w:"meticulous",ph:"/mɪˈtɪkjuləs/",ar:"دقيق / متأنٍّ",cat:"academic"},
+  {w:"mitigate",ph:"/ˈmɪtɪɡeɪt/",ar:"يخفف / يقلل",cat:"academic"},
+  {w:"nuance",ph:"/ˈnjuːɑːns/",ar:"فارق دقيق",cat:"academic"},
+  {w:"paradigm",ph:"/ˈpærədaɪm/",ar:"نموذج / نمط",cat:"academic"},
+  {w:"phenomenon",ph:"/fɪˈnɒmɪnən/",ar:"ظاهرة",cat:"academic"},
+  {w:"preliminary",ph:"/prɪˈlɪmɪnəri/",ar:"تمهيدي / أولي",cat:"academic"},
+  {w:"profound",ph:"/prəˈfaʊnd/",ar:"عميق / جوهري",cat:"academic"},
+  {w:"proliferate",ph:"/prəˈlɪfəreɪt/",ar:"ينتشر / يتكاثر",cat:"academic"},
+  {w:"proponent",ph:"/prəˈpəʊnənt/",ar:"مؤيد / مدافع",cat:"academic"},
+  {w:"reconcile",ph:"/ˈrekənsaɪl/",ar:"يوفّق / يصالح",cat:"academic"},
+  {w:"rhetoric",ph:"/ˈretərɪk/",ar:"خطابة / بلاغة",cat:"academic"},
+  {w:"scrutiny",ph:"/ˈskruːtɪni/",ar:"تدقيق / فحص مكثف",cat:"academic"},
+  {w:"sustainable",ph:"/səˈsteɪnəbəl/",ar:"مستدام",cat:"academic"},
+  {w:"theoretical",ph:"/ˌθɪəˈretɪkəl/",ar:"نظري",cat:"academic"},
+  {w:"ubiquitous",ph:"/juːˈbɪkwɪtəs/",ar:"في كل مكان",cat:"academic"},
+  {w:"unprecedented",ph:"/ʌnˈpresɪdentɪd/",ar:"غير مسبوق",cat:"academic"},
+  {w:"viable",ph:"/ˈvaɪəbəl/",ar:"قابل للتطبيق",cat:"academic"},
+  {w:"ambivalent",ph:"/æmˈbɪvələnt/",ar:"متردد / مزدوج المشاعر",cat:"academic"},
+  {w:"benevolent",ph:"/bɪˈnevələnt/",ar:"خيّر / محسن",cat:"academic"},
+  {w:"bureaucracy",ph:"/bjʊˈrɒkrəsi/",ar:"بيروقراطية",cat:"academic"},
+  {w:"circumvent",ph:"/ˌsɜːkəmˈvent/",ar:"يتحايل / يلتف حول",cat:"academic"},
 
-const ClassReelPage=({isPro,onUpgrade,session,uiLang="ar"})=>{
-  const [images,setImages]=useState([]);
-  const [description,setDescription]=useState("");
-  const [language,setLanguage]=useState("ar");
-  const [style,setStyle]=useState("quick");
-  const [filter,setFilter]=useState("none");
-  const [music,setMusic]=useState("upbeat");
-  const [phase,setPhase]=useState("upload");
-  const [reelData,setReelData]=useState(null);
-  const [error,setError]=useState("");
-  const [isRecording,setIsRecording]=useState(false);
-  const [countdown,setCountdown]=useState(0);
-  const [recordedBlob,setRecordedBlob]=useState(null);
-  const [reelUses,setReelUses]=useState(()=>getReelUses(session?.email));
-  const canvasRef=useRef(null);
-  const animRef=useRef(null);
-  const recorderRef=useRef(null);
-  const chunksRef=useRef([]);
-  const imgElemsRef=useRef([]);
-  const startTimeRef=useRef(null);
-  const blobUrlRef=useRef(null);
-  const audioCtxRef=useRef(null);
-  const email=session?.email;
-  const canUse=isPro||reelUses<FREE_REEL_LIMIT;
-  const SCENE_DUR=4000;
-  const CW=360,CH=640;
-  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
-  const FILTERS=[
-    {id:"none",label:"Original",css:""},
-    {id:"warm",label:"🔆 Warm",css:"sepia(0.3) saturate(1.4) brightness(1.05)"},
-    {id:"cool",label:"❄️ Cool",css:"hue-rotate(20deg) saturate(1.2) brightness(0.95)"},
-    {id:"dramatic",label:"🎬 Cinematic",css:"contrast(1.3) brightness(0.85) saturate(0.8)"},
-    {id:"bw",label:"⬛ B&W",css:"grayscale(1) contrast(1.1)"},
-  ];
+  // Commonly Mispronounced
+  {w:"colonel",ph:"/ˈkɜːnəl/",ar:"عقيد",cat:"tricky"},
+  {w:"debt",ph:"/det/",ar:"دَين",cat:"tricky"},
+  {w:"doubt",ph:"/daʊt/",ar:"شك",cat:"tricky"},
+  {w:"epitome",ph:"/ɪˈpɪtəmi/",ar:"تجسيد / مثال",cat:"tricky"},
+  {w:"façade",ph:"/fəˈsɑːd/",ar:"واجهة / مظهر خادع",cat:"tricky"},
+  {w:"February",ph:"/ˈfebruəri/",ar:"فبراير",cat:"tricky"},
+  {w:"genre",ph:"/ˈʒɒnrə/",ar:"نوع / صنف",cat:"tricky"},
+  {w:"hierarchy",ph:"/ˈhaɪərɑːki/",ar:"تسلسل هرمي",cat:"tricky"},
+  {w:"hyperbole",ph:"/haɪˈpɜːbəli/",ar:"مبالغة",cat:"tricky"},
+  {w:"liaison",ph:"/liˈeɪzɒn/",ar:"تنسيق / اتصال",cat:"tricky"},
+  {w:"mischievous",ph:"/ˈmɪstʃɪvəs/",ar:"شرير / مشاغب",cat:"tricky"},
+  {w:"niche",ph:"/niːʃ/",ar:"مكانة خاصة",cat:"tricky"},
+  {w:"often",ph:"/ˈɒfən/",ar:"في أغلب الأحيان",cat:"tricky"},
+  {w:"onomatopoeia",ph:"/ˌɒnəˌmætəˈpiːə/",ar:"محاكاة صوتية",cat:"tricky"},
+  {w:"parliament",ph:"/ˈpɑːləmənt/",ar:"برلمان",cat:"tricky"},
+  {w:"particularly",ph:"/pəˈtɪkjuləli/",ar:"بشكل خاص",cat:"tricky"},
+  {w:"pronunciation",ph:"/prəˌnʌnsiˈeɪʃən/",ar:"نطق",cat:"tricky"},
+  {w:"queue",ph:"/kjuː/",ar:"طابور",cat:"tricky"},
+  {w:"receipt",ph:"/rɪˈsiːt/",ar:"إيصال",cat:"tricky"},
+  {w:"rural",ph:"/ˈrʊərəl/",ar:"ريفي",cat:"tricky"},
+  {w:"salmon",ph:"/ˈsæmən/",ar:"سلمون",cat:"tricky"},
+  {w:"sandwich",ph:"/ˈsænwɪdʒ/",ar:"ساندويش",cat:"tricky"},
+  {w:"scissors",ph:"/ˈsɪzəz/",ar:"مقص",cat:"tricky"},
+  {w:"subtle",ph:"/ˈsʌtəl/",ar:"خفي / لطيف",cat:"tricky"},
+  {w:"sword",ph:"/sɔːd/",ar:"سيف",cat:"tricky"},
+  {w:"temperature",ph:"/ˈtemprətʃə/",ar:"درجة الحرارة",cat:"tricky"},
+  {w:"thorough",ph:"/ˈθʌrə/",ar:"شامل / دقيق",cat:"tricky"},
+  {w:"through",ph:"/θruː/",ar:"عبر / خلال",cat:"tricky"},
+  {w:"throughout",ph:"/θruːˈaʊt/",ar:"في جميع أنحاء",cat:"tricky"},
+  {w:"unique",ph:"/juːˈniːk/",ar:"فريد",cat:"tricky"},
+  {w:"vegetable",ph:"/ˈvedʒtəbəl/",ar:"خضروات",cat:"tricky"},
+  {w:"vehicle",ph:"/ˈviːɪkəl/",ar:"مركبة",cat:"tricky"},
+  {w:"Wednesday",ph:"/ˈwenzdeɪ/",ar:"الأربعاء",cat:"tricky"},
+  {w:"comfortable",ph:"/ˈkʌmftəbəl/",ar:"مريح",cat:"tricky"},
+  {w:"deteriorate",ph:"/dɪˈtɪəriəreɪt/",ar:"يتدهور",cat:"tricky"},
+  {w:"entrepreneur",ph:"/ˌɒntrəprəˈnɜː/",ar:"رائد أعمال",cat:"tricky"},
+  {w:"environment",ph:"/ɪnˈvaɪrənmənt/",ar:"بيئة",cat:"tricky"},
+  {w:"government",ph:"/ˈɡʌvənmənt/",ar:"حكومة",cat:"tricky"},
+  {w:"interesting",ph:"/ˈɪntrəstɪŋ/",ar:"مثير للاهتمام",cat:"tricky"},
+  {w:"library",ph:"/ˈlaɪbrəri/",ar:"مكتبة",cat:"tricky"},
+  {w:"necessary",ph:"/ˈnesəsəri/",ar:"ضروري",cat:"tricky"},
+  {w:"particularly",ph:"/pəˈtɪkjuləli/",ar:"بشكل خاص",cat:"tricky"},
+  {w:"probably",ph:"/ˈprɒbəbli/",ar:"على الأرجح",cat:"tricky"},
+  {w:"separate",ph:"/ˈsepərət/",ar:"منفصل",cat:"tricky"},
+  {w:"similar",ph:"/ˈsɪmɪlə/",ar:"مشابه",cat:"tricky"},
+  {w:"specific",ph:"/spəˈsɪfɪk/",ar:"محدد / خاص",cat:"tricky"},
+  {w:"studying",ph:"/ˈstʌdiɪŋ/",ar:"يدرس",cat:"tricky"},
+  {w:"supposed",ph:"/səˈpəʊzd/",ar:"من المفترض",cat:"tricky"},
+  {w:"technology",ph:"/tekˈnɒlədʒi/",ar:"تقنية",cat:"tricky"},
+  {w:"vocabulary",ph:"/vəˈkæbjuləri/",ar:"مفردات",cat:"tricky"},
 
-  useEffect(()=>{
-    imgElemsRef.current=[];
-    images.forEach(img=>{
-      const el=new Image();
-      el.src=img.url;
-      imgElemsRef.current.push(el);
-    });
-  },[images]);
+  // Science & Environment
+  {w:"algorithm",ph:"/ˈælɡərɪðəm/",ar:"خوارزمية",cat:"science"},
+  {w:"atmosphere",ph:"/ˈætməsfɪə/",ar:"غلاف جوي",cat:"science"},
+  {w:"biodiversity",ph:"/ˌbaɪəʊdaɪˈvɜːsɪti/",ar:"تنوع بيولوجي",cat:"science"},
+  {w:"biosphere",ph:"/ˈbaɪəsfɪə/",ar:"المحيط الحيوي",cat:"science"},
+  {w:"carcinogen",ph:"/kɑːˈsɪnədʒən/",ar:"مادة مسرطنة",cat:"science"},
+  {w:"chromosome",ph:"/ˈkrəʊməsəʊm/",ar:"كروموسوم",cat:"science"},
+  {w:"climate",ph:"/ˈklaɪmɪt/",ar:"مناخ",cat:"science"},
+  {w:"combustion",ph:"/kəmˈbʌstʃən/",ar:"احتراق",cat:"science"},
+  {w:"deforestation",ph:"/ˌdiːˌfɒrɪˈsteɪʃən/",ar:"إزالة الغابات",cat:"science"},
+  {w:"desertification",ph:"/dɪˌzɜːtɪfɪˈkeɪʃən/",ar:"تصحر",cat:"science"},
+  {w:"ecosystem",ph:"/ˈiːkəʊsɪstəm/",ar:"نظام بيئي",cat:"science"},
+  {w:"electromagnetic",ph:"/ɪˌlektrəʊmæɡˈnetɪk/",ar:"كهرومغناطيسي",cat:"science"},
+  {w:"evolution",ph:"/ˌiːvəˈluːʃən/",ar:"تطور",cat:"science"},
+  {w:"fossil",ph:"/ˈfɒsəl/",ar:"أحفوري / متحجر",cat:"science"},
+  {w:"genome",ph:"/ˈdʒiːnəʊm/",ar:"جينوم / مجين",cat:"science"},
+  {w:"geology",ph:"/dʒiˈɒlədʒi/",ar:"علم الجيولوجيا",cat:"science"},
+  {w:"glacier",ph:"/ˈɡlæsiə/",ar:"نهر جليدي",cat:"science"},
+  {w:"hydraulic",ph:"/haɪˈdrɔːlɪk/",ar:"هيدروليكي",cat:"science"},
+  {w:"molecule",ph:"/ˈmɒlɪkjuːl/",ar:"جزيء",cat:"science"},
+  {w:"nanotechnology",ph:"/ˌnænəʊtekˈnɒlədʒi/",ar:"تقنية النانو",cat:"science"},
+  {w:"nucleus",ph:"/ˈnjuːkliəs/",ar:"نواة",cat:"science"},
+  {w:"photosynthesis",ph:"/ˌfəʊtəʊˈsɪnθəsɪs/",ar:"التركيب الضوئي",cat:"science"},
+  {w:"precipitation",ph:"/prɪˌsɪpɪˈteɪʃən/",ar:"هطول / ترسيب",cat:"science"},
+  {w:"renewable",ph:"/rɪˈnjuːəbəl/",ar:"متجدد",cat:"science"},
+  {w:"satellite",ph:"/ˈsætəlaɪt/",ar:"قمر صناعي",cat:"science"},
+  {w:"seismic",ph:"/ˈsaɪzmɪk/",ar:"زلزالي",cat:"science"},
+  {w:"semiconductor",ph:"/ˌsemɪkənˈdʌktə/",ar:"شبه موصل",cat:"science"},
+  {w:"taxonomy",ph:"/tækˈsɒnəmi/",ar:"تصنيف علمي",cat:"science"},
+  {w:"tectonic",ph:"/tekˈtɒnɪk/",ar:"تكتوني",cat:"science"},
+  {w:"thermal",ph:"/ˈθɜːməl/",ar:"حراري",cat:"science"},
+  {w:"trajectory",ph:"/trəˈdʒektəri/",ar:"مسار / مسارة",cat:"science"},
+  {w:"velocity",ph:"/vɪˈlɒsɪti/",ar:"سرعة",cat:"science"},
+  {w:"volatile",ph:"/ˈvɒlətaɪl/",ar:"متقلب / متطاير",cat:"science"},
+  {w:"wavelength",ph:"/ˈweɪvleŋθ/",ar:"طول الموجة",cat:"science"},
+  {w:"acoustic",ph:"/əˈkuːstɪk/",ar:"صوتي / سمعي",cat:"science"},
+  {w:"catalyst",ph:"/ˈkætəlɪst/",ar:"محفّز",cat:"science"},
+  {w:"centrifugal",ph:"/ˌsentrɪˈfjuːɡəl/",ar:"طارد مركزي",cat:"science"},
+  {w:"chlorophyll",ph:"/ˈklɒrəfɪl/",ar:"كلوروفيل",cat:"science"},
+  {w:"equilibrium",ph:"/ˌiːkwɪˈlɪbriəm/",ar:"توازن",cat:"science"},
+  {w:"fluorescent",ph:"/flɔːˈresənt/",ar:"فلوري / متألق",cat:"science"},
+  {w:"hypothesis",ph:"/haɪˈpɒθəsɪs/",ar:"فرضية",cat:"science"},
+  {w:"inertia",ph:"/ɪˈnɜːʃə/",ar:"قصور ذاتي",cat:"science"},
+  {w:"osmosis",ph:"/ɒzˈməʊsɪs/",ar:"تناضح",cat:"science"},
+  {w:"phenomenon",ph:"/fɪˈnɒmɪnən/",ar:"ظاهرة",cat:"science"},
+  {w:"physiology",ph:"/ˌfɪziˈɒlədʒi/",ar:"علم وظائف الأعضاء",cat:"science"},
+  {w:"psychology",ph:"/saɪˈkɒlədʒi/",ar:"علم النفس",cat:"science"},
+  {w:"quantum",ph:"/ˈkwɒntəm/",ar:"كم / كمي",cat:"science"},
+  {w:"sociology",ph:"/ˌsəʊsiˈɒlədʒi/",ar:"علم الاجتماع",cat:"science"},
+  {w:"thermodynamics",ph:"/ˌθɜːməʊdaɪˈnæmɪks/",ar:"ديناميكا حرارية",cat:"science"},
 
-  useEffect(()=>{
-    if(phase!=="preview"||!reelData||!canvasRef.current)return;
-    const canvas=canvasRef.current;
-    const ctx=canvas.getContext("2d");
-    const allScenes=[
-      {text:reelData.hook,type:"hook"},
-      ...(reelData.scenes||[]).map(t=>({text:t,type:"feature"})),
-      {text:reelData.cta,type:"cta"},
-    ];
-    const TOTAL=SCENE_DUR*allScenes.length;
-    startTimeRef.current=null;
-    const filterCss=(FILTERS.find(f=>f.id===filter)||FILTERS[0]).css;
+  // Economy & Society
+  {w:"capitalism",ph:"/ˈkæpɪtəlɪzəm/",ar:"الرأسمالية",cat:"society"},
+  {w:"collateral",ph:"/kəˈlætərəl/",ar:"ضمان / جانبي",cat:"society"},
+  {w:"commodity",ph:"/kəˈmɒdɪti/",ar:"سلعة",cat:"society"},
+  {w:"compensation",ph:"/ˌkɒmpənˈseɪʃən/",ar:"تعويض",cat:"society"},
+  {w:"consumerism",ph:"/kənˈsjuːmərɪzəm/",ar:"استهلاكية",cat:"society"},
+  {w:"corruption",ph:"/kəˈrʌpʃən/",ar:"فساد",cat:"society"},
+  {w:"deficit",ph:"/ˈdefɪsɪt/",ar:"عجز",cat:"society"},
+  {w:"demographics",ph:"/ˌdeməˈɡræfɪks/",ar:"إحصاءات سكانية",cat:"society"},
+  {w:"depreciation",ph:"/dɪˌpriːʃiˈeɪʃən/",ar:"استهلاك / انخفاض قيمة",cat:"society"},
+  {w:"discrimination",ph:"/dɪˌskrɪmɪˈneɪʃən/",ar:"تمييز",cat:"society"},
+  {w:"diversity",ph:"/daɪˈvɜːsɪti/",ar:"تنوع",cat:"society"},
+  {w:"dividend",ph:"/ˈdɪvɪdend/",ar:"أرباح / عائد",cat:"society"},
+  {w:"entrepreneurship",ph:"/ˌɒntrəprəˈnɜːʃɪp/",ar:"ريادة الأعمال",cat:"society"},
+  {w:"exploitation",ph:"/ˌeksplɔɪˈteɪʃən/",ar:"استغلال",cat:"society"},
+  {w:"fiscal",ph:"/ˈfɪskəl/",ar:"مالي / ضريبي",cat:"society"},
+  {w:"gentrification",ph:"/ˌdʒentrɪfɪˈkeɪʃən/",ar:"تحسين الأحياء",cat:"society"},
+  {w:"globalisation",ph:"/ˌɡləʊbəlaɪˈzeɪʃən/",ar:"عولمة",cat:"society"},
+  {w:"governance",ph:"/ˈɡʌvənəns/",ar:"حوكمة / إدارة",cat:"society"},
+  {w:"humanitarian",ph:"/hjuːˌmænɪˈteəriən/",ar:"إنساني",cat:"society"},
+  {w:"ideology",ph:"/ˌaɪdiˈɒlədʒi/",ar:"أيديولوجية",cat:"society"},
+  {w:"immigration",ph:"/ˌɪmɪˈɡreɪʃən/",ar:"هجرة",cat:"society"},
+  {w:"imperialism",ph:"/ɪmˈpɪəriəlɪzəm/",ar:"إمبريالية",cat:"society"},
+  {w:"inequality",ph:"/ˌɪnɪˈkwɒlɪti/",ar:"عدم المساواة",cat:"society"},
+  {w:"inflation",ph:"/ɪnˈfleɪʃən/",ar:"تضخم",cat:"society"},
+  {w:"initiative",ph:"/ɪˈnɪʃətɪv/",ar:"مبادرة",cat:"society"},
+  {w:"legislation",ph:"/ˌledʒɪˈsleɪʃən/",ar:"تشريع",cat:"society"},
+  {w:"meritocracy",ph:"/ˌmerɪˈtɒkrəsi/",ar:"الجدارة",cat:"society"},
+  {w:"metropolitan",ph:"/ˌmetrəˈpɒlɪtən/",ar:"عاصمة / حضري",cat:"society"},
+  {w:"monopoly",ph:"/məˈnɒpəli/",ar:"احتكار",cat:"society"},
+  {w:"municipality",ph:"/mjuːˌnɪsɪˈpælɪti/",ar:"بلدية",cat:"society"},
+  {w:"philanthropy",ph:"/fɪˈlænθrəpi/",ar:"عمل خيري",cat:"society"},
+  {w:"poverty",ph:"/ˈpɒvəti/",ar:"فقر",cat:"society"},
+  {w:"privatisation",ph:"/ˌpraɪvətaɪˈzeɪʃən/",ar:"خصخصة",cat:"society"},
+  {w:"propaganda",ph:"/ˌprɒpəˈɡændə/",ar:"دعاية",cat:"society"},
+  {w:"protocol",ph:"/ˈprəʊtəkɒl/",ar:"بروتوكول",cat:"society"},
+  {w:"recession",ph:"/rɪˈseʃən/",ar:"ركود اقتصادي",cat:"society"},
+  {w:"referendum",ph:"/ˌrefəˈrendəm/",ar:"استفتاء",cat:"society"},
+  {w:"rehabilitation",ph:"/ˌriːəˌbɪlɪˈteɪʃən/",ar:"إعادة تأهيل",cat:"society"},
+  {w:"remuneration",ph:"/rɪˌmjuːnəˈreɪʃən/",ar:"مكافأة / أجر",cat:"society"},
+  {w:"segregation",ph:"/ˌseɡrɪˈɡeɪʃən/",ar:"فصل / عزل",cat:"society"},
+  {w:"sovereignty",ph:"/ˈsɒvrɪnti/",ar:"سيادة",cat:"society"},
+  {w:"subsidise",ph:"/ˈsʌbsɪdaɪz/",ar:"يدعم مالياً",cat:"society"},
+  {w:"surveillance",ph:"/səˈveɪləns/",ar:"مراقبة",cat:"society"},
+  {w:"taxation",ph:"/tækˈseɪʃən/",ar:"ضرائب",cat:"society"},
+  {w:"transparency",ph:"/trænsˈpærənsi/",ar:"شفافية",cat:"society"},
+  {w:"urbanisation",ph:"/ˌɜːbənaɪˈzeɪʃən/",ar:"تحضر",cat:"society"},
+  {w:"welfare",ph:"/ˈwelfeə/",ar:"رعاية / رفاهية",cat:"society"},
+  {w:"xenophobia",ph:"/ˌzenəˈfəʊbiə/",ar:"كره الأجانب",cat:"society"},
+  {w:"anarchism",ph:"/ˈænəkɪzəm/",ar:"فوضوية",cat:"society"},
+  {w:"bureaucrat",ph:"/ˈbjʊərəkræt/",ar:"بيروقراطي",cat:"society"},
 
-    const wrapText=(ctx,text,maxW)=>{
-      const words=String(text||"").split(" ");
-      const lines=[];let line="";
-      words.forEach(w=>{
-        const test=line?line+" "+w:w;
-        if(ctx.measureText(test).width>maxW){lines.push(line);line=w;}
-        else line=test;
-      });
-      if(line)lines.push(line);
-      return lines;
-    };
+  // Medical & Health
+  {w:"anaesthesia",ph:"/ˌænɪsˈθiːziə/",ar:"تخدير",cat:"medical"},
+  {w:"anatomy",ph:"/əˈnætəmi/",ar:"علم التشريح",cat:"medical"},
+  {w:"antibiotics",ph:"/ˌæntibaɪˈɒtɪks/",ar:"مضادات حيوية",cat:"medical"},
+  {w:"cardiovascular",ph:"/ˌkɑːdiəʊˈvæskjuːlə/",ar:"قلبي وعائي",cat:"medical"},
+  {w:"cholesterol",ph:"/kəˈlestərɒl/",ar:"كوليسترول",cat:"medical"},
+  {w:"chronic",ph:"/ˈkrɒnɪk/",ar:"مزمن",cat:"medical"},
+  {w:"clinical",ph:"/ˈklɪnɪkəl/",ar:"سريري / طبي",cat:"medical"},
+  {w:"contagious",ph:"/kənˈteɪdʒəs/",ar:"معدٍ",cat:"medical"},
+  {w:"dementia",ph:"/dɪˈmenʃə/",ar:"خرف / ضعف إدراكي",cat:"medical"},
+  {w:"diabetes",ph:"/ˌdaɪəˈbiːtiːz/",ar:"سكري",cat:"medical"},
+  {w:"diagnosis",ph:"/ˌdaɪəɡˈnəʊsɪs/",ar:"تشخيص",cat:"medical"},
+  {w:"epidemic",ph:"/ˌepɪˈdemɪk/",ar:"وباء",cat:"medical"},
+  {w:"immunisation",ph:"/ˌɪmjuːnaɪˈzeɪʃən/",ar:"تطعيم",cat:"medical"},
+  {w:"inflammation",ph:"/ˌɪnfləˈmeɪʃən/",ar:"التهاب",cat:"medical"},
+  {w:"intravenous",ph:"/ˌɪntrəˈviːnəs/",ar:"وريدي",cat:"medical"},
+  {w:"malnutrition",ph:"/ˌmælnjuˈtrɪʃən/",ar:"سوء تغذية",cat:"medical"},
+  {w:"metabolism",ph:"/mɪˈtæbəlɪzəm/",ar:"أيض / استقلاب",cat:"medical"},
+  {w:"neurological",ph:"/ˌnjʊərəˈlɒdʒɪkəl/",ar:"عصبي",cat:"medical"},
+  {w:"obese",ph:"/əʊˈbiːs/",ar:"بدين / يعاني من سمنة",cat:"medical"},
+  {w:"obesity",ph:"/əʊˈbiːsɪti/",ar:"سمنة",cat:"medical"},
+  {w:"pandemic",ph:"/pænˈdemɪk/",ar:"جائحة",cat:"medical"},
+  {w:"parasite",ph:"/ˈpærəsaɪt/",ar:"طفيلي",cat:"medical"},
+  {w:"pathogen",ph:"/ˈpæθədʒən/",ar:"مسبب المرض",cat:"medical"},
+  {w:"pharmaceutical",ph:"/ˌfɑːməˈsjuːtɪkəl/",ar:"صيدلاني / دوائي",cat:"medical"},
+  {w:"psychiatry",ph:"/saɪˈkaɪətri/",ar:"طب نفسي",cat:"medical"},
+  {w:"rehabilitation",ph:"/ˌriːəˌbɪlɪˈteɪʃən/",ar:"إعادة تأهيل",cat:"medical"},
+  {w:"respiratory",ph:"/rɪˈspɪrətəri/",ar:"تنفسي",cat:"medical"},
+  {w:"symptom",ph:"/ˈsɪmptəm/",ar:"عَرَض / أعراض",cat:"medical"},
+  {w:"syndrome",ph:"/ˈsɪndrəʊm/",ar:"متلازمة",cat:"medical"},
+  {w:"therapeutic",ph:"/ˌθerəˈpjuːtɪk/",ar:"علاجي",cat:"medical"},
+  {w:"vaccination",ph:"/ˌvæksɪˈneɪʃən/",ar:"تطعيم",cat:"medical"},
+  {w:"anaemia",ph:"/əˈniːmiə/",ar:"فقر دم",cat:"medical"},
+  {w:"endocrine",ph:"/ˈendəkrɪn/",ar:"غدي / صماوي",cat:"medical"},
+  {w:"haemoglobin",ph:"/ˈhiːməɡləʊbɪn/",ar:"هيموغلوبين",cat:"medical"},
+  {w:"ophthalmology",ph:"/ˌɒfθælˈmɒlədʒi/",ar:"طب العيون",cat:"medical"},
+  {w:"orthopaedic",ph:"/ˌɔːθəˈpiːdɪk/",ar:"تقويم العظام",cat:"medical"},
+  {w:"paediatric",ph:"/ˌpiːdiˈætrɪk/",ar:"طب الأطفال",cat:"medical"},
+  {w:"prognosis",ph:"/prɒɡˈnəʊsɪs/",ar:"تكهن طبي",cat:"medical"},
+  {w:"schizophrenia",ph:"/ˌskɪtsəˈfriːniə/",ar:"انفصام الشخصية",cat:"medical"},
+  {w:"stethoscope",ph:"/ˈsteθəskəʊp/",ar:"سماعة طبية",cat:"medical"},
+  {w:"ventricular",ph:"/venˈtrɪkjulə/",ar:"بطيني",cat:"medical"},
 
-    const draw=(ts)=>{
-      if(!startTimeRef.current)startTimeRef.current=ts;
-      const elapsed=(ts-startTimeRef.current)%TOTAL;
-      const si=Math.floor(elapsed/SCENE_DUR);
-      const sc=allScenes[si];
-      const t=(elapsed%SCENE_DUR)/SCENE_DUR;
-      const imgEl=imgElemsRef.current[si%Math.max(imgElemsRef.current.length,1)];
-      ctx.clearRect(0,0,CW,CH);
-      // Background image with Ken Burns
-      if(imgEl&&imgEl.complete&&imgEl.naturalWidth>0){
-        ctx.save();
-        if(filterCss)ctx.filter=filterCss;
-        const scale=1+0.06*t;
-        const iw=imgEl.naturalWidth,ih=imgEl.naturalHeight;
-        const ar=iw/ih,car=CW/CH;
-        let dw,dh;
-        if(ar>car){dh=CH*scale;dw=dh*ar;}else{dw=CW*scale;dh=dw/ar;}
-        ctx.drawImage(imgEl,(CW-dw)/2,(CH-dh)/2,dw,dh);
-        ctx.filter="none";
-        ctx.restore();
-      }else{
-        ctx.fillStyle="#1a1a2e";
-        ctx.fillRect(0,0,CW,CH);
-      }
-      // Overlay gradient
-      const grad=ctx.createLinearGradient(0,0,0,CH);
-      grad.addColorStop(0,"rgba(0,0,0,0.15)");
-      grad.addColorStop(0.5,"rgba(0,0,0,0.4)");
-      grad.addColorStop(1,"rgba(0,0,0,0.7)");
-      ctx.fillStyle=grad;
-      ctx.fillRect(0,0,CW,CH);
-      // Gold accent line
-      const lineW=CW*0.55*Math.min(t*3,1);
-      ctx.fillStyle="#d4af37";
-      ctx.fillRect((CW-lineW)/2,CH*0.4,lineW,2.5);
-      // Text
-      const alpha=Math.min(t*3,1);
-      ctx.globalAlpha=alpha;
-      ctx.fillStyle="#ffffff";
-      const fontSize=sc.type==="hook"?36:28;
-      ctx.font=`bold ${fontSize}px 'Cairo','Noto Sans Arabic',sans-serif`;
-      ctx.textAlign="center";
-      ctx.textBaseline="middle";
-      const lines=wrapText(ctx,sc.text,CW*0.82);
-      const lineH=fontSize+10;
-      lines.forEach((ln,i)=>{ctx.fillText(ln,CW/2,CH/2+(i-(lines.length-1)/2)*lineH);});
-      // CTA button style
-      if(sc.type==="cta"){
-        ctx.globalAlpha=alpha*0.9;
-        ctx.fillStyle="#d4af37";
-        ctx.beginPath();
-        ctx.roundRect(CW/2-85,CH*0.66,170,38,8);
-        ctx.fill();
-        ctx.fillStyle="#1a1a2e";
-        ctx.font="bold 13px 'Cairo',sans-serif";
-        ctx.fillText(language==="ar"?"ابدأ الآن ←":"Start Now →",CW/2,CH*0.66+19);
-      }
-      // Scene dots
-      ctx.globalAlpha=0.85;
-      allScenes.forEach((_,i)=>{
-        const x=CW/2+(i-(allScenes.length-1)/2)*16;
-        ctx.fillStyle=i===si?"#d4af37":"rgba(255,255,255,0.3)";
-        ctx.beginPath();
-        ctx.arc(x,CH*0.91,i===si?5:3,0,Math.PI*2);
-        ctx.fill();
-      });
-      // Progress bar
-      ctx.globalAlpha=0.6;
-      ctx.fillStyle="rgba(255,255,255,0.2)";
-      ctx.fillRect(0,CH-3,CW,3);
-      ctx.fillStyle="#d4af37";
-      ctx.fillRect(0,CH-3,CW*t,3);
-      ctx.globalAlpha=1;
-      animRef.current=requestAnimationFrame(draw);
-    };
-    animRef.current=requestAnimationFrame(draw);
-    return()=>{if(animRef.current)cancelAnimationFrame(animRef.current);};
-  },[phase,reelData,filter,language]);
+  // Arts, Culture & Literature
+  {w:"aesthetic",ph:"/iːsˈθetɪk/",ar:"جمالي",cat:"culture"},
+  {w:"allegory",ph:"/ˈæləɡəri/",ar:"أسلوب رمزي",cat:"culture"},
+  {w:"anachronistic",ph:"/əˌnækrəˈnɪstɪk/",ar:"مناقض للحقبة",cat:"culture"},
+  {w:"archaeology",ph:"/ˌɑːkiˈɒlədʒi/",ar:"علم الآثار",cat:"culture"},
+  {w:"architecture",ph:"/ˈɑːkɪtektʃə/",ar:"عمارة / هندسة معمارية",cat:"culture"},
+  {w:"baroque",ph:"/bəˈrɒk/",ar:"باروكي",cat:"culture"},
+  {w:"bibliography",ph:"/ˌbɪbliˈɒɡrəfi/",ar:"ببليوغرافيا / قائمة مراجع",cat:"culture"},
+  {w:"biography",ph:"/baɪˈɒɡrəfi/",ar:"سيرة ذاتية",cat:"culture"},
+  {w:"calligraphy",ph:"/kəˈlɪɡrəfi/",ar:"الخط العربي / فن الخط",cat:"culture"},
+  {w:"choreography",ph:"/ˌkɒriˈɒɡrəfi/",ar:"تصميم رقصات",cat:"culture"},
+  {w:"cinematography",ph:"/ˌsɪnɪmæˈtɒɡrəfi/",ar:"تصوير سينمائي",cat:"culture"},
+  {w:"civilisation",ph:"/ˌsɪvɪlaɪˈzeɪʃən/",ar:"حضارة",cat:"culture"},
+  {w:"connoisseur",ph:"/ˌkɒnəˈsɜː/",ar:"خبير / ذواقة",cat:"culture"},
+  {w:"contemporary",ph:"/kənˈtempərəri/",ar:"معاصر",cat:"culture"},
+  {w:"cuisine",ph:"/kwɪˈziːn/",ar:"مطبخ / طهي",cat:"culture"},
+  {w:"ethnicity",ph:"/eθˈnɪsɪti/",ar:"عرق / إثنية",cat:"culture"},
+  {w:"eulogy",ph:"/ˈjuːlədʒi/",ar:"رثاء / مديح",cat:"culture"},
+  {w:"euphemism",ph:"/ˈjuːfɪmɪzəm/",ar:"تلطيف اللفظ",cat:"culture"},
+  {w:"indigenous",ph:"/ɪnˈdɪdʒənəs/",ar:"أصلي / محلي",cat:"culture"},
+  {w:"irony",ph:"/ˈaɪrəni/",ar:"سخرية / تهكم",cat:"culture"},
+  {w:"juxtaposition",ph:"/ˌdʒʌkstəpəˈzɪʃən/",ar:"مقارنة / تضاد",cat:"culture"},
+  {w:"metaphor",ph:"/ˈmetəfə/",ar:"استعارة",cat:"culture"},
+  {w:"mythology",ph:"/mɪˈθɒlədʒi/",ar:"أساطير",cat:"culture"},
+  {w:"narrative",ph:"/ˈnærətɪv/",ar:"سرد / رواية",cat:"culture"},
+  {w:"nostalgia",ph:"/nɒˈstældʒə/",ar:"حنين",cat:"culture"},
+  {w:"orchestra",ph:"/ˈɔːkɪstrə/",ar:"أوركسترا",cat:"culture"},
+  {w:"paradox",ph:"/ˈpærədɒks/",ar:"تناقض / مفارقة",cat:"culture"},
+  {w:"philosophy",ph:"/fɪˈlɒsəfi/",ar:"فلسفة",cat:"culture"},
+  {w:"portrayal",ph:"/pɔːˈtreɪəl/",ar:"تصوير / تجسيد",cat:"culture"},
+  {w:"pseudonym",ph:"/ˈsjuːdənɪm/",ar:"اسم مستعار",cat:"culture"},
+  {w:"renaissance",ph:"/rɪˈneɪsəns/",ar:"نهضة",cat:"culture"},
+  {w:"satire",ph:"/ˈsætaɪə/",ar:"هجاء / تهكم",cat:"culture"},
+  {w:"silhouette",ph:"/ˌsɪluˈet/",ar:"صورة ظلية",cat:"culture"},
+  {w:"simultaneously",ph:"/ˌsɪməlˈteɪniəsli/",ar:"في آنٍ واحد",cat:"culture"},
+  {w:"soliloquy",ph:"/səˈlɪləkwi/",ar:"مناجاة / حديث النفس",cat:"culture"},
+  {w:"sophisticated",ph:"/səˈfɪstɪkeɪtɪd/",ar:"متطور / راقٍ",cat:"culture"},
+  {w:"stereotype",ph:"/ˈsteriətaɪp/",ar:"صورة نمطية",cat:"culture"},
+  {w:"symbolism",ph:"/ˈsɪmbəlɪzəm/",ar:"رمزية",cat:"culture"},
+  {w:"symphony",ph:"/ˈsɪmfəni/",ar:"سيمفونية",cat:"culture"},
+  {w:"trajectory",ph:"/trəˈdʒektəri/",ar:"مسار",cat:"culture"},
+  {w:"utopian",ph:"/juːˈtəʊpiən/",ar:"طوباوي / مثالي",cat:"culture"},
+  {w:"vernacular",ph:"/vəˈnækjulə/",ar:"لهجة محلية",cat:"culture"},
+  {w:"virtue",ph:"/ˈvɜːtʃuː/",ar:"فضيلة",cat:"culture"},
+  {w:"vulnerable",ph:"/ˈvʌlnərəbəl/",ar:"ضعيف / عرضة للخطر",cat:"culture"},
+  {w:"whimsical",ph:"/ˈwɪmzɪkəl/",ar:"غريب الأطوار / خيالي",cat:"culture"},
+  {w:"zeitgeist",ph:"/ˈzaɪtɡaɪst/",ar:"روح العصر",cat:"culture"},
+  {w:"zenith",ph:"/ˈzenɪθ/",ar:"قمة / ذروة",cat:"culture"},
+  {w:"zealous",ph:"/ˈzeləs/",ar:"متحمس / غيور",cat:"culture"},
+  {w:"eloquent",ph:"/ˈeləkwənt/",ar:"بليغ / فصيح",cat:"culture"},
+];
 
-  const handleImageUpload=(files)=>{
-    Array.from(files).forEach(file=>{
-      if(!file.type.startsWith("image/"))return;
-      if(images.length>=6)return;
-      const reader=new FileReader();
-      reader.onload=(e)=>setImages(prev=>prev.length<6?[...prev,{url:e.target.result,name:file.name}]:prev);
-      reader.readAsDataURL(file);
-    });
-  };
+const PRON_CATS=[
+  {id:"all",ar:"الكل",en:"All"},
+  {id:"academic",ar:"أكاديمي",en:"Academic"},
+  {id:"tricky",ar:"صعبة النطق",en:"Tricky"},
+  {id:"science",ar:"علوم",en:"Science"},
+  {id:"society",ar:"مجتمع",en:"Society"},
+  {id:"medical",ar:"طبي",en:"Medical"},
+  {id:"culture",ar:"ثقافة",en:"Culture"},
+];
 
-  const generateReel=async()=>{
-    if(!canUse){onUpgrade();return;}
-    setPhase("generating");setError("");
-    const langInstruction=language==="ar"?"in Arabic (Modern Standard Arabic)"
-      :language==="en"?"in English"
-      :"alternating Arabic and English lines";
-    const numScenes=images.length;
-    const middleCount=Math.max(numScenes-2,0);
-    const prompt=`Generate a social media reel script ${langInstruction} for: "${description}".
-There are ${numScenes} scenes. Provide ${middleCount} middle scene texts.
-Rules: max 10 words per line, no hashtags, no emojis, punchy and direct.
-Return ONLY valid JSON, no markdown, no extra text:
-{"hook":"opening line","scenes":[${Array(middleCount).fill('"scene text"').join(",")}],"cta":"call to action"}`;
-    try{
-      const res=await fetch("/api/analyze",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-20250514",
-          max_tokens:400,
-          messages:[{role:"user",content:prompt}],
-        }),
-      });
-      if(!res.ok)throw new Error("API error "+res.status);
-      const raw=await res.json();
-      // /api/analyze returns the full Anthropic response object
-      const text=(raw?.content?.[0]?.text||raw?.text||JSON.stringify(raw));
-      const clean=text.replace(/```json|```/g,"").trim();
-      const data=JSON.parse(clean);
-      if(!data.hook)throw new Error("Bad JSON");
-      setReelData(data);
-      const newCount=reelUses+1;
-      setReelUses(newCount);
-      saveReelUses(newCount,email);
-      setPhase("preview");
-    }catch(e){
-      setError("فشل توليد النص. حاول مرة أخرى.");
-      setPhase("configure");
-    }
-  };
-
-  const buildMusic=(ctx,style,duration)=>{
-    const dest=ctx.createMediaStreamDestination();
-    const master=ctx.createGain();
-    master.gain.value=0.28;
-    master.connect(dest);
-    const pats={
-      upbeat:{notes:[523,659,784,1047,784,659,523,659,784,523,659,784],tempo:0.32,wave:"triangle"},
-      calm:  {notes:[261,329,392,440,392,329,261,294,329,392,261,329],tempo:0.58,wave:"sine"},
-      corporate:{notes:[330,392,494,440,392,330,294,330,392,494,330,392],tempo:0.44,wave:"sine"},
-    };
-    const p=pats[style]||pats.upbeat;
-    const totalNotes=Math.ceil((duration/1000)/p.tempo)+4;
-    for(let i=0;i<totalNotes;i++){
-      const t=ctx.currentTime+i*p.tempo;
-      const osc=ctx.createOscillator();
-      const g=ctx.createGain();
-      osc.type=p.wave;
-      osc.frequency.value=p.notes[i%p.notes.length];
-      osc.connect(g);g.connect(master);
-      g.gain.setValueAtTime(0,t);
-      g.gain.linearRampToValueAtTime(0.35,t+0.04);
-      g.gain.linearRampToValueAtTime(0,t+p.tempo*0.75);
-      osc.start(t);osc.stop(t+p.tempo);
-    }
-    return dest.stream;
-  };
-
-  const downloadReel=(blob)=>{
-    try{
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement("a");
-      a.href=url;
-      a.download="classreel.webm";
-      a.style.display="none";
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},2000);
-    }catch(e){
-      // fallback: open in new tab
-      const url=blobUrlRef.current;
-      if(url)window.open(url,"_blank");
-    }
-  };
-
-  const startRecording=()=>{
-    if(!canvasRef.current||!reelData)return;
-    const allScenes=[reelData.hook,...(reelData.scenes||[]),reelData.cta];
-    const duration=allScenes.length*SCENE_DUR;
-    // 3-second countdown then record
-    setCountdown(3);
-    let c=3;
-    const tick=setInterval(()=>{
-      c--;
-      if(c>0){setCountdown(c);}
-      else{
-        clearInterval(tick);
-        setCountdown(0);
-        setIsRecording(true);
-        setRecordedBlob(null);
-        chunksRef.current=[];
-        startTimeRef.current=null;
-        // Audio
-        try{
-          audioCtxRef.current=new (window.AudioContext||window.webkitAudioContext)();
-          const audioStream=buildMusic(audioCtxRef.current,music,duration);
-          const videoStream=canvasRef.current.captureStream(30);
-          const combined=new MediaStream([...videoStream.getTracks(),...audioStream.getTracks()]);
-          const mimeType=MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")?"video/webm;codecs=vp9,opus":MediaRecorder.isTypeSupported("video/webm;codecs=vp9")?"video/webm;codecs=vp9":"video/webm";
-          recorderRef.current=new MediaRecorder(combined,{mimeType,videoBitsPerSecond:4000000});
-          recorderRef.current.ondataavailable=e=>{if(e.data?.size>0)chunksRef.current.push(e.data);};
-          recorderRef.current.onstop=()=>{
-            const blob=new Blob(chunksRef.current,{type:"video/webm"});
-            if(blobUrlRef.current)URL.revokeObjectURL(blobUrlRef.current);
-            blobUrlRef.current=URL.createObjectURL(blob);
-            setRecordedBlob(blob);
-            setIsRecording(false);
-            if(audioCtxRef.current){audioCtxRef.current.close();audioCtxRef.current=null;}
-          };
-          recorderRef.current.start(100);
-        }catch(err){
-          // Audio failed, record video only
-          const stream=canvasRef.current.captureStream(30);
-          const mimeType=MediaRecorder.isTypeSupported("video/webm;codecs=vp9")?"video/webm;codecs=vp9":"video/webm";
-          recorderRef.current=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:4000000});
-          recorderRef.current.ondataavailable=e=>{if(e.data?.size>0)chunksRef.current.push(e.data);};
-          recorderRef.current.onstop=()=>{
-            const blob=new Blob(chunksRef.current,{type:"video/webm"});
-            if(blobUrlRef.current)URL.revokeObjectURL(blobUrlRef.current);
-            blobUrlRef.current=URL.createObjectURL(blob);
-            setRecordedBlob(blob);
-            setIsRecording(false);
-          };
-          recorderRef.current.start(100);
-        }
-        setTimeout(()=>{if(recorderRef.current?.state==="recording")recorderRef.current.stop();},duration);
-      }
-    },1000);
-  };
-
+const PronunciationPage=({uiLang="ar",isPro})=>{
+  const [search,setSearch]=useState("");
+  const [cat,setCat]=useState("all");
+  const [speaking,setSpeaking]=useState("");
   const isAr=uiLang==="ar";
   const dir=isAr?"rtl":"ltr";
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
-  // UPLOAD PHASE
-  if(phase==="upload")return(
-    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 16px",...sty,direction:dir}}>
-      <h1 style={{fontFamily:"Georgia,serif",fontSize:26,color:T.text,marginBottom:4,textAlign:"center"}}>🎬 ClassReel</h1>
-      <p style={{textAlign:"center",color:T.textMuted,fontSize:14,marginBottom:4}}>
-        {isAr?"حوّل صورك إلى ريلز احترافي للترويج لصفك أو دوراتك":"Turn your photos into a professional reel for your classes"}
-      </p>
-      <p style={{textAlign:"center",fontSize:13,marginBottom:24,color:isPro?T.green:T.amber}}>
-        {isPro?(isAr?"Pro — ريلز غير محدود ✓":"Pro — Unlimited reels ✓"):(isAr?`${FREE_REEL_LIMIT-reelUses} ريلز مجاني متبقي`:`${FREE_REEL_LIMIT-reelUses} free reels remaining`)}
-      </p>
-      <div onDrop={e=>{e.preventDefault();handleImageUpload(e.dataTransfer.files);}} onDragOver={e=>e.preventDefault()}
-        onClick={()=>document.getElementById("reel-file-input").click()}
-        style={{border:`2px dashed ${T.borderMid}`,borderRadius:16,padding:"40px 20px",textAlign:"center",cursor:"pointer",background:T.bgMuted,marginBottom:20}}>
-        <div style={{fontSize:40,marginBottom:10}}>📸</div>
-        <div style={{fontWeight:700,fontSize:16,color:T.text,marginBottom:4}}>{isAr?"اسحب صورك هنا أو اضغط للاختيار":"Drag photos here or click to choose"}</div>
-        <div style={{fontSize:13,color:T.textMuted}}>{isAr?"3 إلى 6 صور · JPG أو PNG":"3 to 6 images · JPG or PNG"}</div>
-        <input id="reel-file-input" type="file" multiple accept="image/*" style={{display:"none"}} onChange={e=>handleImageUpload(e.target.files)}/>
-      </div>
-      {images.length>0&&(
-        <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}}>
-          {images.map((img,i)=>(
-            <div key={i} style={{position:"relative"}}>
-              <img src={img.url} alt="" style={{width:80,height:80,objectFit:"cover",borderRadius:10,border:`1px solid ${T.border}`}}/>
-              <button onClick={()=>setImages(prev=>prev.filter((_,j)=>j!==i))}
-                style={{position:"absolute",top:-6,right:-6,width:20,height:20,borderRadius:"50%",background:T.red,border:"none",color:"white",fontSize:11,cursor:"pointer",fontWeight:700}}>×</button>
-            </div>
-          ))}
-          {images.length<6&&(
-            <div onClick={()=>document.getElementById("reel-file-input").click()}
-              style={{width:80,height:80,border:`2px dashed ${T.borderMid}`,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:T.textMuted,fontSize:28}}>+</div>
-          )}
-        </div>
-      )}
-      <button disabled={images.length<3} onClick={()=>setPhase("configure")}
-        style={{width:"100%",padding:"14px",background:images.length>=3?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:16,fontWeight:700,cursor:images.length>=3?"pointer":"not-allowed",...sty}}>
-        {images.length<3?(isAr?`أضف ${3-images.length} صورة على الأقل`:`Add ${3-images.length} more image(s)`):(isAr?"التالي — ضبط الريلز →":"Next — Configure Reel →")}
-      </button>
-    </div>
-  );
+  const filtered=useMemo(()=>{
+    let list=PRON_WORDS;
+    if(cat!=="all")list=list.filter(w=>w.cat===cat);
+    if(search.trim()){
+      const q=search.toLowerCase().trim();
+      list=list.filter(w=>w.w.toLowerCase().includes(q)||w.ar.includes(q));
+    }
+    return list;
+  },[cat,search]);
 
-  // CONFIGURE PHASE
-  if(phase==="configure")return(
-    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 16px",...sty,direction:dir}}>
-      <button onClick={()=>setPhase("upload")} style={{background:"none",border:"none",color:T.textMuted,fontSize:13,cursor:"pointer",marginBottom:16}}>← {isAr?"رجوع":"Back"}</button>
-      <h2 style={{fontSize:22,color:T.text,marginBottom:20}}>⚙️ {isAr?"ضبط الريلز":"Configure Reel"}</h2>
-      <div style={{marginBottom:20}}>
-        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:6}}>{isAr?"موضوع الريلز (جملة واحدة)":"What is this reel about? (one sentence)"}</label>
-        <textarea value={description} onChange={e=>setDescription(e.target.value)}
-          placeholder={isAr?"مثال: كورس تحضير آيلتس للمعلم أحمد — نتائج مضمونة":"e.g. Ahmad's IELTS prep course — guaranteed results"} rows={3}
-          style={{width:"100%",padding:"12px",borderRadius:10,border:`1px solid ${T.borderMid}`,fontSize:14,resize:"vertical",...sty,direction:dir,boxSizing:"border-box"}}/>
-      </div>
-      <div style={{marginBottom:20}}>
-        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"لغة الريلز":"Reel Language"}</label>
-        <div style={{display:"flex",gap:8}}>
-          {[{id:"ar",label:"🇸🇦 عربي"},{id:"en",label:"🇬🇧 English"},{id:"bilingual",label:"🔀 ثنائي"}].map(l=>(
-            <button key={l.id} onClick={()=>setLanguage(l.id)}
-              style={{flex:1,padding:"10px 8px",borderRadius:8,border:`1px solid ${language===l.id?T.primary:T.border}`,background:language===l.id?T.primaryLight:"white",color:language===l.id?T.primary:T.textMid,fontWeight:language===l.id?700:500,fontSize:13,cursor:"pointer",...sty}}>
-              {l.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div style={{marginBottom:20}}>
-        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"نوع الريلز":"Reel Style"}</label>
-        <div style={{display:"flex",gap:8}}>
-          {[{id:"quick",label:isAr?"⚡ سريع":"⚡ Quick",desc:isAr?"نص + تأثيرات بسيطة":"Text + simple effects"},{id:"enhanced",label:isAr?"✨ متقدم":"✨ Enhanced",desc:isAr?"فلاتر احترافية":"Pro filters",pro:true}].map(s=>(
-            <button key={s.id} onClick={()=>isPro||s.id==="quick"?setStyle(s.id):onUpgrade()}
-              style={{flex:1,padding:"12px 8px",borderRadius:8,border:`1px solid ${style===s.id?T.primary:T.border}`,background:style===s.id?T.primaryLight:"white",color:style===s.id?T.primary:T.textMid,fontWeight:style===s.id?700:500,fontSize:13,cursor:"pointer",...sty,textAlign:"center",position:"relative"}}>
-              {s.pro&&!isPro&&<span style={{position:"absolute",top:-8,right:-8,background:T.accent,color:"#7f1200",fontSize:10,fontWeight:800,padding:"2px 6px",borderRadius:6}}>Pro</span>}
-              <div>{s.label}</div><div style={{fontSize:11,color:T.textMuted,marginTop:2}}>{s.desc}</div>
-            </button>
-          ))}
-        </div>
-      </div>
-      {style==="enhanced"&&isPro&&(
-        <div style={{marginBottom:20}}>
-          <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"فلتر الصورة":"Image Filter"}</label>
-          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            {FILTERS.map(f=>(
-              <button key={f.id} onClick={()=>setFilter(f.id)}
-                style={{padding:"8px 14px",borderRadius:8,border:`1px solid ${filter===f.id?T.primary:T.border}`,background:filter===f.id?T.primaryLight:"white",color:filter===f.id?T.primary:T.textMid,fontWeight:filter===f.id?700:500,fontSize:12,cursor:"pointer",...sty}}>
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      <div style={{marginBottom:24}}>
-        <label style={{display:"block",fontSize:14,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"الموسيقى":"Music"}</label>
-        <div style={{display:"flex",gap:8}}>
-          {[{id:"upbeat",label:isAr?"🎵 نشيط":"🎵 Upbeat"},{id:"calm",label:isAr?"🎵 هادئ":"🎵 Calm"},{id:"corporate",label:isAr?"🎵 احترافي":"🎵 Corporate"}].map(m=>(
-            <button key={m.id} onClick={()=>setMusic(m.id)}
-              style={{flex:1,padding:"10px 8px",borderRadius:8,border:`1px solid ${music===m.id?T.primary:T.border}`,background:music===m.id?T.primaryLight:"white",color:music===m.id?T.primary:T.textMid,fontWeight:music===m.id?700:500,fontSize:13,cursor:"pointer",...sty}}>
-              {m.label}
-            </button>
-          ))}
-        </div>
-        <div style={{fontSize:11,color:T.textMuted,marginTop:6}}>* {isAr?"الموسيقى ستُضاف في التحديث القادم":"Music will be added in the next update"}</div>
-      </div>
-      {error&&<div style={{padding:"12px",background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,color:T.red,fontSize:13,marginBottom:16}}>{error}</div>}
-      {!canUse&&(
-        <div style={{padding:"14px",background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,marginBottom:16,textAlign:"center"}}>
-          <div style={{fontWeight:700,color:T.amber,marginBottom:6}}>{isAr?"استنفدت ريلزاتك المجانية الـ3":"You've used all 3 free reels"}</div>
-          <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontWeight:700,cursor:"pointer",...sty}}>
-            🔓 {isAr?"احصل على Pro — ريلز غير محدود":"Get Pro — Unlimited Reels"}
-          </button>
-        </div>
-      )}
-      <button disabled={!description.trim()||!canUse} onClick={generateReel}
-        style={{width:"100%",padding:"14px",background:description.trim()&&canUse?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:16,fontWeight:700,cursor:description.trim()&&canUse?"pointer":"not-allowed",...sty}}>
-        🎬 {isAr?"توليد الريلز بالذكاء الاصطناعي":"Generate Reel with AI"}
-      </button>
-    </div>
-  );
-
-  // GENERATING PHASE
-  if(phase==="generating")return(
-    <div style={{maxWidth:560,margin:"60px auto",textAlign:"center",padding:"32px 16px",...sty}}>
-      <div style={{fontSize:48,marginBottom:16}}>🎬</div>
-      <div style={{fontSize:18,fontWeight:700,color:T.text,marginBottom:8}}>{isAr?"جاري توليد ريلزك...":"Generating your reel..."}</div>
-      <div style={{fontSize:14,color:T.textMuted}}>{isAr?"الذكاء الاصطناعي يكتب النصوص الآن":"AI is writing your scenes now"}</div>
-    </div>
-  );
-
-  // PREVIEW PHASE
-  if(phase==="preview"&&reelData){
-    const allScenes=[reelData.hook,...(reelData.scenes||[]),reelData.cta];
-    const totalSec=allScenes.length*(SCENE_DUR/1000);
-    return(
-      <div style={{maxWidth:560,margin:"0 auto",padding:"24px 16px",...sty,direction:dir}}>
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
-          <button onClick={()=>{setPhase("configure");setReelData(null);if(animRef.current)cancelAnimationFrame(animRef.current);}}
-            style={{background:"none",border:"none",color:T.textMuted,fontSize:13,cursor:"pointer"}}>← {isAr?"رجوع":"Back"}</button>
-          <h2 style={{fontSize:20,color:T.text,margin:0,flex:1}}>🎬 {isAr?"معاينة الريلز":"Reel Preview"}</h2>
-          <span style={{fontSize:12,color:T.textMuted}}>{totalSec}s</span>
-        </div>
-        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
-          <canvas ref={canvasRef} width={CW} height={CH} style={{borderRadius:16,border:`1px solid ${T.border}`,maxWidth:"100%",maxHeight:500}}/>
-          <div style={{width:"100%",background:T.bgMuted,borderRadius:12,padding:"16px",border:`1px solid ${T.border}`}}>
-            <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:10}}>{isAr?"النصوص المُولَّدة:":"Generated Scenes:"}</div>
-            {allScenes.map((text,i)=>(
-              <div key={i} style={{padding:"8px 12px",marginBottom:6,background:"white",borderRadius:8,border:`1px solid ${T.border}`,fontSize:13,color:T.text,direction:dir,display:"flex",gap:8,alignItems:"flex-start"}}>
-                <span style={{color:T.textMuted,flexShrink:0}}>{i===0?"🪝":i===allScenes.length-1?"🔗":`${i}.`}</span>
-                <span style={{flex:1}}>{text}</span>
-              </div>
-            ))}
-          </div>
-          {!recordedBlob&&(
-            <button onClick={()=>{if(!isRecording&&countdown===0)startRecording();}}
-              disabled={isRecording||countdown>0}
-              style={{width:"100%",padding:"14px",background:isRecording?T.red:countdown>0?T.amber:T.primary,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:(isRecording||countdown>0)?"not-allowed":"pointer",...sty,transition:"background 0.3s"}}>
-              {countdown>0?`${isAr?"يبدأ التسجيل خلال":"Recording starts in"} ${countdown}...`:isRecording?`⏺ ${isAr?"جاري التسجيل...":"Recording..."} ${totalSec}s`:`⏺ ${isAr?`تسجيل الريلز (${totalSec} ثانية)`:`Record Reel (${totalSec}s)`}`}
-            </button>
-          )}
-          {recordedBlob&&(
-            <div style={{width:"100%",display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
-              <video src={blobUrlRef.current} controls width={340} style={{borderRadius:16,border:`1px solid ${T.border}`,maxWidth:"100%"}}/>
-              <button onClick={()=>downloadReel(recordedBlob)}
-                style={{width:"100%",padding:"13px",background:T.green,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
-                ⬇️ {isAr?"تحميل الريلز (.webm)":"Download Reel (.webm)"}
-              </button>
-              <button onClick={()=>{if(blobUrlRef.current)window.open(blobUrlRef.current,"_blank");}}
-                style={{width:"100%",padding:"11px",background:"white",border:`1px solid ${T.border}`,borderRadius:10,fontSize:14,cursor:"pointer",color:T.text,...sty}}>
-                🔗 {isAr?"فتح الفيديو في تبويب جديد":"Open video in new tab"}
-              </button>
-              <div style={{fontSize:11,color:T.textMuted,direction:dir,textAlign:"center"}}>
-                {isAr?"ملاحظة: صيغة .webm تعمل على جميع المتصفحات وأندرويد. لتحويلها MP4 استخدم cloudconvert.com":"Note: .webm works on all browsers and Android. To convert to MP4 use cloudconvert.com"}
-              </div>
-              <button onClick={()=>{setRecordedBlob(null);}} style={{padding:"10px 24px",background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,fontSize:13,cursor:"pointer",color:T.text,...sty}}>
-                🔄 {isAr?"تسجيل مرة أخرى":"Record Again"}
-              </button>
-            </div>
-          )}
-          <button onClick={()=>{setPhase("upload");setImages([]);setReelData(null);setRecordedBlob(null);if(animRef.current)cancelAnimationFrame(animRef.current);}}
-            style={{width:"100%",padding:"12px",background:"white",border:`1px solid ${T.border}`,borderRadius:10,fontSize:14,cursor:"pointer",color:T.text,...sty}}>
-            🎬 {isAr?"إنشاء ريلز جديد":"Create New Reel"}
-          </button>
-        </div>
-      </div>
+  const speak=(word,accent)=>{
+    if(!window.speechSynthesis)return;
+    window.speechSynthesis.cancel();
+    const k=word+accent;
+    setSpeaking(k);
+    const utt=new SpeechSynthesisUtterance(word);
+    utt.lang=accent==="us"?"en-US":"en-GB";
+    utt.rate=0.82;
+    utt.pitch=1;
+    const voices=window.speechSynthesis.getVoices();
+    const match=voices.find(v=>accent==="us"
+      ?(v.lang==="en-US"&&/google|natural|samantha|alex/i.test(v.name))||v.lang==="en-US"
+      :(v.lang==="en-GB"&&/google|natural|daniel|kate/i.test(v.name))||v.lang==="en-GB"
     );
-  }
-  return null;
+    if(match)utt.voice=match;
+    utt.onend=()=>setSpeaking("");
+    utt.onerror=()=>setSpeaking("");
+    window.speechSynthesis.speak(utt);
+  };
+
+  return(
+    <div style={{maxWidth:900,margin:"0 auto",padding:"28px 16px",...sty,direction:dir}}>
+      <h1 style={{fontFamily:"Georgia,serif",fontSize:26,color:T.text,marginBottom:4,textAlign:"center"}}>🔊 {isAr?"النطق الصحيح":"Pronunciation Guide"}</h1>
+      <p style={{textAlign:"center",color:T.textMuted,fontSize:14,marginBottom:20}}>
+        {isAr?`${PRON_WORDS.length} كلمة مع النطق الأمريكي والبريطاني`:`${PRON_WORDS.length} words with American & British audio`}
+      </p>
+
+      {/* Search */}
+      <div style={{position:"relative",marginBottom:16}}>
+        <span style={{position:"absolute",top:"50%",transform:"translateY(-50%)",fontSize:16,color:T.textMuted,[isAr?"right":"left"]:12}}>🔍</span>
+        <input value={search} onChange={e=>setSearch(e.target.value)}
+          placeholder={isAr?"ابحث عن كلمة...":"Search a word..."}
+          style={{width:"100%",padding:`10px ${isAr?"12px":"40px"} 10px ${isAr?"40px":"12px"}`,borderRadius:10,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,direction:dir,boxSizing:"border-box"}}/>
+      </div>
+
+      {/* Category tabs */}
+      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:20}}>
+        {PRON_CATS.map(c=>(
+          <button key={c.id} onClick={()=>setCat(c.id)}
+            style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${cat===c.id?T.primary:T.border}`,background:cat===c.id?T.primaryLight:"white",color:cat===c.id?T.primary:T.textMid,fontWeight:cat===c.id?700:400,fontSize:13,cursor:"pointer",...sty}}>
+            {isAr?c.ar:c.en} {cat===c.id&&`(${filtered.length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* Word count */}
+      <div style={{fontSize:12,color:T.textMuted,marginBottom:14,direction:dir}}>
+        {isAr?`عرض ${filtered.length} كلمة`:`Showing ${filtered.length} words`}
+      </div>
+
+      {/* Word grid */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:10}}>
+        {filtered.map((item,i)=>(
+          <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"14px 16px",display:"flex",flexDirection:"column",gap:8}}>
+            {/* Word + phonetic */}
+            <div style={{display:"flex",alignItems:"baseline",gap:8,flexWrap:"wrap"}}>
+              <span style={{fontSize:18,fontWeight:700,color:T.text,direction:"ltr"}}>{item.w}</span>
+              <span style={{fontSize:11,color:T.textMuted,fontFamily:"monospace",direction:"ltr"}}>{item.ph}</span>
+            </div>
+            <div style={{fontSize:13,color:T.textMid,direction:"rtl"}}>{item.ar}</div>
+            {/* Accent buttons */}
+            <div style={{display:"flex",gap:6,marginTop:2}}>
+              <button onClick={()=>speak(item.w,"us")}
+                style={{flex:1,padding:"7px 4px",borderRadius:8,border:`1px solid ${speaking===item.w+"us"?T.primary:T.border}`,background:speaking===item.w+"us"?T.primaryLight:"white",color:speaking===item.w+"us"?T.primary:T.textMid,fontSize:12,fontWeight:600,cursor:"pointer",...sty,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+                {speaking===item.w+"us"?"🔊":"🔈"} 🇺🇸 {isAr?"أمريكي":"American"}
+              </button>
+              <button onClick={()=>speak(item.w,"gb")}
+                style={{flex:1,padding:"7px 4px",borderRadius:8,border:`1px solid ${speaking===item.w+"gb"?T.blue:T.border}`,background:speaking===item.w+"gb"?T.blueBg:"white",color:speaking===item.w+"gb"?T.blue:T.textMid,fontSize:12,fontWeight:600,cursor:"pointer",...sty,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+                {speaking===item.w+"gb"?"🔊":"🔈"} 🇬🇧 {isAr?"بريطاني":"British"}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filtered.length===0&&(
+        <div style={{textAlign:"center",padding:"60px 20px",color:T.textMuted,fontSize:15}}>
+          {isAr?"لا توجد نتائج — جرب كلمة أخرى":"No results — try a different word"}
+        </div>
+      )}
+
+      <div style={{marginTop:24,padding:"14px",background:T.bgMuted,borderRadius:10,border:`1px solid ${T.border}`,fontSize:12,color:T.textMuted,direction:dir,textAlign:"center"}}>
+        {isAr?"الصوت يعمل عبر متصفحك مباشرةً — لا حاجة لتثبيت أي شيء. قد يختلف الصوت حسب المتصفح والجهاز.":"Audio plays directly in your browser — no installation needed. Voice may vary by browser and device."}
+      </div>
+    </div>
+  );
 };
 
 // ── MAIN APP ──────────────────────────────────
@@ -8028,7 +7957,7 @@ export default function IELTSBot(){
               <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
               <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
-              <MainTab label={UI[uiLang].reel} active={mainView==="reel"} onClick={()=>{switchView("reel");trackEvent("nav_click",{page:"reel"});}}/>
+              <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               {/* Mobile consultation button */}
@@ -8605,7 +8534,7 @@ export default function IELTSBot(){
         {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
-        {mainView==="reel"&&<ClassReelPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} session={session} uiLang={uiLang}/>}
+        {mainView==="pronunciation"&&<PronunciationPage uiLang={uiLang} isPro={proUser}/>}
         </div>
       </div>
       )}
