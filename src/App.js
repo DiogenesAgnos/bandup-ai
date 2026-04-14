@@ -2347,7 +2347,9 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
         {[
-          {icon:"📐",title:"Grammar",count:"130+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},\n          {icon:"🎧",title:"Dictation",count:"25 sentences",desc:"Listen and type — B1, B2, and C1 levels"},\n          {icon:"🔤",title:"Sentence Builder",count:"13 sentences",desc:"Arrange words into the correct sentence"},
+          {icon:"📐",title:"Grammar",count:"130+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},
+          {icon:"🎧",title:"Dictation",count:"25 sentences",desc:"Listen and type — B1, B2, and C1 levels"},
+          {icon:"🔤",title:"Sentence Builder",count:"13 sentences",desc:"Arrange words into the correct sentence"},
           {icon:"📚",title:"Vocabulary",count:"33 questions",desc:"Academic word list, collocations, word formation"},
           {icon:"✏️",title:"Paraphrasing",count:"18 questions",desc:"Rewrite sentences using Band 7+ academic language"},
           {icon:"🔍",title:"Error Correction",count:"25+ questions",desc:"Spot and fix real IELTS-style mistakes"},
