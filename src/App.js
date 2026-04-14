@@ -7490,6 +7490,8 @@ const PronunciationPage=({uiLang="ar",isPro})=>{
   const [search,setSearch]=useState("");
   const [cat,setCat]=useState("all");
   const [speaking,setSpeaking]=useState("");
+  const [audioCache,setAudioCache]=useState({});
+  const audioRef=useRef(null);
   const isAr=uiLang==="ar";
   const dir=isAr?"rtl":"ltr";
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
@@ -7504,20 +7506,53 @@ const PronunciationPage=({uiLang="ar",isPro})=>{
     return list;
   },[cat,search]);
 
-  const speak=(word,accent)=>{
-    if(!window.speechSynthesis)return;
+  const playWord=async(word)=>{
+    if(speaking===word)return;
+    setSpeaking(word);
+    // Try cached URL first
+    let url=audioCache[word];
+    if(!url){
+      try{
+        const res=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+        if(res.ok){
+          const data=await res.json();
+          const phonetics=(data[0]?.phonetics||[]);
+          const found=phonetics.find(p=>p.audio&&p.audio.includes("uk"))||
+                       phonetics.find(p=>p.audio&&p.audio.includes("us"))||
+                       phonetics.find(p=>p.audio&&p.audio.length>0);
+          if(found?.audio){
+            url=found.audio.startsWith("http")?found.audio:"https:"+found.audio;
+            setAudioCache(prev=>({...prev,[word]:url}));
+          }
+        }
+      }catch(e){}
+    }
+    if(url){
+      try{
+        if(audioRef.current){audioRef.current.pause();audioRef.current=null;}
+        const audio=new Audio(url);
+        audioRef.current=audio;
+        audio.onended=()=>setSpeaking("");
+        audio.onerror=()=>{
+          fallbackSpeak(word);
+        };
+        await audio.play();
+        return;
+      }catch(e){}
+    }
+    fallbackSpeak(word);
+  };
+
+  const fallbackSpeak=(word)=>{
+    if(!window.speechSynthesis){setSpeaking("");return;}
     window.speechSynthesis.cancel();
-    const k=word+accent;
-    setSpeaking(k);
     const utt=new SpeechSynthesisUtterance(word);
-    utt.lang=accent==="us"?"en-US":"en-GB";
-    utt.rate=0.82;
-    utt.pitch=1;
+    utt.lang="en-GB";utt.rate=0.8;utt.pitch=1;
     const voices=window.speechSynthesis.getVoices();
-    const match=voices.find(v=>accent==="us"
-      ?(v.lang==="en-US"&&/google|natural|samantha|alex/i.test(v.name))||v.lang==="en-US"
-      :(v.lang==="en-GB"&&/google|natural|daniel|kate/i.test(v.name))||v.lang==="en-GB"
-    );
+    const match=voices.find(v=>v.lang==="en-GB"&&/google|natural|daniel/i.test(v.name))||
+                 voices.find(v=>v.lang==="en-GB")||
+                 voices.find(v=>v.lang==="en-US"&&/google|natural/i.test(v.name))||
+                 voices.find(v=>v.lang.startsWith("en"));
     if(match)utt.voice=match;
     utt.onend=()=>setSpeaking("");
     utt.onerror=()=>setSpeaking("");
@@ -7528,9 +7563,8 @@ const PronunciationPage=({uiLang="ar",isPro})=>{
     <div style={{maxWidth:900,margin:"0 auto",padding:"28px 16px",...sty,direction:dir}}>
       <h1 style={{fontFamily:"Georgia,serif",fontSize:26,color:T.text,marginBottom:4,textAlign:"center"}}>🔊 {isAr?"النطق الصحيح":"Pronunciation Guide"}</h1>
       <p style={{textAlign:"center",color:T.textMuted,fontSize:14,marginBottom:20}}>
-        {isAr?`${PRON_WORDS.length} كلمة مع النطق الأمريكي والبريطاني`:`${PRON_WORDS.length} words with American & British audio`}
+        {isAr?`${PRON_WORDS.length} كلمة — اضغط على أي كلمة لسماع نطقها`:`${PRON_WORDS.length} words — tap any word to hear it`}
       </p>
-
       {/* Search */}
       <div style={{position:"relative",marginBottom:16}}>
         <span style={{position:"absolute",top:"50%",transform:"translateY(-50%)",fontSize:16,color:T.textMuted,[isAr?"right":"left"]:12}}>🔍</span>
@@ -7538,55 +7572,44 @@ const PronunciationPage=({uiLang="ar",isPro})=>{
           placeholder={isAr?"ابحث عن كلمة...":"Search a word..."}
           style={{width:"100%",padding:`10px ${isAr?"12px":"40px"} 10px ${isAr?"40px":"12px"}`,borderRadius:10,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,direction:dir,boxSizing:"border-box"}}/>
       </div>
-
       {/* Category tabs */}
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:20}}>
         {PRON_CATS.map(c=>(
           <button key={c.id} onClick={()=>setCat(c.id)}
             style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${cat===c.id?T.primary:T.border}`,background:cat===c.id?T.primaryLight:"white",color:cat===c.id?T.primary:T.textMid,fontWeight:cat===c.id?700:400,fontSize:13,cursor:"pointer",...sty}}>
-            {isAr?c.ar:c.en} {cat===c.id&&`(${filtered.length})`}
+            {isAr?c.ar:c.en}{cat===c.id?` (${filtered.length})`:``}
           </button>
         ))}
       </div>
-
-      {/* Word count */}
-      <div style={{fontSize:12,color:T.textMuted,marginBottom:14,direction:dir}}>
+      <div style={{fontSize:12,color:T.textMuted,marginBottom:14}}>
         {isAr?`عرض ${filtered.length} كلمة`:`Showing ${filtered.length} words`}
       </div>
-
       {/* Word grid */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:10}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:10}}>
         {filtered.map((item,i)=>(
-          <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"14px 16px",display:"flex",flexDirection:"column",gap:8}}>
-            {/* Word + phonetic */}
-            <div style={{display:"flex",alignItems:"baseline",gap:8,flexWrap:"wrap"}}>
-              <span style={{fontSize:18,fontWeight:700,color:T.text,direction:"ltr"}}>{item.w}</span>
-              <span style={{fontSize:11,color:T.textMuted,fontFamily:"monospace",direction:"ltr"}}>{item.ph}</span>
+          <div key={i}
+            onClick={()=>playWord(item.w)}
+            style={{background:speaking===item.w?T.primaryLight:"white",border:`1.5px solid ${speaking===item.w?T.primary:T.border}`,borderRadius:12,padding:"14px 16px",cursor:"pointer",transition:"all 0.15s",display:"flex",flexDirection:"column",gap:6}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+              <div style={{display:"flex",alignItems:"baseline",gap:8,flexWrap:"wrap"}}>
+                <span style={{fontSize:17,fontWeight:700,color:speaking===item.w?T.primary:T.text,direction:"ltr"}}>{item.w}</span>
+                <span style={{fontSize:11,color:T.textMuted,fontFamily:"monospace",direction:"ltr"}}>{item.ph}</span>
+              </div>
+              <span style={{fontSize:18,flexShrink:0,color:speaking===item.w?T.primary:T.textMuted}}>
+                {speaking===item.w?"🔊":"🔈"}
+              </span>
             </div>
             <div style={{fontSize:13,color:T.textMid,direction:"rtl"}}>{item.ar}</div>
-            {/* Accent buttons */}
-            <div style={{display:"flex",gap:6,marginTop:2}}>
-              <button onClick={()=>speak(item.w,"us")}
-                style={{flex:1,padding:"7px 4px",borderRadius:8,border:`1px solid ${speaking===item.w+"us"?T.primary:T.border}`,background:speaking===item.w+"us"?T.primaryLight:"white",color:speaking===item.w+"us"?T.primary:T.textMid,fontSize:12,fontWeight:600,cursor:"pointer",...sty,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
-                {speaking===item.w+"us"?"🔊":"🔈"} 🇺🇸 {isAr?"أمريكي":"American"}
-              </button>
-              <button onClick={()=>speak(item.w,"gb")}
-                style={{flex:1,padding:"7px 4px",borderRadius:8,border:`1px solid ${speaking===item.w+"gb"?T.blue:T.border}`,background:speaking===item.w+"gb"?T.blueBg:"white",color:speaking===item.w+"gb"?T.blue:T.textMid,fontSize:12,fontWeight:600,cursor:"pointer",...sty,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
-                {speaking===item.w+"gb"?"🔊":"🔈"} 🇬🇧 {isAr?"بريطاني":"British"}
-              </button>
-            </div>
           </div>
         ))}
       </div>
-
       {filtered.length===0&&(
         <div style={{textAlign:"center",padding:"60px 20px",color:T.textMuted,fontSize:15}}>
           {isAr?"لا توجد نتائج — جرب كلمة أخرى":"No results — try a different word"}
         </div>
       )}
-
-      <div style={{marginTop:24,padding:"14px",background:T.bgMuted,borderRadius:10,border:`1px solid ${T.border}`,fontSize:12,color:T.textMuted,direction:dir,textAlign:"center"}}>
-        {isAr?"الصوت يعمل عبر متصفحك مباشرةً — لا حاجة لتثبيت أي شيء. قد يختلف الصوت حسب المتصفح والجهاز.":"Audio plays directly in your browser — no installation needed. Voice may vary by browser and device."}
+      <div style={{marginTop:24,padding:"14px",background:T.bgMuted,borderRadius:10,border:`1px solid ${T.border}`,fontSize:12,color:T.textMuted,textAlign:"center"}}>
+        {isAr?"الصوت من قاموس حقيقي — اضغط أي كلمة مرة واحدة وانتظر ثانية":"Audio from a real dictionary recording — tap once and wait a moment"}
       </div>
     </div>
   );
@@ -7945,7 +7968,7 @@ export default function IELTSBot(){
         {/* TIER 2 — Red navbar: navigation links */}
         <div style={{background:T.primary}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",direction:uiLang==="ar"?"rtl":"ltr"}}>
-            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr"}}>
+            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"wrap"}}>
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
               <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
               <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
