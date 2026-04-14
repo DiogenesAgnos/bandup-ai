@@ -1359,6 +1359,7 @@ const saveGrammarUse = () => {
 };
 
 const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
+  const [gcTab,setGcTab]=useState("checker");
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -1395,6 +1396,16 @@ const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
 
   return (
     <div>
+      <div style={{display:"flex",gap:8,marginBottom:20,flexWrap:"wrap"}}>
+        {[{id:"checker",icon:"✏️",label:"Grammar Checker"},{id:"self",icon:"🔎",label:"Self-Correct Mode"}].map(t=>(
+          <button key={t.id} onClick={()=>setGcTab(t.id)}
+            style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",padding:"9px 18px",borderRadius:8,border:`1px solid ${gcTab===t.id?T.primary:T.border}`,background:gcTab===t.id?T.primaryLight:"white",color:gcTab===t.id?T.primary:T.textMid,fontWeight:gcTab===t.id?700:500,fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
+      {gcTab==="self"&&<SelfCorrectMode isPro={isPro} onUpgrade={onUpgrade}/>}
+      {gcTab==="checker"&&<div>
       <Card style={{ marginBottom: 20, background: T.greenBg, border: `1px solid ${T.greenBorder}` }}>
         <p style={{ color: T.green, fontSize: 13, margin: 0, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
           ✏️ <strong>Grammar & Spell Checker</strong> — {isPro?"Unlimited checks with Pro — enter any text for instant corrections.":dailyLeft>0?(<>Enter any word, phrase, or sentence. <strong>{dailyLeft}</strong> of {GRAMMAR_TOTAL_LIMIT} free {dailyLeft===1?"check":"checks"} remaining.</>):(<span style={{color:T.red}}>You've used all {GRAMMAR_TOTAL_LIMIT} free checks. <button onClick={onUpgrade} style={{background:"none",border:"none",color:T.primary,fontWeight:700,cursor:"pointer",padding:0,textDecoration:"underline",fontFamily:"inherit",fontSize:"inherit"}}>Upgrade to Pro for unlimited use →</button></span>)}
@@ -1485,6 +1496,142 @@ const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
     </div>
   );
 };
+
+
+// ── Dictation Sentences ──────────────────────────────────────────
+const DICTATION_SENTENCES = [
+  {text:"Many students find it difficult to manage their time effectively.",level:"B1"},
+  {text:"Governments should invest more money in public transport.",level:"B1"},
+  {text:"Air pollution is a serious problem in most large cities.",level:"B1"},
+  {text:"Children learn better when they enjoy what they are studying.",level:"B1"},
+  {text:"The cost of living has increased significantly over the past decade.",level:"B1"},
+  {text:"Regular exercise has many benefits for both physical and mental health.",level:"B1"},
+  {text:"Technology has changed the way people communicate with each other.",level:"B1"},
+  {text:"It is important to learn a foreign language at an early age.",level:"B1"},
+  {text:"Young people today have more opportunities than previous generations.",level:"B1"},
+  {text:"The number of people using the internet has grown rapidly in recent years.",level:"B1"},
+  {text:"The rise in obesity rates can be attributed to increasingly sedentary lifestyles.",level:"B2"},
+  {text:"Despite significant progress, gender inequality remains a persistent global challenge.",level:"B2"},
+  {text:"Urban populations are expected to increase substantially over the coming decades.",level:"B2"},
+  {text:"Renewable energy sources are becoming increasingly cost-competitive with fossil fuels.",level:"B2"},
+  {text:"Social media has fundamentally altered the way news is produced and consumed.",level:"B2"},
+  {text:"The relationship between economic growth and environmental sustainability is complex.",level:"B2"},
+  {text:"Access to quality education is widely regarded as a fundamental human right.",level:"B2"},
+  {text:"Governments face considerable pressure to balance economic development with environmental protection.",level:"B2"},
+  {text:"The rapid expansion of artificial intelligence raises important ethical questions.",level:"B2"},
+  {text:"Cultural diversity enriches societies but can also present significant integration challenges.",level:"B2"},
+  {text:"The proliferation of misinformation on digital platforms poses a substantial threat to democratic processes.",level:"C1"},
+  {text:"Socioeconomic disparities in educational attainment perpetuate cycles of intergenerational poverty.",level:"C1"},
+  {text:"The accelerating pace of technological innovation necessitates a fundamental reassessment of labour markets.",level:"C1"},
+  {text:"Climate change mitigation requires unprecedented levels of international cooperation and political will.",level:"C1"},
+  {text:"The correlation between biodiversity loss and ecosystem instability is increasingly well-documented.",level:"C1"},
+];
+
+// ── Sentence Builder Questions ────────────────────────────────────
+const SENTENCE_BUILDER_QS = [
+  {words:["many","people","believe","that","education","is","important"],correct:"many people believe that education is important",hint:"Start with 'many'",level:"B1"},
+  {words:["the","government","should","invest","in","public","transport"],correct:"the government should invest in public transport",hint:"Start with 'the'",level:"B1"},
+  {words:["she","has","been","living","here","for","five","years"],correct:"she has been living here for five years",hint:"Present perfect continuous",level:"B1"},
+  {words:["air","pollution","affects","millions","of","people","worldwide"],correct:"air pollution affects millions of people worldwide",hint:"Subject → verb → object",level:"B1"},
+  {words:["despite","the","rain","the","match","continued"],correct:"despite the rain the match continued",hint:"Despite + noun phrase",level:"B1"},
+  {words:["the","number","of","students","studying","abroad","has","increased","significantly"],correct:"the number of students studying abroad has increased significantly",hint:"'The number of' is singular → 'has'",level:"B2"},
+  {words:["it","is","widely","argued","that","technology","has","both","benefits","and","drawbacks"],correct:"it is widely argued that technology has both benefits and drawbacks",hint:"Impersonal passive structure",level:"B2"},
+  {words:["despite","being","expensive","electric","cars","are","becoming","increasingly","popular"],correct:"despite being expensive electric cars are becoming increasingly popular",hint:"Despite + gerund",level:"B2"},
+  {words:["a","growing","number","of","individuals","are","choosing","to","work","remotely"],correct:"a growing number of individuals are choosing to work remotely",hint:"'A growing number of' + plural verb",level:"B2"},
+  {words:["the","policy","was","implemented","in","order","to","reduce","carbon","emissions"],correct:"the policy was implemented in order to reduce carbon emissions",hint:"Passive + purpose clause",level:"B2"},
+  {words:["the","extent","to","which","globalisation","has","benefited","developing","nations","remains","debated"],correct:"the extent to which globalisation has benefited developing nations remains debated",hint:"Embedded question structure",level:"C1"},
+  {words:["not","until","recently","have","scientists","fully","understood","the","complexity","of","the","microbiome"],correct:"not until recently have scientists fully understood the complexity of the microbiome",hint:"Inversion after negative adverbial",level:"C1"},
+  {words:["were","governments","to","invest","adequately","in","education","inequality","would","diminish"],correct:"were governments to invest adequately in education inequality would diminish",hint:"Formal conditional inversion: Were + subject + to...",level:"C1"},
+];
+
+// ── B1 Reading Tests ──────────────────────────────────────────────
+const B1_TESTS = [
+  {
+    level:"B1", title:"Working from Home",
+    text:"More and more people are now working from home. This has become very common since 2020. Many workers say they are happier because they save time on travel. They can also spend more time with their families.\n\nHowever, some people find it difficult to work at home. They miss talking to their colleagues. Some homes are small and it is hard to find a quiet place to work. Children can also be a distraction.\n\nCompanies have different opinions about working from home. Some businesses have decided to let their employees work from home permanently. Others want everyone back in the office. Many companies now use a mix — some days in the office and some days at home. This is called hybrid working.",
+    questions:[
+      {type:"tf",q:"Working from home became popular before 2020.",a:"FALSE",exp:"The text says it 'has become very common since 2020'."},
+      {type:"tf",q:"All workers prefer working from home.",a:"FALSE",exp:"'Some people find it difficult to work at home.'"},
+      {type:"mc",q:"What is 'hybrid working'?",options:["Working only at home","Working only in an office","A mix of home and office work","Working in different countries"],a:"A mix of home and office work",exp:"'Some days in the office and some days at home.'"},
+      {type:"mc",q:"Which of these is a problem some people have at home?",options:["They earn less money","They miss talking to colleagues","They work longer hours","They cannot use technology"],a:"They miss talking to colleagues",exp:"'They miss talking to their colleagues.'"},
+      {type:"completion",q:"Some workers save time on ___ when they work from home.",a:"travel",exp:"'They save time on travel.'"},
+    ]
+  },
+  {
+    level:"B1", title:"Fast Food and Health",
+    text:"Fast food is very popular in many countries. People like it because it is quick, cheap, and tasty. However, eating fast food too often can be bad for your health. Most fast food contains a lot of fat, sugar, and salt.\n\nStudies show that people who eat fast food regularly are more likely to become overweight. They also have a higher risk of heart disease and diabetes. Children are particularly at risk because they often prefer fast food to healthier options.\n\nSome fast food companies are now trying to offer healthier choices. They have added salads and fruit to their menus. However, many customers still choose the less healthy options. Experts believe that governments should do more to encourage healthy eating, for example by putting higher taxes on unhealthy food.",
+    questions:[
+      {type:"tf",q:"Fast food is popular partly because it is cheap.",a:"TRUE",exp:"'People like it because it is quick, cheap, and tasty.'"},
+      {type:"tf",q:"Children face no special health risks from fast food.",a:"FALSE",exp:"'Children are particularly at risk.'"},
+      {type:"mc",q:"What have some fast food companies added to their menus?",options:["More burgers","Salads and fruit","Cheaper drinks","Larger portions"],a:"Salads and fruit",exp:"'They have added salads and fruit to their menus.'"},
+      {type:"mc",q:"What do experts suggest governments should do?",options:["Ban fast food","Put higher taxes on unhealthy food","Give money to fast food companies","Build more gyms"],a:"Put higher taxes on unhealthy food",exp:"'Putting higher taxes on unhealthy food.'"},
+      {type:"completion",q:"People who eat fast food regularly have a higher risk of heart disease and ___.",a:"diabetes",exp:"'A higher risk of heart disease and diabetes.'"},
+    ]
+  },
+  {
+    level:"B1", title:"Travelling by Train",
+    text:"Many people enjoy travelling by train. It is a comfortable way to get from one place to another. You can read, work, or look out of the window at the countryside. Unlike flying, you do not need to arrive at the station hours before your journey.\n\nHowever, trains can sometimes be expensive, especially if you book at the last minute. It is usually cheaper to book your tickets in advance. Many railway companies offer discounts for young people, families, and senior citizens.\n\nTrains are also better for the environment than planes or cars. They produce less carbon dioxide per passenger. Many countries are now investing in new high-speed rail lines to make train travel faster and more convenient.",
+    questions:[
+      {type:"tf",q:"You must arrive at the station hours before a train journey.",a:"FALSE",exp:"'Unlike flying, you do not need to arrive at the station hours before your journey.'"},
+      {type:"tf",q:"Booking train tickets in advance is usually cheaper.",a:"TRUE",exp:"'It is usually cheaper to book your tickets in advance.'"},
+      {type:"mc",q:"Why are trains better for the environment than planes?",options:["They are faster","They cost less","They produce less carbon dioxide per passenger","They carry more people"],a:"They produce less carbon dioxide per passenger",exp:"'They produce less carbon dioxide per passenger.'"},
+      {type:"mc",q:"Who can get discounts on train tickets?",options:["Only students","Business travellers only","Young people, families, and senior citizens","Everyone automatically"],a:"Young people, families, and senior citizens",exp:"'Many railway companies offer discounts for young people, families, and senior citizens.'"},
+      {type:"completion",q:"Countries are investing in high-speed rail to make train travel faster and more ___.",a:"convenient",exp:"'Faster and more convenient.'"},
+    ]
+  },
+  {
+    level:"B1", title:"Social Media",
+    text:"Social media has changed the way people communicate. Billions of people around the world use platforms like Instagram, Facebook, and X every day. These platforms allow people to share photos, videos, and opinions with friends and strangers.\n\nSocial media can be very useful. It helps people stay in touch with family and friends who live far away. It also allows people to learn about events happening around the world. Some people use social media to start businesses or find jobs.\n\nHowever, there are also problems with social media. Some people spend too much time on their phones and feel anxious when they cannot check their accounts. Young people in particular can feel bad about themselves when they compare their lives to the perfect images they see online. Experts recommend taking regular breaks from social media to protect mental health.",
+    questions:[
+      {type:"tf",q:"Social media is only used by young people.",a:"FALSE",exp:"'Billions of people around the world' — not only young people."},
+      {type:"tf",q:"Social media can help people find a job.",a:"TRUE",exp:"'Some people use social media to start businesses or find jobs.'"},
+      {type:"mc",q:"What mental health problem is linked to too much social media use?",options:["Sleeping too much","Feeling anxious","Losing memory","Feeling overconfident"],a:"Feeling anxious",exp:"'Some people feel anxious when they cannot check their accounts.'"},
+      {type:"mc",q:"What do experts suggest to protect mental health?",options:["Delete all accounts","Stop using smartphones","Take regular breaks from social media","Only follow positive content"],a:"Take regular breaks from social media",exp:"'Experts recommend taking regular breaks from social media.'"},
+      {type:"completion",q:"Young people may feel bad when they compare themselves to ___ images online.",a:"perfect",exp:"'The perfect images they see online.'"},
+    ]
+  },
+  {
+    level:"B1", title:"Zoos: For and Against",
+    text:"Many people enjoy visiting zoos. They can see animals from all over the world in one place. Zoos are also educational — children can learn about different species and the importance of protecting animals.\n\nHowever, some people believe that zoos are cruel. They argue that animals should live in their natural habitat, not in small enclosures. Animals in zoos sometimes show signs of stress and boredom.\n\nSupporters of zoos say that modern zoos are very different from zoos in the past. Many zoos now have large, natural spaces for animals. Some zoos also run important conservation programmes that help to save endangered species. Without these programmes, some animals might already be extinct.",
+    questions:[
+      {type:"tf",q:"Modern zoos are the same as zoos in the past.",a:"FALSE",exp:"'Modern zoos are very different from zoos in the past.'"},
+      {type:"tf",q:"Some animals in zoos show signs of stress.",a:"TRUE",exp:"'Animals in zoos sometimes show signs of stress and boredom.'"},
+      {type:"mc",q:"What is one argument in favour of zoos?",options:["They are cheap to run","They help save endangered species","They give animals complete freedom","They are better than national parks"],a:"They help save endangered species",exp:"'Some zoos run conservation programmes that help to save endangered species.'"},
+      {type:"mc",q:"What do critics say about zoos?",options:["They are too expensive","Animals should live in natural habitats","Zoos are too small","Zoos have too many visitors"],a:"Animals should live in natural habitats",exp:"'Animals should live in their natural habitat, not in small enclosures.'"},
+      {type:"completion",q:"Without conservation programmes, some animals might already be ___.",a:"extinct",exp:"'Some animals might already be extinct.'"},
+    ]
+  },
+];
+
+// ── Daily Challenge ───────────────────────────────────────────────
+const DAILY_KEY="ef_daily_v2";
+const STREAK_KEY="ef_streak_v2";
+const getDailyChallenge=()=>{
+  const today=new Date().toDateString();
+  try{const s=JSON.parse(localStorage.getItem(DAILY_KEY)||"null");if(s&&s.date===today)return s;}catch{}
+  const d=new Date();
+  const seed=(d.getDate()*17+d.getMonth()*31+d.getFullYear())%1000;
+  // Build pool from grammar + vocab exercises
+  const gPool=[];
+  GRAMMAR_EXERCISES.forEach(cat=>{
+    cat.exercises.forEach(q=>{
+      if(q.correct!==undefined&&Array.isArray(q.options)){
+        gPool.push({type:"grammar",q:q.sentence,opts:q.options,a:q.correct,exp:q.explanation||"",cat:cat.category||cat.title});
+      }
+    });
+  });
+  const vPool=VOCAB_EXERCISES.filter(q=>q.weak&&q.options&&q.correct!==undefined).map(q=>({
+    type:"vocab",q:`Which is the best academic replacement for "${q.weak}"?`,opts:q.options,a:q.correct,exp:q.tip||"",cat:"Vocabulary Upgrade"
+  }));
+  const pool=[...gPool,...vPool];
+  if(!pool.length)return null;
+  const q=pool[seed%pool.length];
+  const obj={date:today,q,answered:false,userAnswer:null};
+  try{localStorage.setItem(DAILY_KEY,JSON.stringify(obj));}catch{}
+  return obj;
+};
+const getStreak=()=>{try{return JSON.parse(localStorage.getItem(STREAK_KEY)||"null")||{count:0,last:""};}catch{return{count:0,last:""};}};
+const saveStreak=(count)=>{try{localStorage.setItem(STREAK_KEY,JSON.stringify({count,last:new Date().toDateString()}));}catch{}};
 
 // ── Grammar Exercises ────────────────────────
 const GRAMMAR_EXERCISES = [
@@ -2195,11 +2342,11 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       <div style={{textAlign:"center",marginBottom:24}}>
         <div style={{fontSize:52,marginBottom:12}}>🏋️</div>
         <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:8}}>Practice Exercises</h2>
-        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>190+ exercises across 5 categories — all with instant feedback and detailed explanations.</p>
+        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>230+ exercises across 8 categories — all with instant feedback and detailed explanations.</p>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
         {[
-          {icon:"📐",title:"Grammar",count:"130+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},
+          {icon:"📐",title:"Grammar",count:"130+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},\n          {icon:"🎧",title:"Dictation",count:"25 sentences",desc:"Listen and type — B1, B2, and C1 levels"},\n          {icon:"🔤",title:"Sentence Builder",count:"13 sentences",desc:"Arrange words into the correct sentence"},
           {icon:"📚",title:"Vocabulary",count:"33 questions",desc:"Academic word list, collocations, word formation"},
           {icon:"✏️",title:"Paraphrasing",count:"18 questions",desc:"Rewrite sentences using Band 7+ academic language"},
           {icon:"🔍",title:"Error Correction",count:"25+ questions",desc:"Spot and fix real IELTS-style mistakes"},
@@ -2266,6 +2413,8 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
     { key:"vocab", icon:"📖", label:"Vocabulary Upgrade" },
     { key:"errors", icon:"🔍", label:"Error Correction" },
     { key:"bandcheck", icon:"🎯", label:"Band Self-Check" },
+    { key:"dictation", icon:"🎧", label:"Dictation" },
+    { key:"builder", icon:"🔤", label:"Sentence Builder" },
   ];
 
   return (
@@ -2365,7 +2514,444 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
         {activeExTab === "vocab" && <VocabUpgradeExercises canAnswer={canAnswer} />}
         {activeExTab === "errors" && <ErrorCorrectionExercises canAnswer={canAnswer} />}
         {activeExTab === "bandcheck" && <BandSelfCheck />}
+        {activeExTab === "dictation" && <DictationExercises canAnswer={canAnswer} />}
+        {activeExTab === "builder" && <SentenceBuilder canAnswer={canAnswer} />}
       </div>
+    </div>
+  );
+};
+
+
+// ── Dictation Component ──────────────────────────────────────────
+const DictationExercises = ({canAnswer}) => {
+  const [level,setLevel]=useState("B1");
+  const [qIdx,setQIdx]=useState(0);
+  const [typed,setTyped]=useState("");
+  const [submitted,setSubmitted]=useState(false);
+  const [playCount,setPlayCount]=useState(0);
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+  const sentences=DICTATION_SENTENCES.filter(s=>s.level===level);
+  const current=sentences[qIdx%sentences.length];
+
+  const speak=()=>{
+    if(!window.speechSynthesis)return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(current.text);
+    u.lang="en-GB";u.rate=0.82;u.pitch=1;
+    const voices=window.speechSynthesis.getVoices();
+    const pick=voices.find(v=>v.lang.startsWith("en-GB")&&v.name.includes("Female"))
+      ||voices.find(v=>v.lang.startsWith("en-GB"))
+      ||voices.find(v=>v.lang.startsWith("en-US"))||null;
+    if(pick)u.voice=pick;
+    window.speechSynthesis.speak(u);
+    setPlayCount(p=>p+1);
+  };
+
+  const normalise=s=>s.toLowerCase().trim().replace(/[.,!?;:]/g,"").replace(/\s+/g," ");
+  const isCorrect=submitted&&normalise(typed)===normalise(current.text);
+
+  const wordDiff=()=>{
+    const cWords=current.text.split(" ");
+    const uWords=typed.trim().split(" ");
+    return cWords.map((w,i)=>({w,ok:normalise(w)===normalise(uWords[i]||""),userW:uWords[i]||"(missing)"}));
+  };
+
+  const next=()=>{setQIdx(i=>i+1);setTyped("");setSubmitted(false);setPlayCount(0);window.speechSynthesis?.cancel();};
+
+  return(
+    <div>
+      <div style={{background:"#f0f9ff",border:"1px solid #bae6fd",borderRadius:10,padding:"12px 16px",marginBottom:16}}>
+        <p style={{...sty,color:"#0369a1",fontSize:13,margin:"0 0 10px"}}>🎧 <strong>Dictation</strong> — Click Play, listen carefully, then type exactly what you hear. Builds spelling, grammar and listening together.</p>
+        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+          <span style={{...sty,fontSize:12,color:"#0369a1",fontWeight:600}}>Level:</span>
+          {["B1","B2","C1"].map(l=>(
+            <button key={l} onClick={()=>{setLevel(l);setQIdx(0);setTyped("");setSubmitted(false);setPlayCount(0);}}
+              style={{...sty,padding:"4px 12px",borderRadius:6,border:`1px solid ${level===l?"#0369a1":"#bae6fd"}`,background:level===l?"#0369a1":"white",color:level===l?"white":"#0369a1",fontWeight:level===l?700:400,fontSize:12,cursor:"pointer"}}>
+              {l}
+            </button>
+          ))}
+          <span style={{...sty,fontSize:11,color:"#64748b",marginLeft:4}}>{qIdx%sentences.length+1} / {sentences.length}</span>
+        </div>
+      </div>
+
+      <div style={{background:"white",border:"1px solid #e2e8f0",borderRadius:12,padding:"20px",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
+        <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:16,flexWrap:"wrap"}}>
+          <button onClick={speak} disabled={!canAnswer}
+            style={{...sty,background:playCount===0?"#b91c1c":"#1e3a5f",color:"white",border:"none",borderRadius:10,padding:"12px 24px",fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,opacity:canAnswer?1:0.5,transition:"background 0.2s"}}>
+            🔊 {playCount===0?"Play Sentence":"Play Again"}
+          </button>
+          {playCount>0&&!submitted&&<span style={{...sty,fontSize:12,color:"#64748b"}}>Played {playCount}× — you can replay as many times as needed</span>}
+        </div>
+
+        <textarea value={typed} onChange={e=>!submitted&&setTyped(e.target.value)}
+          onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!submitted&&typed.trim())setSubmitted(true);}}}
+          placeholder={playCount===0?"Click Play first, then type here...":"Type exactly what you heard..."}
+          disabled={submitted||!canAnswer}
+          style={{...sty,width:"100%",minHeight:72,padding:"10px 12px",border:`2px solid ${submitted?(isCorrect?"#86efac":"#fca5a5"):"#e2e8f0"}`,borderRadius:8,fontSize:14,color:"#1e293b",background:submitted?(isCorrect?"#f0fdf4":"#fff1f2"):"#fafafa",resize:"vertical",boxSizing:"border-box",marginBottom:12,transition:"border-color 0.2s"}}
+        />
+
+        {!submitted&&(
+          <button onClick={()=>setSubmitted(true)} disabled={!typed.trim()||!canAnswer}
+            style={{...sty,background:typed.trim()&&canAnswer?"#b91c1c":"#e2e8f0",color:typed.trim()&&canAnswer?"white":"#94a3b8",border:"none",borderRadius:8,padding:"10px 22px",fontSize:14,fontWeight:700,cursor:typed.trim()&&canAnswer?"pointer":"default"}}>
+            Check →
+          </button>
+        )}
+
+        {submitted&&(
+          <div>
+            <div style={{...sty,fontWeight:800,fontSize:15,color:isCorrect?"#059669":"#dc2626",marginBottom:12}}>
+              {isCorrect?"✅ Perfect!":"❌ Not quite — differences highlighted below"}
+            </div>
+            <div style={{background:"#f8fafc",borderRadius:8,padding:"12px 14px",marginBottom:12,border:"1px solid #e2e8f0"}}>
+              <div style={{...sty,fontSize:11,fontWeight:700,color:"#94a3b8",marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Correct sentence</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                {wordDiff().map((wd,i)=>(
+                  <span key={i} style={{...sty,fontSize:14,padding:"2px 6px",borderRadius:4,
+                    background:wd.ok?"transparent":"#fee2e2",
+                    color:wd.ok?"#1e293b":"#991b1b",
+                    fontWeight:wd.ok?400:700,
+                    borderBottom:wd.ok?"none":"2px solid #dc2626"}}>
+                    {wd.w}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {!isCorrect&&(
+              <div style={{background:"#fff7ed",border:"1px solid #fed7aa",borderRadius:8,padding:"10px 12px",marginBottom:12}}>
+                <div style={{...sty,fontSize:11,fontWeight:700,color:"#9a3412",marginBottom:4,textTransform:"uppercase",letterSpacing:"0.06em"}}>You wrote</div>
+                <div style={{...sty,fontSize:13,color:"#9a3412",fontStyle:"italic"}}>{typed}</div>
+              </div>
+            )}
+            <button onClick={next}
+              style={{...sty,background:"#b91c1c",color:"white",border:"none",borderRadius:8,padding:"10px 22px",fontSize:14,fontWeight:700,cursor:"pointer"}}>
+              Next sentence →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ── Sentence Builder Component ───────────────────────────────────
+const SentenceBuilder = ({canAnswer}) => {
+  const [filter,setFilter]=useState("all");
+  const [qIdx,setQIdx]=useState(0);
+  const [selected,setSelected]=useState([]);
+  const [submitted,setSubmitted]=useState(false);
+  const [showHint,setShowHint]=useState(false);
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+
+  const qs=filter==="all"?SENTENCE_BUILDER_QS:SENTENCE_BUILDER_QS.filter(q=>q.level===filter);
+  const q=qs[qIdx%qs.length];
+
+  const shuffled=useMemo(()=>{
+    const arr=[...q.words];
+    const s=qIdx*7+qs.length;
+    for(let i=arr.length-1;i>0;i--){const j=(s*(i+3))%(i+1);[arr[i],arr[j]]=[arr[j],arr[i]];}
+    return arr;
+  },[q,qIdx,qs.length]);
+
+  const builtStr=selected.map(i=>shuffled[i]).join(" ").toLowerCase();
+  const isCorrect=submitted&&builtStr===q.correct.toLowerCase();
+
+  const addWord=(i)=>{if(!submitted&&!selected.includes(i))setSelected(p=>[...p,i]);};
+  const removeWord=(pos)=>{if(!submitted)setSelected(p=>p.filter((_,j)=>j!==pos));};
+
+  const next=()=>{setQIdx(i=>(i+1)%qs.length);setSelected([]);setSubmitted(false);setShowHint(false);};
+
+  return(
+    <div>
+      <div style={{background:"#f5f3ff",border:"1px solid #c4b5fd",borderRadius:10,padding:"12px 16px",marginBottom:16}}>
+        <p style={{...sty,color:"#7c3aed",fontSize:13,margin:"0 0 10px"}}>🔤 <strong>Sentence Builder</strong> — Tap the words in the correct order to build the sentence. No grammar lesson — just try it.</p>
+        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+          <span style={{...sty,fontSize:12,color:"#7c3aed",fontWeight:600}}>Level:</span>
+          {[{k:"all",l:"All"},{k:"B1",l:"B1"},{k:"B2",l:"B2"},{k:"C1",l:"C1"}].map(({k,l})=>(
+            <button key={k} onClick={()=>{setFilter(k);setQIdx(0);setSelected([]);setSubmitted(false);setShowHint(false);}}
+              style={{...sty,padding:"4px 12px",borderRadius:6,border:`1px solid ${filter===k?"#7c3aed":"#c4b5fd"}`,background:filter===k?"#7c3aed":"white",color:filter===k?"white":"#7c3aed",fontWeight:filter===k?700:400,fontSize:12,cursor:"pointer"}}>
+              {l}
+            </button>
+          ))}
+          <span style={{...sty,fontSize:11,color:"#64748b",marginLeft:4}}>{qIdx%qs.length+1} / {qs.length}</span>
+        </div>
+      </div>
+
+      <div style={{background:"white",border:"1px solid #e2e8f0",borderRadius:12,padding:"20px",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
+        {/* Answer tray */}
+        <div style={{...sty,fontSize:11,fontWeight:700,color:"#94a3b8",marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your sentence</div>
+        <div style={{minHeight:52,background:"#f8fafc",borderRadius:8,padding:"10px 12px",marginBottom:16,border:`2px solid ${submitted?(isCorrect?"#86efac":"#fca5a5"):"#e2e8f0"}`,display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",transition:"border-color 0.2s"}}>
+          {selected.length===0
+            ?<span style={{...sty,color:"#94a3b8",fontSize:13,fontStyle:"italic"}}>Tap words below to build the sentence...</span>
+            :selected.map((si,pos)=>(
+              <button key={pos} onClick={()=>removeWord(pos)} disabled={submitted}
+                style={{...sty,background:submitted?(isCorrect?"#dcfce7":"#fee2e2"):T.primaryLight,border:`1px solid ${submitted?(isCorrect?"#86efac":"#fca5a5"):T.primaryBorder}`,borderRadius:6,padding:"5px 10px",fontSize:13,fontWeight:600,color:submitted?(isCorrect?"#166534":"#991b1b"):T.primary,cursor:submitted?"default":"pointer"}}>
+                {shuffled[si]}
+              </button>
+            ))
+          }
+        </div>
+
+        {/* Word bank */}
+        {!submitted&&(
+          <>
+            <div style={{...sty,fontSize:11,fontWeight:700,color:"#94a3b8",marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Word bank — tap to add</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:16}}>
+              {shuffled.map((word,i)=>!selected.includes(i)&&(
+                <button key={i} onClick={()=>canAnswer&&addWord(i)}
+                  style={{...sty,background:"white",border:"1px solid #e2e8f0",borderRadius:6,padding:"7px 13px",fontSize:13,fontWeight:500,color:"#475569",cursor:canAnswer?"pointer":"default",transition:"all 0.15s",boxShadow:"0 1px 3px rgba(0,0,0,0.06)"}}
+                  onMouseOver={e=>{if(canAnswer){e.currentTarget.style.background="#f5f3ff";e.currentTarget.style.borderColor="#c4b5fd";e.currentTarget.style.color="#7c3aed";}}}
+                  onMouseOut={e=>{e.currentTarget.style.background="white";e.currentTarget.style.borderColor="#e2e8f0";e.currentTarget.style.color="#475569";}}>
+                  {word}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Controls */}
+        {!submitted&&(
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <button onClick={()=>setSubmitted(true)} disabled={selected.length<2}
+              style={{...sty,background:selected.length>=2?"#b91c1c":"#e2e8f0",color:selected.length>=2?"white":"#94a3b8",border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:700,cursor:selected.length>=2?"pointer":"default"}}>
+              Check
+            </button>
+            <button onClick={()=>setSelected([])}
+              style={{...sty,background:"white",border:"1px solid #e2e8f0",borderRadius:8,padding:"9px 16px",fontSize:13,color:"#64748b",cursor:"pointer"}}>
+              Reset
+            </button>
+            <button onClick={()=>setShowHint(h=>!h)}
+              style={{...sty,background:"white",border:"1px solid #f59e0b",borderRadius:8,padding:"9px 16px",fontSize:13,color:"#d97706",cursor:"pointer",fontWeight:600}}>
+              {showHint?"Hide hint":"💡 Hint"}
+            </button>
+          </div>
+        )}
+        {showHint&&!submitted&&(
+          <div style={{...sty,marginTop:10,padding:"8px 12px",background:"#fef3c7",border:"1px solid #fbbf24",borderRadius:8,fontSize:13,color:"#92400e"}}>
+            💡 {q.hint}
+          </div>
+        )}
+
+        {/* Result */}
+        {submitted&&(
+          <div style={{marginTop:12}}>
+            <div style={{...sty,fontWeight:800,fontSize:15,color:isCorrect?"#059669":"#dc2626",marginBottom:10}}>
+              {isCorrect?"✅ Correct!":"❌ Not quite"}
+            </div>
+            {!isCorrect&&(
+              <div style={{background:"#f8fafc",borderRadius:8,padding:"12px 14px",marginBottom:10,border:"1px solid #e2e8f0"}}>
+                <div style={{...sty,fontSize:11,fontWeight:700,color:"#94a3b8",marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Correct answer</div>
+                <div style={{...sty,fontSize:14,color:"#1e293b",fontWeight:600,lineHeight:1.6}}>{q.correct.charAt(0).toUpperCase()+q.correct.slice(1)}.</div>
+              </div>
+            )}
+            <button onClick={next}
+              style={{...sty,background:"#b91c1c",color:"white",border:"none",borderRadius:8,padding:"10px 22px",fontSize:14,fontWeight:700,cursor:"pointer"}}>
+              Next →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ── Self-Correct Mode ────────────────────────────────────────────
+const SelfCorrectMode = ({isPro,onUpgrade}) => {
+  const [text,setText]=useState("");
+  const [selfText,setSelfText]=useState("");
+  const [stage,setStage]=useState("write");
+  const [result,setResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+
+  const analyse=async()=>{
+    setLoading(true);
+    try{
+      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:700,
+          system:`You are an English grammar checker. Analyse the provided text and return only JSON:
+{"errors":[{"wrong":"exact wrong phrase","right":"corrected version","explanation":"concise rule explanation","severity":"major|moderate|minor"}],"overall":"one sentence summary","score":0}
+score is 0-10. If no errors, return {"errors":[],"overall":"No errors found.","score":10}. Return ONLY valid JSON, no markdown.`,
+          messages:[{role:"user",content:selfText.trim()}]})});
+      const data=await res.json();
+      const txt=data.content?.map(b=>b.text||"").join("")||"";
+      const parsed=JSON.parse(txt.replace(/```json|```/g,"").trim());
+      setResult({orig:text,self:selfText,parsed});
+      setStage("result");
+    }catch(e){console.error(e);}
+    finally{setLoading(false);}
+  };
+
+  const reset=()=>{setText("");setSelfText("");setStage("write");setResult(null);};
+  const sevColor={major:"#dc2626",moderate:"#d97706",minor:"#2563eb"};
+
+  return(
+    <div>
+      <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"12px 16px",marginBottom:16}}>
+        <p style={{...sty,color:"#166534",fontSize:13,margin:0}}>🔎 <strong>Self-Correct Mode</strong> — Write freely, then edit your own mistakes before seeing AI feedback. Trains error-spotting independently.</p>
+      </div>
+
+      {/* Stage pills */}
+      <div style={{display:"flex",gap:6,marginBottom:16}}>
+        {[{id:"write",label:"1 Write"},
+          {id:"correct",label:"2 Self-correct"},
+          {id:"result",label:"3 Feedback"}].map(s=>(
+          <div key={s.id} style={{...sty,fontSize:12,fontWeight:stage===s.id?700:400,
+            color:stage===s.id?"white":["write","correct","result"].indexOf(s.id)<["write","correct","result"].indexOf(stage)?"#059669":"#94a3b8",
+            padding:"5px 12px",borderRadius:20,
+            background:stage===s.id?"#b91c1c":["write","correct","result"].indexOf(s.id)<["write","correct","result"].indexOf(stage)?"#dcfce7":"#f1f5f9",
+            border:`1px solid ${stage===s.id?"#b91c1c":["write","correct","result"].indexOf(s.id)<["write","correct","result"].indexOf(stage)?"#86efac":"#e2e8f0"}`,
+            whiteSpace:"nowrap"}}>
+            {s.label}
+          </div>
+        ))}
+      </div>
+
+      {stage==="write"&&(
+        <div>
+          <label style={{...sty,fontSize:12,fontWeight:700,color:"#64748b",display:"block",marginBottom:6}}>Write anything — a sentence, paragraph, or argument. Don't worry about errors.</label>
+          <textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Start writing here..."
+            style={{...sty,width:"100%",minHeight:140,padding:"12px",border:"1px solid #e2e8f0",borderRadius:8,fontSize:14,color:"#1e293b",resize:"vertical",boxSizing:"border-box",marginBottom:12}}/>
+          <button onClick={()=>{setSelfText(text);setStage("correct");}} disabled={text.trim().length<10}
+            style={{...sty,background:text.trim().length>=10?"#b91c1c":"#e2e8f0",color:text.trim().length>=10?"white":"#94a3b8",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:text.trim().length>=10?"pointer":"default"}}>
+            Done — now find your own errors →
+          </button>
+        </div>
+      )}
+
+      {stage==="correct"&&(
+        <div>
+          <label style={{...sty,fontSize:12,fontWeight:700,color:"#d97706",display:"block",marginBottom:6}}>Now correct your own mistakes — edit the text below before checking.</label>
+          <textarea value={selfText} onChange={e=>setSelfText(e.target.value)}
+            style={{...sty,width:"100%",minHeight:140,padding:"12px",border:"2px solid #f59e0b",borderRadius:8,fontSize:14,color:"#1e293b",resize:"vertical",boxSizing:"border-box",background:"#fffbeb",marginBottom:12}}/>
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={analyse} disabled={loading}
+              style={{...sty,background:"#b91c1c",color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:"pointer"}}>
+              {loading?"⏳ Analysing...":"Show me the errors →"}
+            </button>
+            <button onClick={()=>setStage("write")}
+              style={{...sty,background:"white",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px 16px",fontSize:13,color:"#64748b",cursor:"pointer"}}>← Back</button>
+          </div>
+        </div>
+      )}
+
+      {stage==="result"&&result&&(
+        <div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,flexWrap:"wrap",gap:8}}>
+            <div style={{...sty,fontWeight:700,fontSize:15,color:"#1e293b"}}>Feedback on your corrected text</div>
+            <div style={{fontSize:28,fontWeight:900,color:result.parsed.score>=8?"#059669":result.parsed.score>=5?"#d97706":"#dc2626",...sty}}>
+              {result.parsed.score}<span style={{fontSize:14,color:"#94a3b8"}}>/10</span>
+            </div>
+          </div>
+          <div style={{...sty,fontSize:13,color:"#475569",marginBottom:14,padding:"10px 14px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0",lineHeight:1.6}}>
+            {result.parsed.overall}
+          </div>
+          {result.parsed.errors.length===0
+            ?<div style={{...sty,fontSize:14,color:"#059669",fontWeight:700,padding:"12px 16px",background:"#f0fdf4",border:"1px solid #86efac",borderRadius:8,marginBottom:14}}>✅ No errors found in your corrected text!</div>
+            :<div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
+              {result.parsed.errors.map((e,i)=>(
+                <div key={i} style={{background:"#fff5f5",border:`1px solid #fecaca`,borderRadius:8,padding:"10px 14px"}}>
+                  <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center",marginBottom:4}}>
+                    <span style={{...sty,background:"#fee2e2",borderRadius:6,padding:"2px 8px",fontSize:12,color:"#991b1b",fontWeight:600}}>✗ "{e.wrong}"</span>
+                    <span style={{color:"#94a3b8"}}>→</span>
+                    <span style={{...sty,background:"#dcfce7",borderRadius:6,padding:"2px 8px",fontSize:12,color:"#166534",fontWeight:600}}>✓ "{e.right}"</span>
+                    <span style={{...sty,fontSize:10,fontWeight:700,color:sevColor[e.severity]||"#64748b",background:"white",border:`1px solid ${sevColor[e.severity]||"#e2e8f0"}`,borderRadius:4,padding:"1px 6px",textTransform:"uppercase"}}>{e.severity}</span>
+                  </div>
+                  <div style={{...sty,fontSize:12,color:"#64748b"}}>💡 {e.explanation}</div>
+                </div>
+              ))}
+            </div>
+          }
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+            {[{label:"Original",text:result.orig,bg:"#f8fafc",border:"#e2e8f0"},{label:"Your correction",text:result.self,bg:"#f0fdf4",border:"#86efac"}].map(p=>(
+              <div key={p.label} style={{background:p.bg,borderRadius:8,padding:"10px 12px",border:`1px solid ${p.border}`}}>
+                <div style={{...sty,fontSize:11,color:"#94a3b8",marginBottom:4,fontWeight:600}}>{p.label}</div>
+                <div style={{...sty,fontSize:12,color:"#1e293b",lineHeight:1.6}}>{p.text}</div>
+              </div>
+            ))}
+          </div>
+          <button onClick={reset}
+            style={{...sty,background:"white",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:700,color:"#b91c1c",cursor:"pointer"}}>
+            🔄 Try again with new text
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Daily Challenge Widget ────────────────────────────────────────
+const DailyChallengeWidget = ({uiLang="en"}) => {
+  const [ch,setCh]=useState(()=>getDailyChallenge());
+  const [chosen,setChosen]=useState(()=>{try{const s=JSON.parse(localStorage.getItem(DAILY_KEY)||"null");return s?.answered?s.userAnswer:null;}catch{return null;}});
+  const [submitted,setSubmitted]=useState(()=>{try{const s=JSON.parse(localStorage.getItem(DAILY_KEY)||"null");return s?.answered||false;}catch{return false;}});
+  const [streak,setStreak]=useState(()=>getStreak());
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+  if(!ch||!ch.q)return null;
+  const q=ch.q;
+  const isCorrect=submitted&&chosen===q.a;
+
+  const pick=(i)=>{
+    if(submitted)return;
+    const today=new Date().toDateString();
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    const cur=getStreak();
+    const newCount=cur.last===yesterday?cur.count+1:cur.last===today?cur.count:1;
+    saveStreak(newCount);
+    const updated={...ch,answered:true,userAnswer:i};
+    try{localStorage.setItem(DAILY_KEY,JSON.stringify(updated));}catch{}
+    setCh(updated);setChosen(i);setSubmitted(true);
+    setStreak({count:newCount,last:today});
+  };
+
+  const ar=uiLang==="ar";
+  const title=ar?"تحدي اليوم 🔥":"Daily Challenge 🔥";
+  const sub=ar?`${new Date().toLocaleDateString("ar-SA",{weekday:"long",day:"numeric",month:"short"})}`:new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"});
+  const streakLabel=ar?`يوم متتالٍ`:"day streak";
+  const comeBack=ar?"عُد غداً لتحدٍّ جديد":"Come back tomorrow for a new challenge";
+
+  return(
+    <div style={{background:"linear-gradient(135deg,#1e3a5f 0%,#7f1d1d 100%)",borderRadius:16,padding:"24px",color:"white",marginBottom:0}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16,flexWrap:"wrap",gap:10}}>
+        <div>
+          <div style={{...sty,fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.55)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>{title}</div>
+          <div style={{...sty,fontSize:11,color:"rgba(255,255,255,0.4)"}}>{sub} · {q.cat}</div>
+        </div>
+        <div style={{textAlign:"center",background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"8px 16px",border:"1px solid rgba(255,255,255,0.15)"}}>
+          <div style={{fontSize:20,fontWeight:900,color:streak.count>0?"#fbbf24":"rgba(255,255,255,0.3)"}}>🔥 {streak.count}</div>
+          <div style={{...sty,fontSize:10,color:"rgba(255,255,255,0.4)"}}>{streakLabel}</div>
+        </div>
+      </div>
+      <div style={{...sty,fontSize:14,fontWeight:600,color:"white",marginBottom:14,lineHeight:1.6,direction:ar?"rtl":"ltr"}}>{q.q}</div>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:submitted?14:0}}>
+        {q.opts.map((opt,i)=>{
+          let bg="rgba(255,255,255,0.08)",bc="rgba(255,255,255,0.12)",col="rgba(255,255,255,0.8)";
+          if(submitted){
+            if(i===q.a){bg="rgba(16,185,129,0.25)";bc="#10b981";col="#6ee7b7";}
+            else if(i===chosen&&chosen!==q.a){bg="rgba(239,68,68,0.18)";bc="#ef4444";col="#fca5a5";}
+          }
+          return(
+            <button key={i} onClick={()=>pick(i)} disabled={submitted}
+              style={{...sty,background:bg,border:`1.5px solid ${bc}`,borderRadius:8,padding:"10px 14px",textAlign:ar?"right":"left",cursor:submitted?"default":"pointer",color:col,fontSize:13,fontWeight:i===q.a&&submitted?700:400,display:"flex",gap:10,alignItems:"center",transition:"all 0.15s",direction:ar?"rtl":"ltr"}}
+              onMouseOver={e=>{if(!submitted)e.currentTarget.style.background="rgba(255,255,255,0.14)";}}
+              onMouseOut={e=>{if(!submitted)e.currentTarget.style.background=bg;}}>
+              <span style={{background:"rgba(255,255,255,0.12)",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>
+                {["A","B","C","D"][i]}
+              </span>
+              <span style={{flex:1}}>{opt}</span>
+              {submitted&&i===q.a&&<span style={{flexShrink:0,marginLeft:ar?0:4,marginRight:ar?4:0}}>✓</span>}
+            </button>
+          );
+        })}
+      </div>
+      {submitted&&(
+        <div>
+          <div style={{...sty,fontWeight:700,fontSize:13,color:isCorrect?"#6ee7b7":"#fca5a5",marginBottom:q.exp?6:8,direction:ar?"rtl":"ltr"}}>
+            {isCorrect?`✅ ${ar?"صحيح! التسلسل":"Correct! Streak"}: ${streak.count} 🔥`:`❌ ${ar?"إجابة خاطئة":"Incorrect"}`}
+          </div>
+          {q.exp&&<div style={{...sty,fontSize:12,color:"rgba(255,255,255,0.6)",lineHeight:1.6,marginBottom:8,direction:ar?"rtl":"ltr"}}>💡 {q.exp}</div>}
+          <div style={{...sty,fontSize:11,color:"rgba(255,255,255,0.35)",direction:ar?"rtl":"ltr"}}>{comeBack}</div>
+        </div>
+      )}
     </div>
   );
 };
@@ -3721,7 +4307,8 @@ const ReadingPage = ({isPro, onUpgrade}) => {
   const timerColor = timerSeconds<3600 ? (timerSeconds>3300?T.amber:T.green) : T.red;
 
   const tabs = [
-    {id:"academic",label:"📖 Academic Tests ("+AC_TESTS.length+")"},
+    {id:"b1",label:"📗 B1 Level ("+B1_TESTS.length+")"},
+    {id:"academic",label:"📖 Academic C1 ("+AC_TESTS.length+")"},
     {id:"gt",label:"📄 General Training ("+GT_TESTS_DATA.length+")"},
     {id:"strategies",label:"🎯 Question Strategies"},
     {id:"timetips",label:"⏱️ Time Management"}
@@ -3848,6 +4435,156 @@ const ReadingPage = ({isPro, onUpgrade}) => {
     </div>
   );
 
+
+
+  const renderB1TestList = () => (
+    <div>
+      <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"14px 18px",marginBottom:20}}>
+        <h3 style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:15,fontWeight:700,color:"#166534",margin:"0 0 4px"}}>📗 B1 Reading Practice</h3>
+        <p style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:13,color:"#166534",margin:0,lineHeight:1.6}}>Shorter passages at intermediate level. Suitable for IELTS targets of Band 5–6. 5 questions per passage.</p>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:14}}>
+        {B1_TESTS.map((t,i)=>(
+          <div key={i} onClick={()=>{setActiveTest({level:"B1",idx:i});setUserAnswers({});setSubmitted(false);window.scrollTo({top:0,behavior:"smooth"});}}
+            style={{...card,cursor:"pointer",transition:"all 0.2s"}}
+            onMouseOver={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.12)";e.currentTarget.style.transform="translateY(-2px)";}}
+            onMouseOut={e=>{e.currentTarget.style.boxShadow=T.shadow;e.currentTarget.style.transform="translateY(0)";}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+              <span style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,fontWeight:700,color:"#166534",background:"#dcfce7",border:"1px solid #86efac",borderRadius:4,padding:"2px 8px"}}>B1</span>
+              <span style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:"#94a3b8"}}>{t.questions.length} questions</span>
+            </div>
+            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,fontSize:15,color:"#1e293b",marginBottom:6}}>{t.title}</div>
+            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:12,color:"#94a3b8"}}>{t.text.substring(0,80)}...</div>
+            <div style={{marginTop:10,fontSize:12,fontWeight:600,color:"#b91c1c",fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>Start →</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderB1Test = () => {
+    const test=B1_TESTS[activeTest.idx];
+    const sty2={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+    const qKeys=test.questions.map((_,i)=>`b1_${i}`);
+    const allAnswered=qKeys.every(k=>userAnswers[k]!==undefined);
+
+    return(
+      <div>
+        {/* Back + header */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16,flexWrap:"wrap",gap:10}}>
+          <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});setTimerRunning(false);window.scrollTo({top:0,behavior:"smooth"});setTab("b1");}}
+            style={{...sty2,background:"white",border:"1px solid #e2e8f0",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#475569",cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+            ← Back to B1 Tests
+          </button>
+          <span style={{...sty2,fontSize:12,background:"#dcfce7",border:"1px solid #86efac",borderRadius:6,padding:"3px 10px",color:"#166534",fontWeight:700}}>
+            B1 Level
+          </span>
+        </div>
+
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:"#1e293b",margin:"0 0 4px"}}>{test.title}</h2>
+        <p style={{...sty2,fontSize:12,color:"#94a3b8",margin:"0 0 16px"}}>{test.questions.length} comprehension questions</p>
+
+        {/* Passage */}
+        <div style={{background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10,padding:"18px 20px",marginBottom:20,maxHeight:380,overflowY:"auto",direction:"ltr",textAlign:"left"}}>
+          {test.text.split("\n\n").map((p,i)=>(
+            <p key={i} style={{...sty2,fontSize:14,color:"#1e293b",lineHeight:1.85,margin:i>0?"14px 0 0":0}}>{p}</p>
+          ))}
+        </div>
+
+        {/* Questions */}
+        {!submitted&&(
+          <div style={{display:"flex",flexDirection:"column",gap:14,marginBottom:20}}>
+            {test.questions.map((q,qi)=>{
+              const key=`b1_${qi}`;
+              return(
+                <div key={qi} style={{background:"white",border:"1px solid #e2e8f0",borderRadius:10,padding:"16px 18px",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"}}>
+                  <div style={{...sty2,fontSize:14,fontWeight:600,color:"#1e293b",marginBottom:12}}>
+                    <span style={{color:"#b91c1c",fontWeight:800,marginRight:8}}>{qi+1}.</span>{q.q}
+                  </div>
+                  {q.type==="tf"&&(
+                    <div style={{display:"flex",gap:8}}>
+                      {["TRUE","FALSE","NOT GIVEN"].map(opt=>(
+                        <button key={opt} onClick={()=>setUserAnswers(p=>({...p,[key]:opt}))}
+                          style={{...sty2,flex:1,padding:"8px 4px",border:`1.5px solid ${userAnswers[key]===opt?"#b91c1c":"#e2e8f0"}`,borderRadius:8,background:userAnswers[key]===opt?"#fff1f2":"white",color:userAnswers[key]===opt?"#b91c1c":"#64748b",fontWeight:userAnswers[key]===opt?700:400,fontSize:12,cursor:"pointer",transition:"all 0.15s"}}>
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {q.type==="mc"&&(
+                    <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                      {q.options.map((opt,oi)=>(
+                        <button key={oi} onClick={()=>setUserAnswers(p=>({...p,[key]:opt}))}
+                          style={{...sty2,textAlign:"left",padding:"9px 12px",border:`1.5px solid ${userAnswers[key]===opt?"#b91c1c":"#e2e8f0"}`,borderRadius:8,background:userAnswers[key]===opt?"#fff1f2":"white",color:userAnswers[key]===opt?"#b91c1c":"#64748b",fontWeight:userAnswers[key]===opt?700:400,fontSize:13,cursor:"pointer",transition:"all 0.15s"}}>
+                          {["A","B","C","D"][oi]}. {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {q.type==="completion"&&(
+                    <input value={userAnswers[key]||""} onChange={e=>setUserAnswers(p=>({...p,[key]:e.target.value}))}
+                      placeholder="Your answer..."
+                      style={{...sty2,width:"100%",padding:"9px 12px",border:"1.5px solid #e2e8f0",borderRadius:8,fontSize:13,color:"#1e293b",boxSizing:"border-box"}}/>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {!submitted&&(
+          <button onClick={()=>setSubmitted(true)} disabled={!allAnswered}
+            style={{...sty2,background:allAnswered?"#b91c1c":"#e2e8f0",color:allAnswered?"white":"#94a3b8",border:"none",borderRadius:8,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:allAnswered?"pointer":"default",marginBottom:20}}>
+            Submit Answers →
+          </button>
+        )}
+
+        {/* Results */}
+        {submitted&&(()=>{
+          const score=test.questions.reduce((sum,q,qi)=>{
+            const key=`b1_${qi}`;
+            const ans=userAnswers[key]||"";
+            const correct=q.a;
+            const isRight=q.type==="completion"?ans.toLowerCase().trim()===correct.toLowerCase().trim():ans===correct;
+            return sum+(isRight?1:0);
+          },0);
+          const pct=Math.round(score/test.questions.length*100);
+          return(
+            <div>
+              <div style={{background:pct>=80?"#f0fdf4":pct>=60?"#fef3c7":"#fff1f2",border:`1px solid ${pct>=80?"#86efac":pct>=60?"#fbbf24":"#fca5a5"}`,borderRadius:12,padding:"16px 20px",marginBottom:20,textAlign:"center"}}>
+                <div style={{fontSize:32,fontWeight:900,color:pct>=80?"#059669":pct>=60?"#d97706":"#dc2626",...sty2}}>{score}/{test.questions.length}</div>
+                <div style={{...sty2,fontSize:14,color:pct>=80?"#166534":pct>=60?"#92400e":"#991b1b",fontWeight:600,marginTop:4}}>
+                  {pct>=80?"Excellent!":pct>=60?"Good — review the explanations below":"Keep practising — read the explanations carefully"}
+                </div>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+                {test.questions.map((q,qi)=>{
+                  const key=`b1_${qi}`;
+                  const ans=userAnswers[key]||"";
+                  const isRight=q.type==="completion"?ans.toLowerCase().trim()===q.a.toLowerCase().trim():ans===q.a;
+                  return(
+                    <div key={qi} style={{background:"white",border:`1.5px solid ${isRight?"#86efac":"#fca5a5"}`,borderRadius:10,padding:"14px 16px"}}>
+                      <div style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:6}}>
+                        <span style={{fontSize:14,flexShrink:0}}>{isRight?"✅":"❌"}</span>
+                        <div style={{...sty2,fontSize:13,color:"#1e293b",fontWeight:600}}>{q.q}</div>
+                      </div>
+                      {!isRight&&<div style={{...sty2,fontSize:12,color:"#dc2626",marginBottom:4}}>Your answer: <strong>{ans||"(no answer)"}</strong></div>}
+                      <div style={{...sty2,fontSize:12,color:"#166534",marginBottom:4}}>Correct: <strong>{q.a}</strong></div>
+                      <div style={{...sty2,fontSize:12,color:"#64748b",lineHeight:1.5}}>💡 {q.exp}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <button onClick={()=>{setActiveTest(null);setSubmitted(false);setUserAnswers({});setTimerRunning(false);window.scrollTo({top:0,behavior:"smooth"});setTab("b1");}}
+                style={{...sty2,background:"white",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px 22px",fontSize:14,fontWeight:700,color:"#b91c1c",cursor:"pointer"}}>
+                ← Try another B1 test
+              </button>
+            </div>
+          );
+        })()}
+      </div>
+    );
+  };
+
   const renderActiveTest = () => {
     const tests = activeTest.type==="ac"?AC_TESTS:GT_TESTS_DATA;
     const test = tests[activeTest.idx];
@@ -3957,7 +4694,9 @@ const ReadingPage = ({isPro, onUpgrade}) => {
 
       {!activeTest&&tab==="academic"&&renderTestList(AC_TESTS,"ac")}
       {!activeTest&&tab==="gt"&&renderTestList(GT_TESTS_DATA,"gt")}
-      {activeTest&&renderActiveTest()}
+      {!activeTest&&tab==="b1"&&renderB1TestList()}
+      {activeTest&&activeTest.level==="B1"&&renderB1Test()}
+      {activeTest&&activeTest.level!=="B1"&&renderActiveTest()}
 
       {!activeTest&&tab==="strategies"&&(
         <div>
@@ -6282,7 +7021,7 @@ const UI = {
     f3t:"Speaking Practice",f3d:"Free: Band 8 model answers for Parts 1, 2 & 3 — no restrictions",
     f4t:"Learning Games",f4d:"Free: All 5 games — no restrictions",
     f5t:"Grammar & Spelling",f5d:"Free: 5 checks · Pro: Unlimited",
-    f6t:"Practice Exercises",f6d:"Pro only · 300+ exercises — grammar, vocabulary, paraphrasing, and error correction",
+    f6t:"Practice Exercises",f6d:"Pro only · 230+ exercises — grammar, dictation, sentence building, vocabulary and more",
     f7t:"IELTS Toolkit",f7d:"Free: Linking words & Grammar · Pro: Full toolkit",
     f8t:"Track Progress",f8d:"Pro only · Track your scores and progress over time",
     fat:"Placement Test",fad:"Free: Discover your level from A1 to C2 with an IELTS band estimate",
@@ -6883,6 +7622,22 @@ export default function IELTSBot(){
         </div>
       )}
 
+      {/* DAILY CHALLENGE — homepage gamified widget */}
+      {mainView==="home"&&(
+        <div style={{background:"#0f172a",padding:"40px 32px"}}>
+          <div style={{maxWidth:700,margin:"0 auto"}}>
+            <div style={{textAlign:"center",marginBottom:20}}>
+              <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(18px,2.5vw,24px)",color:"white",margin:"0 0 6px",fontWeight:700}}>
+                {uiLang==="ar"?"سؤال اليوم":"Question of the Day"}
+              </h2>
+              <p style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"rgba(255,255,255,0.45)",margin:0}}>
+                {uiLang==="ar"?"سؤال يومي جديد · حافظ على تسلسلك!":"One new question daily · Keep your streak going!"}
+              </p>
+            </div>
+            <DailyChallengeWidget uiLang={uiLang}/>
+          </div>
+        </div>
+      )}
       {/* TESTIMONIALS — social proof on homepage */}
       {mainView==="home"&&<TestimonialsSection uiLang={uiLang}/>}
 
