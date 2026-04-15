@@ -7411,10 +7411,8 @@ const StudyPlanPage=({uiLang="en",onNavigate})=>{
     <div style={{maxWidth:780,margin:"0 auto",padding:"32px 16px 60px",...sty,direction:dir}}>
       <div style={{textAlign:"center",marginBottom:36}}>
         <div style={{fontSize:44,marginBottom:12}}>🗺️</div>
-        <h1 style={{fontFamily:"Georgia,serif",fontSize:"clamp(22px,3vw,30px)",color:T.text,margin:"0 0 10px",textAlign:"center",direction:"ltr"}}>
-          {isAr
-            ?<><span style={{direction:"rtl",unicodeBidi:"embed"}}>خطة دراستك على </span><span style={{direction:"ltr"}}>Englishfool</span></>
-            :"Your Study Plan on Englishfool"}
+        <h1 style={{fontFamily:"Georgia,serif",fontSize:"clamp(22px,3vw,30px)",color:T.text,margin:"0 0 10px",textAlign:"center"}}>
+          {isAr?"خطتك الدراسية على موقعنا":"Your Study Plan on Englishfool"}
         </h1>
         <p style={{fontSize:15,color:T.textMuted,margin:"0 auto",lineHeight:1.7,maxWidth:560,textAlign:"center"}}>
           {isAr?"اتبع هذه الخطوات بالترتيب للحصول على أفضل النتائج. الخطوات المجانية أولاً — يمكنك البدء الآن بدون اشتراك.":"Follow these steps in order for the best results. Free steps come first — you can start right now without a subscription."}
@@ -7432,13 +7430,13 @@ const StudyPlanPage=({uiLang="en",onNavigate})=>{
           const tagBg=step.free===true?T.greenBg:step.free===false?T.purpleBg:T.amberBg;
           const tagColor=step.free===true?T.green:step.free===false?T.purple:T.amber;
           return(
-            <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,padding:"20px 22px",display:"flex",flexDirection:isAr?"row-reverse":"row",gap:16,alignItems:"flex-start",borderLeft:isAr?"none":"4px solid "+dotColor,borderRight:isAr?"4px solid "+dotColor:"none"}}>
+            <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,padding:"20px 22px",display:"flex",flexDirection:"row",gap:16,alignItems:"flex-start",borderLeft:isAr?"none":"4px solid "+dotColor,borderRight:isAr?"4px solid "+dotColor:"none"}}>
               {/* Step number */}
               <div style={{width:36,height:36,borderRadius:"50%",background:dotColor,color:"white",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:15,flexShrink:0,marginTop:2}}>
                 {step.num}
               </div>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6,flexDirection:isAr?"row-reverse":"row",justifyContent:"flex-start"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6,flexDirection:"row",justifyContent:"flex-start"}}>
                   <span style={{fontSize:16,fontWeight:700,color:T.text}}>{step.title}</span>
                   <span style={{fontSize:11,fontWeight:700,padding:"3px 9px",borderRadius:20,background:tagBg,color:tagColor,flexShrink:0}}>{step.tag}</span>
                 </div>
