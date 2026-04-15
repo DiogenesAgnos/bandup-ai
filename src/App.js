@@ -7091,7 +7091,7 @@ const UI = {
     // Nav
     home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
-    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق",
+    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق", studyplan:"🗺️ خطة الدراسة",
     // Account
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
@@ -7147,7 +7147,7 @@ const UI = {
     // Nav
     home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", placement:"📋 Placement Test", speaking:"🗣️ Speaking",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
-    progress:"📈 Progress", contact:"✉️ Contact", pronunciation:"🔊 Pronunciation",
+    progress:"📈 Progress", contact:"✉️ Contact", pronunciation:"🔊 Pronunciation", studyplan:"🗺️ Study Plan",
     // Account
     signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
     manageSubscription:"Manage Subscription",
@@ -7201,6 +7201,275 @@ const UI = {
   }
 };
 
+
+// ── STUDY PLAN PAGE ───────────────────────────
+const STUDY_STEPS = {
+  ar: [
+    {
+      num:1, free:true, view:"placement",
+      title:"اختبار تحديد المستوى",
+      tag:"ابدأ هنا — مجاني",
+      desc:"قبل أي شيء آخر، تحتاج أن تعرف مستواك الحقيقي. الاختبار يحدد مستواك من A1 إلى C2 مع تقدير لدرجة الآيلتس.",
+      tip:"لا تخمّن — أجب بصدق. النتيجة هي نقطة انطلاقك، وليست حكماً عليك.",
+      action:"ابدأ الاختبار ←",
+    },
+    {
+      num:2, free:true, view:"vocabulary",
+      title:"صفحة المفردات",
+      tag:"مجاني",
+      desc:"تصفّح المفردات حسب الموضوع. ركّز على الكلمات التي لا تعرفها.",
+      tip:"احضر دفتراً ورقياً. اكتب كل كلمة جديدة مع معناها بالعربي وجملة مثال. الكتابة اليدوية تثبّت الحفظ أكثر بكثير من مجرد القراءة.",
+      action:"افتح المفردات ←",
+    },
+    {
+      num:3, free:true, view:"pronunciation",
+      title:"النطق الصحيح",
+      tag:"مجاني",
+      desc:"لكل كلمة كتبتها في دفترك، افتح هذه الصفحة واستمع لنطقها الصحيح.",
+      tip:"تعلّم كلمة وأنت تنطقها خطأ أسوأ من عدم تعلّمها. النطق الخاطئ يبني عادة يصعب تصحيحها لاحقاً.",
+      action:"افتح النطق ←",
+    },
+    {
+      num:4, free:true, view:"game",
+      title:"ألعاب الآيلتس",
+      tag:"مجاني بالكامل",
+      desc:"العب لعبة واحدة يومياً — إملاء، قواعد، مفردات، قراءة، أو كتابة. الألعاب تحوّل ما قرأته في الخطوات السابقة إلى معرفة فعلية.",
+      tip:"الفرق بين أن تتعرّف على كلمة وأن تمتلكها فعلاً هو الاسترجاع النشط — وهذا بالضبط ما تفعله الألعاب.",
+      action:"العب الآن ←",
+    },
+    {
+      num:5, free:true, view:"reading",
+      title:"اختبارات القراءة",
+      tag:"اختبار B1 مجاني — باقي الاختبارات Pro",
+      desc:"إذا كان مستواك أقل من Band 6، ابدأ باختبار B1. إذا كنت Band 6 أو أعلى، انتقل مباشرة للاختبارات الأكاديمية أو General Training.",
+      tip:"التزم بالوقت بدقة — لا تعطِ نفسك دقيقة إضافية. بعد الانتهاء، راجع كل إجابة خاطئة وافهم السبب قبل أن تغلق الصفحة.",
+      action:"افتح القراءة ←",
+    },
+    {
+      num:6, free:"5 فحوصات مجانية", view:"grammar",
+      title:"فحص القواعد والإملاء",
+      tag:"5 فحوصات مجانية — Pro غير محدود",
+      desc:"اكتب فقرة قصيرة من 100 إلى 150 كلمة عن أي موضوع. أرسلها هنا واقرأ كل خطأ رُصد بعناية.",
+      tip:"لا تكتفِ بالقراءة — أعِد كتابة الفقرة كاملةً من الصفر مع تطبيق كل التصحيحات. هذا هو التدريب الحقيقي.",
+      action:"افتح القواعد ←",
+    },
+    {
+      num:7, free:"تحليلان مجانيان", view:"analyze",
+      title:"تحليل المقالة",
+      tag:"تحليلان مجانيان — Pro غير محدود",
+      desc:"اكتب مقالتك الأولى الكاملة — 250 كلمة على الأقل. أرسلها هنا واحصل على درجتك الكاملة مع تفصيل كل معيار.",
+      tip:"لا تنظر فقط إلى الدرجة — اقرأ كل خطأ، كل ترقية مفردات، والمقال النموذجي في الأسفل. انسخ المقال النموذجي في دفترك وادرس بناءه.",
+      action:"حلّل مقالتك ←",
+    },
+    {
+      num:8, free:"جزئياً مجاني", view:"toolkit",
+      title:"أدوات الآيلتس",
+      tag:"الروابط والقواعد مجانية — Pro للكل",
+      desc:"ادرس الروابط والقوالب. هذه ليست اختصارات — هي الهيكل الذي يبني عليه الطالب Band 7+.",
+      tip:"احفظ 5 روابط على الأقل من كل فئة. الطالب الذي يحفظ 'Furthermore / Moreover / In addition' فقط يبدو متكرراً. التنوع هو المطلوب.",
+      action:"افتح الأدوات ←",
+    },
+    {
+      num:9, free:true, view:"speaking",
+      title:"تدريب المحادثة",
+      tag:"مجاني",
+      desc:"اقرأ نماذج الإجابات Band 8 بصوت عالٍ — وليس في ذهنك فقط. سجّل نفسك على هاتفك واستمع للتسجيل.",
+      tip:"الهدف ليس حفظ الإجابات — بل تعويد أذنك ولسانك على الإنجليزية الأكاديمية المنطوقة. ما تسمعه منك أنت يختلف عما تسمعه من الآخرين.",
+      action:"افتح المحادثة ←",
+    },
+    {
+      num:10, free:false, view:"exercises",
+      title:"التمارين التدريبية",
+      tag:"Pro فقط",
+      desc:"افعل مجموعة تمارين واحدة على الأقل يومياً — قواعد، إملاء، بناء جمل، مفردات. هذه هي التدريبات التي تحوّل الفهم إلى عادة.",
+      tip:"القاعدة التي تفهمها ولم تتدرّب عليها ستُخذلك تحت ضغط الامتحان. الفهم وحده لا يكفي.",
+      action:"افتح التمارين ←",
+    },
+    {
+      num:11, free:false, view:"practice",
+      title:"تدريب الكتابة",
+      tag:"Pro فقط",
+      desc:"اكتب مقالة موقوتة أسبوعياً. استخدم التغذية الراجعة أثناء الكتابة، ثم أرسل النسخة النهائية لتحليل المقالة للحصول على الدرجة الكاملة.",
+      tip:"تتبّع هل درجتك تتحسّن من أسبوع لآخر. إذا ظلّت ثابتة لأسبوعين متتاليين — شيء محدد يحتاج تغييراً في أسلوبك.",
+      action:"افتح التدريب ←",
+    },
+    {
+      num:12, free:false, view:"progress",
+      title:"تتبّع تقدمك",
+      tag:"Pro فقط",
+      desc:"راجع هذه الصفحة كل أسبوعين. تاريخ درجاتك محفوظ تلقائياً — ستلاحظ الاتجاه بوضوح.",
+      tip:"إذا لم تتحسّن درجتك بعد جهد منتظم، احجز استشارة مجانية. في الغالب يوجد شيء محدد في أسلوبك يحتاج تعديلاً — لا يتعلق بالجهد.",
+      action:"افتح التقدم ←",
+    },
+  ],
+  en: [
+    {
+      num:1, free:true, view:"placement",
+      title:"Placement Test",
+      tag:"Start here — free",
+      desc:"Before anything else, you need to know your actual level. The test places you from A1 to C2 with an estimated IELTS band score.",
+      tip:"Don't guess — answer honestly. The result is your starting point, not a judgement. Everything that comes after depends on getting this right.",
+      action:"Take the test →",
+    },
+    {
+      num:2, free:true, view:"vocabulary",
+      title:"Vocabulary Page",
+      tag:"Free",
+      desc:"Browse vocabulary by topic and focus on words you don't know yet.",
+      tip:"Get a physical notebook. Write every new word with its meaning and an example sentence. Handwriting fixes words in memory far better than just reading them on screen.",
+      action:"Open vocabulary →",
+    },
+    {
+      num:3, free:true, view:"pronunciation",
+      title:"Pronunciation",
+      tag:"Free",
+      desc:"For every word you wrote in your notebook, come here and listen to how it's actually pronounced.",
+      tip:"Learning a word while mispronouncing it is worse than not learning it — it builds a habit that's hard to correct later. Do this alongside Step 2, not after.",
+      action:"Open pronunciation →",
+    },
+    {
+      num:4, free:true, view:"game",
+      title:"IELTS Games",
+      tag:"Completely free",
+      desc:"Play one game per day — spelling, grammar, vocabulary, reading, or writing. The games turn what you studied passively in Steps 2 and 3 into active knowledge.",
+      tip:"The difference between recognising a word and actually owning it is active recall — which is exactly what the games force you to do.",
+      action:"Play now →",
+    },
+    {
+      num:5, free:true, view:"reading",
+      title:"Reading Tests",
+      tag:"B1 test free — full tests Pro",
+      desc:"If your placement result was below Band 6, start with the B1 test. If you're Band 6 or above, go straight to Academic or General Training tests.",
+      tip:"Time yourself strictly — no extra minutes. After finishing, review every wrong answer and understand the reason before closing the page. The review is more valuable than the test itself.",
+      action:"Open reading →",
+    },
+    {
+      num:6, free:"5 free checks", view:"grammar",
+      title:"Grammar & Spelling Checker",
+      tag:"5 checks free — Pro unlimited",
+      desc:"Write a short paragraph of 100–150 words on any topic. Submit it here and read every flagged error carefully.",
+      tip:"Don't just read the corrections — rewrite the entire paragraph from scratch applying every fix. That rewrite is the actual training.",
+      action:"Open grammar →",
+    },
+    {
+      num:7, free:"2 free analyses", view:"analyze",
+      title:"Essay Analysis",
+      tag:"2 analyses free — Pro unlimited",
+      desc:"Write your first full essay — minimum 250 words. Submit it and get your complete score with detailed breakdown across all four IELTS criteria.",
+      tip:"Don't just look at the score. Read every mistake, every vocabulary upgrade, and the model essay at the bottom. Copy the model essay into your notebook and study its structure.",
+      action:"Analyse your essay →",
+    },
+    {
+      num:8, free:"Partially free", view:"toolkit",
+      title:"IELTS Toolkit",
+      tag:"Linking words & grammar free — Pro for all",
+      desc:"Study the linking words and essay templates. These are not shortcuts — they are the scaffolding that Band 7+ essays are built on.",
+      tip:"Memorise at least 5 linking phrases per category. Students who only know 'Furthermore / Moreover / In addition' sound repetitive. Variety is what the examiner notices.",
+      action:"Open toolkit →",
+    },
+    {
+      num:9, free:true, view:"speaking",
+      title:"Speaking Practice",
+      tag:"Free",
+      desc:"Read the Band 8 model answers out loud — not silently in your head. Record yourself on your phone and play it back.",
+      tip:"The goal is not to memorise the answers — it's to train your ear and tongue to produce academic English naturally. What you hear from yourself sounds different from what you hear from others.",
+      action:"Open speaking →",
+    },
+    {
+      num:10, free:false, view:"exercises",
+      title:"Practice Exercises",
+      tag:"Pro only",
+      desc:"Do at least one exercise set per day — grammar, spelling, sentence building, vocabulary. These drills turn understanding into habit.",
+      tip:"Grammar you understand but haven't drilled will fail you under exam pressure. Understanding alone is not enough — automaticity is.",
+      action:"Open exercises →",
+    },
+    {
+      num:11, free:false, view:"practice",
+      title:"Writing Practice",
+      tag:"Pro only",
+      desc:"Write a timed essay every week. Use the live coaching feedback during writing, then submit the final version to Essay Analysis for a full score.",
+      tip:"Track whether your band improves week by week. If it stays flat for two consecutive weeks, something specific in your approach needs to change — not more effort, different effort.",
+      action:"Open writing practice →",
+    },
+    {
+      num:12, free:false, view:"progress",
+      title:"Progress Tracker",
+      tag:"Pro only",
+      desc:"Check this page every two weeks. Your score history is saved automatically — you will see the trend clearly.",
+      tip:"If your score isn't moving after consistent work, book a Free Consultation. Usually there's one specific thing in your approach that needs adjusting — it's rarely about effort.",
+      action:"Open progress →",
+    },
+  ],
+};
+
+const StudyPlanPage=({uiLang="en",onNavigate})=>{
+  const isAr=uiLang==="ar";
+  const dir=isAr?"rtl":"ltr";
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+  const steps=isAr?STUDY_STEPS.ar:STUDY_STEPS.en;
+  return(
+    <div style={{maxWidth:780,margin:"0 auto",padding:"32px 16px 60px",...sty,direction:dir}}>
+      <div style={{textAlign:"center",marginBottom:36}}>
+        <div style={{fontSize:44,marginBottom:12}}>🗺️</div>
+        <h1 style={{fontFamily:"Georgia,serif",fontSize:"clamp(22px,3vw,30px)",color:T.text,margin:"0 0 10px"}}>
+          {isAr?"خطة دراستك على Englishfool":"Your Study Plan on Englishfool"}
+        </h1>
+        <p style={{fontSize:15,color:T.textMuted,margin:0,lineHeight:1.7,maxWidth:560,marginLeft:"auto",marginRight:"auto"}}>
+          {isAr?"اتبع هذه الخطوات بالترتيب للحصول على أفضل النتائج. الخطوات المجانية أولاً — يمكنك البدء الآن بدون اشتراك.":"Follow these steps in order for the best results. Free steps come first — you can start right now without a subscription."}
+        </p>
+        <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:16,flexWrap:"wrap"}}>
+          <div style={{display:"flex",alignItems:"center",gap:6,fontSize:13,color:T.green}}><span style={{width:12,height:12,borderRadius:"50%",background:T.green,display:"inline-block"}}></span>{isAr?"مجاني":"Free"}</div>
+          <div style={{display:"flex",alignItems:"center",gap:6,fontSize:13,color:T.amber}}><span style={{width:12,height:12,borderRadius:"50%",background:T.amber,display:"inline-block"}}></span>{isAr?"مجاني جزئياً":"Partially free"}</div>
+          <div style={{display:"flex",alignItems:"center",gap:6,fontSize:13,color:T.purple}}><span style={{width:12,height:12,borderRadius:"50%",background:T.purple,display:"inline-block"}}></span>Pro</div>
+        </div>
+      </div>
+
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        {steps.map((step,i)=>{
+          const dotColor=step.free===true?T.green:step.free===false?T.purple:T.amber;
+          const tagBg=step.free===true?T.greenBg:step.free===false?T.purpleBg:T.amberBg;
+          const tagColor=step.free===true?T.green:step.free===false?T.purple:T.amber;
+          return(
+            <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,padding:"20px 22px",display:"flex",gap:16,alignItems:"flex-start",borderLeft:isAr?"none":"4px solid "+dotColor,borderRight:isAr?"4px solid "+dotColor:"none",transition:"box-shadow 0.15s"}}>
+              {/* Step number */}
+              <div style={{width:36,height:36,borderRadius:"50%",background:dotColor,color:"white",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:15,flexShrink:0,marginTop:2}}>
+                {step.num}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6}}>
+                  <span style={{fontSize:16,fontWeight:700,color:T.text}}>{step.title}</span>
+                  <span style={{fontSize:11,fontWeight:700,padding:"3px 9px",borderRadius:20,background:tagBg,color:tagColor,flexShrink:0}}>{step.tag}</span>
+                </div>
+                <p style={{fontSize:14,color:T.textMid,margin:"0 0 8px",lineHeight:1.7}}>{step.desc}</p>
+                <div style={{background:T.bgMuted,borderRadius:8,padding:"10px 13px",marginBottom:12,display:"flex",gap:8,alignItems:"flex-start"}}>
+                  <span style={{fontSize:14,flexShrink:0,marginTop:1}}>💡</span>
+                  <span style={{fontSize:13,color:T.textMid,lineHeight:1.6}}>{step.tip}</span>
+                </div>
+                <button onClick={()=>onNavigate(step.view)}
+                  style={{background:dotColor,color:"white",border:"none",borderRadius:8,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",...sty,whiteSpace:"nowrap"}}>
+                  {step.action}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{marginTop:32,padding:"18px 20px",background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:12,textAlign:"center"}}>
+        <div style={{fontSize:15,fontWeight:700,color:T.primary,marginBottom:6}}>
+          {isAr?"هل تحتاج مساعدة شخصية؟":"Need personal guidance?"}
+        </div>
+        <div style={{fontSize:13,color:T.textMid,marginBottom:12}}>
+          {isAr?"احجز استشارة مجانية مع فريقنا — نساعدك تحديد ما تحتاجه بالضبط.":"Book a free consultation with our team — we'll help you identify exactly what you need."}
+        </div>
+        <button onClick={()=>onNavigate("contact")}
+          style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+          {isAr?"احجز استشارة مجانية ←":"Book a free consultation →"}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // ── PRONUNCIATION PAGE ─────────────────────────
 const PRON_WORDS=[
@@ -8032,6 +8301,7 @@ export default function IELTSBot(){
               <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
               <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
               <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label={UI[uiLang].studyplan} active={mainView==="studyplan"} onClick={()=>{switchView("studyplan");trackEvent("nav_click",{page:"studyplan"});}}/>
               <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
@@ -8590,6 +8860,7 @@ export default function IELTSBot(){
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
         {mainView==="pronunciation"&&<PronunciationPage uiLang={uiLang} isPro={proUser}/>}
+        {mainView==="studyplan"&&<StudyPlanPage uiLang={uiLang} onNavigate={switchView}/>}
         </div>
       </div>
       )}
