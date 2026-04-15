@@ -7962,12 +7962,30 @@ export default function IELTSBot(){
                 <button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:6,padding:"6px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].signIn}</button>
               )}
             </div>
+            {/* Mobile-only auth strip */}
+            <div className="mobile-top-controls" style={{display:"none",alignItems:"center",gap:6}}>
+              <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2}}>
+                {["ar","en"].map(l=>(
+                  <button key={l} onClick={()=>setUiLang(l)} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 9px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>
+                    {l==="ar"?"ع":"EN"}
+                  </button>
+                ))}
+              </div>
+              {proUser
+                ?<span style={{fontSize:11,color:T.primary,fontWeight:700,fontFamily:"'Cairo',system-ui",background:T.primaryLight,padding:"3px 8px",borderRadius:20,border:`1px solid ${T.primaryBorder}`}}>✓ Pro</span>
+                :<button onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"6px 10px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>🔓 Pro</button>
+              }
+              {session
+                ?<button onClick={handleSignOut} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:6,padding:"5px 8px",fontSize:11,cursor:"pointer",color:T.textMid,fontFamily:"'Cairo',system-ui"}}>{uiLang==="ar"?"خروج":"Out"}</button>
+                :<button onClick={()=>setShowAuth(true)} style={{background:"transparent",color:T.primary,border:`1.5px solid ${T.primary}`,borderRadius:6,padding:"5px 10px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{uiLang==="ar"?"دخول":"Sign In"}</button>
+              }
+            </div>
           </div>
         </div>
 
         {/* TIER 2 — Red navbar: navigation links */}
         <div style={{background:T.primary}}>
-          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",direction:uiLang==="ar"?"rtl":"ltr"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px"}}>
             <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"wrap"}}>
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
               <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
@@ -7979,23 +7997,8 @@ export default function IELTSBot(){
               <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
               <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
               <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
-              <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
               <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
-            </div>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              {/* Mobile consultation button */}
-              <button className="mobile-consult-btn" onClick={()=>setShowConsultation(true)} style={{display:"none",background:"rgba(255,255,255,0.15)",border:"1.5px solid rgba(255,255,255,0.5)",borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:11,color:"white",fontFamily:"'Cairo',system-ui",fontWeight:700,whiteSpace:"nowrap",alignItems:"center",gap:4}}>
-                🎓 {uiLang==="ar"?"استشارة":"Consult"}
-              </button>
-              {/* Mobile language toggle */}
-              <div className="mobile-lang-toggle" style={{display:"none",background:"rgba(255,255,255,0.15)",borderRadius:8,padding:2,gap:2}}>
-                {["ar","en"].map(l=>(
-                  <button key={l} onClick={()=>setUiLang(l)} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"5px 10px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:"rgba(255,255,255,0.8)",cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s"}}>
-                    {l==="ar"?"ع":"EN"}
-                  </button>
-                ))}
-              </div>
-              <button className="hamburger-btn" onClick={()=>setMenuOpen(true)} style={{display:"none",background:"none",border:"1.5px solid rgba(255,255,255,0.4)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontSize:18,color:"white",minWidth:40,minHeight:40,justifyContent:"center",alignItems:"center"}}>☰</button>
+              <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
           </div>
         </div>
@@ -8645,37 +8648,8 @@ export default function IELTSBot(){
               <Logo size={20} onClick={()=>{switchView("analyze");setMenuOpen(false);}}/>
               <button onClick={()=>setMenuOpen(false)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"rgba(255,255,255,0.7)",padding:4}}>✕</button>
             </div>
-            {/* Nav items */}
+            {/* Nav items — removed, tabs now visible directly on mobile */}
             <div style={{flex:1,overflowY:"auto",padding:"8px 0"}}>
-              {[
-                {view:"home",icon:"🏠",label:"الرئيسية",labelEn:"Home"},
-                {view:"analyze",icon:"🎓",label:"تحليل المقالة",labelEn:"Essay Analysis"},
-                {view:"practice",icon:"🖊️",label:"تدريب الكتابة",labelEn:"Writing Practice"},
-                {view:"grammar",icon:"✏️",label:"قواعد وإملاء",labelEn:"Grammar & Spelling"},
-                {view:"exercises",icon:"🏋️",label:"تمارين",labelEn:"Exercises"},
-                {view:"speaking",icon:"🗣️",label:"تدريب المحادثة",labelEn:"Speaking Practice"},
-                {view:"reading",icon:"📖",label:"اختبارات القراءة",labelEn:"Reading Tests"},
-                {view:"game",icon:"🎮",label:"ألعاب الآيلتس",labelEn:"IELTS Games"},
-                {view:"placement",icon:"📋",label:"تحديد المستوى",labelEn:"Placement Test"},
-                {view:"exercises",icon:"🏋️",label:"تمارين",labelEn:"Exercises"},
-                {view:"vocabulary",icon:"📝",label:"مفردات الآيلتس",labelEn:"IELTS Vocabulary"},
-                {view:"toolkit",icon:"📚",label:"أدوات الآيلتس",labelEn:"IELTS Toolkit"},
-                {view:"progress",icon:"📈",label:"تتبع تقدمي",labelEn:"My Progress"},
-                {view:"contact",icon:"✉️",label:"اتصل بنا",labelEn:"Contact"},
-              ].map(item=>(
-                <button key={item.view} onClick={()=>{switchView(item.view);setMenuOpen(false);}}
-                  style={{
-                    width:"100%",background:mainView===item.view?T.primaryLight:"transparent",
-                    border:"none",borderRight:mainView===item.view?`4px solid ${T.primary}`:"4px solid transparent",
-                    padding:"14px 20px",display:"flex",alignItems:"center",gap:14,
-                    cursor:"pointer",textAlign:"right",direction:"rtl",minHeight:48,
-                    color:mainView===item.view?T.primary:T.text,
-                    fontSize:15,fontWeight:mainView===item.view?700:500,
-                    fontFamily:"'Cairo',system-ui"
-                  }}>
-                  <span style={{fontSize:18}}>{item.icon}</span>{uiLang==="ar"?item.label:item.labelEn||item.label}
-                </button>
-              ))}
               <div style={{height:1,background:T.border,margin:"8px 20px"}}/>
               <div style={{padding:"8px 20px"}}>
                 <div style={{fontSize:11,color:T.textMuted,fontWeight:700,marginBottom:8,fontFamily:"'Cairo',system-ui",direction:"rtl"}}>{UI[uiLang].siteLang}</div>
@@ -8774,13 +8748,15 @@ export default function IELTSBot(){
         @media (max-width: 768px) {
           /* NAV TIER 1 */
           .nav-right { display: none !important; }
-          .sticky-nav div[style*="height:56"] { padding: 0 16px !important; }
+          .mobile-top-controls { display: flex !important; }
+          .sticky-nav div[style*="height:56"] { padding: 0 12px !important; }
 
-          /* NAV TIER 2 */
-          .hamburger-btn { display: flex !important; }
-          .mobile-lang-toggle { display: flex !important; }
-          .mobile-consult-btn { display: flex !important; }
-          .nav-tabs { display: none !important; }
+          /* NAV TIER 2 — show all tabs as wrapping rows, no hamburger */
+          .hamburger-btn { display: none !important; }
+          .mobile-lang-toggle { display: none !important; }
+          .mobile-consult-btn { display: none !important; }
+          .nav-tabs { display: flex !important; flex-wrap: wrap !important; width: 100% !important; }
+          .nav-tabs button { font-size: 11px !important; padding: 8px 7px !important; white-space: nowrap !important; min-height: 36px !important; }
           .sticky-nav { position: sticky !important; top: 0 !important; }
 
           /* HERO */
