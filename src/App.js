@@ -4915,9 +4915,14 @@ const ContactPage = () => {
         <div style={{fontSize:48,marginBottom:12}}>✉️</div>
         <h2 style={{fontFamily:"Arial Black,system-ui",color:T.text,fontSize:28,margin:"0 0 8px 0",fontWeight:900,direction:"rtl"}}>اتصل بنا</h2>
         <p style={{color:T.textMid,fontSize:15,fontFamily:"'Cairo','Source Sans Pro',system-ui",margin:0,lineHeight:1.6,direction:"rtl"}}>هل لديك سؤال أو ملاحظة؟ تواصل معنا بكل سرور، أو راسلنا مباشرةً عبر Messenger.</p>
-        <a href="https://www.facebook.com/profile.php?id=61579432547860" target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:8,background:"#1877f2",color:"white",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:700,textDecoration:"none",fontFamily:"'Cairo',system-ui",marginTop:12}}>
-          <span style={{fontSize:18}}>💬</span> تواصل عبر Facebook Messenger
-        </a>
+        <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginTop:12}}>
+          <a href="https://www.facebook.com/profile.php?id=61579432547860" target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:8,background:"#1877f2",color:"white",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:700,textDecoration:"none",fontFamily:"'Cairo',system-ui"}}>
+            <span style={{fontSize:18}}>💬</span> Facebook Messenger
+          </a>
+          <a href="https://www.instagram.com/englishfool4/" target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:8,background:"linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)",color:"white",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:700,textDecoration:"none",fontFamily:"'Cairo',system-ui"}}>
+            <span style={{fontSize:18}}>📸</span> Instagram
+          </a>
+        </div>
       </div>
       <Card style={{border:"2px solid #e0e0e0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:16}}>
