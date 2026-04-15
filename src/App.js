@@ -8123,46 +8123,40 @@ export default function IELTSBot(){
       </div>}
 
 
-      {/* WHY NOT CHATGPT — homepage only */}
+      {/* PLATFORM DESCRIPTION — homepage only */}
       {mainView==="home"&&(
         <div style={{background:"white",borderTop:"1px solid #e2e8f0",padding:"56px 32px"}}>
-          <div style={{maxWidth:860,margin:"0 auto",direction:uiLang==="ar"?"rtl":"ltr"}}>
-            <div style={{textAlign:uiLang==="ar"?"center":"left",marginBottom:36}}>
-              <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(20px,2.5vw,28px)",color:"#1e293b",margin:"0 0 10px",fontWeight:700,textAlign:"center"}}>
-                {uiLang==="ar"?"ChatGPT يعطيك إجابات. هذا يعطيك تحسناً.":"ChatGPT gives you answers. This gives you improvement."}
-              </h2>
-              <p style={{fontFamily:"'Cairo',system-ui",fontSize:15,color:"#64748b",margin:"0 auto",lineHeight:1.7,textAlign:"center",maxWidth:620}}>
-                {uiLang==="ar"?"ChatGPT مفيد للصياغة والشرح. لكنه لم يُصمَّم لتعليم الإنجليزية بشكل منهجي أو لإخبارك إذا كنت مستعداً للامتحان.":"ChatGPT is useful for drafting and explaining. It is not designed to teach you English systematically or tell you whether you're ready for an exam."}
-              </p>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16}}>
-              {(uiLang==="ar"?[
-                {icon:"📍",title:"يعرف مستواك",ef:"اختبار تحديد المستوى عند أول زيارة — A1 إلى C2",gpt:"يبدأ من الصفر في كل محادثة"},
-                {icon:"📊",title:"تقييم المقالات",ef:"أربعة معايير، وصفات درجات رسمية، ودرجة محددة",gpt:"تغذية راجعة عامة — بلا درجة ولا معايير"},
-                {icon:"📈",title:"يتتبع تقدمك",ef:"تاريخ الدرجات يُحفظ تلقائياً في كل مقالة",gpt:"لا ذاكرة بين الجلسات"},
-                {icon:"🗺️",title:"مسار تعلّم منظم",ef:"بناءً على نتيجة اختبارك — تعرف ماذا تفعل أولاً",gpt:"أنت من يقرر ماذا تسأل"},
-              ]:[
-                {icon:"📍",title:"Knows your level",ef:"Placement test on first visit — A1 to C2",gpt:"Starts from scratch every conversation"},
-                {icon:"📊",title:"Essay scoring",ef:"Four criteria, official band descriptors, specific score",gpt:"General feedback — no band score, no criteria"},
-                {icon:"📈",title:"Tracks your progress",ef:"Score history saved automatically every essay",gpt:"No memory between sessions"},
-                {icon:"🗺️",title:"Structured learning path",ef:"Based on your placement result — you know what to do first",gpt:"You decide what to ask"},
-              ]).map((item,i)=>(
-                <div key={i} style={{background:"#f8fafc",borderRadius:12,padding:"20px",border:"1px solid #e2e8f0",direction:uiLang==="ar"?"rtl":"ltr",textAlign:uiLang==="ar"?"right":"left"}}>
-                  <div style={{fontSize:24,marginBottom:8}}>{item.icon}</div>
-                  <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:15,color:"#1e293b",marginBottom:12}}>{item.title}</div>
-                  <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                    <div style={{display:"flex",gap:10,alignItems:"flex-start",flexDirection:uiLang==="ar"?"row-reverse":"row"}}>
-                      <span style={{fontSize:12,fontWeight:700,color:"#059669",background:"#d1fae5",borderRadius:4,padding:"2px 7px",flexShrink:0,marginTop:1}}>EF</span>
-                      <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#1e293b",lineHeight:1.5}}>{item.ef}</span>
-                    </div>
-                    <div style={{display:"flex",gap:10,alignItems:"flex-start",flexDirection:uiLang==="ar"?"row-reverse":"row"}}>
-                      <span style={{fontSize:12,fontWeight:700,color:"#6b7280",background:"#f3f4f6",borderRadius:4,padding:"2px 7px",flexShrink:0,marginTop:1}}>GPT</span>
-                      <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#6b7280",lineHeight:1.5}}>{item.gpt}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div style={{maxWidth:720,margin:"0 auto",direction:uiLang==="ar"?"rtl":"ltr",textAlign:"center"}}>
+            <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(20px,2.5vw,26px)",color:"#1e293b",margin:"0 0 16px",fontWeight:700,lineHeight:1.4}}>
+              {uiLang==="ar"
+                ?"مهارات القراءة والكتابة والقواعد والمفردات — كل ما تحتاجه لترفع مستوى لغتك الإنجليزية في مكان واحد."
+                :"Reading, writing, grammar, and vocabulary — everything you need to improve your English, in one place."}
+            </h2>
+            <p style={{fontFamily:"'Cairo',system-ui",fontSize:16,color:"#475569",margin:"0 auto",lineHeight:1.8,maxWidth:600}}>
+              {uiLang==="ar"
+                ?"وإن كان هدفك الآيلتس، فالمنصة بُنيت أصلاً من أجل هذا."
+                :"And if your goal is IELTS, this platform was built specifically for that."}
+            </p>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16,maxWidth:860,margin:"40px auto 0"}}>
+            {(uiLang==="ar"?[
+              {icon:"📍",title:"يعرف مستواك",ef:"اختبار تحديد المستوى عند أول زيارة — A1 إلى C2",sub:"بناءً على نتيجتك تعرف ماذا تفعل أولاً"},
+              {icon:"📊",title:"تقييم المقالات",ef:"أربعة معايير، وصفات درجات رسمية، ودرجة محددة",sub:"تغذية راجعة حقيقية لا عامة"},
+              {icon:"📈",title:"يتتبع تقدمك",ef:"تاريخ الدرجات يُحفظ تلقائياً في كل مقالة",sub:"ترى تطورك بوضوح بمرور الوقت"},
+              {icon:"🗺️",title:"مسار تعلّم منظم",ef:"تمارين، ألعاب، قراءة، محادثة، ومفردات",sub:"كل شيء منظم ومترابط"},
+            ]:[
+              {icon:"📍",title:"Knows your level",ef:"Placement test on first visit — A1 to C2",sub:"Know exactly where to start"},
+              {icon:"📊",title:"Essay scoring",ef:"Four criteria, official band descriptors, specific score",sub:"Real feedback, not generic suggestions"},
+              {icon:"📈",title:"Tracks your progress",ef:"Score history saved automatically every essay",sub:"See your improvement over time"},
+              {icon:"🗺️",title:"Structured learning",ef:"Exercises, games, reading, speaking, and vocabulary",sub:"Everything organised and connected"},
+            ]).map((item,i)=>(
+              <div key={i} style={{background:"#f8fafc",borderRadius:12,padding:"20px",border:"1px solid #e2e8f0",direction:uiLang==="ar"?"rtl":"ltr",textAlign:uiLang==="ar"?"right":"left"}}>
+                <div style={{fontSize:24,marginBottom:8}}>{item.icon}</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontWeight:700,fontSize:15,color:"#1e293b",marginBottom:8}}>{item.title}</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#1e293b",lineHeight:1.6,marginBottom:6}}>{item.ef}</div>
+                <div style={{fontFamily:"'Cairo',system-ui",fontSize:12,color:"#64748b",lineHeight:1.5}}>{item.sub}</div>
+              </div>
+            ))}
           </div>
         </div>
       )}
