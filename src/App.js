@@ -7674,7 +7674,7 @@ export default function IELTSBot(){
   const [session,setSession]=useState(null);
   const [uses,setUses]=useState(0);
   const [lang,setLang]=useState("en");
-  const [uiLang,setUiLang]=useState("ar"); // Website UI language
+  const [uiLang,setUiLang]=useState(()=>{try{return localStorage.getItem("ef_ui_lang")||"en";}catch{return "en";}}); // Website UI language
   const [menuOpen,setMenuOpen]=useState(false);
   const analyzeRef=useRef(null);
   const [proUser, setProUser] = useState(false);
@@ -7973,7 +7973,7 @@ export default function IELTSBot(){
                 <span style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo',system-ui"}}>{uiLang==="ar"?"لغة الموقع:":"Site:"}</span>
                 <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2}}>
                   {["ar","en"].map(l=>(
-                    <button key={l} onClick={()=>setUiLang(l)} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s",boxShadow:uiLang===l?T.shadow:"none"}}>
+                    <button key={l} onClick={()=>{setUiLang(l);try{localStorage.setItem("ef_ui_lang",l);}catch{}}} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui",transition:"all 0.2s",boxShadow:uiLang===l?T.shadow:"none"}}>
                       {l==="ar"?"ع":"EN"}
                     </button>
                   ))}
@@ -8001,7 +8001,7 @@ export default function IELTSBot(){
             <div className="mobile-top-controls" style={{display:"none",alignItems:"center",gap:6}}>
               <div style={{display:"flex",background:T.bgMuted,borderRadius:8,padding:2,gap:2}}>
                 {["ar","en"].map(l=>(
-                  <button key={l} onClick={()=>setUiLang(l)} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 9px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>
+                  <button key={l} onClick={()=>{setUiLang(l);try{localStorage.setItem("ef_ui_lang",l);}catch{}}} style={{background:uiLang===l?"white":"transparent",border:"none",borderRadius:6,padding:"4px 9px",fontSize:12,fontWeight:uiLang===l?700:500,color:uiLang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>
                     {l==="ar"?"ع":"EN"}
                   </button>
                 ))}
@@ -8684,7 +8684,7 @@ export default function IELTSBot(){
                 <div style={{fontSize:11,color:T.textMuted,fontWeight:700,marginBottom:8,fontFamily:"'Cairo',system-ui",direction:"rtl"}}>{UI[uiLang].siteLang}</div>
                 <div style={{display:"flex",gap:8}}>
                   {["ar","en"].map(l=>(
-                    <button key={l} onClick={()=>setUiLang(l)} style={{flex:1,background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{l==="ar"?"🇸🇦 عربي (AR)":"🇬🇧 English (EN)"}</button>
+                    <button key={l} onClick={()=>{setUiLang(l);try{localStorage.setItem("ef_ui_lang",l);}catch{}}} style={{flex:1,background:lang===l?T.primaryLight:"transparent",border:`1px solid ${lang===l?T.primaryBorder:T.border}`,borderRadius:8,padding:"8px",fontSize:13,fontWeight:lang===l?700:400,color:lang===l?T.primary:T.textMuted,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{l==="ar"?"🇸🇦 عربي (AR)":"🇬🇧 English (EN)"}</button>
                   ))}
                 </div>
               </div>
