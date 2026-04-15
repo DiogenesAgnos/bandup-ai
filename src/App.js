@@ -198,8 +198,24 @@ GRAMMATICAL RANGE & ACCURACY:
 SCORING RULES:
 - Overall band = mean of four criteria, rounded to nearest 0.5
 - Under 250 words Task 2 = Task Achievement MAX Band 5.0. Under 150 words Task 1 = Task Achievement MAX Band 5.0
+- Under 100 words ANY task = Task Achievement MAX Band 3.0. Score other criteria on what is present but note severe underdevelopment.
 - LOCK IN all band scores based on holistic impression. Then produce mistakes. The mistakes list must NEVER retroactively change your band scores.
 - Scores must be identical whether feedback language is English or Arabic.
+
+OFF-TOPIC ESSAYS — CRITICAL:
+- If the essay does not answer the question asked, Task Achievement = Band 3.0 to 4.0 MAXIMUM regardless of language quality. Fluent English does not compensate for missing the question.
+- If only partially on topic (answers one part but ignores another), Task Achievement MAX Band 5.0.
+- Always check: does this essay actually respond to what was asked? Do this BEFORE scoring anything else.
+
+NON-ENGLISH INPUT:
+- If the submitted text is not in English (e.g. Arabic only, or majority non-English), do NOT attempt to score it.
+- Return this exact JSON and nothing else: {"error":"non_english","message":"Please submit your essay in English. This tool evaluates English writing only."}
+
+BAND 4-6 CALIBRATION — anchor your low-end scoring to these:
+- Band 5-6: Essay attempts the task but ideas are underdeveloped. Vocabulary is mostly basic with occasional attempts at less common words that sometimes fail. Grammar is simple with frequent errors in complex structures. Organisation is present but mechanical — heavy reliance on "Firstly/Secondly/Finally" with little development between points. 200-240 words typical.
+- Band 4-5: Essay only partially addresses the task. Ideas are listed rather than developed. Vocabulary is limited and repetitive. Most sentences are short and simple. Errors are frequent and sometimes impede meaning. Reader has to work to follow the argument.
+- The key difference between Band 5 and Band 6 is development: Band 6 extends ideas with explanation and some examples. Band 5 states ideas and moves on.
+- The key difference between Band 6 and Band 7 is range and sophistication: Band 7 uses less common vocabulary successfully, attempts complex grammar successfully most of the time, and arguments are logically extended not just listed.
 
 WORD COUNT: Count by splitting on spaces. Report exact count in wordCount field.
 
@@ -229,9 +245,18 @@ CORRECTION FIELD RULES: ALWAYS write a concrete drop-in replacement. NEVER write
   - "good" → "beneficial" or "advantageous"
   - "In my opinion, I think" → "I firmly contend that"
 
-MINIMUM: Band 7-8 essay = 5-10 items. Band 5-6 = 10-20+. Never fewer than 5 unless genuinely Band 9.
+MISTAKE COUNT: Report ALL genuine errors found — no minimum, no maximum. Do not invent errors to reach a number. Do not omit real errors to stay under a number. If a Band 8 essay has 3 genuine errors, report 3. If a Band 5 essay has 25 errors, report 25. Accuracy over quantity.
 Each "original" must match essay text EXACTLY character for character.
 
+SAMPLE ESSAY REQUIREMENTS — the sampleEssay field must demonstrate ALL of the following or it fails its purpose:
+- Direct answer to the question in the introduction — no vague opening
+- Clear position stated in the introduction if Task 2
+- Every body paragraph must have: topic sentence + explanation + specific named example (country, study, statistic, or real case) + link back to the argument
+- Minimum two different complex sentence structures per paragraph (relative clause, conditional, passive, hedging)
+- No contractions, no "a lot of", no "things", no "nowadays" as an opener
+- Varied cohesive devices — not just "Firstly/Secondly/Finally"
+- Conclusion must synthesise, not just repeat the introduction
+- MINIMUM 280 words Task 2 / 190 words Task 1. Count carefully before returning.
 Respond ONLY with valid JSON (no markdown, no backticks):
 {
   "wordCount":201,"overallBand":7.5,
@@ -242,7 +267,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
   "examinerTips":["insider tip 1 specific to this essay","tip 2","tip 3"],
   "strengths":["strength 1","strength 2"],
   "improvements":["improvement 1","improvement 2"],
-  "sampleEssay":"Full Band 8+ response — MINIMUM 270 words Task 2 / 185 words Task 1. Count carefully.",
+  "sampleEssay":"Full Band 8+ response — MINIMUM 280 words Task 2 / 190 words Task 1. Must meet all sample essay requirements above.",
   "sampleEssayExplanation":{"introduction":"...","bodyParagraphs":"...","conclusion":"...","vocabularyHighlights":["word 1","word 2"],"whyHighScore":"..."}
 }
 
@@ -7906,6 +7931,11 @@ export default function IELTSBot(){
       const data=await res.json();
       const text=data.content.map(b=>b.text||"").join("");
       const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
+      if(parsed.error==="non_english"){
+        setLoading(false);
+        setError(lang==="ar"?"يرجى كتابة مقالتك باللغة الإنجليزية. هذه الأداة تقيّم الكتابة الإنجليزية فقط.":"Please submit your essay in English. This tool evaluates English writing only.");
+        return;
+      }
       if(!proUser){ const n=uses+1; setUses(n); saveUses(n,session?.email); }
       addToHistory({ band:parsed.overallBand, taskType, wordCount:wordCount, mistakeCount:parsed.mistakes?.length||0, criteria:{ taskAchievement:parsed.criteria?.taskAchievement?.band, coherenceCohesion:parsed.criteria?.coherenceCohesion?.band, lexicalResource:parsed.criteria?.lexicalResource?.band, grammaticalRange:parsed.criteria?.grammaticalRange?.band } },session?.email);
       saveLastResult({result:parsed, topic, essay, taskType, lang});
