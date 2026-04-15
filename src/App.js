@@ -7091,7 +7091,7 @@ const UI = {
     // Nav
     home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
-    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق", studyplan:"🗺️ خطة الدراسة",
+    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق", studyplan:"🗺️ الخطة الدراسية",
     // Account
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
@@ -7241,7 +7241,7 @@ const STUDY_STEPS = {
       num:5, free:true, view:"reading",
       title:"اختبارات القراءة",
       tag:"اختبار B1 مجاني — باقي الاختبارات Pro",
-      desc:"إذا كان مستواك أقل من Band 6، ابدأ باختبار B1. إذا كنت Band 6 أو أعلى، انتقل مباشرة للاختبارات الأكاديمية أو General Training.",
+      desc:"إذا كان مستواك أقل من الدرجة السادسة، ابدأ باختبار المستوى الأساسي. إذا كنت في الدرجة السادسة أو أعلى، انتقل مباشرة للاختبارات الأكاديمية أو التدريب العام.",
       tip:"التزم بالوقت بدقة — لا تعطِ نفسك دقيقة إضافية. بعد الانتهاء، راجع كل إجابة خاطئة وافهم السبب قبل أن تغلق الصفحة.",
       action:"افتح القراءة ←",
     },
@@ -7265,7 +7265,7 @@ const STUDY_STEPS = {
       num:8, free:"جزئياً مجاني", view:"toolkit",
       title:"أدوات الآيلتس",
       tag:"الروابط والقواعد مجانية — Pro للكل",
-      desc:"ادرس الروابط والقوالب. هذه ليست اختصارات — هي الهيكل الذي يبني عليه الطالب Band 7+.",
+      desc:"ادرس الروابط والقوالب. هذه ليست اختصارات — هي الهيكل الذي يبني عليه الطالب الناجح في الدرجات العليا.",
       tip:"احفظ 5 روابط على الأقل من كل فئة. الطالب الذي يحفظ 'Furthermore / Moreover / In addition' فقط يبدو متكرراً. التنوع هو المطلوب.",
       action:"افتح الأدوات ←",
     },
@@ -7273,7 +7273,7 @@ const STUDY_STEPS = {
       num:9, free:true, view:"speaking",
       title:"تدريب المحادثة",
       tag:"مجاني",
-      desc:"اقرأ نماذج الإجابات Band 8 بصوت عالٍ — وليس في ذهنك فقط. سجّل نفسك على هاتفك واستمع للتسجيل.",
+      desc:"اقرأ نماذج الإجابات عالية المستوى بصوت عالٍ — وليس في ذهنك فقط. سجّل نفسك على هاتفك واستمع للتسجيل.",
       tip:"الهدف ليس حفظ الإجابات — بل تعويد أذنك ولسانك على الإنجليزية الأكاديمية المنطوقة. ما تسمعه منك أنت يختلف عما تسمعه من الآخرين.",
       action:"افتح المحادثة ←",
     },
@@ -7436,19 +7436,21 @@ const StudyPlanPage=({uiLang="en",onNavigate})=>{
                 {step.num}
               </div>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6,justifyContent:isAr?"flex-end":"flex-start"}}>
                   <span style={{fontSize:16,fontWeight:700,color:T.text}}>{step.title}</span>
                   <span style={{fontSize:11,fontWeight:700,padding:"3px 9px",borderRadius:20,background:tagBg,color:tagColor,flexShrink:0}}>{step.tag}</span>
                 </div>
-                <p style={{fontSize:14,color:T.textMid,margin:"0 0 8px",lineHeight:1.7}}>{step.desc}</p>
-                <div style={{background:T.bgMuted,borderRadius:8,padding:"10px 13px",marginBottom:12,display:"flex",gap:8,alignItems:"flex-start"}}>
+                <p style={{fontSize:14,color:T.textMid,margin:"0 0 8px",lineHeight:1.7,textAlign:isAr?"right":"left"}}>{step.desc}</p>
+                <div style={{background:T.bgMuted,borderRadius:8,padding:"10px 13px",marginBottom:12,display:"flex",gap:8,alignItems:"flex-start",flexDirection:isAr?"row-reverse":"row"}}>
                   <span style={{fontSize:14,flexShrink:0,marginTop:1}}>💡</span>
-                  <span style={{fontSize:13,color:T.textMid,lineHeight:1.6}}>{step.tip}</span>
+                  <span style={{fontSize:13,color:T.textMid,lineHeight:1.6,textAlign:isAr?"right":"left"}}>{step.tip}</span>
                 </div>
+                <div style={{textAlign:isAr?"right":"left"}}>
                 <button onClick={()=>onNavigate(step.view)}
                   style={{background:dotColor,color:"white",border:"none",borderRadius:8,padding:"8px 18px",fontSize:13,fontWeight:700,cursor:"pointer",...sty,whiteSpace:"nowrap"}}>
                   {step.action}
                 </button>
+                </div>
               </div>
             </div>
           );
