@@ -5087,11 +5087,11 @@ const PricingPage = ({onBack, onUpgrade, isPro, onManageSub=()=>{}}) => (
 // IELTS GAME — DATA
 // ─────────────────────────────────────────────────────────────
 const IELTS_GAME_CATS=[
-  {id:"spelling", arabic:"لعبة التهجئة",  english:"Spelling Game",   emoji:"🔤", free:true, color:"#059669", bg:"#d1fae5", desc:"هل تعرف كيف تكتب الكلمات الإنجليزية صح؟", descEn:"Can you spell English words correctly?"},
-  {id:"grammar",  arabic:"لعبة القواعد",  english:"Grammar Game",    emoji:"📖", free:true, color:"#2563eb", bg:"#dbeafe", desc:"تحدَّ نفسك في قواعد اللغة الإنجليزية", descEn:"Challenge yourself on English grammar rules"},
-  {id:"writing",  arabic:"لعبة الكتابة", english:"Writing Game",    emoji:"✍️", free:true, color:"#d97706", bg:"#fef3c7", desc:"مفردات وتعابير الكتابة الأكاديمية", descEn:"Academic writing vocabulary and expressions"},
-  {id:"reading",  arabic:"لعبة القراءة", english:"Reading Game",    emoji:"📚", free:true, color:"#7c3aed", bg:"#ede9fe", desc:"فهم النصوص والمفردات القرائية", descEn:"Reading comprehension and vocabulary"},
-  {id:"vocab",    arabic:"لعبة المفردات",english:"Vocabulary Game",  emoji:"💡", free:true, color:"#dc2626", bg:"#fee2e2", desc:"وسّع قاموسك لمستوى الدرجة 8", descEn:"Expand your vocabulary to Band 8 level"},
+  {id:"spelling", arabic:"لعبة التهجئة",  english:"Spelling Game",   emoji:"🔤", free:true,  color:"#059669", bg:"#d1fae5", desc:"هل تعرف كيف تكتب الكلمات الإنجليزية صح؟", descEn:"Can you spell English words correctly?"},
+  {id:"grammar",  arabic:"لعبة القواعد",  english:"Grammar Game",    emoji:"📖", free:false, color:"#2563eb", bg:"#dbeafe", desc:"تحدَّ نفسك في قواعد اللغة الإنجليزية", descEn:"Challenge yourself on English grammar rules"},
+  {id:"writing",  arabic:"لعبة الكتابة", english:"Writing Game",    emoji:"✍️", free:false, color:"#d97706", bg:"#fef3c7", desc:"مفردات وتعابير الكتابة الأكاديمية", descEn:"Academic writing vocabulary and expressions"},
+  {id:"reading",  arabic:"لعبة القراءة", english:"Reading Game",    emoji:"📚", free:false, color:"#7c3aed", bg:"#ede9fe", desc:"فهم النصوص والمفردات القرائية", descEn:"Reading comprehension and vocabulary"},
+  {id:"vocab",    arabic:"لعبة المفردات",english:"Vocabulary Game",  emoji:"💡", free:false, color:"#dc2626", bg:"#fee2e2", desc:"وسّع قاموسك لمستوى الدرجة 8", descEn:"Expand your vocabulary to Band 8 level"},
 ];
 const IELTS_GAME_QS={
   spelling:[
@@ -6365,7 +6365,8 @@ const EXTRA_VOCAB_B2 = {
     {w:"it goes without saying",ar:"من البديهي / لا شك في",en:"it is obvious",ex:"It goes without saying that honesty is important."},
   ],
 };
-const VocabularyPage = ({uiLang="ar"}) => {
+const VocabularyPage = ({uiLang="ar", isPro=false}) => {
+  const FREE_VOCAB_CATS=["writing2","reading"];
   const MERGED_VOCAB = {
     reading: [...IELTS_VOCAB.reading, ...(GENERAL_VOCAB_EXTRA.reading_extra||[]), ...(EXTRA_VOCAB_B2.reading||[])],
     listening: [...IELTS_VOCAB.listening, ...(GENERAL_VOCAB_EXTRA.listening_extra||[]), ...(EXTRA_VOCAB_B2.listening||[])],
@@ -6374,15 +6375,16 @@ const VocabularyPage = ({uiLang="ar"}) => {
     speaking: [...IELTS_VOCAB.speaking, ...(GENERAL_VOCAB_EXTRA.speaking||[]), ...(EXTRA_VOCAB_B2.speaking||[])],
   };
   const CATS=[
-    {key:"reading",  labelAr:"القراءة 📖",      labelEn:"Reading 📖"},
-    {key:"listening",labelAr:"الاستماع 🎧",      labelEn:"Listening 🎧"},
-    {key:"writing1", labelAr:"الكتابة - Task 1 📊",labelEn:"Writing Task 1 📊"},
-    {key:"writing2", labelAr:"الكتابة - Task 2 ✍️",labelEn:"Writing Task 2 ✍️"},
-    {key:"speaking", labelAr:"المحادثة 🗣️",      labelEn:"Speaking 🗣️"},
+    {key:"writing2", labelAr:"الكتابة - Task 2 ✍️",labelEn:"Writing Task 2 ✍️", free:true},
+    {key:"reading",  labelAr:"القراءة 📖",          labelEn:"Reading 📖",         free:true},
+    {key:"writing1", labelAr:"الكتابة - Task 1 📊", labelEn:"Writing Task 1 📊",  free:false},
+    {key:"listening",labelAr:"الاستماع 🎧",          labelEn:"Listening 🎧",       free:false},
+    {key:"speaking", labelAr:"المحادثة 🗣️",          labelEn:"Speaking 🗣️",        free:false},
   ];
   const [cat,setCat]=useState("writing2");
-  const [meaningsLang,setMeaningsLang]=useState("ar"); // "ar" | "en"
+  const [meaningsLang,setMeaningsLang]=useState("ar");
   const [search,setSearch]=useState("");
+  const catLocked=(key)=>!isPro&&!FREE_VOCAB_CATS.includes(key);
   const words=(MERGED_VOCAB[cat]||[]).filter(w=>
     !search||w.w.toLowerCase().includes(search.toLowerCase())||w.ar.includes(search)||w.en.toLowerCase().includes(search.toLowerCase())
   );
@@ -6392,7 +6394,7 @@ const VocabularyPage = ({uiLang="ar"}) => {
       {/* Header */}
       <div style={{marginBottom:24,direction:"rtl"}}>
         <h1 style={{fontFamily:"'Cairo',system-ui",fontSize:26,fontWeight:800,color:T.primary,margin:"0 0 6px"}}>{uiLang==="ar"?"📝 مفردات الآيلتس الأساسية":"📝 IELTS Core Vocabulary"}</h1>
-        <p style={{fontFamily:"'Cairo',system-ui",fontSize:14,color:T.textMuted,margin:0,lineHeight:1.7}}>أهم المفردات والتعابير المستخدمة في الآيلتس — مجاني بالكامل. اختر القسم وحدّد لغة الشرح.</p>
+        <p style={{fontFamily:"'Cairo',system-ui",fontSize:14,color:T.textMuted,margin:0,lineHeight:1.7}}>{uiLang==="ar"?"الكتابة والقراءة مجانيان — باقي الأقسام Pro":"Writing Task 2 & Reading are free — other categories require Pro"}</p>
       </div>
 
       {/* Controls row */}
@@ -6414,12 +6416,15 @@ const VocabularyPage = ({uiLang="ar"}) => {
 
       {/* Category tabs */}
       <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:20,paddingBottom:4}} className="tab-row">
-        {CATS.map(c=>(
-          <button key={c.key} onClick={()=>{setCat(c.key);setSearch("");}}
-            style={{background:cat===c.key?T.primaryLight:"white",border:`1.5px solid ${cat===c.key?T.primary:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:cat===c.key?700:500,color:cat===c.key?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s"}}>
-            {uiLang==="ar"?c.labelAr:c.labelEn}
-          </button>
-        ))}
+        {CATS.map(c=>{
+          const locked=catLocked(c.key);
+          return(
+            <button key={c.key} onClick={()=>{if(!locked){setCat(c.key);setSearch("");}}}
+              style={{background:cat===c.key?T.primaryLight:locked?T.bgMuted:"white",border:`1.5px solid ${cat===c.key?T.primary:locked?T.border:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:cat===c.key?700:500,color:cat===c.key?T.primary:locked?T.textLight:T.textMid,cursor:locked?"not-allowed":"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s",opacity:locked?0.7:1}}>
+              {locked?"🔒 ":""}{uiLang==="ar"?c.labelAr:c.labelEn}
+            </button>
+          );
+        })}
       </div>
 
       {/* Word grid */}
@@ -6527,8 +6532,9 @@ const savePlacementResult = (data) => { try { localStorage.setItem(PLACEMENT_STO
 const loadPlacementResult = () => { try { const d=localStorage.getItem(PLACEMENT_STORAGE_KEY); return d?JSON.parse(d):null; } catch { return null; } };
 const clearPlacementResult = () => { try { localStorage.removeItem(PLACEMENT_STORAGE_KEY); } catch {} };
 
-const PlacementTest = ({uiLang="ar", onNavigate}) => {
+const PlacementTest = ({uiLang="ar", onNavigate, isPro=false}) => {
   const saved = loadPlacementResult();
+  const hasTaken = !!saved;
   const [screen, setScreen] = useState(saved?"results":"intro");
   const [readingAnswers, setReadingAnswers] = useState(saved?.readingAnswers||{});
   const [grammarAnswers, setGrammarAnswers] = useState(saved?.grammarAnswers||{});
@@ -6867,9 +6873,20 @@ const PlacementTest = ({uiLang="ar", onNavigate}) => {
 
         {/* Retake */}
         <div style={{textAlign:"center"}}>
-          <button onClick={retake} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 24px",fontSize:13,...sty,color:T.textMid,cursor:"pointer"}}>
-            {uiLang==="ar"?"🔄 أعد الاختبار (سيمسح نتيجتك الحالية)":"🔄 Retake Test (clears your saved result)"}
-          </button>
+          {isPro?(
+            <button onClick={retake} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 24px",fontSize:13,...sty,color:T.textMid,cursor:"pointer"}}>
+              {uiLang==="ar"?"🔄 أعد الاختبار (سيمسح نتيجتك الحالية)":"🔄 Retake Test (clears your saved result)"}
+            </button>
+          ):(
+            <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"14px 20px",display:"inline-block"}}>
+              <div style={{fontSize:13,color:T.amber,fontWeight:700,...sty,marginBottom:4}}>
+                {uiLang==="ar"?"🔒 إعادة الاختبار متاحة لمشتركي Pro":"🔒 Retaking the test is a Pro feature"}
+              </div>
+              <div style={{fontSize:12,color:T.textMuted,...sty}}>
+                {uiLang==="ar"?"اشترك في Pro لإعادة الاختبار وتتبع تحسّنك عبر الزمن":"Subscribe to Pro to retake and track your improvement over time"}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -7108,13 +7125,13 @@ const UI = {
     f1t:"تقييم المقالات",f1d:"مجاني: تحليلان كاملان · Pro: تحليل غير محدود",
     f2t:"اختبارات القراءة",f2d:"مجاني: اختبار واحد · Pro: جميع الـ٧ اختبارات",
     f3t:"تدريب المحادثة",f3d:"مجاني: نماذج Band 8 للأجزاء ١ و٢ و٣ — بدون قيود",
-    f4t:"ألعاب تعليمية",f4d:"مجاني: جميع الألعاب الـ٥ بدون قيود",
+    f4t:"ألعاب تعليمية",f4d:"مجاني: لعبة الإملاء فقط · Pro: جميع الألعاب الـ٥",
     f5t:"قواعد وإملاء",f5d:"مجاني: ٥ فحوصات · Pro: غير محدود",
     f6t:"تمارين تدريبية",f6d:"Pro فقط · ٣٠٠+ تمرين شامل — قواعد، مفردات، تعبير، وتصحيح أخطاء",
     f7t:"أدوات الآيلتس",f7d:"مجاني: الروابط والقواعد · Pro: الأدوات الكاملة",
     f8t:"تتبع تقدمي",f8d:"Pro فقط · تابع درجاتك وتطورك عبر الزمن",
     fat:"اختبار تحديد المستوى",fad:"مجاني: اكتشف مستواك من A1 إلى C2 وتقدير درجة الآيلتس",
-    f9t:"مفردات الآيلتس",f9d:"مجاني: ٤٠٠+ كلمة آيلتس مع المعنى بالعربي وأمثلة",
+    f9t:"مفردات الآيلتس",f9d:"مجاني: أقسام الكتابة والقراءة · Pro: جميع الأقسام (٤٠٠+ كلمة)",
     fStart:"← ابدأ",
     // Stats bar
     stat1n:"20 min",stat1l:"اختبار تحديد المستوى المجاني",
@@ -7164,13 +7181,13 @@ const UI = {
     f1t:"Essay Analysis",f1d:"Free: 2 full analyses · Pro: Unlimited",
     f2t:"Reading Tests",f2d:"Free: 1 test · Pro: All 7 tests",
     f3t:"Speaking Practice",f3d:"Free: Band 8 model answers for Parts 1, 2 & 3 — no restrictions",
-    f4t:"Learning Games",f4d:"Free: All 5 games — no restrictions",
+    f4t:"Learning Games",f4d:"Free: Spelling game only · Pro: All 5 games",
     f5t:"Grammar & Spelling",f5d:"Free: 5 checks · Pro: Unlimited",
     f6t:"Practice Exercises",f6d:"Pro only · 230+ exercises — grammar, dictation, sentence building, vocabulary and more",
     f7t:"IELTS Toolkit",f7d:"Free: Linking words & Grammar · Pro: Full toolkit",
     f8t:"Track Progress",f8d:"Pro only · Track your scores and progress over time",
     fat:"Placement Test",fad:"Free: Discover your level from A1 to C2 with an IELTS band estimate",
-    f9t:"IELTS Vocabulary",f9d:"Free: 400+ IELTS vocabulary words with Arabic meanings and examples",
+    f9t:"IELTS Vocabulary",f9d:"Free: Writing Task 2 & Reading categories · Pro: All categories (400+ words)",
     fStart:"Start →",
     // Stats bar
     stat1n:"20 min",stat1l:"Free placement test",
@@ -7208,7 +7225,7 @@ const STUDY_STEPS = {
     {
       num:1, free:true, view:"placement",
       title:"اختبار تحديد المستوى",
-      tag:"ابدأ هنا — مجاني",
+      tag:"مرة واحدة مجاناً — إعادة الاختبار Pro",
       desc:"قبل أي شيء آخر، تحتاج أن تعرف مستواك الحقيقي. الاختبار يحدد مستواك من A1 إلى C2 مع تقدير لدرجة الآيلتس.",
       tip:"لا تخمّن — أجب بصدق. النتيجة هي نقطة انطلاقك، وليست حكماً عليك.",
       action:"ابدأ الاختبار ←",
@@ -7216,24 +7233,24 @@ const STUDY_STEPS = {
     {
       num:2, free:true, view:"vocabulary",
       title:"صفحة المفردات",
-      tag:"مجاني",
-      desc:"تصفّح المفردات حسب الموضوع. ركّز على الكلمات التي لا تعرفها.",
+      tag:"مجاني: الكتابة والقراءة — Pro: جميع الأقسام",
+      desc:"تصفّح مفردات الكتابة والقراءة مجاناً. ركّز على الكلمات التي لا تعرفها — هذا وحده يكفي للبدء.",
       tip:"احضر دفتراً ورقياً. اكتب كل كلمة جديدة مع معناها بالعربي وجملة مثال. الكتابة اليدوية تثبّت الحفظ أكثر بكثير من مجرد القراءة.",
       action:"افتح المفردات ←",
     },
     {
       num:3, free:true, view:"pronunciation",
       title:"النطق الصحيح",
-      tag:"مجاني",
-      desc:"لكل كلمة كتبتها في دفترك، افتح هذه الصفحة واستمع لنطقها الصحيح.",
+      tag:"مجاني: 50 كلمة أكاديمية — Pro: 289 كلمة",
+      desc:"لكل كلمة كتبتها في دفترك، افتح هذه الصفحة واستمع لنطقها الصحيح. تبدأ بالكلمات الأكاديمية مجاناً.",
       tip:"تعلّم كلمة وأنت تنطقها خطأ أسوأ من عدم تعلّمها. النطق الخاطئ يبني عادة يصعب تصحيحها لاحقاً.",
       action:"افتح النطق ←",
     },
     {
       num:4, free:true, view:"game",
       title:"ألعاب الآيلتس",
-      tag:"مجاني بالكامل",
-      desc:"العب لعبة واحدة يومياً — إملاء، قواعد، مفردات، قراءة، أو كتابة. الألعاب تحوّل ما قرأته في الخطوات السابقة إلى معرفة فعلية.",
+      tag:"مجاني: لعبة الإملاء — Pro: جميع الألعاب",
+      desc:"ابدأ بلعبة الإملاء مجاناً يومياً. تحوّل ما قرأته في الخطوات السابقة إلى معرفة فعلية. باقي الألعاب متاحة لمشتركي Pro.",
       tip:"الفرق بين أن تتعرّف على كلمة وأن تمتلكها فعلاً هو الاسترجاع النشط — وهذا بالضبط ما تفعله الألعاب.",
       action:"العب الآن ←",
     },
@@ -7306,7 +7323,7 @@ const STUDY_STEPS = {
     {
       num:1, free:true, view:"placement",
       title:"Placement Test",
-      tag:"Start here — free",
+      tag:"One attempt free — retaking is Pro",
       desc:"Before anything else, you need to know your actual level. The test places you from A1 to C2 with an estimated IELTS band score.",
       tip:"Don't guess — answer honestly. The result is your starting point, not a judgement. Everything that comes after depends on getting this right.",
       action:"Take the test →",
@@ -7314,24 +7331,24 @@ const STUDY_STEPS = {
     {
       num:2, free:true, view:"vocabulary",
       title:"Vocabulary Page",
-      tag:"Free",
-      desc:"Browse vocabulary by topic and focus on words you don't know yet.",
+      tag:"Free: Writing & Reading · Pro: all categories",
+      desc:"Browse Writing Task 2 and Reading vocabulary for free. Focus on words you don't know — that alone is enough to get started.",
       tip:"Get a physical notebook. Write every new word with its meaning and an example sentence. Handwriting fixes words in memory far better than just reading them on screen.",
       action:"Open vocabulary →",
     },
     {
       num:3, free:true, view:"pronunciation",
       title:"Pronunciation",
-      tag:"Free",
-      desc:"For every word you wrote in your notebook, come here and listen to how it's actually pronounced.",
+      tag:"Free: 50 academic words · Pro: 289 words",
+      desc:"For every word you wrote in your notebook, come here and listen to how it's actually pronounced. The academic category is free to start.",
       tip:"Learning a word while mispronouncing it is worse than not learning it — it builds a habit that's hard to correct later. Do this alongside Step 2, not after.",
       action:"Open pronunciation →",
     },
     {
       num:4, free:true, view:"game",
       title:"IELTS Games",
-      tag:"Completely free",
-      desc:"Play one game per day — spelling, grammar, vocabulary, reading, or writing. The games turn what you studied passively in Steps 2 and 3 into active knowledge.",
+      tag:"Free: Spelling game · Pro: all 5 games",
+      desc:"Start with the free Spelling game daily. It turns what you studied passively in Steps 2 and 3 into active knowledge. All 5 games unlock with Pro.",
       tip:"The difference between recognising a word and actually owning it is active recall — which is exactly what the games force you to do.",
       action:"Play now →",
     },
@@ -7787,7 +7804,7 @@ const PRON_CATS=[
   {id:"culture",ar:"ثقافة",en:"Culture"},
 ];
 
-const PronunciationPage=({uiLang="ar",isPro})=>{
+const PronunciationPage=({uiLang="ar",isPro=false})=>{
   const [search,setSearch]=useState("");
   const [cat,setCat]=useState("all");
   const [speaking,setSpeaking]=useState("");
@@ -7797,15 +7814,24 @@ const PronunciationPage=({uiLang="ar",isPro})=>{
   const dir=isAr?"rtl":"ltr";
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
+  const FREE_PRON_CATS=["academic"];
+  const FREE_PRON_LIMIT=50;
+
+  const catLocked=(id)=>id!=="all"&&!isPro&&!FREE_PRON_CATS.includes(id);
+
   const filtered=useMemo(()=>{
     let list=PRON_WORDS;
+    // Free users: only academic category
+    if(!isPro) list=list.filter(w=>w.cat==="academic");
     if(cat!=="all")list=list.filter(w=>w.cat===cat);
     if(search.trim()){
       const q=search.toLowerCase().trim();
       list=list.filter(w=>w.w.toLowerCase().includes(q)||w.ar.includes(q));
     }
+    // Cap free users at 50 words
+    if(!isPro) list=list.slice(0,FREE_PRON_LIMIT);
     return list;
-  },[cat,search]);
+  },[cat,search,isPro]);
 
   const playWord=async(word)=>{
     if(speaking===word)return;
@@ -7864,7 +7890,10 @@ const PronunciationPage=({uiLang="ar",isPro})=>{
     <div style={{maxWidth:900,margin:"0 auto",padding:"28px 16px",...sty,direction:dir}}>
       <h1 style={{fontFamily:"Georgia,serif",fontSize:26,color:T.text,marginBottom:4,textAlign:"center"}}>🔊 {isAr?"النطق الصحيح":"Pronunciation Guide"}</h1>
       <p style={{textAlign:"center",color:T.textMuted,fontSize:14,marginBottom:20}}>
-        {isAr?`${PRON_WORDS.length} كلمة — اضغط على أي كلمة لسماع نطقها`:`${PRON_WORDS.length} words — tap any word to hear it`}
+        {isPro
+          ?(isAr?`${PRON_WORDS.length} كلمة — اضغط على أي كلمة لسماع نطقها`:`${PRON_WORDS.length} words — tap any word to hear it`)
+          :(isAr?"50 كلمة أكاديمية مجانية — Pro للوصول الكامل (289 كلمة)":"50 academic words free — Pro for full access (289 words)")
+        }
       </p>
       {/* Search */}
       <div style={{position:"relative",marginBottom:16}}>
@@ -7875,12 +7904,15 @@ const PronunciationPage=({uiLang="ar",isPro})=>{
       </div>
       {/* Category tabs */}
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:20}}>
-        {PRON_CATS.map(c=>(
-          <button key={c.id} onClick={()=>setCat(c.id)}
-            style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${cat===c.id?T.primary:T.border}`,background:cat===c.id?T.primaryLight:"white",color:cat===c.id?T.primary:T.textMid,fontWeight:cat===c.id?700:400,fontSize:13,cursor:"pointer",...sty}}>
-            {isAr?c.ar:c.en}{cat===c.id?` (${filtered.length})`:``}
-          </button>
-        ))}
+        {PRON_CATS.map(c=>{
+          const locked=catLocked(c.id);
+          return(
+            <button key={c.id} onClick={()=>{if(!locked)setCat(c.id);}}
+              style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${cat===c.id?T.primary:T.border}`,background:cat===c.id?T.primaryLight:locked?T.bgMuted:"white",color:cat===c.id?T.primary:locked?T.textLight:T.textMid,fontWeight:cat===c.id?700:400,fontSize:13,cursor:locked?"not-allowed":"pointer",opacity:locked?0.6:1,...sty}}>
+              {locked?"🔒 ":""}{isAr?c.ar:c.en}{cat===c.id?` (${filtered.length})`:``}
+            </button>
+          );
+        })}
       </div>
       <div style={{fontSize:12,color:T.textMuted,marginBottom:14}}>
         {isAr?`عرض ${filtered.length} كلمة`:`Showing ${filtered.length} words`}
@@ -8857,8 +8889,8 @@ export default function IELTSBot(){
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang}/>}
-        {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView}/>}
+        {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang} isPro={proUser}/>}
+        {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView} isPro={proUser}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
         {mainView==="pronunciation"&&<PronunciationPage uiLang={uiLang} isPro={proUser}/>}
