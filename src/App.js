@@ -7081,7 +7081,7 @@ function ManageSubModal({onClose,email=""}){
 }
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary","/placement":"placement","/exercises":"exercises"};
+const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary","/placement":"placement","/pronunciation":"pronunciation","/studyplan":"studyplan"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "home"; };
 
@@ -7281,7 +7281,7 @@ const STUDY_STEPS = {
       num:10, free:false, view:"exercises",
       title:"التمارين التدريبية",
       tag:"Pro فقط",
-      desc:"افعل مجموعة تمارين واحدة على الأقل يومياً — قواعد، إملاء، بناء جمل، مفردات. هذه هي التدريبات التي تحوّل الفهم إلى عادة.",
+      desc:"قم بحل مجموعة تمارين واحدة على الأقل يومياً — قواعد، إملاء، بناء جمل، مفردات. هذه هي التدريبات التي تحوّل الفهم إلى عادة.",
       tip:"القاعدة التي تفهمها ولم تتدرّب عليها ستُخذلك تحت ضغط الامتحان. الفهم وحده لا يكفي.",
       action:"افتح التمارين ←",
     },
