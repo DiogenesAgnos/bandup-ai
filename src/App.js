@@ -3873,27 +3873,21 @@ const ALL_IELTS_QUESTIONS=[
   ...SPEAKING_PART3.flatMap(t=>t.questions.map(q=>({part:3,topic:t.topic,q:q.q}))),
 ];
 
-const speakText=(text)=>{
-  if(!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  const utt=new SpeechSynthesisUtterance(text);
-  utt.lang="en-GB";utt.rate=0.9;utt.pitch=1.05;
-  const voices=window.speechSynthesis.getVoices();
-  const match=
-    voices.find(v=>v.lang==="en-GB"&&/female|woman|kate|google uk|natural/i.test(v.name))||
-    voices.find(v=>v.lang==="en-GB")||
-    voices.find(v=>v.lang.startsWith("en")&&/female|woman/i.test(v.name))||
-    voices.find(v=>v.lang.startsWith("en"));
-  if(match)utt.voice=match;
-  window.speechSynthesis.speak(utt);
-};
+const FREE_SESSION_MS=5*60*1000;
+
+const stripForTTS=(text)=>text
+  .replace(/[\u{1F300}-\u{1FAFF}]/gu,"")
+  .replace(/[\u2600-\u27BF]/gu,"")
+  .replace(/\*\*/g,"").replace(/\*/g,"")
+  .replace(/#+\s*/g,"").replace(/_{1,2}/g,"")
+  .replace(/[^\w\s.,!?;:'"-]/g," ")
+  .replace(/\s+/g," ").trim();
 
 const ConversationPractice=({isPro,onUpgrade})=>{
   const [screen,setScreen]=useState("setup");
   const [mode,setMode]=useState(null);
   const [level,setLevel]=useState("b1");
   const [userName,setUserName]=useState("");
-  const [topic,setTopic]=useState("");
   const [messages,setMessages]=useState([]);
   const [isThinking,setIsThinking]=useState(false);
   const [isRecording,setIsRecording]=useState(false);
@@ -3901,51 +3895,84 @@ const ConversationPractice=({isPro,onUpgrade})=>{
   const [error,setError]=useState("");
   const [qIndex,setQIndex]=useState(0);
   const [ttsEnabled,setTtsEnabled]=useState(true);
+  const [sessionMs,setSessionMs]=useState(0);
+  const [sessionEnded,setSessionEnded]=useState(false);
+  const [report,setReport]=useState(null);
+  const [showMicHint,setShowMicHint]=useState(true);
   const messagesEndRef=useRef(null);
   const recognitionRef=useRef(null);
+  const sessionTimerRef=useRef(null);
+  const isRecordingRef=useRef(false);
+  const userScrolledRef=useRef(false);
+  const chatBoxRef=useRef(null);
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
-  const scrollToBottom=()=>{messagesEndRef.current?.scrollIntoView({behavior:"smooth"});};
-  useEffect(()=>{scrollToBottom();},[messages]);
+  const isFreeB1=!isPro&&mode==="free";
+  const timeLeft=Math.max(0,FREE_SESSION_MS-sessionMs);
+  const timeLeftStr=`${Math.floor(timeLeft/60000)}:${String(Math.floor((timeLeft%60000)/1000)).padStart(2,"0")}`;
+
+  useEffect(()=>{
+    if(screen!=="chat"||!isFreeB1)return;
+    sessionTimerRef.current=setInterval(()=>{
+      setSessionMs(p=>{
+        const next=p+1000;
+        if(next>=FREE_SESSION_MS){
+          clearInterval(sessionTimerRef.current);
+          setSessionEnded(true);
+          window.speechSynthesis?.cancel();
+          isRecordingRef.current=false;
+          recognitionRef.current?.stop();
+        }
+        return next;
+      });
+    },1000);
+    return()=>clearInterval(sessionTimerRef.current);
+  },[screen,isFreeB1]);
+
+  useEffect(()=>{
+    if(userScrolledRef.current)return;
+    const last=messages[messages.length-1];
+    if(last?.role==="bot")messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
+  },[messages]);
 
   const levelLocked=(id)=>!isPro&&!FREE_CONVO_LEVELS.includes(id);
 
   const buildSystemPrompt=()=>{
-    const levelDesc={a1:"very simple sentences, basic vocabulary only, very short questions",a2:"simple sentences, common everyday vocabulary, easy questions",b1:"clear sentences, everyday vocabulary, intermediate questions",b2:"varied vocabulary, some idiomatic language, more challenging questions",c1:"sophisticated vocabulary, nuanced questions, natural pace",c2:"native-level vocabulary, complex abstract topics, no simplification"};
+    const levelDesc={a1:"very simple sentences, basic vocabulary only",a2:"simple sentences, common vocabulary",b1:"clear sentences, everyday vocabulary, intermediate level",b2:"varied vocabulary, some idiomatic language",c1:"sophisticated vocabulary, nuanced questions",c2:"native-level vocabulary, complex topics"};
     const ieltsParts=["Part 1 — personal questions about familiar topics","Part 2 — long turn cue card (ask user to speak for 1-2 minutes)","Part 3 — in-depth discussion questions"];
-    return `You are Sarah, a warm and encouraging IELTS conversation partner. You have one role: help ${userName} practise their spoken English.
+    return `You are Sarah, a warm and encouraging English conversation partner helping ${userName} practise their spoken English.
 
 Mode: ${mode==="ielts"?"IELTS Speaking Test practice — follow the test structure":"Free conversation practice"}
-${mode==="free"?`Topic: ${topic}\nLanguage level: ${levelDesc[level]||levelDesc.b1}`:`Current section: ${ieltsParts[Math.min(Math.floor(qIndex/3),2)]}`}
+${mode==="free"?`Language level: ${levelDesc[level]||levelDesc.b1}\nIf no topic has been established, ask the user what they want to talk about or suggest one yourself.`:`Current section: ${ieltsParts[Math.min(Math.floor(qIndex/3),2)]}`}
 
-YOUR RULES:
-- Speak as Sarah only. Never play other characters or refer to anyone else.
-- Keep each response to 2-4 sentences maximum. Be concise.
-- After EVERY user response: check for grammar or vocabulary errors. If you find one, correct it naturally mid-conversation like: "By the way, a more natural way to say that would be '...' — anyway, ..." then continue. If no errors, give brief encouraging acknowledgement and move on.
-- Do NOT give long lists of corrections. One correction per turn maximum.
-- Ask one question at a time. Never ask multiple questions in the same message.
-- Keep the conversation flowing naturally. Be warm, never clinical.
-- In IELTS mode: follow Part 1 → Part 2 → Part 3 structure. In free mode: explore the topic naturally, go deeper as the conversation develops.
+RULES — follow these strictly:
+- You are Sarah only. No other characters.
+- Keep each response to 2-4 sentences maximum.
+- NO emojis whatsoever. Plain text only.
+- NO asterisks, no bold, no markdown of any kind.
+- After EVERY user response: check for ONE grammar or vocabulary error. Correct it naturally: "By the way, a more natural way to say that is '...' — anyway, ..." then continue. If no errors, give brief warm acknowledgement.
+- One correction per turn only.
+- Ask one question at a time.
+- Keep the conversation natural and warm.
+- In IELTS mode: follow Part 1, Part 2, Part 3 structure.
 - Respond in English only.`;
   };
 
   const getOpeningPrompt=()=>{
     if(mode==="ielts"){
       const q=ALL_IELTS_QUESTIONS[qIndex%ALL_IELTS_QUESTIONS.length];
-      return `Greet ${userName} warmly as Sarah. In 1-2 sentences explain this is IELTS speaking practice with vocabulary and grammar corrections. Then ask this first question: "${q.q}"`;
+      return `Greet ${userName} warmly as Sarah. In one sentence say this is IELTS practice with grammar corrections. Ask this first question: "${q.q}"`;
     }
-    return `Greet ${userName} warmly as Sarah. In one sentence say you're here to practise conversation on "${topic}". Then ask a natural opening question about the topic to get things started.`;
+    return `Greet ${userName} warmly as Sarah. In one sentence say you are here to practise English together. Ask what topic they would like to discuss, or offer to suggest one.`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
     try{
       const msgs=[...history];
       if(userMsg)msgs.push({role:"user",content:userMsg});
-      // Trim history to last 16 messages to avoid slowdown
-      const trimmed=msgs.slice(-16);
       const res=await fetch("/api/analyze",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:350,system,messages:trimmed})
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,system,messages:msgs.slice(-16)})
       });
       const data=await res.json();
       return data?.content?.[0]?.text||"";
@@ -3953,13 +3980,9 @@ YOUR RULES:
   };
 
   const addSarahMessage=(text)=>{
-    const clean=text.replace(/^\[Sarah\]\s*/i,"").trim();
-    const msg={role:"bot",char:"sarah",text:clean,id:Date.now()+Math.random()};
-    setMessages(prev=>[...prev,msg]);
-    if(ttsEnabled){
-      // Small delay so state updates first
-      setTimeout(()=>speakText(clean),100);
-    }
+    const clean=text.replace(/^\[Sarah\]\s*/i,"").replace(/\*\*/g,"").replace(/\*/g,"").trim();
+    setMessages(prev=>[...prev,{role:"bot",char:"sarah",text:clean,id:Date.now()+Math.random()}]);
+    if(ttsEnabled)setTimeout(()=>speakText(stripForTTS(clean)),100);
   };
 
   const getHistory=()=>messages.map(m=>({
@@ -3968,9 +3991,11 @@ YOUR RULES:
   }));
 
   const sendMessage=async(text)=>{
-    if(!text.trim()||isThinking)return;
+    if(!text.trim()||isThinking||sessionEnded)return;
+    if(showMicHint)setShowMicHint(false);
     window.speechSynthesis?.cancel();
     setTranscript("");
+    userScrolledRef.current=false;
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
     setIsThinking(true);
     if(mode==="ielts")setQIndex(q=>q+1);
@@ -3981,41 +4006,91 @@ YOUR RULES:
   };
 
   const startConversation=async()=>{
-    if(!userName.trim())return;
-    if(mode==="free"&&!topic.trim())return;
-    // Load voices before starting
-    if(window.speechSynthesis&&window.speechSynthesis.getVoices().length===0){
-      window.speechSynthesis.addEventListener("voiceschanged",()=>{},{ once:true });
-    }
+    if(!userName.trim()||!mode)return;
+    if(window.speechSynthesis&&window.speechSynthesis.getVoices().length===0)
+      window.speechSynthesis.addEventListener("voiceschanged",()=>{},{once:true});
     setScreen("chat");
     setMessages([]);
+    setSessionMs(0);
+    setSessionEnded(false);
+    setShowMicHint(true);
     setIsThinking(true);
     const reply=await callClaude(buildSystemPrompt(),[],getOpeningPrompt());
     setIsThinking(false);
     if(reply)addSarahMessage(reply);
   };
 
+  const generateReport=async()=>{
+    window.speechSynthesis?.cancel();
+    isRecordingRef.current=false;
+    recognitionRef.current?.stop();
+    clearInterval(sessionTimerRef.current);
+    setScreen("report");
+    setReport(null);
+    const convo=messages.map(m=>`${m.role==="user"?userName:"Sarah"}: ${m.text}`).join("\n");
+    const sys=`You are an English language teacher. Analyse this conversation and write a concise learning report for ${userName}.
+Plain text only. No markdown, no asterisks, no emojis. Use these exact headings:
+
+MISTAKES FOUND:
+List up to 5 specific grammar or vocabulary mistakes from the conversation with corrections. If none found write "No significant mistakes found."
+
+VOCABULARY TO LEARN:
+List 3-5 words or phrases the user should learn based on the conversation.
+
+TIPS FOR IMPROVEMENT:
+List 3 specific actionable tips based on what you observed in the conversation.
+
+OVERALL:
+Write 2-3 encouraging sentences about the user's level and what they should focus on next.`;
+    try{
+      const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:500,system:sys,
+          messages:[{role:"user",content:`Conversation:\n\n${convo}`}]})});
+      const data=await res.json();
+      setReport(data?.content?.[0]?.text||"Could not generate report.");
+    }catch(e){setReport("Could not generate report.");}
+  };
+
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
-      setError("Voice input requires Google Chrome. Please type your response instead.");
+      setError("Voice input requires Google Chrome. Please type instead.");
       return;
     }
+    isRecordingRef.current=true;
+    setIsRecording(true);
+    setError("");
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    const rec=new SR();
-    rec.lang="en-US";rec.continuous=false;rec.interimResults=true;
-    rec.onstart=()=>{setIsRecording(true);setError("");};
-    rec.onresult=(e)=>{
-      const t=Array.from(e.results).map(r=>r[0].transcript).join("");
-      setTranscript(t);
+    const startRec=()=>{
+      if(!isRecordingRef.current)return;
+      const rec=new SR();
+      rec.lang="en-US";
+      rec.continuous=true;
+      rec.interimResults=true;
+      rec.onresult=(e)=>{
+        const t=Array.from(e.results).map(r=>r[0].transcript).join("");
+        setTranscript(t);
+      };
+      rec.onerror=(e)=>{
+        if(e.error==="no-speech"||e.error==="aborted")return;
+        setError("Mic error. Try typing.");
+        isRecordingRef.current=false;
+        setIsRecording(false);
+      };
+      rec.onend=()=>{
+        if(isRecordingRef.current)setTimeout(()=>startRec(),150);
+      };
+      recognitionRef.current=rec;
+      try{rec.start();}catch(e){}
     };
-    rec.onerror=(e)=>{setIsRecording(false);if(e.error!=="aborted")setError("Microphone error. Please type your response.");};
-    rec.onend=()=>setIsRecording(false);
-    recognitionRef.current=rec;
-    rec.start();
+    startRec();
   };
 
-  const stopRecording=()=>{recognitionRef.current?.stop();setIsRecording(false);};
+  const stopRecording=()=>{
+    isRecordingRef.current=false;
+    recognitionRef.current?.stop();
+    setIsRecording(false);
+  };
 
   const SarahAvatar=({size=44})=>(
     <div style={{width:size,height:size,flexShrink:0,borderRadius:"50%",overflow:"hidden",border:`2px solid ${CHAR_SARAH.border}`}}
@@ -4028,38 +4103,93 @@ YOUR RULES:
     </div>
   );
 
+  // REPORT SCREEN
+  if(screen==="report")return(
+    <div style={{maxWidth:600,margin:"0 auto",padding:"20px 0",...sty}}>
+      <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,marginBottom:16}}>Session Report</h2>
+      {!report?(
+        <div style={{textAlign:"center",padding:"40px",color:T.textMuted,...sty}}>
+          <div style={{fontSize:13,marginBottom:12}}>Generating your report...</div>
+          <div style={{display:"flex",gap:4,justifyContent:"center"}}>
+            {[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:T.primary,animation:`bounce 1s ${i*0.2}s infinite`}}/>)}
+          </div>
+        </div>
+      ):(
+        <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",lineHeight:1.9,fontSize:14,color:T.text,whiteSpace:"pre-wrap",...sty}}>
+          {report}
+        </div>
+      )}
+      <button onClick={()=>{setScreen("setup");setMessages([]);setQIndex(0);setReport(null);setSessionMs(0);setSessionEnded(false);}}
+        style={{marginTop:16,width:"100%",padding:"12px",background:T.primary,color:"white",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+        Start New Conversation
+      </button>
+    </div>
+  );
+
+  // SESSION ENDED SCREEN
+  if(sessionEnded&&screen==="chat")return(
+    <div style={{maxWidth:520,margin:"0 auto",padding:"40px 16px",textAlign:"center",...sty}}>
+      <div style={{fontSize:44,marginBottom:16}}>⏱</div>
+      <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,marginBottom:8}}>Free session complete</h2>
+      <p style={{fontSize:14,color:T.textMuted,marginBottom:24,lineHeight:1.7}}>
+        Your 5-minute free session has ended. Upgrade to Pro for unlimited sessions.<br/>
+        <span style={{direction:"rtl",display:"block",marginTop:6}}>انتهت جلستك المجانية. اشترك في Pro للحصول على جلسات غير محدودة.</span>
+      </p>
+      <div style={{display:"flex",gap:10,flexDirection:"column"}}>
+        <button onClick={generateReport}
+          style={{padding:"13px",background:T.green,color:"white",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+          View My Session Report
+        </button>
+        <button onClick={onUpgrade}
+          style={{padding:"13px",background:T.primary,color:"white",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+          Upgrade to Pro — Unlimited Sessions
+        </button>
+        <button onClick={()=>{setScreen("setup");setMessages([]);setQIndex(0);setSessionMs(0);setSessionEnded(false);}}
+          style={{padding:"11px",background:"white",border:`1px solid ${T.border}`,borderRadius:10,fontSize:13,cursor:"pointer",color:T.textMid,...sty}}>
+          Start New Free Session
+        </button>
+      </div>
+    </div>
+  );
+
   // SETUP SCREEN
   if(screen==="setup")return(
     <div style={{maxWidth:520,margin:"0 auto",padding:"20px 0",...sty}}>
-      {/* Disclaimers */}
-      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
+      <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:12,fontSize:13,color:"#065f46",...sty}}>
+        <strong>What this does:</strong> Sarah has a real conversation with you and corrects your grammar and vocabulary naturally — without interrupting the flow.
+        <div style={{direction:"rtl",marginTop:6,color:"#047857"}}>ستتحدث سارة معك بشكل طبيعي وتصحح أخطاءك النحوية والمفردات دون أن تقاطعك.</div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
         <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#1d4ed8",...sty}}>
-          🌐 <strong>Google Chrome required</strong> for voice input and Sarah's voice. Other browsers support text only.<br/>
-          <span style={{direction:"rtl",display:"block",marginTop:4,color:"#1e40af"}}>يتطلب هذا القسم متصفح Google Chrome لتفعيل التسجيل الصوتي وصوت Sarah. المتصفحات الأخرى تدعم الكتابة فقط.</span>
+          <strong>Google Chrome required</strong> for voice input and Sarah's voice. Other browsers support text only.<br/>
+          <span style={{direction:"rtl",display:"block",marginTop:4,color:"#1e40af"}}>يتطلب متصفح Google Chrome للصوت. المتصفحات الأخرى تدعم الكتابة فقط.</span>
         </div>
         <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"10px 14px",fontSize:12,color:T.amber,...sty}}>
-          📝 <strong>This feature improves your grammar and vocabulary only.</strong> Pronunciation cannot be assessed through text.<br/>
-          <span style={{direction:"rtl",display:"block",marginTop:4}}>هذه الميزة تساعدك على تحسين القواعد والمفردات فقط. لا يمكن تقييم النطق من خلال النص.</span>
+          <strong>Grammar and vocabulary only.</strong> Pronunciation cannot be assessed through text.<br/>
+          <span style={{direction:"rtl",display:"block",marginTop:4}}>تحسين القواعد والمفردات فقط. النطق لا يمكن تقييمه من خلال النص.</span>
         </div>
+        {!isPro&&(
+          <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"10px 14px",fontSize:12,color:T.primary,...sty}}>
+            <strong>Free users:</strong> 5-minute session limit on Free Conversation. Pro unlocks unlimited sessions and all levels.<br/>
+            <span style={{direction:"rtl",display:"block",marginTop:4}}>المستخدمون المجانيون: جلسة واحدة لمدة 5 دقائق في المحادثة الحرة. Pro للجلسات غير المحدودة.</span>
+          </div>
+        )}
       </div>
-
-      <div style={{textAlign:"center",marginBottom:20}}>
-        <SarahAvatar size={64}/>
-        <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"10px 0 4px"}}>Conversation Practice with Sarah</h2>
-        <p style={{fontSize:13,color:T.textMuted,margin:0}}>Real-time grammar & vocabulary corrections during natural conversation</p>
+      <div style={{textAlign:"center",marginBottom:16}}>
+        <SarahAvatar size={60}/>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"10px 0 4px"}}>Conversation with Sarah</h2>
+        <p style={{fontSize:13,color:T.textMuted,margin:0}}>Real-time grammar and vocabulary corrections</p>
       </div>
-
       <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,padding:"20px"}}>
         <div style={{marginBottom:16}}>
           <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your name</label>
           <input value={userName} onChange={e=>setUserName(e.target.value)} placeholder="Enter your first name"
             style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,boxSizing:"border-box"}}/>
         </div>
-
         <div style={{marginBottom:16}}>
           <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Mode</label>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-            {[{id:"ielts",icon:"🎓",title:"IELTS Practice",desc:"Structured test format"},{id:"free",icon:"💬",title:"Free Conversation",desc:"Any topic you choose"}].map(m=>(
+            {[{id:"ielts",icon:"🎓",title:"IELTS Practice",desc:"Structured test format"},{id:"free",icon:"💬",title:"Free Conversation",desc:"Sarah picks or you suggest a topic"}].map(m=>(
               <button key={m.id} onClick={()=>setMode(m.id)}
                 style={{padding:"12px",borderRadius:10,border:`2px solid ${mode===m.id?T.primary:T.border}`,background:mode===m.id?T.primaryLight:"white",cursor:"pointer",textAlign:"center",...sty}}>
                 <div style={{fontSize:22,marginBottom:4}}>{m.icon}</div>
@@ -4069,41 +4199,30 @@ YOUR RULES:
             ))}
           </div>
         </div>
-
         {mode==="ielts"&&(
           <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 12px",marginBottom:16,fontSize:12,color:T.amber,...sty}}>
-            ⚠️ No band score is given. Sarah will correct grammar and vocabulary during the conversation.
+            No band score is given. Sarah will correct grammar and vocabulary during the conversation.
           </div>
         )}
-
         {mode==="free"&&(
-          <>
-            <div style={{marginBottom:16}}>
-              <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your level</label>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
-                {CONVO_LEVELS.map(l=>{
-                  const locked=levelLocked(l.id);
-                  return(
-                    <button key={l.id} onClick={()=>locked?onUpgrade():setLevel(l.id)}
-                      style={{padding:"8px 4px",borderRadius:8,border:`1px solid ${level===l.id?T.primary:T.border}`,background:level===l.id?T.primaryLight:locked?T.bgMuted:"white",cursor:"pointer",fontSize:11,fontWeight:level===l.id?700:500,color:level===l.id?T.primary:locked?T.textLight:T.textMid,...sty,textAlign:"center"}}>
-                      {locked?"🔒 ":""}{l.id.toUpperCase()}{l.id==="b1"?" ✓":""}
-                    </button>
-                  );
-                })}
-              </div>
-              {!isPro&&<div style={{fontSize:11,color:T.textMuted,marginTop:6}}>B1 is free · Other levels require Pro</div>}
+          <div style={{marginBottom:16}}>
+            <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your level</label>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
+              {CONVO_LEVELS.map(l=>{
+                const locked=levelLocked(l.id);
+                return(
+                  <button key={l.id} onClick={()=>locked?onUpgrade():setLevel(l.id)}
+                    style={{padding:"8px 4px",borderRadius:8,border:`1px solid ${level===l.id?T.primary:T.border}`,background:level===l.id?T.primaryLight:locked?T.bgMuted:"white",cursor:"pointer",fontSize:11,fontWeight:level===l.id?700:500,color:level===l.id?T.primary:locked?T.textLight:T.textMid,...sty,textAlign:"center"}}>
+                    {locked?"🔒 ":""}{l.id.toUpperCase()}{l.id==="b1"?" ✓":""}
+                  </button>
+                );
+              })}
             </div>
-            <div style={{marginBottom:16}}>
-              <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Conversation topic</label>
-              <input value={topic} onChange={e=>setTopic(e.target.value)} placeholder="e.g. Travel, Technology, My job..."
-                style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,boxSizing:"border-box"}}/>
-            </div>
-          </>
+            {!isPro&&<div style={{fontSize:11,color:T.textMuted,marginTop:6}}>B1 free (5 min) · Other levels require Pro</div>}
+          </div>
         )}
-
-        <button onClick={startConversation}
-          disabled={!userName.trim()||!mode||(mode==="free"&&!topic.trim())}
-          style={{width:"100%",padding:"13px",background:userName.trim()&&mode&&(mode==="ielts"||topic.trim())?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
+        <button onClick={startConversation} disabled={!userName.trim()||!mode}
+          style={{width:"100%",padding:"13px",background:userName.trim()&&mode?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
           Start Conversation with Sarah →
         </button>
       </div>
@@ -4113,25 +4232,31 @@ YOUR RULES:
   // CHAT SCREEN
   return(
     <div style={{maxWidth:600,margin:"0 auto",display:"flex",flexDirection:"column",height:"calc(100vh - 260px)",minHeight:420,...sty}}>
-      {/* Header */}
-      <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${T.border}`,marginBottom:10,flexShrink:0}}>
-        <SarahAvatar size={38}/>
+      <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 0",borderBottom:`1px solid ${T.border}`,marginBottom:10,flexShrink:0}}>
+        <SarahAvatar size={36}/>
         <div style={{flex:1}}>
           <div style={{fontSize:13,fontWeight:700,color:T.text}}>Sarah</div>
           <div style={{fontSize:11,color:T.textMuted}}>{mode==="ielts"?"IELTS Practice":"Free Conversation · "+level.toUpperCase()}</div>
         </div>
+        {isFreeB1&&(
+          <div style={{fontSize:12,fontWeight:700,color:timeLeft<60000?T.red:T.amber,background:timeLeft<60000?T.redBg:T.amberBg,padding:"3px 8px",borderRadius:6,...sty}}>
+            {timeLeftStr}
+          </div>
+        )}
         <button onClick={()=>{window.speechSynthesis?.cancel();setTtsEnabled(v=>!v);}}
-          style={{background:ttsEnabled?T.primaryLight:T.bgMuted,border:`1px solid ${ttsEnabled?T.primaryBorder:T.border}`,borderRadius:8,padding:"5px 10px",fontSize:12,cursor:"pointer",color:ttsEnabled?T.primary:T.textMuted,...sty}}>
-          {ttsEnabled?"🔊 Voice On":"🔇 Voice Off"}
+          style={{background:ttsEnabled?T.primaryLight:T.bgMuted,border:`1px solid ${ttsEnabled?T.primaryBorder:T.border}`,borderRadius:8,padding:"5px 8px",fontSize:11,cursor:"pointer",color:ttsEnabled?T.primary:T.textMuted,...sty}}>
+          {ttsEnabled?"🔊":"🔇"}
         </button>
-        <button onClick={()=>{window.speechSynthesis?.cancel();setScreen("setup");setMessages([]);setQIndex(0);}}
+        <button onClick={generateReport}
           style={{background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",fontSize:12,cursor:"pointer",color:T.textMid,...sty}}>
           End
         </button>
       </div>
-
-      {/* Messages */}
-      <div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:10,paddingBottom:8}}>
+      <div ref={chatBoxRef} onScroll={()=>{
+        const el=chatBoxRef.current;
+        if(!el)return;
+        userScrolledRef.current=(el.scrollHeight-el.scrollTop-el.clientHeight)>80;
+      }} style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:10,paddingBottom:8}}>
         {messages.map((msg)=>{
           const isUser=msg.role==="user";
           return(
@@ -4158,34 +4283,37 @@ YOUR RULES:
         )}
         <div ref={messagesEndRef}/>
       </div>
-
-      {/* Input */}
       <div style={{flexShrink:0,paddingTop:10,borderTop:`1px solid ${T.border}`}}>
         {error&&<div style={{fontSize:12,color:T.red,marginBottom:6,...sty}}>{error}</div>}
-        <div style={{display:"flex",gap:8,alignItems:"flex-end"}}>
+        <div style={{display:"flex",gap:8,alignItems:"flex-end",position:"relative"}}>
           <textarea value={transcript} onChange={e=>setTranscript(e.target.value)}
             onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage(transcript);}}}
-            placeholder="Tap 🎤 to speak, or type here... (Enter to send)"
+            placeholder="Tap the mic to speak, or type here..."
             rows={2}
             style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box"}}/>
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+          <div style={{display:"flex",flexDirection:"column",gap:6,position:"relative"}}>
+            {showMicHint&&messages.length>0&&!isRecording&&(
+              <div style={{position:"absolute",bottom:54,right:0,display:"flex",alignItems:"center",gap:4,pointerEvents:"none",whiteSpace:"nowrap",zIndex:10}}>
+                <span style={{fontSize:12,fontWeight:700,color:T.primary,background:T.primaryLight,padding:"3px 8px",borderRadius:6,border:`1px solid ${T.primaryBorder}`,...sty}}>Tap to speak</span>
+                <span style={{fontSize:16,color:T.primary}}>↓</span>
+              </div>
+            )}
             <button onClick={isRecording?stopRecording:startRecording}
-              style={{width:44,height:44,borderRadius:"50%",border:"none",background:isRecording?T.red:T.primary,color:"white",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?`0 0 0 3px ${T.redBorder}`:"none"}}>
+              style={{width:48,height:48,borderRadius:"50%",border:"none",background:isRecording?T.red:T.primary,color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?`0 0 0 4px ${T.redBorder}`:`0 2px 8px ${T.primary}44`,transition:"all 0.2s"}}>
               {isRecording?"⏹":"🎤"}
             </button>
             <button onClick={()=>sendMessage(transcript)} disabled={!transcript.trim()||isThinking}
-              style={{width:44,height:44,borderRadius:"50%",border:"none",background:transcript.trim()&&!isThinking?T.green:T.border,color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              style={{width:48,height:48,borderRadius:"50%",border:"none",background:transcript.trim()&&!isThinking?T.green:T.border,color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
               ↑
             </button>
           </div>
         </div>
-        {isRecording&&<div style={{fontSize:12,color:T.red,marginTop:4,...sty}}>🔴 Listening... tap ⏹ when done speaking</div>}
+        {isRecording&&<div style={{fontSize:12,color:T.red,marginTop:4,...sty}}>Recording — tap stop when done speaking</div>}
       </div>
       <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}`}</style>
     </div>
   );
 };
-
 const SpeakingPage = ({isPro, onUpgrade}) => {
   const [tab, setTab] = useState("examples");
   const [expandedP1, setExpandedP1] = useState(null);
