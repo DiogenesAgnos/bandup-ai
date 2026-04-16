@@ -3873,7 +3873,8 @@ const ALL_IELTS_QUESTIONS=[
   ...SPEAKING_PART3.flatMap(t=>t.questions.map(q=>({part:3,topic:t.topic,q:q.q}))),
 ];
 
-const FREE_SESSION_MS=5*60*1000;
+const FREE_SESSION_MS=7*60*1000;
+const IELTS_SESSION_MS=7*60*1000;
 
 const stripForTTS=(text)=>text
   .replace(/[\u{1F300}-\u{1FAFF}]/gu,"")
@@ -3888,15 +3889,18 @@ const speakText=(text)=>{
   const doSpeak=()=>{
     window.speechSynthesis.cancel();
     const utt=new SpeechSynthesisUtterance(text);
-    utt.lang="en-GB";utt.rate=0.88;utt.pitch=1.05;
+    utt.lang="en-GB";utt.rate=0.88;utt.pitch=1.1;
     const voices=window.speechSynthesis.getVoices();
+    // Priority: Google UK English Female > any en-GB female > Google US Female > any female > any en
     const match=
-      voices.find(v=>v.lang==="en-GB"&&/google|natural|kate|female/i.test(v.name))||
-      voices.find(v=>v.lang==="en-GB")||
-      voices.find(v=>v.lang==="en-US"&&/google|natural|female/i.test(v.name))||
+      voices.find(v=>v.lang==="en-GB"&&/google uk english female/i.test(v.name))||
+      voices.find(v=>v.lang==="en-GB"&&/female|woman|kate|serena/i.test(v.name))||
+      voices.find(v=>v.lang==="en-GB"&&!/male|man/i.test(v.name))||
+      voices.find(v=>v.lang==="en-US"&&/google us english female|zira|samantha/i.test(v.name))||
+      voices.find(v=>v.lang==="en-US"&&/female|woman/i.test(v.name))||
+      voices.find(v=>v.lang.startsWith("en")&&!/male|man/i.test(v.name))||
       voices.find(v=>v.lang.startsWith("en"));
     if(match)utt.voice=match;
-    // Mobile Chrome workaround: resume if paused
     if(window.speechSynthesis.paused)window.speechSynthesis.resume();
     window.speechSynthesis.speak(utt);
   };
@@ -3931,16 +3935,17 @@ const ConversationPractice=({isPro,onUpgrade})=>{
   const chatBoxRef=useRef(null);
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
-  const isFreeB1=!isPro&&mode==="free";
-  const timeLeft=Math.max(0,FREE_SESSION_MS-sessionMs);
+  const hasTimeLimit=!isPro;
+  const sessionLimit=mode==="ielts"?IELTS_SESSION_MS:FREE_SESSION_MS;
+  const timeLeft=Math.max(0,sessionLimit-sessionMs);
   const timeLeftStr=`${Math.floor(timeLeft/60000)}:${String(Math.floor((timeLeft%60000)/1000)).padStart(2,"0")}`;
 
   useEffect(()=>{
-    if(screen!=="chat"||!isFreeB1)return;
+    if(screen!=="chat"||!hasTimeLimit)return;
     sessionTimerRef.current=setInterval(()=>{
       setSessionMs(p=>{
         const next=p+1000;
-        if(next>=FREE_SESSION_MS){
+        if(next>=sessionLimit){
           clearInterval(sessionTimerRef.current);
           setSessionEnded(true);
           window.speechSynthesis?.cancel();
@@ -3951,13 +3956,21 @@ const ConversationPractice=({isPro,onUpgrade})=>{
       });
     },1000);
     return()=>clearInterval(sessionTimerRef.current);
-  },[screen,isFreeB1]);
+  },[screen,hasTimeLimit,sessionLimit]);
 
   useEffect(()=>{
+    if(screen!=="chat")return;
     const el=chatBoxRef.current;
     if(!el)return;
-    const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<120;
-    if(atBottom)messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
+    const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<100;
+    // Only auto-scroll on bot messages if already at bottom
+    const last=messages[messages.length-1];
+    if(last?.role==="bot"&&atBottom){
+      messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
+    } else if(last?.role==="user"){
+      // Always scroll for user's own messages
+      messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
+    }
   },[messages,isThinking]);
 
   const levelLocked=(id)=>!isPro&&!FREE_CONVO_LEVELS.includes(id);
@@ -4163,8 +4176,8 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
       <div style={{fontSize:44,marginBottom:16}}>⏱</div>
       <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,marginBottom:8}}>Free session complete</h2>
       <p style={{fontSize:14,color:T.textMuted,marginBottom:24,lineHeight:1.7}}>
-        Your 5-minute free session has ended. Upgrade to Pro for unlimited sessions.<br/>
-        <span style={{direction:"rtl",display:"block",marginTop:6}}>انتهت جلستك المجانية. اشترك في Pro للحصول على جلسات غير محدودة.</span>
+        Your 7-minute session has ended. Upgrade to Pro for unlimited sessions.<br/>
+        <span style={{direction:"rtl",display:"block",marginTop:6}}>انتهت جلستك (7 دقائق). اشترك في Pro للحصول على جلسات غير محدودة.</span>
       </p>
       <div style={{display:"flex",gap:10,flexDirection:"column"}}>
         <button onClick={generateReport}
@@ -4201,7 +4214,7 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
         </div>
         {!isPro&&(
           <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"10px 14px",fontSize:12,color:T.primary,...sty}}>
-            <strong>Free users:</strong> 5-minute session limit on Free Conversation. Pro unlocks unlimited sessions and all levels.<br/>
+            <strong>Free users:</strong> 7-minute session limit per conversation. Pro unlocks unlimited sessions and all levels.<br/>
             <span style={{direction:"rtl",display:"block",marginTop:4}}>المستخدمون المجانيون: جلسة واحدة لمدة 5 دقائق في المحادثة الحرة. Pro للجلسات غير المحدودة.</span>
           </div>
         )}
@@ -4249,7 +4262,7 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
                 );
               })}
             </div>
-            {!isPro&&<div style={{fontSize:11,color:T.textMuted,marginTop:6}}>B1 free (5 min) · Other levels require Pro</div>}
+            {!isPro&&<div style={{fontSize:11,color:T.textMuted,marginTop:6}}>B1 free (7 min) · Other levels require Pro</div>}
           </div>
         )}
         <button onClick={startConversation} disabled={!userName.trim()||!mode}
@@ -4269,7 +4282,7 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
           <div style={{fontSize:13,fontWeight:700,color:T.text}}>Sarah</div>
           <div style={{fontSize:11,color:T.textMuted}}>{mode==="ielts"?"IELTS Practice":"Free Conversation · "+level.toUpperCase()}</div>
         </div>
-        {isFreeB1&&(
+        {hasTimeLimit&&(
           <div style={{fontSize:12,fontWeight:700,color:timeLeft<60000?T.red:T.amber,background:timeLeft<60000?T.redBg:T.amberBg,padding:"3px 8px",borderRadius:6,...sty}}>
             {timeLeftStr}
           </div>
@@ -4343,17 +4356,16 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
   );
 };
 const SpeakingPage = ({isPro, onUpgrade}) => {
-  const [tab, setTab] = useState("examples");
+  const [tab, setTab] = useState("chat");
   const [expandedP1, setExpandedP1] = useState(null);
   const [expandedP2, setExpandedP2] = useState(null);
   const [expandedP3, setExpandedP3] = useState(null);
   const [showAnswer, setShowAnswer] = useState({});
 
   const tabs = [
-    {id:"examples",label:"📝 Examples & Answers",free:true},
-    {id:"chat",label:"💬 Conversation Practice",free:true},
+    {id:"chat",label:"🎤 Speaking Practice",free:true},
+    {id:"examples",label:"📝 Models & Tips",free:true},
     {id:"vocabulary",label:"📚 Vocabulary",free:false},
-    {id:"tips",label:"💡 Tips & Strategies",free:true},
     {id:"mistakes",label:"⚠️ Common Mistakes",free:true}
   ];
   const toggleAnswer = (key) => setShowAnswer(prev=>({...prev,[key]:!prev[key]}));
@@ -4362,9 +4374,9 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
   const locked = (free) => !free && !isPro;
 
     return (
-    <div style={{maxWidth:900,margin:"0 auto",padding:"36px 24px 80px"}}>
-      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 6px",direction:"ltr",textAlign:"left"}}>🗣️ IELTS Speaking</h1>
-      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}></p>
+    <div style={{maxWidth:900,margin:"0 auto",padding:"24px 24px 80px"}}>
+      <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 4px",direction:"ltr",textAlign:"left"}}>🗣️ Speaking Practice</h1>
+      <p style={{...sty,fontSize:14,color:T.textMuted,margin:"0 0 20px",lineHeight:1.5}}>Practise speaking with Sarah and get real-time grammar and vocabulary corrections.</p>
 
       {/* Tab bar */}
       <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:24,paddingBottom:4}} className="tab-row">
@@ -4486,18 +4498,6 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
         </div>
       )}
 
-      {/* TIPS TAB */}
-      {tab==="tips"&&(
-        <div>
-          {SPEAKING_TIPS.map((tip,i)=>(
-            <div key={i} style={card}>
-              <h3 style={{fontFamily:"Georgia,serif",fontSize:16,color:T.text,margin:"0 0 6px"}}>{i+1}. {tip.title}</h3>
-              <p style={{...sty,fontSize:14,color:T.textMid,margin:0,lineHeight:1.6}}>{tip.desc}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* MISTAKES TAB */}
       {tab==="mistakes"&&(
         <div>
@@ -4513,12 +4513,11 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
         </div>
       )}
 
-      {/* CHAT TAB */}
+      {/* CHAT TAB — shown first by default */}
       {tab==="chat"&&(
         <ConversationPractice isPro={isPro} onUpgrade={onUpgrade}/>
       )}
 
-      {/* VIDEOS TAB */}
     </div>
   );
 };
@@ -7617,7 +7616,7 @@ const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$
 const UI = {
   ar:{
     // Nav
-    home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ المحادثة",
+    home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ تدريب المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
     progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق", studyplan:"🗺️ الخطة الدراسية",
     // Account
@@ -7635,7 +7634,7 @@ const UI = {
     // Features grid
     f1t:"تقييم المقالات",f1d:"مجاني: تحليلان كاملان · Pro: تحليل غير محدود",
     f2t:"اختبارات القراءة",f2d:"مجاني: اختبار واحد · Pro: جميع الـ٧ اختبارات",
-    f3t:"تدريب المحادثة",f3d:"مجاني: نماذج Band 8 للأجزاء ١ و٢ و٣ — بدون قيود",
+    f3t:"تدريب المحادثة مع سارة",f3d:"مجاني: محادثة حقيقية مع تصحيح فوري للقواعد والمفردات · 7 دقائق للمستخدمين المجانيين",
     f4t:"ألعاب تعليمية",f4d:"مجاني: لعبة الإملاء فقط · Pro: جميع الألعاب الـ٥",
     f5t:"قواعد وإملاء",f5d:"مجاني: ٥ فحوصات · Pro: غير محدود",
     f6t:"تمارين تدريبية",f6d:"Pro فقط · ٣٠٠+ تمرين شامل — قواعد، مفردات، تعبير، وتصحيح أخطاء",
@@ -7673,7 +7672,7 @@ const UI = {
   },
   en:{
     // Nav
-    home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", placement:"📋 Placement Test", speaking:"🗣️ Speaking",
+    home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", placement:"📋 Placement Test", speaking:"🗣️ Speaking Practice",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
     progress:"📈 Progress", contact:"✉️ Contact", pronunciation:"🔊 Pronunciation", studyplan:"🗺️ Study Plan",
     // Account
@@ -7691,7 +7690,7 @@ const UI = {
     // Features grid
     f1t:"Essay Analysis",f1d:"Free: 2 full analyses · Pro: Unlimited",
     f2t:"Reading Tests",f2d:"Free: 1 test · Pro: All 7 tests",
-    f3t:"Speaking Practice",f3d:"Free: Band 8 model answers for Parts 1, 2 & 3 — no restrictions",
+    f3t:"Speaking Practice with Sarah",f3d:"Free: Real conversation with live grammar and vocabulary corrections · 7 minutes free per session",
     f4t:"Learning Games",f4d:"Free: Spelling game only · Pro: All 5 games",
     f5t:"Grammar & Spelling",f5d:"Free: 5 checks · Pro: Unlimited",
     f6t:"Practice Exercises",f6d:"Pro only · 230+ exercises — grammar, dictation, sentence building, vocabulary and more",
@@ -7799,11 +7798,11 @@ const STUDY_STEPS = {
     },
     {
       num:9, free:true, view:"speaking",
-      title:"تدريب المحادثة",
-      tag:"مجاني",
-      desc:"اقرأ نماذج الإجابات عالية المستوى بصوت عالٍ — وليس في ذهنك فقط. سجّل نفسك على هاتفك واستمع للتسجيل.",
-      tip:"الهدف ليس حفظ الإجابات — بل تعويد أذنك ولسانك على الإنجليزية الأكاديمية المنطوقة. ما تسمعه منك أنت يختلف عما تسمعه من الآخرين.",
-      action:"افتح المحادثة ←",
+      title:"تدريب المحادثة مع سارة",
+      tag:"مجاني — 7 دقائق للمستخدمين المجانيين",
+      desc:"تدرّب على المحادثة مع سارة وهي تصحح أخطاءك النحوية والمفردات في الوقت الفعلي. اختر وضع الآيلتس أو المحادثة الحرة.",
+      tip:"هذه الميزة تعمل على Google Chrome فقط. استخدم الميكروفون للتحدث وانتظر ردّ سارة — الهدف هو الطلاقة والدقة معاً، وليس الكمال.",
+      action:"ابدأ المحادثة ←",
     },
     {
       num:10, free:false, view:"exercises",
@@ -7897,11 +7896,11 @@ const STUDY_STEPS = {
     },
     {
       num:9, free:true, view:"speaking",
-      title:"Speaking Practice",
-      tag:"Free",
-      desc:"Read the Band 8 model answers out loud — not silently in your head. Record yourself on your phone and play it back.",
-      tip:"The goal is not to memorise the answers — it's to train your ear and tongue to produce academic English naturally. What you hear from yourself sounds different from what you hear from others.",
-      action:"Open speaking →",
+      title:"Speaking Practice with Sarah",
+      tag:"Free — 7 minutes per session",
+      desc:"Have a real conversation with Sarah and get live grammar and vocabulary corrections. Choose IELTS mode or free conversation on any topic.",
+      tip:"Use Google Chrome for voice input. Speak naturally, wait for Sarah's response, and pay attention to every correction — those are your most valuable learning moments.",
+      action:"Start speaking →",
     },
     {
       num:10, free:false, view:"exercises",
@@ -8490,6 +8489,8 @@ export default function IELTSBot(){
   const [lang,setLang]=useState("en");
   const [uiLang,setUiLang]=useState(()=>{try{return localStorage.getItem("ef_ui_lang")||"en";}catch{return "en";}}); // Website UI language
   const [menuOpen,setMenuOpen]=useState(false);
+  const [navVisible,setNavVisible]=useState(true);
+  const lastScrollY=useRef(0);
   const analyzeRef=useRef(null);
   const [proUser, setProUser] = useState(false);
   const [heroTab, setHeroTab] = useState(0);
@@ -8520,6 +8521,27 @@ export default function IELTSBot(){
       }
     });
     return ()=> subscription.unsubscribe();
+  },[]);
+
+  // ── Smart nav hide on scroll (mobile) ──
+  useEffect(()=>{
+    let ticking=false;
+    const onScroll=()=>{
+      if(ticking)return;
+      ticking=true;
+      requestAnimationFrame(()=>{
+        const currentY=window.scrollY;
+        const delta=currentY-lastScrollY.current;
+        // Hide when scrolling down >40px, show when scrolling up or near top
+        if(currentY<80){setNavVisible(true);}
+        else if(delta>8){setNavVisible(false);}
+        else if(delta<-8){setNavVisible(true);}
+        lastScrollY.current=currentY;
+        ticking=false;
+      });
+    };
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
   },[]);
 
   // ── Initialize Paddle.js ──
@@ -8772,7 +8794,7 @@ export default function IELTSBot(){
 
       {/* NAV BAR 2 */}
       {/* ── TWO-TIER NAV (ieltsanswers style) ───────────── */}
-      <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,boxShadow:"0 2px 8px rgba(0,0,0,0.1)"}}>
+      <div className="sticky-nav" style={{position:"sticky",top:0,zIndex:200,boxShadow:"0 2px 8px rgba(0,0,0,0.1)",transform:navVisible?"translateY(0)":"translateY(-100%)",transition:"transform 0.25s ease"}}>
 
         {/* TIER 1 — White topbar: logo + language + account */}
         <div style={{background:"#ffffff",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
