@@ -3837,6 +3837,375 @@ const SPEAKING_MISTAKES = [
   {mistake:"Not using linking words",fix:"Connect ideas with: 'However,' 'Moreover,' 'In addition,' 'On the other hand,' 'Having said that.' This improves coherence scores."}
 ];
 
+// ── CONVERSATION PRACTICE ─────────────────────
+const FREE_CONVO_LEVELS=["b1"];
+const CONVO_LEVELS=[
+  {id:"a1",label:"A1 — Beginner",free:false},
+  {id:"a2",label:"A2 — Elementary",free:false},
+  {id:"b1",label:"B1 — Intermediate",free:true},
+  {id:"b2",label:"B2 — Upper Intermediate",free:false},
+  {id:"c1",label:"C1 — Advanced",free:false},
+  {id:"c2",label:"C2 — Proficiency",free:false},
+];
+
+const CHAR_TEACHER={
+  name:"Ms. Sarah",
+  role:"IELTS Examiner",
+  color:"#b91c1c",
+  bg:"#fef2f2",
+  border:"#fecaca",
+  avatar:(
+    `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="38" fill="#fef2f2" stroke="#fecaca" strokeWidth="2"/>
+      <circle cx="40" cy="30" r="14" fill="#f9a8a8"/>
+      <ellipse cx="40" cy="62" rx="18" ry="12" fill="#b91c1c"/>
+      <circle cx="40" cy="30" r="11" fill="#fddcdc"/>
+      <ellipse cx="35" cy="28" rx="2" ry="2.5" fill="#7f1d1d"/>
+      <ellipse cx="45" cy="28" rx="2" ry="2.5" fill="#7f1d1d"/>
+      <path d="M35 35 Q40 39 45 35" stroke="#c05050" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      <rect x="22" y="44" width="36" height="5" rx="2" fill="#991b1b"/>
+      <path d="M28 50 Q40 58 52 50" fill="#b91c1c"/>
+    </svg>`
+  )
+};
+
+const CHAR_FRIEND={
+  name:"Alex",
+  role:"English Learner",
+  color:"#1d4ed8",
+  bg:"#eff6ff",
+  border:"#bfdbfe",
+  avatar:(
+    `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="38" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="2"/>
+      <circle cx="40" cy="30" r="14" fill="#93c5fd"/>
+      <ellipse cx="40" cy="62" rx="18" ry="12" fill="#1d4ed8"/>
+      <circle cx="40" cy="30" r="11" fill="#dbeafe"/>
+      <ellipse cx="35" cy="28" rx="2" ry="2.5" fill="#1e3a8a"/>
+      <ellipse cx="45" cy="28" rx="2" ry="2.5" fill="#1e3a8a"/>
+      <path d="M35 35 Q40 39 45 35" stroke="#3b82f6" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      <rect x="24" y="44" width="32" height="5" rx="2" fill="#1e40af"/>
+      <path d="M29 50 Q40 58 51 50" fill="#1d4ed8"/>
+    </svg>`
+  )
+};
+
+const ALL_IELTS_QUESTIONS=[
+  ...SPEAKING_PART1.flatMap(t=>t.questions.map(q=>({part:1,topic:t.topic,q:q.q}))),
+  ...SPEAKING_PART2.map(t=>({part:2,topic:t.topic,q:`Talk about the following topic for 1-2 minutes: "${t.topic}"`})),
+  ...SPEAKING_PART3.flatMap(t=>t.questions.map(q=>({part:3,topic:t.topic,q:q.q}))),
+];
+
+const ConversationPractice=({isPro,onUpgrade})=>{
+  const [screen,setScreen]=useState("setup");
+  const [mode,setMode]=useState(null);
+  const [level,setLevel]=useState("b1");
+  const [userName,setUserName]=useState("");
+  const [topic,setTopic]=useState("");
+  const [messages,setMessages]=useState([]);
+  const [isThinking,setIsThinking]=useState(false);
+  const [isRecording,setIsRecording]=useState(false);
+  const [transcript,setTranscript]=useState("");
+  const [error,setError]=useState("");
+  const [qIndex,setQIndex]=useState(0);
+  const messagesEndRef=useRef(null);
+  const recognitionRef=useRef(null);
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+
+  const scrollToBottom=()=>{messagesEndRef.current?.scrollIntoView({behavior:"smooth"});};
+  useEffect(()=>{scrollToBottom();},[messages]);
+
+  const levelLocked=(id)=>!isPro&&!FREE_CONVO_LEVELS.includes(id);
+
+  const startConversation=async()=>{
+    if(!userName.trim())return;
+    if(mode==="free"&&!topic.trim())return;
+    setScreen("chat");
+    setMessages([]);
+    setIsThinking(true);
+    const systemPrompt=buildSystemPrompt();
+    const opening=await callClaude(systemPrompt,[],getOpeningPrompt());
+    setIsThinking(false);
+    if(opening)addBotMessages(opening);
+  };
+
+  const buildSystemPrompt=()=>{
+    const levelDesc={a1:"very simple sentences, basic vocabulary, short questions",a2:"simple sentences, common vocabulary, easy questions",b1:"clear sentences, everyday vocabulary, intermediate questions",b2:"varied vocabulary, some idiomatic language, challenging questions",c1:"sophisticated vocabulary, nuanced questions, natural conversation pace",c2:"native-level vocabulary, complex topics, no simplification"};
+    const ieltsParts=["Part 1 (personal questions)","Part 2 (long turn cue card)","Part 3 (discussion questions)"];
+    return `You are TWO characters in an English conversation practice session. You play BOTH characters and alternate between them naturally.
+
+CHARACTER 1: Ms. Sarah — an experienced, encouraging IELTS examiner. She asks questions, gives corrections, and guides the conversation. She is warm but professional.
+CHARACTER 2: Alex — a fellow English learner who is slightly more advanced than the user. He comments, adds to the conversation, and models good responses.
+
+The user's name is: ${userName}
+Mode: ${mode==="ielts"?"IELTS Speaking Test practice":"Free conversation practice"}
+${mode==="free"?`Topic: ${topic}`:`Current IELTS section: ${ieltsParts[Math.min(Math.floor(qIndex/3),2)]}`}
+${mode==="free"?`Language level: ${levelDesc[level]||levelDesc.b1}`:"Language level: B1-B2 (standard IELTS level)"}
+
+CRITICAL RULES:
+- Always respond as BOTH characters. Format each message with the character name in brackets like [Ms. Sarah] and [Alex]
+- Keep each character's response to 2-3 sentences maximum
+- After every user response: first have Ms. Sarah give ONE specific correction if there is a grammar, vocabulary, or pronunciation note (say "I noticed you said X — a more natural way would be Y"), then continue the conversation
+- If the response is correct, Ms. Sarah gives brief praise and moves forward
+- Alex reacts naturally to what the user said, like a real conversation partner would
+- Keep the conversation flowing — don't just correct, keep engaging
+- In IELTS mode, follow the test structure. In free mode, explore the topic naturally
+- Respond in English only
+- Never break character`;
+  };
+
+  const getOpeningPrompt=()=>{
+    if(mode==="ielts"){
+      const q=ALL_IELTS_QUESTIONS[qIndex%ALL_IELTS_QUESTIONS.length];
+      return `Start the IELTS speaking practice session. Greet ${userName} warmly, explain what will happen, then ask this first question: "${q.q}"`;
+    }
+    return `Start the conversation. Greet ${userName} warmly, introduce yourselves briefly, then open the discussion on: "${topic}". Keep it natural and inviting.`;
+  };
+
+  const callClaude=async(system,history,userMsg)=>{
+    try{
+      const msgs=[...history];
+      if(userMsg)msgs.push({role:"user",content:userMsg});
+      const res=await fetch("/api/analyze",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,system,messages:msgs})
+      });
+      const data=await res.json();
+      return data?.content?.[0]?.text||"";
+    }catch(e){return "";}
+  };
+
+  const parseCharMessages=(text)=>{
+    const parts=[];
+    const lines=text.split(/\n+/);
+    let current=null;
+    lines.forEach(line=>{
+      const sarahMatch=line.match(/^\[Ms\.?\s*Sarah\]/i);
+      const alexMatch=line.match(/^\[Alex\]/i);
+      if(sarahMatch){
+        if(current)parts.push(current);
+        current={char:"sarah",text:line.replace(/^\[Ms\.?\s*Sarah\]\s*/i,"").trim()};
+      }else if(alexMatch){
+        if(current)parts.push(current);
+        current={char:"alex",text:line.replace(/^\[Alex\]\s*/i,"").trim()};
+      }else if(current&&line.trim()){
+        current.text+=" "+line.trim();
+      }
+    });
+    if(current)parts.push(current);
+    if(parts.length===0&&text.trim())parts.push({char:"sarah",text:text.trim()});
+    return parts;
+  };
+
+  const addBotMessages=(text)=>{
+    const parts=parseCharMessages(text);
+    setMessages(prev=>[...prev,...parts.map(p=>({role:"bot",char:p.char,text:p.text,id:Date.now()+Math.random()}))]);
+  };
+
+  const getHistory=()=>messages.map(m=>({
+    role:m.role==="user"?"user":"assistant",
+    content:m.role==="user"?`[${userName}]: ${m.text}`:`[${m.char==="sarah"?"Ms. Sarah":"Alex"}]: ${m.text}`
+  }));
+
+  const sendMessage=async(text)=>{
+    if(!text.trim()||isThinking)return;
+    setTranscript("");
+    setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
+    setIsThinking(true);
+    if(mode==="ielts")setQIndex(q=>q+1);
+    const history=getHistory();
+    history.push({role:"user",content:`[${userName}]: ${text.trim()}`});
+    const reply=await callClaude(buildSystemPrompt(),history.slice(0,-1),`[${userName}]: ${text.trim()}`);
+    setIsThinking(false);
+    if(reply)addBotMessages(reply);
+  };
+
+  const startRecording=()=>{
+    if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
+      setError("Voice input not supported in this browser. Please type your response.");
+      return;
+    }
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    const rec=new SR();
+    rec.lang="en-US";rec.continuous=false;rec.interimResults=true;
+    rec.onstart=()=>{setIsRecording(true);setError("");};
+    rec.onresult=(e)=>{
+      const t=Array.from(e.results).map(r=>r[0].transcript).join("");
+      setTranscript(t);
+    };
+    rec.onerror=(e)=>{setIsRecording(false);if(e.error!=="aborted")setError("Microphone error. Try typing instead.");};
+    rec.onend=()=>{setIsRecording(false);};
+    recognitionRef.current=rec;
+    rec.start();
+  };
+
+  const stopRecording=()=>{
+    recognitionRef.current?.stop();
+    setIsRecording(false);
+  };
+
+  const CharAvatar=({char,size=44})=>(
+    <div style={{width:size,height:size,flexShrink:0,borderRadius:"50%",overflow:"hidden",border:`2px solid ${char==="sarah"?CHAR_TEACHER.border:CHAR_FRIEND.border}`}}
+      dangerouslySetInnerHTML={{__html:char==="sarah"?CHAR_TEACHER.avatar:CHAR_FRIEND.avatar}}/>
+  );
+
+  const UserAvatar=()=>(
+    <div style={{width:44,height:44,flexShrink:0,borderRadius:"50%",background:T.primaryLight,border:`2px solid ${T.primaryBorder}`,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:16,color:T.primary,...sty}}>
+      {userName.charAt(0).toUpperCase()}
+    </div>
+  );
+
+  // SETUP SCREEN
+  if(screen==="setup")return(
+    <div style={{maxWidth:520,margin:"0 auto",padding:"20px 0",...sty}}>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{display:"flex",justifyContent:"center",gap:12,marginBottom:12}}>
+          <div style={{width:56,height:56,borderRadius:"50%",overflow:"hidden",border:`2px solid ${CHAR_TEACHER.border}`}} dangerouslySetInnerHTML={{__html:CHAR_TEACHER.avatar}}/>
+          <div style={{width:56,height:56,borderRadius:"50%",overflow:"hidden",border:`2px solid ${CHAR_FRIEND.border}`}} dangerouslySetInnerHTML={{__html:CHAR_FRIEND.avatar}}/>
+        </div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 6px"}}>Conversation Practice</h2>
+        <p style={{fontSize:13,color:T.textMuted,margin:0}}>Practice speaking with Ms. Sarah & Alex. Get real-time corrections.</p>
+      </div>
+
+      <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,padding:"20px"}}>
+        <div style={{marginBottom:16}}>
+          <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your name</label>
+          <input value={userName} onChange={e=>setUserName(e.target.value)} placeholder="Enter your first name"
+            style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,boxSizing:"border-box"}}/>
+        </div>
+
+        <div style={{marginBottom:16}}>
+          <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Mode</label>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            {[{id:"ielts",icon:"🎓",title:"IELTS Practice",desc:"Structured test format"},{id:"free",icon:"💬",title:"Free Conversation",desc:"Any topic you choose"}].map(m=>(
+              <button key={m.id} onClick={()=>setMode(m.id)}
+                style={{padding:"12px",borderRadius:10,border:`2px solid ${mode===m.id?T.primary:T.border}`,background:mode===m.id?T.primaryLight:"white",cursor:"pointer",textAlign:"center",...sty}}>
+                <div style={{fontSize:22,marginBottom:4}}>{m.icon}</div>
+                <div style={{fontSize:13,fontWeight:700,color:mode===m.id?T.primary:T.text}}>{m.title}</div>
+                <div style={{fontSize:11,color:T.textMuted,marginTop:2}}>{m.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {mode==="ielts"&&(
+          <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"10px 12px",marginBottom:16,fontSize:12,color:T.amber,...sty}}>
+            ⚠️ This is conversation practice only. No band score is given. Corrections will be provided during the conversation.
+          </div>
+        )}
+
+        {mode==="free"&&(
+          <>
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your level</label>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+                {CONVO_LEVELS.map(l=>{
+                  const locked=levelLocked(l.id);
+                  return(
+                    <button key={l.id} onClick={()=>locked?onUpgrade():setLevel(l.id)}
+                      style={{padding:"8px 4px",borderRadius:8,border:`1px solid ${level===l.id?T.primary:T.border}`,background:level===l.id?T.primaryLight:locked?T.bgMuted:"white",cursor:"pointer",fontSize:11,fontWeight:level===l.id?700:500,color:level===l.id?T.primary:locked?T.textLight:T.textMid,...sty,textAlign:"center"}}>
+                      {locked?"🔒 ":""}{l.id.toUpperCase()}{l.id==="b1"?" ✓":""}
+                    </button>
+                  );
+                })}
+              </div>
+              {!isPro&&<div style={{fontSize:11,color:T.textMuted,marginTop:6}}>B1 is free · Other levels require Pro</div>}
+            </div>
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:12,fontWeight:700,color:T.textMid,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>Conversation topic</label>
+              <input value={topic} onChange={e=>setTopic(e.target.value)} placeholder="e.g. Travel, Technology, My job..."
+                style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,boxSizing:"border-box"}}/>
+            </div>
+          </>
+        )}
+
+        <button onClick={startConversation}
+          disabled={!userName.trim()||!mode||(mode==="free"&&!topic.trim())}
+          style={{width:"100%",padding:"13px",background:userName.trim()&&mode&&(mode==="ielts"||topic.trim())?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
+          Start Conversation →
+        </button>
+      </div>
+    </div>
+  );
+
+  // CHAT SCREEN
+  return(
+    <div style={{maxWidth:600,margin:"0 auto",display:"flex",flexDirection:"column",height:"calc(100vh - 280px)",minHeight:400,...sty}}>
+      {/* Header */}
+      <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 0",borderBottom:`1px solid ${T.border}`,marginBottom:12,flexShrink:0}}>
+        <div style={{display:"flex",gap:-8}}>
+          <div style={{width:36,height:36,borderRadius:"50%",overflow:"hidden",border:`2px solid ${CHAR_TEACHER.border}`,zIndex:2}} dangerouslySetInnerHTML={{__html:CHAR_TEACHER.avatar}}/>
+          <div style={{width:36,height:36,borderRadius:"50%",overflow:"hidden",border:`2px solid ${CHAR_FRIEND.border}`,marginLeft:-10,zIndex:1}} dangerouslySetInnerHTML={{__html:CHAR_FRIEND.avatar}}/>
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.text}}>Ms. Sarah & Alex</div>
+          <div style={{fontSize:11,color:T.textMuted}}>{mode==="ielts"?"IELTS Practice Mode":"Free Conversation · "+level.toUpperCase()}</div>
+        </div>
+        <button onClick={()=>{setScreen("setup");setMessages([]);setQIndex(0);}}
+          style={{background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer",color:T.textMid,...sty}}>
+          End
+        </button>
+      </div>
+
+      {/* Messages */}
+      <div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:12,paddingBottom:8}}>
+        {messages.map((msg)=>{
+          const isUser=msg.role==="user";
+          const char=msg.char;
+          const charData=char==="sarah"?CHAR_TEACHER:CHAR_FRIEND;
+          return(
+            <div key={msg.id} style={{display:"flex",gap:10,alignItems:"flex-start",flexDirection:isUser?"row-reverse":"row"}}>
+              {isUser?<UserAvatar/>:<CharAvatar char={char}/>}
+              <div style={{maxWidth:"75%",display:"flex",flexDirection:"column",alignItems:isUser?"flex-end":"flex-start"}}>
+                {!isUser&&<div style={{fontSize:11,fontWeight:700,color:charData.color,marginBottom:3,...sty}}>{char==="sarah"?"Ms. Sarah":"Alex"}</div>}
+                <div style={{background:isUser?T.primaryLight:char==="sarah"?CHAR_TEACHER.bg:CHAR_FRIEND.bg,border:`1px solid ${isUser?T.primaryBorder:char==="sarah"?CHAR_TEACHER.border:CHAR_FRIEND.border}`,borderRadius:isUser?"14px 14px 4px 14px":"14px 14px 14px 4px",padding:"10px 14px",fontSize:14,color:T.text,lineHeight:1.6,...sty}}>
+                  {msg.text}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {isThinking&&(
+          <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+            <CharAvatar char="sarah"/>
+            <div style={{background:CHAR_TEACHER.bg,border:`1px solid ${CHAR_TEACHER.border}`,borderRadius:"14px 14px 14px 4px",padding:"10px 14px"}}>
+              <div style={{display:"flex",gap:4,alignItems:"center"}}>
+                {[0,1,2].map(i=><div key={i} style={{width:7,height:7,borderRadius:"50%",background:T.textMuted,animation:`bounce 1s ${i*0.2}s infinite`}}/>)}
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef}/>
+      </div>
+
+      {/* Input */}
+      <div style={{flexShrink:0,paddingTop:10,borderTop:`1px solid ${T.border}`}}>
+        {error&&<div style={{fontSize:12,color:T.red,marginBottom:6,...sty}}>{error}</div>}
+        <div style={{display:"flex",gap:8,alignItems:"flex-end"}}>
+          <textarea value={transcript} onChange={e=>setTranscript(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage(transcript);}}}
+            placeholder="Speak or type your response... (Enter to send)"
+            rows={2}
+            style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box"}}/>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            <button onClick={isRecording?stopRecording:startRecording}
+              style={{width:44,height:44,borderRadius:"50%",border:"none",background:isRecording?T.red:T.primary,color:"white",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              {isRecording?"⏹":"🎤"}
+            </button>
+            <button onClick={()=>sendMessage(transcript)} disabled={!transcript.trim()||isThinking}
+              style={{width:44,height:44,borderRadius:"50%",border:"none",background:transcript.trim()&&!isThinking?T.green:T.border,color:"white",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              ↑
+            </button>
+          </div>
+        </div>
+        {isRecording&&<div style={{fontSize:12,color:T.red,marginTop:4,...sty}}>🔴 Recording... tap stop when done</div>}
+      </div>
+
+      <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}`}</style>
+    </div>
+  );
+};
+
 const SpeakingPage = ({isPro, onUpgrade}) => {
   const [tab, setTab] = useState("examples");
   const [expandedP1, setExpandedP1] = useState(null);
@@ -3846,6 +4215,7 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
 
   const tabs = [
     {id:"examples",label:"📝 Examples & Answers",free:true},
+    {id:"chat",label:"💬 Conversation Practice",free:true},
     {id:"vocabulary",label:"📚 Vocabulary",free:false},
     {id:"tips",label:"💡 Tips & Strategies",free:true},
     {id:"mistakes",label:"⚠️ Common Mistakes",free:true}
@@ -4005,6 +4375,11 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
             </div>
           ))}
         </div>
+      )}
+
+      {/* CHAT TAB */}
+      {tab==="chat"&&(
+        <ConversationPractice isPro={isPro} onUpgrade={onUpgrade}/>
       )}
 
       {/* VIDEOS TAB */}
