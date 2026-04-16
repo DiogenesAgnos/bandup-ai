@@ -3883,6 +3883,30 @@ const stripForTTS=(text)=>text
   .replace(/[^\w\s.,!?;:'"-]/g," ")
   .replace(/\s+/g," ").trim();
 
+const speakText=(text)=>{
+  if(!window.speechSynthesis)return;
+  const doSpeak=()=>{
+    window.speechSynthesis.cancel();
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang="en-GB";utt.rate=0.88;utt.pitch=1.05;
+    const voices=window.speechSynthesis.getVoices();
+    const match=
+      voices.find(v=>v.lang==="en-GB"&&/google|natural|kate|female/i.test(v.name))||
+      voices.find(v=>v.lang==="en-GB")||
+      voices.find(v=>v.lang==="en-US"&&/google|natural|female/i.test(v.name))||
+      voices.find(v=>v.lang.startsWith("en"));
+    if(match)utt.voice=match;
+    // Mobile Chrome workaround: resume if paused
+    if(window.speechSynthesis.paused)window.speechSynthesis.resume();
+    window.speechSynthesis.speak(utt);
+  };
+  if(window.speechSynthesis.getVoices().length===0){
+    window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};
+  }else{
+    doSpeak();
+  }
+};
+
 const ConversationPractice=({isPro,onUpgrade})=>{
   const [screen,setScreen]=useState("setup");
   const [mode,setMode]=useState(null);
@@ -3903,7 +3927,7 @@ const ConversationPractice=({isPro,onUpgrade})=>{
   const recognitionRef=useRef(null);
   const sessionTimerRef=useRef(null);
   const isRecordingRef=useRef(false);
-  const userScrolledRef=useRef(false);
+  const accumulatedRef=useRef("");
   const chatBoxRef=useRef(null);
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
@@ -3930,10 +3954,11 @@ const ConversationPractice=({isPro,onUpgrade})=>{
   },[screen,isFreeB1]);
 
   useEffect(()=>{
-    if(userScrolledRef.current)return;
-    const last=messages[messages.length-1];
-    if(last?.role==="bot")messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
-  },[messages]);
+    const el=chatBoxRef.current;
+    if(!el)return;
+    const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<120;
+    if(atBottom)messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
+  },[messages,isThinking]);
 
   const levelLocked=(id)=>!isPro&&!FREE_CONVO_LEVELS.includes(id);
 
@@ -3995,7 +4020,7 @@ RULES — follow these strictly:
     if(showMicHint)setShowMicHint(false);
     window.speechSynthesis?.cancel();
     setTranscript("");
-    userScrolledRef.current=false;
+    accumulatedRef.current="";
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
     setIsThinking(true);
     if(mode==="ielts")setQIndex(q=>q+1);
@@ -4058,6 +4083,8 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
       return;
     }
     isRecordingRef.current=true;
+    accumulatedRef.current="";
+    setTranscript("");
     setIsRecording(true);
     setError("");
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -4067,9 +4094,11 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
       rec.lang="en-US";
       rec.continuous=true;
       rec.interimResults=true;
+      // Capture the base at the moment this session starts
+      const base=accumulatedRef.current;
       rec.onresult=(e)=>{
-        const t=Array.from(e.results).map(r=>r[0].transcript).join("");
-        setTranscript(t);
+        const sessionText=Array.from(e.results).map(r=>r[0].transcript).join("");
+        setTranscript((base+(base?" ":"")+sessionText).trim());
       };
       rec.onerror=(e)=>{
         if(e.error==="no-speech"||e.error==="aborted")return;
@@ -4078,6 +4107,8 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
         setIsRecording(false);
       };
       rec.onend=()=>{
+        // Finalise accumulated before restarting
+        setTranscript(prev=>{accumulatedRef.current=prev;return prev;});
         if(isRecordingRef.current)setTimeout(()=>startRec(),150);
       };
       recognitionRef.current=rec;
@@ -4252,11 +4283,8 @@ Write 2-3 encouraging sentences about the user's level and what they should focu
           End
         </button>
       </div>
-      <div ref={chatBoxRef} onScroll={()=>{
-        const el=chatBoxRef.current;
-        if(!el)return;
-        userScrolledRef.current=(el.scrollHeight-el.scrollTop-el.clientHeight)>80;
-      }} style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:10,paddingBottom:8}}>
+      <div ref={chatBoxRef}
+        style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:10,paddingBottom:8}}>
         {messages.map((msg)=>{
           const isUser=msg.role==="user";
           return(
