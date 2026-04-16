@@ -5308,7 +5308,7 @@ const gameAudio={
 // ─────────────────────────────────────────────────────────────
 // IELTS GAME — LOBBY
 // ─────────────────────────────────────────────────────────────
-function IELTSGameLobby({proUser,onSelect,uiLang="ar"}){
+function IELTSGameLobby({proUser,onSelect,uiLang="ar",onUpgrade}){
   return(
     <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#0f172a 0%,#431407 50%,#0f172a 100%)",padding:"40px 20px",position:"relative",overflow:"hidden"}}>
       {/* Stars background */}
@@ -5347,12 +5347,12 @@ function IELTSGameLobby({proUser,onSelect,uiLang="ar"}){
             const locked=!cat.free&&!proUser;
             return(
               <div key={cat.id}
-                onClick={()=>!locked&&onSelect(cat)}
+                onClick={()=>locked?onUpgrade&&onUpgrade():onSelect(cat)}
                 style={{
                   background:locked?"rgba(255,255,255,0.03)":"rgba(255,255,255,0.07)",
                   border:`2px solid ${locked?"rgba(255,255,255,0.08)":cat.color+"99"}`,
                   borderRadius:20,padding:"28px 24px",
-                  cursor:locked?"not-allowed":"pointer",
+                  cursor:"pointer",
                   opacity:locked?0.55:1,
                   backdropFilter:"blur(12px)",
                   transition:"transform 0.2s,background 0.2s,box-shadow 0.2s",
@@ -5537,7 +5537,7 @@ function IELTSGameComplete({answers,score,category,onReplay,onLobby,history=[],r
   );
 }
 
-function IELTSGame({proUser,onNavigate,uiLang="ar"}){
+function IELTSGame({proUser,onNavigate,uiLang="ar",onUpgrade}){
   const [screen,setScreen]=useState("lobby");
   const [cat,setCat]=useState(null);
   const [qIdx,setQIdx]=useState(0);
@@ -5597,7 +5597,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar"}){
     },1500);
   };
 
-  if(screen==="lobby") return <IELTSGameLobby proUser={proUser} onSelect={startGame} uiLang={uiLang}/>;
+  if(screen==="lobby") return <IELTSGameLobby proUser={proUser} onSelect={startGame} uiLang={uiLang} onUpgrade={onUpgrade}/>;
 
   if(screen==="intro"&&cat) return(
     <div style={{minHeight:"calc(100vh - 64px)",background:"linear-gradient(160deg,#450a0a,#431407)",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"'Cairo',system-ui"}}>
@@ -6365,7 +6365,7 @@ const EXTRA_VOCAB_B2 = {
     {w:"it goes without saying",ar:"من البديهي / لا شك في",en:"it is obvious",ex:"It goes without saying that honesty is important."},
   ],
 };
-const VocabularyPage = ({uiLang="ar", isPro=false}) => {
+const VocabularyPage = ({uiLang="ar", isPro=false, onUpgrade}) => {
   const FREE_VOCAB_CATS=["writing2","reading"];
   const MERGED_VOCAB = {
     reading: [...IELTS_VOCAB.reading, ...(GENERAL_VOCAB_EXTRA.reading_extra||[]), ...(EXTRA_VOCAB_B2.reading||[])],
@@ -6419,8 +6419,8 @@ const VocabularyPage = ({uiLang="ar", isPro=false}) => {
         {CATS.map(c=>{
           const locked=catLocked(c.key);
           return(
-            <button key={c.key} onClick={()=>{if(!locked){setCat(c.key);setSearch("");}}}
-              style={{background:cat===c.key?T.primaryLight:locked?T.bgMuted:"white",border:`1.5px solid ${cat===c.key?T.primary:locked?T.border:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:cat===c.key?700:500,color:cat===c.key?T.primary:locked?T.textLight:T.textMid,cursor:locked?"not-allowed":"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s",opacity:locked?0.7:1}}>
+            <button key={c.key} onClick={()=>{if(locked){onUpgrade&&onUpgrade();}else{setCat(c.key);setSearch("");}}}
+              style={{background:cat===c.key?T.primaryLight:locked?T.bgMuted:"white",border:`1.5px solid ${cat===c.key?T.primary:locked?T.border:T.border}`,borderRadius:8,padding:"8px 16px",fontSize:13,fontWeight:cat===c.key?700:500,color:cat===c.key?T.primary:locked?T.textLight:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s",opacity:locked?0.7:1}}>
               {locked?"🔒 ":""}{uiLang==="ar"?c.labelAr:c.labelEn}
             </button>
           );
@@ -7804,7 +7804,7 @@ const PRON_CATS=[
   {id:"culture",ar:"ثقافة",en:"Culture"},
 ];
 
-const PronunciationPage=({uiLang="ar",isPro=false})=>{
+const PronunciationPage=({uiLang="ar",isPro=false,onUpgrade})=>{
   const [search,setSearch]=useState("");
   const [cat,setCat]=useState("all");
   const [speaking,setSpeaking]=useState("");
@@ -7907,8 +7907,8 @@ const PronunciationPage=({uiLang="ar",isPro=false})=>{
         {PRON_CATS.map(c=>{
           const locked=catLocked(c.id);
           return(
-            <button key={c.id} onClick={()=>{if(!locked)setCat(c.id);}}
-              style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${cat===c.id?T.primary:T.border}`,background:cat===c.id?T.primaryLight:locked?T.bgMuted:"white",color:cat===c.id?T.primary:locked?T.textLight:T.textMid,fontWeight:cat===c.id?700:400,fontSize:13,cursor:locked?"not-allowed":"pointer",opacity:locked?0.6:1,...sty}}>
+            <button key={c.id} onClick={()=>{if(locked){onUpgrade&&onUpgrade();}else{setCat(c.id);}}}
+              style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${cat===c.id?T.primary:T.border}`,background:cat===c.id?T.primaryLight:locked?T.bgMuted:"white",color:cat===c.id?T.primary:locked?T.textLight:T.textMid,fontWeight:cat===c.id?700:400,fontSize:13,cursor:"pointer",opacity:locked?0.6:1,...sty}}>
               {locked?"🔒 ":""}{isAr?c.ar:c.en}{cat===c.id?` (${filtered.length})`:``}
             </button>
           );
@@ -8889,11 +8889,11 @@ export default function IELTSBot(){
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang} isPro={proUser}/>}
+        {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView} isPro={proUser}/>}
         {mainView==="contact"&&<ContactPage/>}
-        {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang}/>}
-        {mainView==="pronunciation"&&<PronunciationPage uiLang={uiLang} isPro={proUser}/>}
+        {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang} onUpgrade={()=>setShowPaywall(true)}/>}
+        {mainView==="pronunciation"&&<PronunciationPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="studyplan"&&<StudyPlanPage uiLang={uiLang} onNavigate={switchView}/>}
         </div>
       </div>
