@@ -3875,17 +3875,13 @@ const ALL_IELTS_QUESTIONS=[
 
 const FREE_SESSION_MS=7*60*1000;
 const IELTS_SESSION_MS=7*60*1000;
-const SESSION_USED_KEY="ef_session_used_today";
+const SESSION_USED_KEY="ef_session_used_forever";
 
 const getSessionUsed=()=>{
-  try{
-    const d=JSON.parse(localStorage.getItem(SESSION_USED_KEY)||"{}");
-    const today=new Date().toDateString();
-    return d.date===today?d.used:false;
-  }catch{return false;}
+  try{return localStorage.getItem(SESSION_USED_KEY)==="1";}catch{return false;}
 };
 const markSessionUsed=()=>{
-  try{localStorage.setItem(SESSION_USED_KEY,JSON.stringify({date:new Date().toDateString(),used:true}));}catch{}
+  try{localStorage.setItem(SESSION_USED_KEY,"1");}catch{}
 };
 
 const stripForTTS=(text)=>text
@@ -3993,42 +3989,59 @@ const ConversationPractice=({isPro,onUpgrade})=>{
     return()=>clearInterval(sessionTimerRef.current);
   },[screen,hasTimeLimit,sessionLimit]);
 
-  // Scroll — only when user is already at bottom
+  // Scroll to bottom on every new message and on thinking state change
   useEffect(()=>{
     if(screen!=="chat")return;
-    const el=chatBoxRef.current;
-    if(!el)return;
-    const atBottom=(el.scrollHeight-el.scrollTop-el.clientHeight)<80;
-    if(atBottom)messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
-  },[messages]);
+    // Small delay so the DOM has rendered the new message
+    const t=setTimeout(()=>{
+      messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
+    },60);
+    return()=>clearTimeout(t);
+  },[messages,isThinking]);
 
   const levelLocked=(id)=>!isPro&&!FREE_CONVO_LEVELS.includes(id);
 
   const buildSystemPrompt=()=>{
     const levelDesc={
-      a1:"Speak in very short, simple sentences. Use only basic vocabulary (A1 level). Ask extremely simple yes/no questions the user can answer in 1-2 words.",
-      a2:"Use simple sentences. Basic everyday vocabulary. Short, easy questions. Never use idioms or complex grammar.",
-      b1:"Use clear sentences and everyday vocabulary. Intermediate level questions. Occasional simple idioms are fine.",
-      b2:"Use varied vocabulary and some idiomatic language. More challenging discussion questions. Push the user gently.",
-      c1:"Use sophisticated vocabulary, nuanced questions. Natural conversation pace. Challenge the user with complex ideas.",
-      c2:"Native-level vocabulary. Complex abstract topics. No simplification. Treat the user as a near-native speaker."
+      a1:"Use only basic vocabulary and very short sentences. Yes/no questions only.",
+      a2:"Simple sentences, common vocabulary, short easy questions.",
+      b1:"Clear sentences, everyday vocabulary, intermediate questions.",
+      b2:"Varied vocabulary, some idioms, more challenging questions.",
+      c1:"Sophisticated vocabulary, nuanced discussion questions.",
+      c2:"Native-level, complex abstract topics, no simplification."
     };
-    const selectedTopic=IELTS_TOPICS[ieltsTopicIdx];
-    return `You are Sarah, a warm and professional IELTS speaking examiner and English conversation coach helping ${userName} practise their English.
+    const selectedTopic=mode==="ielts"?IELTS_TOPICS[ieltsTopicIdx]:null;
+    const ieltsInstructions=selectedTopic?`
+IELTS STRUCTURE — follow this exactly:
 
-Mode: ${mode==="ielts"?`IELTS Speaking Test practice\nSelected topic: ${selectedTopic.topic}\nYour question bank for this topic:\n${selectedTopic.questions.map((q,i)=>`${i+1}. ${q}`).join("\n")}\nWork through these questions in order across Part 1. After 3-4 questions on this topic, naturally transition to Part 2 (ask user to speak for 1-2 minutes on a related topic), then Part 3 discussion.`:`Free conversation practice at ${levelDesc[level]||levelDesc.b1}`}
+PART 1 (first 6-8 exchanges):
+Your question bank for topic "${selectedTopic.topic}":
+${selectedTopic.questions.map((q,i)=>`${i+1}. ${q}`).join("\n")}
+Ask ALL questions in order. Do NOT move to Part 2 until you have asked at least 4 questions. Ask one question per turn.
 
-STRICT RULES:
-1. You are Sarah only. Never break character.
-2. Maximum 3 sentences per response. Be concise.
-3. NO emojis, NO asterisks, NO bold, NO markdown. Plain text only.
-4. After EVERY user response: find ONE grammar or vocabulary error and correct it naturally mid-flow: "By the way, it is more natural to say '...' — anyway..." If no error found, give one short warm acknowledgement and continue.
-5. Only ONE correction per response. Never list multiple corrections.
-6. Ask EXACTLY one question per response. Never two.
-7. Vocabulary tip: occasionally (every 3-4 turns) suggest a stronger vocabulary word the user could have used, framed positively: "A great word you could use here is '...'"
-8. In IELTS mode: if this is Part 2, give the user 30 seconds to think, then say "Ready? Go ahead." In Part 3, ask deeper discussion questions.
-9. Respond in English only.
-10. Be warm, encouraging, and patient.`;
+PART 2 (after Part 1 is complete):
+Say exactly: "Now we move to Part 2. Here is your topic: ${selectedTopic.topic}. You have one minute to prepare your thoughts. When you are ready, speak for two full minutes."
+Then WAIT. When the user responds:
+- If their response is under 5 sentences or clearly less than one minute of speaking: say "That was a good start, but in the real IELTS exam you need to speak for two full minutes without stopping. Try again — take your time and go into more detail."
+- If their response is longer: give brief positive feedback and transition to Part 3.
+
+PART 3 (after Part 2):
+Ask 4-5 in-depth discussion questions related to the topic. These should be analytical and abstract, not personal. Push the user to give developed answers.`:"";
+    return `You are Sarah, a strict but warm IELTS speaking examiner helping ${userName} practise.
+
+Mode: ${mode==="ielts"?`IELTS Speaking Test`:`Free conversation (${levelDesc[level]||levelDesc.b1})`}
+${ieltsInstructions}
+${mode==="free"?`If no topic yet, ask the user what they want to discuss.`:""}
+
+RESPONSE RULES — follow every single one:
+1. MAXIMUM 2 SENTENCES per response. Not 3, not 4. Two sentences only.
+2. NO emojis, NO asterisks, NO bold, NO markdown. Plain text.
+3. After every user response: find ONE grammar or vocabulary mistake. Correct it naturally: "By the way, a more natural way to say that is '...' — anyway,..." Never list multiple corrections.
+4. If no mistake: give one 4-6 word warm acknowledgement only, then ask your question.
+5. Ask EXACTLY one question. Never more.
+6. Every 4 turns: suggest one stronger vocabulary word the user could have used: "A better word here would be '...' — "
+7. Never repeat a question you have already asked.
+8. English only.`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -4037,7 +4050,7 @@ STRICT RULES:
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const res=await fetch("/api/analyze",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:280,system,messages:msgs})
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:160,system,messages:msgs})
       });
       if(!mountedRef.current)return "";
       const data=await res.json();
@@ -4129,7 +4142,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     }catch(e){setReport("Could not generate report.");}
   };
 
-  // Recording — use only FINAL results to prevent triple-word bug
+  // Recording — continuous:true for full accuracy, isFinal deduplication prevents triple words
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
@@ -4146,35 +4159,39 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       if(!isRecordingRef.current)return;
       const rec=new SR();
       rec.lang="en-US";
-      rec.continuous=false; // single-shot per session to prevent duplicates on mobile
+      rec.continuous=true;   // keeps listening through pauses
       rec.interimResults=true;
-      const sessionBase=finalTranscriptRef.current;
+      rec.maxAlternatives=1;
+      // Capture confirmed finals at session start — closed over, never changes within session
+      const baseAtStart=finalTranscriptRef.current;
+      let sessionFinals=""; // finals only within THIS session instance
       rec.onresult=(e)=>{
-        let final="";let interim="";
+        sessionFinals="";
+        let interim="";
         for(let i=0;i<e.results.length;i++){
-          if(e.results[i].isFinal)final+=e.results[i][0].transcript+" ";
+          if(e.results[i].isFinal)sessionFinals+=e.results[i][0].transcript;
           else interim+=e.results[i][0].transcript;
         }
-        // Update display: finalised base + new final + current interim
-        const display=(sessionBase+final+interim).trim();
-        setTranscript(display);
-        // Update finalTranscriptRef only with confirmed final results
-        if(final)finalTranscriptRef.current=(sessionBase+final).trim();
+        if(sessionFinals)finalTranscriptRef.current=[baseAtStart,sessionFinals].filter(Boolean).join(" ");
+        setTranscript([baseAtStart,sessionFinals,interim].filter(Boolean).join(" "));
       };
       rec.onerror=(e)=>{
-        if(e.error==="no-speech")return; // ignore silence, will restart
+        if(e.error==="no-speech")return; // silence — let onend restart
         if(e.error==="aborted")return;
-        setError("Mic error. Please type your response.");
+        setError("Microphone error. Please type your response.");
         isRecordingRef.current=false;
         setIsRecording(false);
       };
       rec.onend=()=>{
-        // Auto-restart to continue through pauses
-        if(isRecordingRef.current)setTimeout(()=>startRec(),200);
+        // Persist finals before restart
+        if(sessionFinals)finalTranscriptRef.current=[baseAtStart,sessionFinals].filter(Boolean).join(" ");
+        if(isRecordingRef.current)startRec(); // immediate restart — no delay
         else setIsRecording(false);
       };
       recognitionRef.current=rec;
-      try{rec.start();}catch(err){}
+      try{rec.start();}catch(err){
+        if(isRecordingRef.current)setTimeout(()=>startRec(),300);
+      }
     };
     startRec();
   };
@@ -4228,10 +4245,10 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
   if(sessionBlockedToday&&!isPro)return(
     <div style={{maxWidth:520,margin:"0 auto",padding:"40px 16px",textAlign:"center",...sty}}>
       <div style={{fontSize:44,marginBottom:16}}>📅</div>
-      <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,marginBottom:8}}>Daily session used</h2>
+      <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,marginBottom:8}}>Free session used</h2>
       <p style={{fontSize:14,color:T.textMuted,marginBottom:24,lineHeight:1.7}}>
-        You have already used your free 7-minute session today. Come back tomorrow for another free session, or upgrade to Pro for unlimited access.<br/>
-        <span style={{direction:"rtl",display:"block",marginTop:8}}>لقد استخدمت جلستك المجانية لهذا اليوم. عد غداً للحصول على جلسة جديدة، أو اشترك في Pro للوصول غير المحدود.</span>
+        You have used your free 7-minute session. Upgrade to Pro for unlimited sessions with all levels and no time limits.<br/>
+        <span style={{direction:"rtl",display:"block",marginTop:8}}>لقد استخدمت جلستك المجانية (7 دقائق). اشترك في Pro للحصول على جلسات غير محدودة بجميع المستويات.</span>
       </p>
       <button onClick={onUpgrade}
         style={{padding:"13px 32px",background:T.primary,color:"white",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
@@ -4246,8 +4263,8 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       <div style={{fontSize:44,marginBottom:16}}>⏱</div>
       <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,marginBottom:8}}>Session complete</h2>
       <p style={{fontSize:14,color:T.textMuted,marginBottom:24,lineHeight:1.7}}>
-        Your 7-minute session has ended. Your daily free session is now used — come back tomorrow or upgrade to Pro.<br/>
-        <span style={{direction:"rtl",display:"block",marginTop:6}}>انتهت جلستك (7 دقائق). الجلسة المجانية اليومية انتهت — ارجع غداً أو اشترك في Pro.</span>
+        Your free 7-minute session is now complete. View your report below, or upgrade to Pro for unlimited sessions.<br/>
+        <span style={{direction:"rtl",display:"block",marginTop:6}}>انتهت جلستك المجانية (7 دقائق). اطّلع على تقريرك أدناه، أو اشترك في Pro للجلسات غير المحدودة.</span>
       </p>
       <div style={{display:"flex",gap:10,flexDirection:"column"}}>
         <button onClick={generateReport}
@@ -4308,8 +4325,8 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
         </div>
         {!isPro&&(
           <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.primary,...sty}}>
-            <strong>Free users:</strong> One 7-minute session per day. Pro = unlimited sessions, all levels.<br/>
-            <span style={{direction:"rtl",display:"block",marginTop:3}}>المجاني: جلسة واحدة (7 دقائق) يومياً. Pro = جلسات غير محدودة.</span>
+            <strong>Free users:</strong> One free 7-minute session (lifetime). Pro = unlimited sessions, all levels, no time limit.<br/>
+            <span style={{direction:"rtl",display:"block",marginTop:3}}>المجاني: جلسة واحدة (7 دقائق) مجانية مدى الحياة. Pro = جلسات غير محدودة بجميع المستويات.</span>
           </div>
         )}
       </div>
