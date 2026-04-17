@@ -4126,7 +4126,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     }catch(e){setReport("Could not generate report.");}
   };
 
-  // Recording — e.resultIndex prevents triple-word mobile bug
+  // Recording — single-shot per session, only isFinal results accumulated — fixes Android triple-word bug
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
@@ -4143,31 +4143,37 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       if(!isRecordingRef.current)return;
       const rec=new SR();
       rec.lang="en-US";
-      rec.continuous=true;
+      rec.continuous=false;   // single-shot: avoids Android duplicate result bug
       rec.interimResults=true;
       rec.maxAlternatives=1;
-      const confirmedBase=finalTranscriptRef.current;
-      let newFinals="";
+      // Snapshot of confirmed text before this session — never changes within session
+      const base=finalTranscriptRef.current;
       rec.onresult=(e)=>{
-        // Only process NEW results starting from e.resultIndex — prevents replaying old ones
-        let addedFinals="";
-        let currentInterim="";
-        for(let i=e.resultIndex;i<e.results.length;i++){
-          if(e.results[i].isFinal)addedFinals+=e.results[i][0].transcript+" ";
-          else currentInterim+=e.results[i][0].transcript;
+        // Collect ONLY final results from THIS session — no iteration over old results
+        let sessionFinal="";
+        let sessionInterim="";
+        for(let i=0;i<e.results.length;i++){
+          if(e.results[i].isFinal)sessionFinal+=e.results[i][0].transcript;
+          else sessionInterim+=e.results[i][0].transcript;
         }
-        if(addedFinals)newFinals+=addedFinals;
-        if(newFinals.trim())finalTranscriptRef.current=[confirmedBase,newFinals].filter(s=>s.trim()).join(" ").trim();
-        setTranscript([confirmedBase,newFinals,currentInterim].filter(s=>s.trim()).join(" ").trim());
+        // Display = confirmed base + this session's final + live interim
+        const display=[base,sessionFinal,sessionInterim].filter(s=>s.trim()).join(" ").trim();
+        setTranscript(display);
       };
       rec.onerror=(e)=>{
-        if(e.error==="no-speech"||e.error==="aborted")return;
+        if(e.error==="no-speech")return; // silence — onend will restart
+        if(e.error==="aborted")return;
         setError("Microphone error. Please type your response.");
         isRecordingRef.current=false;
         setIsRecording(false);
       };
       rec.onend=()=>{
-        if(isRecordingRef.current)startRec();
+        // Before restarting, save the final text from this session as the new base
+        setTranscript(prev=>{
+          finalTranscriptRef.current=prev;
+          return prev;
+        });
+        if(isRecordingRef.current)setTimeout(()=>startRec(),80);
         else setIsRecording(false);
       };
       recognitionRef.current=rec;
