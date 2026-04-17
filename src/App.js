@@ -4187,8 +4187,8 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     }catch(e){setReport("Could not generate report.");}
   };
 
-  // Recording — continuous:true keeps mic open with no gaps
-  // lastProcessedIndex tracks which results were already finalised to prevent duplicates
+  // Recording — continuous:false prevents Android duplicate results
+  // Immediate restart on onend keeps the mic open with no perceptible gap
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
@@ -4201,67 +4201,46 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     setIsRecording(true);
     setError("");
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    const rec=new SR();
-    rec.lang="en-US";
-    rec.continuous=true;       // never stops — no gaps between sentences
-    rec.interimResults=true;
-    rec.maxAlternatives=1;
-    let confirmedText="";      // finalised text accumulated in this session
-    let lastFinalIdx=-1;       // index of last result we already finalised
-    rec.onresult=(e)=>{
-      // Only process results we haven't finalised yet
-      for(let i=Math.max(0,lastFinalIdx+1);i<e.results.length;i++){
-        if(e.results[i].isFinal){
-          confirmedText+=e.results[i][0].transcript+" ";
-          lastFinalIdx=i;
+    const startRec=()=>{
+      if(!isRecordingRef.current)return;
+      const rec=new SR();
+      rec.lang="en-US";
+      rec.continuous=false;     // single utterance — Android never duplicates with this
+      rec.interimResults=true;
+      rec.maxAlternatives=1;
+      const base=finalTranscriptRef.current; // confirmed text before this utterance
+      let thisFinal="";
+      rec.onresult=(e)=>{
+        thisFinal="";
+        let interim="";
+        // e.results only contains THIS utterance — safe to iterate all
+        for(let i=0;i<e.results.length;i++){
+          if(e.results[i].isFinal)thisFinal+=e.results[i][0].transcript;
+          else interim+=e.results[i][0].transcript;
         }
-      }
-      // Current interim = anything after the last finalised result
-      let interim="";
-      if(e.results.length>0&&!e.results[e.results.length-1].isFinal){
-        interim=e.results[e.results.length-1][0].transcript;
-      }
-      finalTranscriptRef.current=confirmedText.trim();
-      setTranscript((confirmedText+interim).trim());
-    };
-    rec.onerror=(e)=>{
-      if(e.error==="no-speech")return; // normal silence — continuous keeps running
-      if(e.error==="aborted")return;
-      setError("Microphone error. Please type your response.");
-      isRecordingRef.current=false;
-      setIsRecording(false);
-    };
-    rec.onend=()=>{
-      // Only restart if user hasn't pressed stop
-      if(isRecordingRef.current){
-        // Carry confirmed text over to new session
-        finalTranscriptRef.current=confirmedText.trim();
-        // Restart immediately — no gap
-        const newRec=new SR();
-        newRec.lang="en-US";newRec.continuous=true;newRec.interimResults=true;newRec.maxAlternatives=1;
-        const base=confirmedText.trim();
-        let newConfirmed="";
-        let newLastIdx=-1;
-        newRec.onresult=(e)=>{
-          for(let i=Math.max(0,newLastIdx+1);i<e.results.length;i++){
-            if(e.results[i].isFinal){newConfirmed+=e.results[i][0].transcript+" ";newLastIdx=i;}
-          }
-          let interim="";
-          if(e.results.length>0&&!e.results[e.results.length-1].isFinal)
-            interim=e.results[e.results.length-1][0].transcript;
-          finalTranscriptRef.current=[base,newConfirmed].filter(s=>s.trim()).join(" ").trim();
-          setTranscript([base,newConfirmed,interim].filter(s=>s.trim()).join(" ").trim());
-        };
-        newRec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return;isRecordingRef.current=false;setIsRecording(false);};
-        newRec.onend=rec.onend; // keep the chain going
-        recognitionRef.current=newRec;
-        try{newRec.start();}catch(err){}
-      }else{
+        setTranscript([base,thisFinal,interim].filter(s=>s.trim()).join(" ").trim());
+      };
+      rec.onerror=(e)=>{
+        if(e.error==="no-speech")return; // silence between sentences — will restart
+        if(e.error==="aborted")return;
+        setError("Microphone error. Please type your response.");
+        isRecordingRef.current=false;
         setIsRecording(false);
+      };
+      rec.onend=()=>{
+        // Commit this utterance's final text before restarting
+        if(thisFinal.trim()){
+          finalTranscriptRef.current=[base,thisFinal].filter(s=>s.trim()).join(" ").trim();
+        }
+        if(isRecordingRef.current)startRec(); // immediate restart — no setTimeout, no gap
+        else setIsRecording(false);
+      };
+      recognitionRef.current=rec;
+      try{rec.start();}catch(err){
+        if(isRecordingRef.current)setTimeout(()=>startRec(),200);
       }
     };
-    recognitionRef.current=rec;
-    try{rec.start();}catch(err){setError("Could not start mic. Please type instead.");}
+    startRec();
   };
 
   const stopRecording=()=>{
