@@ -4187,7 +4187,8 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     }catch(e){setReport("Could not generate report.");}
   };
 
-  // Recording — single-shot per session, only isFinal results accumulated — fixes Android triple-word bug
+  // Recording — continuous:true keeps mic open with no gaps
+  // lastProcessedIndex tracks which results were already finalised to prevent duplicates
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
@@ -4200,55 +4201,80 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     setIsRecording(true);
     setError("");
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    const startRec=()=>{
-      if(!isRecordingRef.current)return;
-      const rec=new SR();
-      rec.lang="en-US";
-      rec.continuous=false;   // single-shot: avoids Android duplicate result bug
-      rec.interimResults=true;
-      rec.maxAlternatives=1;
-      // Snapshot of confirmed text before this session — never changes within session
-      const base=finalTranscriptRef.current;
-      rec.onresult=(e)=>{
-        // Collect ONLY final results from THIS session — no iteration over old results
-        let sessionFinal="";
-        let sessionInterim="";
-        for(let i=0;i<e.results.length;i++){
-          if(e.results[i].isFinal)sessionFinal+=e.results[i][0].transcript;
-          else sessionInterim+=e.results[i][0].transcript;
+    const rec=new SR();
+    rec.lang="en-US";
+    rec.continuous=true;       // never stops — no gaps between sentences
+    rec.interimResults=true;
+    rec.maxAlternatives=1;
+    let confirmedText="";      // finalised text accumulated in this session
+    let lastFinalIdx=-1;       // index of last result we already finalised
+    rec.onresult=(e)=>{
+      // Only process results we haven't finalised yet
+      for(let i=Math.max(0,lastFinalIdx+1);i<e.results.length;i++){
+        if(e.results[i].isFinal){
+          confirmedText+=e.results[i][0].transcript+" ";
+          lastFinalIdx=i;
         }
-        // Display = confirmed base + this session's final + live interim
-        const display=[base,sessionFinal,sessionInterim].filter(s=>s.trim()).join(" ").trim();
-        setTranscript(display);
-      };
-      rec.onerror=(e)=>{
-        if(e.error==="no-speech")return; // silence — onend will restart
-        if(e.error==="aborted")return;
-        setError("Microphone error. Please type your response.");
-        isRecordingRef.current=false;
+      }
+      // Current interim = anything after the last finalised result
+      let interim="";
+      if(e.results.length>0&&!e.results[e.results.length-1].isFinal){
+        interim=e.results[e.results.length-1][0].transcript;
+      }
+      finalTranscriptRef.current=confirmedText.trim();
+      setTranscript((confirmedText+interim).trim());
+    };
+    rec.onerror=(e)=>{
+      if(e.error==="no-speech")return; // normal silence — continuous keeps running
+      if(e.error==="aborted")return;
+      setError("Microphone error. Please type your response.");
+      isRecordingRef.current=false;
+      setIsRecording(false);
+    };
+    rec.onend=()=>{
+      // Only restart if user hasn't pressed stop
+      if(isRecordingRef.current){
+        // Carry confirmed text over to new session
+        finalTranscriptRef.current=confirmedText.trim();
+        // Restart immediately — no gap
+        const newRec=new SR();
+        newRec.lang="en-US";newRec.continuous=true;newRec.interimResults=true;newRec.maxAlternatives=1;
+        const base=confirmedText.trim();
+        let newConfirmed="";
+        let newLastIdx=-1;
+        newRec.onresult=(e)=>{
+          for(let i=Math.max(0,newLastIdx+1);i<e.results.length;i++){
+            if(e.results[i].isFinal){newConfirmed+=e.results[i][0].transcript+" ";newLastIdx=i;}
+          }
+          let interim="";
+          if(e.results.length>0&&!e.results[e.results.length-1].isFinal)
+            interim=e.results[e.results.length-1][0].transcript;
+          finalTranscriptRef.current=[base,newConfirmed].filter(s=>s.trim()).join(" ").trim();
+          setTranscript([base,newConfirmed,interim].filter(s=>s.trim()).join(" ").trim());
+        };
+        newRec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return;isRecordingRef.current=false;setIsRecording(false);};
+        newRec.onend=rec.onend; // keep the chain going
+        recognitionRef.current=newRec;
+        try{newRec.start();}catch(err){}
+      }else{
         setIsRecording(false);
-      };
-      rec.onend=()=>{
-        // Before restarting, save the final text from this session as the new base
-        setTranscript(prev=>{
-          finalTranscriptRef.current=prev;
-          return prev;
-        });
-        if(isRecordingRef.current)setTimeout(()=>startRec(),80);
-        else setIsRecording(false);
-      };
-      recognitionRef.current=rec;
-      try{rec.start();}catch(err){
-        if(isRecordingRef.current)setTimeout(()=>startRec(),300);
       }
     };
-    startRec();
+    recognitionRef.current=rec;
+    try{rec.start();}catch(err){setError("Could not start mic. Please type instead.");}
   };
 
   const stopRecording=()=>{
     isRecordingRef.current=false;
     recognitionRef.current?.stop();
     setIsRecording(false);
+    // Auto-send whatever was recorded
+    setTimeout(()=>{
+      setTranscript(prev=>{
+        if(prev.trim())sendMessage(prev);
+        return prev;
+      });
+    },150); // small delay to let final result land
   };
 
   const SarahAvatar=({size=44})=>(
@@ -4474,27 +4500,30 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       {/* Input */}
       <div style={{flexShrink:0,paddingTop:6}}>
         {error&&<div style={{fontSize:12,color:T.red,marginBottom:5,...sty}}>{error}</div>}
-        <div style={{display:"flex",gap:8,alignItems:"flex-end"}}>
+        <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
           <textarea value={transcript} onChange={e=>setTranscript(e.target.value)}
-            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!isRecording)sendMessage(transcript);}}}
-            placeholder={isRecording?"Listening... tap stop when done":"Tap mic to speak or type here..."}
+            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!isRecording&&!isPaused)sendMessage(transcript);}}}
+            placeholder={isRecording?"Listening... tap mic to stop and send":"Tap mic to speak, or type here..."}
             rows={2}
             style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?T.red:T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
-            <button onClick={isRecording?stopRecording:startRecording}
-              disabled={isPaused}
-              aria-label={isRecording?"Stop recording":"Start recording"}
-              style={{width:50,height:50,borderRadius:"50%",border:"none",background:isPaused?T.border:isRecording?T.red:T.primary,color:"white",fontSize:20,cursor:isPaused?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?`0 0 0 4px ${T.redBorder}`:`0 3px 10px ${T.primary}55`,transition:"all 0.2s",opacity:isPaused?0.5:1}}>
-              {isRecording?"⏹":"🎤"}
-            </button>
-            <button onClick={()=>{if(!isRecording&&!isPaused)sendMessage(transcript);}} disabled={!transcript.trim()||isThinking||isRecording||isPaused}
-              aria-label="Send message"
-              style={{width:50,height:50,borderRadius:"50%",border:"none",background:transcript.trim()&&!isThinking&&!isRecording?T.green:T.border,color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background 0.2s"}}>
-              ↑
-            </button>
-          </div>
+          <button
+            onClick={isRecording?stopRecording:startRecording}
+            disabled={isPaused}
+            aria-label={isRecording?"Stop and send":"Start recording"}
+            style={{width:54,height:54,borderRadius:"50%",border:"none",
+              background:isPaused?T.border:isRecording?T.red:T.primary,
+              color:"white",fontSize:22,cursor:isPaused?"not-allowed":"pointer",
+              display:"flex",alignItems:"center",justifyContent:"center",
+              flexShrink:0,
+              boxShadow:isRecording?`0 0 0 5px ${T.redBorder}`:`0 3px 12px ${T.primary}55`,
+              transition:"all 0.2s",opacity:isPaused?0.5:1}}>
+            {isRecording?"⏹":"🎤"}
+          </button>
         </div>
-        {isRecording&&<div style={{fontSize:12,color:T.red,marginTop:4,...sty}}>Recording — tap stop when done</div>}
+        {isRecording
+          ?<div style={{fontSize:12,color:T.red,marginTop:4,...sty}}>Recording — tap ⏹ to stop and send</div>
+          :transcript.trim()&&<div style={{fontSize:12,color:T.textMuted,marginTop:4,...sty}}>Press Enter or tap mic after speaking to send</div>
+        }
       </div>
       <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}`}</style>
     </div>
