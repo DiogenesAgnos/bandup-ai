@@ -3876,13 +3876,32 @@ const ALL_IELTS_QUESTIONS=[
 const FREE_SESSION_MS=7*60*1000;
 const IELTS_SESSION_MS=7*60*1000;
 const SESSION_USED_KEY="ef_session_used_forever";
+const SESSION_TIMER_KEY="ef_session_timer_ms";
+const SESSION_HISTORY_KEY="ef_sarah_history";
 
-const getSessionUsed=()=>{
-  try{return localStorage.getItem(SESSION_USED_KEY)==="1";}catch{return false;}
-};
-const markSessionUsed=()=>{
-  try{localStorage.setItem(SESSION_USED_KEY,"1");}catch{}
-};
+const getSessionUsed=()=>{try{return localStorage.getItem(SESSION_USED_KEY)==="1";}catch{return false;}};
+const markSessionUsed=()=>{try{localStorage.setItem(SESSION_USED_KEY,"1");}catch{}};
+
+const saveTimerMs=(ms)=>{try{localStorage.setItem(SESSION_TIMER_KEY,String(ms));}catch{}};
+const loadTimerMs=()=>{try{const v=localStorage.getItem(SESSION_TIMER_KEY);return v?parseInt(v,10):0;}catch{return 0;}};
+const clearTimerMs=()=>{try{localStorage.removeItem(SESSION_TIMER_KEY);}catch{}};
+
+const loadSarahHistory=()=>{try{const d=localStorage.getItem(SESSION_HISTORY_KEY);return d?JSON.parse(d):null;}catch{return null;}};
+const saveSarahHistory=(data)=>{try{localStorage.setItem(SESSION_HISTORY_KEY,JSON.stringify(data));}catch{}};
+
+// Varied correction phrases for Sarah
+const CORRECTION_OPENERS=[
+  "Actually, a more natural way to say that is",
+  "Just a small note —",
+  "Worth mentioning —",
+  "One thing to polish:",
+  "I noticed you said '...', which is close, but",
+  "A small grammar point here —",
+  "Native speakers would typically say",
+  "That's a good attempt, but the natural phrasing is",
+  "Quick tip:",
+  "In English we usually say",
+];
 
 const stripForTTS=(text)=>text
   .replace(/[\u{1F300}-\u{1FAFF}]/gu,"")
@@ -3899,15 +3918,18 @@ const speakText=(text,onEnd)=>{
     const utt=new SpeechSynthesisUtterance(text);
     utt.lang="en-GB";utt.rate=0.88;utt.pitch=1.1;
     const voices=window.speechSynthesis.getVoices();
+    // Explicit priority list — covers Chrome desktop, Chrome Android, Safari iOS
     const match=
-      voices.find(v=>v.lang==="en-GB"&&/google uk english female/i.test(v.name))||
-      voices.find(v=>v.lang==="en-GB"&&/female|woman|kate|serena/i.test(v.name))||
+      voices.find(v=>/google uk english female/i.test(v.name))||
+      voices.find(v=>/samantha/i.test(v.name))||           // iOS Safari
+      voices.find(v=>/karen/i.test(v.name))||              // iOS Australian female
+      voices.find(v=>/moira/i.test(v.name))||              // iOS Irish female
       voices.find(v=>v.lang==="en-GB"&&!/male|man/i.test(v.name))||
-      voices.find(v=>v.lang==="en-US"&&/google us english female|zira|samantha/i.test(v.name))||
-      voices.find(v=>v.lang==="en-US"&&/female|woman/i.test(v.name))||
+      voices.find(v=>/google us english female|zira/i.test(v.name))||
+      voices.find(v=>v.lang==="en-US"&&!/male|man/i.test(v.name))||
       voices.find(v=>v.lang.startsWith("en")&&!/male|man/i.test(v.name))||
       voices.find(v=>v.lang.startsWith("en"));
-    if(match)utt.voice=match;
+    if(match){utt.voice=match;utt.lang=match.lang;}
     if(onEnd)utt.onend=onEnd;
     if(window.speechSynthesis.paused)window.speechSynthesis.resume();
     window.speechSynthesis.speak(utt);
@@ -3924,28 +3946,31 @@ const IELTS_TOPICS=SPEAKING_PART1.map(t=>({
 }));
 
 const ConversationPractice=({isPro,onUpgrade})=>{
-  const [screen,setScreen]=useState("setup"); // setup | topic | chat | report
+  const [screen,setScreen]=useState("setup");
   const [mode,setMode]=useState("free");
-  const [level,setLevel]=useState("b1");
-  const [userName,setUserName]=useState("");
+  const [level,setLevel]=useState(()=>{try{return localStorage.getItem("ef_sarah_level")||"b1";}catch{return "b1";}});
+  const [userName,setUserName]=useState(()=>{try{return localStorage.getItem("ef_sarah_name")||"";}catch{return "";}});
   const [ieltsTopicIdx,setIeltsTopicIdx]=useState(0);
   const [messages,setMessages]=useState([]);
   const [isThinking,setIsThinking]=useState(false);
   const [isRecording,setIsRecording]=useState(false);
+  const [isPaused,setIsPaused]=useState(false);
   const [transcript,setTranscript]=useState("");
   const [error,setError]=useState("");
   const [ttsEnabled,setTtsEnabled]=useState(true);
-  const [sessionMs,setSessionMs]=useState(0);
+  const [sessionMs,setSessionMs]=useState(()=>loadTimerMs());
   const [sessionEnded,setSessionEnded]=useState(false);
   const [sessionBlockedToday,setSessionBlockedToday]=useState(false);
   const [report,setReport]=useState(null);
   const [showMicHint,setShowMicHint]=useState(true);
+  const [pastHistory,setPastHistory]=useState(()=>loadSarahHistory());
   const messagesEndRef=useRef(null);
   const chatBoxRef=useRef(null);
   const recognitionRef=useRef(null);
   const sessionTimerRef=useRef(null);
   const isRecordingRef=useRef(false);
-  const finalTranscriptRef=useRef(""); // only holds FINAL recognised results
+  const isPausedRef=useRef(false);
+  const finalTranscriptRef=useRef("");
   const mountedRef=useRef(true);
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
@@ -3966,13 +3991,15 @@ const ConversationPractice=({isPro,onUpgrade})=>{
     };
   },[]);
 
-  // Session timer
+  // Session timer — persists to localStorage, respects pause
   useEffect(()=>{
     if(screen!=="chat"||!hasTimeLimit)return;
     clearInterval(sessionTimerRef.current);
     sessionTimerRef.current=setInterval(()=>{
+      if(isPausedRef.current)return;
       setSessionMs(p=>{
         const next=p+1000;
+        saveTimerMs(next);
         if(next>=sessionLimit){
           clearInterval(sessionTimerRef.current);
           window.speechSynthesis?.cancel();
@@ -3981,6 +4008,7 @@ const ConversationPractice=({isPro,onUpgrade})=>{
           if(mountedRef.current){
             setSessionEnded(true);
             markSessionUsed();
+            clearTimerMs();
           }
         }
         return next;
@@ -4011,23 +4039,41 @@ const ConversationPractice=({isPro,onUpgrade})=>{
       c2:"Native-level, complex abstract topics, no simplification."
     };
     const ieltsTopicList=IELTS_TOPICS.map(t=>`- ${t.topic}: ${t.questions.join(" / ")}`).join("\n");
-    return `You are Sarah, a warm and professional English conversation coach and IELTS examiner helping ${userName} practise speaking.
+    const historyContext=pastHistory?`
+RETURNING USER — past session info:
+Name: ${pastHistory.name}
+Level at last session: ${pastHistory.level}
+Words/phrases they struggled with: ${pastHistory.struggles||"none noted"}
+Words they learned: ${pastHistory.learned||"none noted"}
+Greet them warmly as a returning student. Reference something specific from their past progress if relevant.`:"";
 
-Language level: ${levelDesc[level]||levelDesc.b1}
+    return `You are Sarah, a warm, professional English conversation coach and IELTS examiner helping ${userName} practise speaking.
+${historyContext}
+Current level: ${levelDesc[level]||levelDesc.b1}
 
-You have access to these IELTS speaking topics and questions you can use when relevant:
+IELTS speaking topics and questions available:
 ${ieltsTopicList}
 
-RESPONSE RULES — follow every single one:
-1. MAXIMUM 2 SENTENCES per response. Not 3. Two only.
-2. NO emojis, NO asterisks, NO bold, NO markdown. Plain text only.
-3. After every user response: find ONE grammar or vocabulary mistake and correct it naturally mid-flow: "By the way, a more natural way to say that is '...' — anyway..." If no mistake, give a 4-6 word warm acknowledgement only.
-4. Ask EXACTLY one question per response. Never two.
-5. Every 4 turns: suggest one stronger word the user could have used: "A better word here would be '...' — "
-6. Never repeat a question already asked.
+CORRECTION STYLE — vary your phrasing every time. Never use the same opener twice in a row. Choose from these styles:
+- "Actually, the more natural phrasing here is '...' —"
+- "Small note: native speakers would say '...' —"
+- "Worth knowing: '...' sounds more natural —"
+- "Just a quick tip — '...' works better here —"
+- "That's close, but the natural English is '...' —"
+- "Good effort, but we'd usually say '...' —"
+- "One thing to polish: try '...' instead —"
+- "Native speakers tend to say '...' in this situation —"
+
+RESPONSE RULES:
+1. MAXIMUM 2 SENTENCES per response.
+2. NO emojis, NO asterisks, NO markdown. Plain text only.
+3. After every user response: find ONE grammar or vocabulary error, correct it using one of the varied phrasings above. If no error, give a brief 4-6 word warm acknowledgement only.
+4. Ask EXACTLY one question. Never two.
+5. Every 4 turns: suggest a stronger vocabulary word: "A richer word here would be '...'"
+6. Never repeat a question already asked in this conversation.
 7. English only.
-8. If the user has not suggested a topic yet, ask them what they would like to talk about, OR offer to ask them some IELTS-style questions if they would like to practise for the exam.
-9. If the user wants IELTS practice, naturally work through the relevant questions from your topic list above — start with personal questions (Part 1 style), then ask them to talk for 2 minutes on a topic (Part 2 style), then move to discussion questions (Part 3 style). If their Part 2 answer is too short, tell them to try again and speak for 2 full minutes.`;
+8. If no topic chosen yet: ask what they want to talk about, OR offer a choice of 3-4 IELTS topics by name so they can pick.
+9. If user wants IELTS practice: offer them a list of available topics to choose from. Then work through Part 1 questions on that topic, transition to Part 2 (ask them to speak for 2 minutes — if they stop early, tell them to continue), then Part 3 discussion.`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -4071,21 +4117,26 @@ RESPONSE RULES — follow every single one:
 
   const startConversation=async()=>{
     if(!userName.trim())return;
-    // Block if free user already used session today
     if(hasTimeLimit&&getSessionUsed()){
       setSessionBlockedToday(true);
       return;
     }
     if(window.speechSynthesis?.getVoices().length===0)
       window.speechSynthesis.addEventListener("voiceschanged",()=>{},{once:true});
+    clearTimerMs();
     setScreen("chat");
     setMessages([]);
     setSessionMs(0);
     setSessionEnded(false);
+    setIsPaused(false);
+    isPausedRef.current=false;
     setSessionBlockedToday(false);
     setShowMicHint(true);
     setIsThinking(true);
-    const opening=`Greet ${userName} warmly as Sarah. Say you are here to practise English together. Ask what they would like to talk about, or offer to ask IELTS-style questions if they want to practise for the exam.`;
+    const isReturning=!!pastHistory;
+    const opening=isReturning
+      ?`Welcome ${userName} back warmly. You know them — they practised before at ${pastHistory.level} level. Briefly acknowledge their return, then ask what they'd like to work on today.`
+      :`Greet ${userName} warmly as Sarah. Say you are here to practise English together. Ask what they would like to talk about, or offer to ask IELTS-style questions if they want to practise for the exam.`;
     const reply=await callClaude(buildSystemPrompt(),[],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addSarahMessage(reply);}
   };
@@ -4097,7 +4148,10 @@ RESPONSE RULES — follow every single one:
     clearInterval(sessionTimerRef.current);
     setScreen("report");
     setReport(null);
+    // Save session history for next time
     const convo=messages.map(m=>`${m.role==="user"?userName:"Sarah"}: ${m.text}`).join("\n");
+    try{localStorage.setItem("ef_sarah_name",userName);}catch{}
+    try{localStorage.setItem("ef_sarah_level",level);}catch{}
     if(!convo.trim()){setReport("No conversation recorded.");return;}
     const sys=`You are an IELTS speaking coach. Write a helpful session report for ${userName} based on this conversation.
 Plain text only. No markdown, no asterisks, no emojis. Use these exact section headings followed by a colon and newline:
@@ -4122,7 +4176,14 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
           messages:[{role:"user",content:`Conversation:\n\n${convo}`}]})});
       if(!mountedRef.current)return;
       const data=await res.json();
-      setReport(data?.content?.[0]?.text||"Could not generate report.");
+      const reportText=data?.content?.[0]?.text||"Could not generate report.";
+      setReport(reportText);
+      // Save history summary for next session
+      saveSarahHistory({name:userName,level,date:new Date().toISOString(),
+        struggles:messages.filter(m=>m.role==="bot"&&/say|phrasing|natural|word|tip/i.test(m.text)).slice(-3).map(m=>m.text).join("; "),
+        learned:messages.filter(m=>m.role==="bot"&&/richer|stronger|better word/i.test(m.text)).map(m=>m.text).join("; ")
+      });
+      setPastHistory(loadSarahHistory());
     }catch(e){setReport("Could not generate report.");}
   };
 
@@ -4330,17 +4391,32 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
   return(
     <div style={{maxWidth:620,margin:"0 auto",display:"flex",flexDirection:"column",height:"calc(100vh - 240px)",minHeight:440,...sty}}>
       {/* Header */}
-      <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.border}`,marginBottom:10,flexShrink:0}}>
+      <div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 0",borderBottom:`1px solid ${T.border}`,marginBottom:10,flexShrink:0}}>
         <SarahAvatar size={34}/>
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:13,fontWeight:700,color:T.text}}>Sarah</div>
-          <div style={{fontSize:11,color:T.textMuted}}>Free Conversation · {level.toUpperCase()}</div>
+          <div style={{fontSize:11,color:T.textMuted}}>Conversation · {level.toUpperCase()}{isPaused?" · Paused":""}</div>
         </div>
         {hasTimeLimit&&(
-          <div style={{fontSize:12,fontWeight:700,color:timeLeft<60000?T.red:timeLeft<120000?T.amber:T.green,background:timeLeft<60000?T.redBg:timeLeft<120000?T.amberBg:T.greenBg,padding:"3px 9px",borderRadius:6,flexShrink:0,...sty}}>
+          <div style={{fontSize:12,fontWeight:700,color:isPaused?T.textMuted:timeLeft<60000?T.red:timeLeft<120000?T.amber:T.green,background:isPaused?T.bgMuted:timeLeft<60000?T.redBg:timeLeft<120000?T.amberBg:T.greenBg,padding:"3px 9px",borderRadius:6,flexShrink:0,...sty}}>
             {timeLeftStr}
           </div>
         )}
+        {/* Pause button */}
+        <button onClick={()=>{
+          const next=!isPaused;
+          setIsPaused(next);
+          isPausedRef.current=next;
+          if(next){
+            // Pausing — stop voice and recording
+            window.speechSynthesis?.cancel();
+            if(isRecording){isRecordingRef.current=false;recognitionRef.current?.stop();setIsRecording(false);}
+          }
+        }}
+          title={isPaused?"Resume":"Pause"}
+          style={{background:isPaused?T.amber:T.bgMuted,border:`1px solid ${isPaused?T.amberBorder:T.border}`,borderRadius:8,padding:"5px 8px",fontSize:13,cursor:"pointer",color:isPaused?T.amber:T.textMid,flexShrink:0,...sty}}>
+          {isPaused?"▶":"⏸"}
+        </button>
         <button onClick={()=>{window.speechSynthesis?.cancel();setTtsEnabled(v=>!v);}}
           title={ttsEnabled?"Mute Sarah":"Unmute Sarah"}
           style={{background:ttsEnabled?T.primaryLight:T.bgMuted,border:`1px solid ${ttsEnabled?T.primaryBorder:T.border}`,borderRadius:8,padding:"5px 8px",fontSize:12,cursor:"pointer",color:ttsEnabled?T.primary:T.textMuted,flexShrink:0,...sty}}>
@@ -4381,6 +4457,13 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
         <div ref={messagesEndRef}/>
       </div>
 
+      {/* Paused overlay */}
+      {isPaused&&(
+        <div style={{textAlign:"center",background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"8px 12px",marginBottom:6,fontSize:13,color:T.amber,...sty}}>
+          ⏸ Paused — tap ▶ to resume
+        </div>
+      )}
+
       {/* Mic hint */}
       {showMicHint&&messages.length>0&&!isRecording&&(
         <div style={{textAlign:"center",fontSize:12,color:T.primary,background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:8,padding:"6px 12px",marginBottom:6,...sty}}>
@@ -4399,11 +4482,12 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
             style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?T.red:T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
           <div style={{display:"flex",flexDirection:"column",gap:6}}>
             <button onClick={isRecording?stopRecording:startRecording}
+              disabled={isPaused}
               aria-label={isRecording?"Stop recording":"Start recording"}
-              style={{width:50,height:50,borderRadius:"50%",border:"none",background:isRecording?T.red:T.primary,color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?`0 0 0 4px ${T.redBorder}`:`0 3px 10px ${T.primary}55`,transition:"all 0.2s"}}>
+              style={{width:50,height:50,borderRadius:"50%",border:"none",background:isPaused?T.border:isRecording?T.red:T.primary,color:"white",fontSize:20,cursor:isPaused?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?`0 0 0 4px ${T.redBorder}`:`0 3px 10px ${T.primary}55`,transition:"all 0.2s",opacity:isPaused?0.5:1}}>
               {isRecording?"⏹":"🎤"}
             </button>
-            <button onClick={()=>{if(!isRecording)sendMessage(transcript);}} disabled={!transcript.trim()||isThinking||isRecording}
+            <button onClick={()=>{if(!isRecording&&!isPaused)sendMessage(transcript);}} disabled={!transcript.trim()||isThinking||isRecording||isPaused}
               aria-label="Send message"
               style={{width:50,height:50,borderRadius:"50%",border:"none",background:transcript.trim()&&!isThinking&&!isRecording?T.green:T.border,color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background 0.2s"}}>
               ↑
