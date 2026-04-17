@@ -3925,7 +3925,7 @@ const IELTS_TOPICS=SPEAKING_PART1.map(t=>({
 
 const ConversationPractice=({isPro,onUpgrade})=>{
   const [screen,setScreen]=useState("setup"); // setup | topic | chat | report
-  const [mode,setMode]=useState(null);
+  const [mode,setMode]=useState("free");
   const [level,setLevel]=useState("b1");
   const [userName,setUserName]=useState("");
   const [ieltsTopicIdx,setIeltsTopicIdx]=useState(0);
@@ -4070,7 +4070,7 @@ RESPONSE RULES — follow every single one:
   };
 
   const startConversation=async()=>{
-    if(!userName.trim()||!mode)return;
+    if(!userName.trim())return;
     // Block if free user already used session today
     if(hasTimeLimit&&getSessionUsed()){
       setSessionBlockedToday(true);
