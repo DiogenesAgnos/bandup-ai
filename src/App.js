@@ -3992,10 +3992,10 @@ const ConversationPractice=({isPro,onUpgrade})=>{
   // Scroll to bottom on every new message and on thinking state change
   useEffect(()=>{
     if(screen!=="chat")return;
-    // Small delay so the DOM has rendered the new message
     const t=setTimeout(()=>{
-      messagesEndRef.current?.scrollIntoView({behavior:"smooth"});
-    },60);
+      const el=chatBoxRef.current;
+      if(el)el.scrollTop=el.scrollHeight;
+    },80);
     return()=>clearTimeout(t);
   },[messages,isThinking]);
 
@@ -4010,38 +4010,24 @@ const ConversationPractice=({isPro,onUpgrade})=>{
       c1:"Sophisticated vocabulary, nuanced discussion questions.",
       c2:"Native-level, complex abstract topics, no simplification."
     };
-    const selectedTopic=mode==="ielts"?IELTS_TOPICS[ieltsTopicIdx]:null;
-    const ieltsInstructions=selectedTopic?`
-IELTS STRUCTURE — follow this exactly:
+    const ieltsTopicList=IELTS_TOPICS.map(t=>`- ${t.topic}: ${t.questions.join(" / ")}`).join("\n");
+    return `You are Sarah, a warm and professional English conversation coach and IELTS examiner helping ${userName} practise speaking.
 
-PART 1 (first 6-8 exchanges):
-Your question bank for topic "${selectedTopic.topic}":
-${selectedTopic.questions.map((q,i)=>`${i+1}. ${q}`).join("\n")}
-Ask ALL questions in order. Do NOT move to Part 2 until you have asked at least 4 questions. Ask one question per turn.
+Language level: ${levelDesc[level]||levelDesc.b1}
 
-PART 2 (after Part 1 is complete):
-Say exactly: "Now we move to Part 2. Here is your topic: ${selectedTopic.topic}. You have one minute to prepare your thoughts. When you are ready, speak for two full minutes."
-Then WAIT. When the user responds:
-- If their response is under 5 sentences or clearly less than one minute of speaking: say "That was a good start, but in the real IELTS exam you need to speak for two full minutes without stopping. Try again — take your time and go into more detail."
-- If their response is longer: give brief positive feedback and transition to Part 3.
-
-PART 3 (after Part 2):
-Ask 4-5 in-depth discussion questions related to the topic. These should be analytical and abstract, not personal. Push the user to give developed answers.`:"";
-    return `You are Sarah, a strict but warm IELTS speaking examiner helping ${userName} practise.
-
-Mode: ${mode==="ielts"?`IELTS Speaking Test`:`Free conversation (${levelDesc[level]||levelDesc.b1})`}
-${ieltsInstructions}
-${mode==="free"?`If no topic yet, ask the user what they want to discuss.`:""}
+You have access to these IELTS speaking topics and questions you can use when relevant:
+${ieltsTopicList}
 
 RESPONSE RULES — follow every single one:
-1. MAXIMUM 2 SENTENCES per response. Not 3, not 4. Two sentences only.
-2. NO emojis, NO asterisks, NO bold, NO markdown. Plain text.
-3. After every user response: find ONE grammar or vocabulary mistake. Correct it naturally: "By the way, a more natural way to say that is '...' — anyway,..." Never list multiple corrections.
-4. If no mistake: give one 4-6 word warm acknowledgement only, then ask your question.
-5. Ask EXACTLY one question. Never more.
-6. Every 4 turns: suggest one stronger vocabulary word the user could have used: "A better word here would be '...' — "
-7. Never repeat a question you have already asked.
-8. English only.`;
+1. MAXIMUM 2 SENTENCES per response. Not 3. Two only.
+2. NO emojis, NO asterisks, NO bold, NO markdown. Plain text only.
+3. After every user response: find ONE grammar or vocabulary mistake and correct it naturally mid-flow: "By the way, a more natural way to say that is '...' — anyway..." If no mistake, give a 4-6 word warm acknowledgement only.
+4. Ask EXACTLY one question per response. Never two.
+5. Every 4 turns: suggest one stronger word the user could have used: "A better word here would be '...' — "
+6. Never repeat a question already asked.
+7. English only.
+8. If the user has not suggested a topic yet, ask them what they would like to talk about, OR offer to ask them some IELTS-style questions if they would like to practise for the exam.
+9. If the user wants IELTS practice, naturally work through the relevant questions from your topic list above — start with personal questions (Part 1 style), then ask them to talk for 2 minutes on a topic (Part 2 style), then move to discussion questions (Part 3 style). If their Part 2 answer is too short, tell them to try again and speak for 2 full minutes.`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -4099,9 +4085,7 @@ RESPONSE RULES — follow every single one:
     setSessionBlockedToday(false);
     setShowMicHint(true);
     setIsThinking(true);
-    const opening=mode==="ielts"
-      ?`Greet ${userName} warmly as Sarah. Say in one sentence this is IELTS speaking practice with grammar corrections, and you will start with the topic "${IELTS_TOPICS[ieltsTopicIdx].topic}". Then immediately ask this first question: "${IELTS_TOPICS[ieltsTopicIdx].questions[0]}"`
-      :`Greet ${userName} as Sarah. Say you are here to practise English together. Ask what they would like to talk about, or suggest a topic yourself.`;
+    const opening=`Greet ${userName} warmly as Sarah. Say you are here to practise English together. Ask what they would like to talk about, or offer to ask IELTS-style questions if they want to practise for the exam.`;
     const reply=await callClaude(buildSystemPrompt(),[],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addSarahMessage(reply);}
   };
@@ -4142,7 +4126,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     }catch(e){setReport("Could not generate report.");}
   };
 
-  // Recording — continuous:true for full accuracy, isFinal deduplication prevents triple words
+  // Recording — e.resultIndex prevents triple-word mobile bug
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
@@ -4159,33 +4143,31 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       if(!isRecordingRef.current)return;
       const rec=new SR();
       rec.lang="en-US";
-      rec.continuous=true;   // keeps listening through pauses
+      rec.continuous=true;
       rec.interimResults=true;
       rec.maxAlternatives=1;
-      // Capture confirmed finals at session start — closed over, never changes within session
-      const baseAtStart=finalTranscriptRef.current;
-      let sessionFinals=""; // finals only within THIS session instance
+      const confirmedBase=finalTranscriptRef.current;
+      let newFinals="";
       rec.onresult=(e)=>{
-        sessionFinals="";
-        let interim="";
-        for(let i=0;i<e.results.length;i++){
-          if(e.results[i].isFinal)sessionFinals+=e.results[i][0].transcript;
-          else interim+=e.results[i][0].transcript;
+        // Only process NEW results starting from e.resultIndex — prevents replaying old ones
+        let addedFinals="";
+        let currentInterim="";
+        for(let i=e.resultIndex;i<e.results.length;i++){
+          if(e.results[i].isFinal)addedFinals+=e.results[i][0].transcript+" ";
+          else currentInterim+=e.results[i][0].transcript;
         }
-        if(sessionFinals)finalTranscriptRef.current=[baseAtStart,sessionFinals].filter(Boolean).join(" ");
-        setTranscript([baseAtStart,sessionFinals,interim].filter(Boolean).join(" "));
+        if(addedFinals)newFinals+=addedFinals;
+        if(newFinals.trim())finalTranscriptRef.current=[confirmedBase,newFinals].filter(s=>s.trim()).join(" ").trim();
+        setTranscript([confirmedBase,newFinals,currentInterim].filter(s=>s.trim()).join(" ").trim());
       };
       rec.onerror=(e)=>{
-        if(e.error==="no-speech")return; // silence — let onend restart
-        if(e.error==="aborted")return;
+        if(e.error==="no-speech"||e.error==="aborted")return;
         setError("Microphone error. Please type your response.");
         isRecordingRef.current=false;
         setIsRecording(false);
       };
       rec.onend=()=>{
-        // Persist finals before restart
-        if(sessionFinals)finalTranscriptRef.current=[baseAtStart,sessionFinals].filter(Boolean).join(" ");
-        if(isRecordingRef.current)startRec(); // immediate restart — no delay
+        if(isRecordingRef.current)startRec();
         else setIsRecording(false);
       };
       recognitionRef.current=rec;
@@ -4279,45 +4261,17 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     </div>
   );
 
-  // IELTS TOPIC SELECTION SCREEN
-  if(screen==="topic")return(
-    <div style={{maxWidth:520,margin:"0 auto",padding:"20px 0",...sty}}>
-      <button onClick={()=>setScreen("setup")} style={{background:"none",border:"none",fontSize:13,color:T.textMuted,cursor:"pointer",marginBottom:16}}>← Back</button>
-      <div style={{textAlign:"center",marginBottom:20}}>
-        <SarahAvatar size={52}/>
-        <h2 style={{fontFamily:"Georgia,serif",fontSize:18,color:T.text,margin:"10px 0 4px"}}>Choose Your IELTS Topic</h2>
-        <p style={{fontSize:13,color:T.textMuted,margin:0}}>Sarah will ask you Part 1 questions on this topic, then move to Part 2 and Part 3.</p>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}}>
-        {IELTS_TOPICS.map((t,i)=>(
-          <button key={i} onClick={()=>setIeltsTopicIdx(i)}
-            style={{padding:"12px 10px",borderRadius:10,border:`2px solid ${ieltsTopicIdx===i?T.primary:T.border}`,background:ieltsTopicIdx===i?T.primaryLight:"white",cursor:"pointer",fontSize:13,fontWeight:ieltsTopicIdx===i?700:500,color:ieltsTopicIdx===i?T.primary:T.text,...sty,textAlign:"center",transition:"all 0.15s"}}>
-            {t.topic}
-          </button>
-        ))}
-      </div>
-      <div style={{background:T.bgMuted,borderRadius:10,padding:"12px 14px",marginBottom:16,fontSize:12,color:T.textMuted,...sty}}>
-        First question will be: "{IELTS_TOPICS[ieltsTopicIdx].questions[0]}"
-      </div>
-      <button onClick={startConversation}
-        style={{width:"100%",padding:"13px",background:T.primary,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
-        Start IELTS Practice with this Topic →
-      </button>
-    </div>
-  );
-
   // SETUP SCREEN
   if(screen==="setup")return(
     <div style={{maxWidth:520,margin:"0 auto",padding:"20px 0",...sty}}>
-      {/* Feature description */}
       <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:10,fontSize:13,color:"#065f46",...sty}}>
-        <strong>What Sarah does:</strong> She has a real conversation with you, corrects your grammar and vocabulary naturally as you speak, and gives you a detailed report at the end.
-        <div style={{direction:"rtl",marginTop:6,color:"#047857",fontSize:12}}>سارة ستتحدث معك بشكل طبيعي، تصحح القواعد والمفردات أثناء المحادثة، وتعطيك تقريراً مفصلاً في النهاية.</div>
+        <strong>What Sarah does:</strong> She has a real conversation with you, corrects your grammar and vocabulary naturally as you speak, and gives you a full report at the end. You can also ask her for IELTS-style practice questions.
+        <div style={{direction:"rtl",marginTop:6,color:"#047857",fontSize:12}}>سارة تتحدث معك وتصحح أخطاء القواعد والمفردات أثناء المحادثة، وتعطيك تقريراً في النهاية. يمكنك طلب أسئلة على طراز الآيلتس منها.</div>
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:16}}>
         <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1d4ed8",...sty}}>
-          <strong>Requires Google Chrome</strong> for voice and Sarah's voice. Other browsers: text only.<br/>
-          <span style={{direction:"rtl",display:"block",marginTop:3,color:"#1e40af"}}>يتطلب Google Chrome للصوت. المتصفحات الأخرى: كتابة فقط.</span>
+          <strong>Requires Google Chrome</strong> for voice input and Sarah's voice. Other browsers: text only.<br/>
+          <span style={{direction:"rtl",display:"block",marginTop:3,color:"#1e40af"}}>يتطلب متصفح Google Chrome للصوت. المتصفحات الأخرى: كتابة فقط.</span>
         </div>
         <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.amber,...sty}}>
           <strong>Grammar and vocabulary only.</strong> Pronunciation cannot be assessed through text.<br/>
@@ -4325,69 +4279,42 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
         </div>
         {!isPro&&(
           <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.primary,...sty}}>
-            <strong>Free users:</strong> One free 7-minute session (lifetime). Pro = unlimited sessions, all levels, no time limit.<br/>
-            <span style={{direction:"rtl",display:"block",marginTop:3}}>المجاني: جلسة واحدة (7 دقائق) مجانية مدى الحياة. Pro = جلسات غير محدودة بجميع المستويات.</span>
+            <strong>Free users:</strong> One free 7-minute session. Pro = unlimited sessions and all levels.<br/>
+            <span style={{direction:"rtl",display:"block",marginTop:3}}>المجاني: جلسة واحدة مجانية مدتها 7 دقائق. Pro = جلسات غير محدودة بجميع المستويات.</span>
           </div>
         )}
       </div>
       <div style={{textAlign:"center",marginBottom:16}}>
         <SarahAvatar size={58}/>
         <h2 style={{fontFamily:"Georgia,serif",fontSize:19,color:T.text,margin:"10px 0 4px"}}>Conversation with Sarah</h2>
-        <p style={{fontSize:13,color:T.textMuted,margin:0}}>Real-time grammar and vocabulary corrections</p>
+        <p style={{fontSize:13,color:T.textMuted,margin:0}}>Real-time corrections · IELTS questions on request</p>
       </div>
       <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,padding:"18px"}}>
         <div style={{marginBottom:14}}>
           <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,marginBottom:5,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your name</label>
           <input value={userName} onChange={e=>setUserName(e.target.value)} placeholder="Enter your first name"
+            onKeyDown={e=>{if(e.key==="Enter"&&userName.trim()){if(hasTimeLimit&&getSessionUsed()){setSessionBlockedToday(true);}else{startConversation();}}}}
             style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${T.borderMid}`,fontSize:14,...sty,boxSizing:"border-box"}}/>
         </div>
         <div style={{marginBottom:14}}>
-          <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,marginBottom:7,textTransform:"uppercase",letterSpacing:"0.06em"}}>Mode</label>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-            {[{id:"ielts",icon:"🎓",title:"IELTS Practice",desc:"Choose a topic, follow the test structure"},{id:"free",icon:"💬",title:"Free Conversation",desc:"Any topic — Sarah guides the chat"}].map(m=>(
-              <button key={m.id} onClick={()=>setMode(m.id)}
-                style={{padding:"11px",borderRadius:10,border:`2px solid ${mode===m.id?T.primary:T.border}`,background:mode===m.id?T.primaryLight:"white",cursor:"pointer",textAlign:"center",...sty,transition:"all 0.15s"}}>
-                <div style={{fontSize:20,marginBottom:3}}>{m.icon}</div>
-                <div style={{fontSize:12,fontWeight:700,color:mode===m.id?T.primary:T.text}}>{m.title}</div>
-                <div style={{fontSize:11,color:T.textMuted,marginTop:2,lineHeight:1.3}}>{m.desc}</div>
-              </button>
-            ))}
+          <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,marginBottom:5,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your level</label>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5}}>
+            {CONVO_LEVELS.map(l=>{
+              const locked=levelLocked(l.id);
+              return(
+                <button key={l.id} onClick={()=>locked?onUpgrade():setLevel(l.id)}
+                  style={{padding:"7px 4px",borderRadius:8,border:`1px solid ${level===l.id?T.primary:T.border}`,background:level===l.id?T.primaryLight:locked?T.bgMuted:"white",cursor:"pointer",fontSize:11,fontWeight:level===l.id?700:500,color:level===l.id?T.primary:locked?T.textLight:T.textMid,...sty,textAlign:"center"}}>
+                  {locked?"🔒 ":""}{l.id.toUpperCase()}{l.id==="b1"?" ✓":""}
+                </button>
+              );
+            })}
           </div>
+          {!isPro&&<div style={{fontSize:11,color:T.textMuted,marginTop:5}}>B1 free · Other levels require Pro</div>}
         </div>
-        {mode==="ielts"&&(
-          <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:8,padding:"9px 11px",marginBottom:14,fontSize:12,color:T.amber,...sty}}>
-            No band score is given. Sarah corrects grammar and vocabulary during the test.
-          </div>
-        )}
-        {mode==="free"&&(
-          <div style={{marginBottom:14}}>
-            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.textMid,marginBottom:5,textTransform:"uppercase",letterSpacing:"0.06em"}}>Your level</label>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5}}>
-              {CONVO_LEVELS.map(l=>{
-                const locked=levelLocked(l.id);
-                return(
-                  <button key={l.id} onClick={()=>locked?onUpgrade():setLevel(l.id)}
-                    style={{padding:"7px 4px",borderRadius:8,border:`1px solid ${level===l.id?T.primary:T.border}`,background:level===l.id?T.primaryLight:locked?T.bgMuted:"white",cursor:"pointer",fontSize:11,fontWeight:level===l.id?700:500,color:level===l.id?T.primary:locked?T.textLight:T.textMid,...sty,textAlign:"center"}}>
-                    {locked?"🔒 ":""}{l.id.toUpperCase()}{l.id==="b1"?" ✓":""}
-                  </button>
-                );
-              })}
-            </div>
-            {!isPro&&<div style={{fontSize:11,color:T.textMuted,marginTop:5}}>B1 free (7 min/day) · Other levels Pro</div>}
-          </div>
-        )}
-        <button
-          onClick={()=>{
-            if(!userName.trim()||!mode)return;
-            if(mode==="ielts"){setScreen("topic");}
-            else{
-              if(hasTimeLimit&&getSessionUsed()){setSessionBlockedToday(true);return;}
-              startConversation();
-            }
-          }}
-          disabled={!userName.trim()||!mode}
-          style={{width:"100%",padding:"13px",background:userName.trim()&&mode?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
-          {mode==="ielts"?"Choose Topic →":"Start Conversation with Sarah →"}
+        <button onClick={()=>{if(!userName.trim())return;if(hasTimeLimit&&getSessionUsed()){setSessionBlockedToday(true);return;}startConversation();}}
+          disabled={!userName.trim()}
+          style={{width:"100%",padding:"13px",background:userName.trim()?T.primary:T.border,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
+          Start Conversation with Sarah →
         </button>
       </div>
     </div>
@@ -4401,9 +4328,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
         <SarahAvatar size={34}/>
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:13,fontWeight:700,color:T.text}}>Sarah</div>
-          <div style={{fontSize:11,color:T.textMuted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
-            {mode==="ielts"?`IELTS Practice · ${IELTS_TOPICS[ieltsTopicIdx].topic}`:`Free Conversation · ${level.toUpperCase()}`}
-          </div>
+          <div style={{fontSize:11,color:T.textMuted}}>Free Conversation · {level.toUpperCase()}</div>
         </div>
         {hasTimeLimit&&(
           <div style={{fontSize:12,fontWeight:700,color:timeLeft<60000?T.red:timeLeft<120000?T.amber:T.green,background:timeLeft<60000?T.redBg:timeLeft<120000?T.amberBg:T.greenBg,padding:"3px 9px",borderRadius:6,flexShrink:0,...sty}}>
