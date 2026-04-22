@@ -8805,9 +8805,50 @@ export default function IELTSBot(){
     const timer = setTimeout(()=>{ setLoading(false); setError("Analysis timed out. Please try again."); }, 90000);
     return ()=>clearTimeout(timer);
   }, [loading]);
-  const PAGE_TITLES = {home:"Englishfool — منصة الآيلتس الشاملة",vocabulary:"مفردات الآيلتس — Englishfool",analyze:"Englishfool — منصة الآيلتس الشاملة | تقييم مقالات + ألعاب + اختبارات",practice:"تدريب الكتابة — Englishfool",progress:"متابعة التقدم — Englishfool",toolkit:"أدوات الآيلتس — Englishfool",contact:"تواصل معنا — Englishfool",grammar:"مدقق القواعد والإملاء — Englishfool",exercises:"تمارين الآيلتس — Englishfool",admin:"Admin — Englishfool",terms:"شروط الخدمة — Englishfool",privacy:"سياسة الخصوصية — Englishfool",refund:"سياسة الاسترداد — Englishfool",pricing:"الأسعار — Englishfool",speaking:"تدريب المحادثة — Englishfool",reading:"اختبارات القراءة — Englishfool",game:"ألعاب الآيلتس — Englishfool"};
-  const PAGE_DESCS = {analyze:"احصل على تقييم فوري لمقالتك بناءً على معايير كامبريدج الأربعة. مع نماذج إجابة، تصحيح أخطاء، وخطة لرفع درجتك. جرّب مجاناً.",practice:"تدرّب على كتابة الآيلتس مع تغذية راجعة فورية لكل جملة. Task 1 و Task 2 بدعم من معايير Band 8+.",reading:"7 اختبارات قراءة آيلتس كاملة (Academic + General) مع مؤقت رسمي وتصحيح فوري.",speaking:"نماذج إجابة Band 8 لجميع أجزاء الآيلتس Speaking: Part 1, 2, 3 مع مفردات وأخطاء شائعة.",game:"تعلّم الآيلتس من خلال ألعاب تفاعلية: إملاء، قواعد، مفردات، كتابة، وقراءة.",pricing:"اشتراك Pro لمدة 3 أشهر بـ 25 دينار (الأردن) أو $35 (دولي). وصول كامل لجميع الأدوات.",default:"منصة Englishfool للتحضير للآيلتس — تقييم مقالات احترافي، اختبارات قراءة، ألعاب تدريبية، وتمارين قواعد."};
-  const PAGE_PATHS = {analyze:"/",practice:"/practice",reading:"/reading",speaking:"/speaking",game:"/game",pricing:"/pricing",grammar:"/grammar",exercises:"/exercises",progress:"/progress",toolkit:"/toolkit",contact:"/contact"};
+  const PAGE_TITLES = {
+    home:"Englishfool — IELTS Preparation Platform | Essay Analysis, Speaking Practice, Reading Tests",
+    analyze:"IELTS Essay Checker & Band Score Calculator | Englishfool تقييم مقالات الآيلتس",
+    practice:"IELTS Writing Practice with Live Feedback | Englishfool تدريب الكتابة",
+    reading:"IELTS Reading Tests Online — 7 Full Academic & GT Tests | Englishfool",
+    speaking:"IELTS Speaking Practice with AI Corrections | Englishfool تدريب المحادثة",
+    game:"IELTS Learning Games — Spelling, Grammar, Vocabulary | Englishfool ألعاب الآيلتس",
+    vocabulary:"IELTS Vocabulary List with Arabic Meanings | Englishfool مفردات الآيلتس",
+    placement:"Free IELTS Level Test — A1 to C2 Band Estimate | Englishfool اختبار تحديد المستوى",
+    grammar:"IELTS Grammar & Spelling Checker | Englishfool مدقق القواعد",
+    exercises:"IELTS Practice Exercises — Grammar, Spelling, Vocabulary | Englishfool تمارين",
+    toolkit:"IELTS Writing Toolkit — Templates, Linking Words, Model Essays | Englishfool",
+    progress:"Track Your IELTS Progress | Englishfool تتبع التقدم",
+    pronunciation:"English Pronunciation Guide — 289 IELTS Words | Englishfool النطق",
+    studyplan:"IELTS Study Plan — 12 Steps from Beginner to Exam-Ready | Englishfool",
+    pricing:"Englishfool Pro Pricing — 25 JOD / $35 for 3 Months | الأسعار",
+    contact:"Contact Englishfool — Free Consultation | تواصل معنا",
+    terms:"Terms of Service | Englishfool شروط الخدمة",
+    privacy:"Privacy Policy | Englishfool سياسة الخصوصية",
+    refund:"Refund Policy | Englishfool سياسة الاسترداد",
+    admin:"Admin — Englishfool",
+  };
+
+  const PAGE_DESCS = {
+    home:"Englishfool is the leading IELTS preparation platform for Arabic speakers. Get instant AI essay analysis, speaking practice with live corrections, 7 reading tests, IELTS games, and a personalised study plan. Free to start.",
+    analyze:"Get your IELTS essay scored instantly on all 4 Cambridge criteria. Receive mistake corrections, vocabulary upgrades to Band 8, and a full model essay. Free for 2 analyses. احصل على تقييم فوري لمقالتك مع تصحيح الأخطاء ونموذج إجابة.",
+    practice:"Practice IELTS Writing Task 1 and Task 2 with real-time AI coaching. Improve your band score with targeted feedback on every sentence. تدرّب على كتابة الآيلتس مع تغذية راجعة فورية.",
+    reading:"7 full IELTS Reading tests online — Academic and General Training. Timed, auto-scored, with answer explanations. Perfect for IELTS exam preparation. اختبارات قراءة آيلتس كاملة مع مؤقت وتصحيح فوري.",
+    speaking:"Practice IELTS speaking with AI character Sarah. Get live grammar and vocabulary corrections during real conversations. Free 7-minute session included. تدرّب على المحادثة مع سارة واحصل على تصحيح فوري للقواعد والمفردات.",
+    game:"Learn IELTS vocabulary and grammar through interactive games. Spelling, grammar, writing, reading, and vocabulary games. Completely free spelling game. تعلّم الآيلتس من خلال ألعاب تفاعلية.",
+    vocabulary:"400+ IELTS vocabulary words with Arabic meanings and example sentences. Covers Writing, Reading, Listening, and Speaking. مفردات الآيلتس الأساسية مع المعنى بالعربي.",
+    placement:"Free IELTS level test — discover your level from A1 to C2 with an estimated IELTS band score. Takes 20 minutes. No signup required. اختبار مجاني لتحديد مستواك مع تقدير درجة الآيلتس.",
+    grammar:"Check your English grammar and spelling with AI. Identify mistakes, get corrections, and improve your IELTS writing accuracy. فحص القواعد والإملاء بالذكاء الاصطناعي.",
+    exercises:"300+ IELTS practice exercises — grammar, spelling, sentence building, vocabulary. Turn understanding into exam-ready habit. تمارين الآيلتس التدريبية لجميع المهارات.",
+    toolkit:"IELTS writing templates, linking words, model essays, and grammar rules. Everything you need to write Band 7+ essays. أدوات الكتابة الأكاديمية لمستوى Band 7+.",
+    progress:"Track your IELTS essay scores over time. See your band score history and improvement trends. تتبّع تحسّن درجاتك في الآيلتس.",
+    pronunciation:"Hear the correct British English pronunciation of 289 IELTS words. Academic, tricky, science, medical and cultural vocabulary. دليل النطق الصحيح لكلمات الآيلتس.",
+    studyplan:"A complete 12-step IELTS study plan — from placement test to exam day. Free and Pro steps clearly marked. خطة دراسية مكونة من 12 خطوة للتحضير للآيلتس.",
+    pricing:"Englishfool Pro — unlimited essay analysis, all reading tests, exercises, and speaking sessions. 25 JOD (Jordan) or $35 international for 3 months.",
+    contact:"Contact the Englishfool team for a free consultation. We help Arabic-speaking students achieve their target IELTS band score. استشارة مجانية مع فريق Englishfool.",
+    default:"Englishfool — the complete IELTS preparation platform for Arabic speakers. Essay analysis, speaking practice, reading tests, vocabulary, and games.",
+  };
+
+  const PAGE_PATHS = {home:"/",analyze:"/analyze",practice:"/practice",reading:"/reading",speaking:"/speaking",game:"/game",vocabulary:"/vocabulary",placement:"/placement",grammar:"/grammar",exercises:"/exercises",toolkit:"/toolkit",progress:"/progress",pronunciation:"/pronunciation",studyplan:"/studyplan",pricing:"/pricing",contact:"/contact",terms:"/terms",privacy:"/privacy",refund:"/refund"};
 
   const updateSEO=(view)=>{
     const title=PAGE_TITLES[view]||"Englishfool";
@@ -8846,6 +8887,44 @@ export default function IELTSBot(){
       if(!el){el=document.createElement("meta");el.name=name;document.head.appendChild(el);}
       el.content=content;
     });
+    // JSON-LD Structured Data
+    const jsonLd={
+      "@context":"https://schema.org",
+      "@graph":[
+        {
+          "@type":"WebSite",
+          "@id":"https://englishfool.com/#website",
+          "url":"https://englishfool.com",
+          "name":"Englishfool",
+          "description":"IELTS preparation platform for Arabic speakers — essay analysis, speaking practice, reading tests, vocabulary, and games.",
+          "inLanguage":["en","ar"],
+          "potentialAction":{"@type":"SearchAction","target":"https://englishfool.com/?q={search_term_string}","query-input":"required name=search_term_string"}
+        },
+        {
+          "@type":"EducationalOrganization",
+          "@id":"https://englishfool.com/#org",
+          "name":"Englishfool",
+          "url":"https://englishfool.com",
+          "logo":"https://englishfool.com/og-image.png",
+          "sameAs":["https://www.facebook.com/profile.php?id=61579432547860","https://www.instagram.com/englishfool4/"],
+          "description":"Online IELTS preparation platform for Arabic-speaking students.",
+          "areaServed":["JO","SA","EG","AE","KW","QA","BH","OM","LB","IQ","MA","DZ","TN","LY","YE","SY"],
+          "knowsLanguage":["en","ar"]
+        },
+        {
+          "@type":"Course",
+          "name":"IELTS Preparation — Complete Platform",
+          "description":"Complete IELTS preparation with AI essay analysis, speaking practice, reading tests, vocabulary, and exercises.",
+          "provider":{"@id":"https://englishfool.com/#org"},
+          "url":"https://englishfool.com",
+          "inLanguage":["en","ar"],
+          "offers":{"@type":"Offer","price":"25","priceCurrency":"JOD","availability":"https://schema.org/InStock","validFrom":"2025-01-01"}
+        }
+      ]
+    };
+    let ldScript=document.querySelector("script[data-ef-jsonld]");
+    if(!ldScript){ldScript=document.createElement("script");ldScript.type="application/ld+json";ldScript.setAttribute("data-ef-jsonld","1");document.head.appendChild(ldScript);}
+    ldScript.textContent=JSON.stringify(jsonLd);
   };
 
   const switchView=(view)=>{ 
