@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /api/
 
-Sitemap: https://www.englishfool.com/sitemap.xml
+# Block admin page from indexing
+Disallow: /admin
+
+Sitemap: https://englishfool.com/sitemap.xml
