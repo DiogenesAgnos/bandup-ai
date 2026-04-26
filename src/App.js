@@ -8286,8 +8286,9 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
   const [transcript,setTranscript]=useState("");
   const [ttsEnabled,setTtsEnabled]=useState(true);
   const [error,setError]=useState("");
-  const [repeatTarget,setRepeatTarget]=useState(null); // {text, count, needed}
+  const [repeatTarget,setRepeatTarget]=useState(null);
   const [repeatSuccess,setRepeatSuccess]=useState(0);
+  const [mobileTab,setMobileTab]=useState("chat");
   const chatBoxRef=useRef(null);
   const messagesEndRef=useRef(null);
   const recognitionRef=useRef(null);
