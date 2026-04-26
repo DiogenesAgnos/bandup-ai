@@ -8318,8 +8318,7 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
     saveLindaProgress(next);
   };
 
-  const buildSystemPrompt=()=>{
-    const lesson=currentLesson;
+  const buildSystemPrompt=(lesson)=>{
     if(!lesson)return "";
     const vocab=lesson.vocab.map(v=>`${v.w} = "${v.ar}" — example: "${v.ex}"`).join("\n");
     const grammarExamples=lesson.grammar.examples.join("\n");
@@ -8418,18 +8417,21 @@ YOUR TEACHING METHOD:
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
     setIsThinking(true);
     const history=getHistory();
-    const reply=await callClaude(buildSystemPrompt(),history,`[Student]: ${text.trim()}`);
+    const reply=await callClaude(buildSystemPrompt(currentLesson),history,`[Student]: ${text.trim()}`);
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
 
   const startLesson=async(lesson)=>{
+    if(!lesson)return;
     saveProgress({...progress,currentLesson:lesson.id});
     setScreen("chat");
     setMessages([]);
+    setRepeatTarget(null);
+    setRepeatSuccess(0);
     setIsThinking(true);
     const hist=loadLindaProgress().completed?.length>0?`The student has completed ${loadLindaProgress().completed.length} lessons previously.`:"This is a new student.";
     const opening=`Welcome the student warmly as Linda. Tell them today's lesson is "${lesson.title}" (${lesson.titleAr}). In one sentence, mention what they will learn. Then start by teaching the first vocabulary word: "${lesson.vocab[0].w}" which means "${lesson.vocab[0].ar}". Give the example and ask them to repeat it.`;
-    const reply=await callClaude(buildSystemPrompt(),[{role:"user",content:hist}],opening);
+    const reply=await callClaude(buildSystemPrompt(lesson),[{role:"user",content:hist}],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
 
@@ -8561,8 +8563,9 @@ YOUR TEACHING METHOD:
         </div>
       )}
 
-      <button onClick={()=>startLesson(currentLesson)}
-        style={{width:"100%",padding:"14px",background:"#7c3aed",color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",...sty}}>
+      <button onClick={()=>{if(currentLesson)startLesson(currentLesson);}}
+        disabled={!currentLesson}
+        style={{width:"100%",padding:"14px",background:currentLesson?"#7c3aed":T.border,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:currentLesson?"pointer":"not-allowed",...sty}}>
         {isAr?`ابدأ الدرس: ${currentLesson?.titleAr||""}  ←`:`Start Lesson: ${currentLesson?.title||""} →`}
       </button>
     </div>
