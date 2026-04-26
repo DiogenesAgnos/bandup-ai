@@ -8321,44 +8321,35 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
 
   const buildSystemPrompt=(lesson)=>{
     if(!lesson)return "";
+    const isLowLevel=["a1","a2"].includes(progress.level);
     const vocab=lesson.vocab.map(v=>`${v.w} = "${v.ar}" — example: "${v.ex}"`).join("\n");
     const grammarExamples=lesson.grammar.examples.join("\n");
     const practiceLines=lesson.practice.join("\n");
-    return `You are Linda, a warm, patient, and engaging English teacher for Arabic-speaking students. You teach English from A1 to C2 level.
+    return `You are Linda, a warm, enthusiastic, and patient English teacher for Arabic-speaking students.
 
 Student level: ${progress.level.toUpperCase()} — ${levelData.name}
 Current lesson: ${lesson.title} (${lesson.titleAr})
+${isLowLevel?`IMPORTANT: Low-level student. After EVERY English word or sentence, immediately add the Arabic meaning in brackets: Hello [مرحباً]. Keep sentences very short. Use Arabic generously to help them understand.`:"Use Arabic only when the student asks or seems confused."}
 
-LESSON VOCABULARY to teach:
+VOCABULARY to teach:
 ${vocab}
 
-GRAMMAR POINT: ${lesson.grammar.point}
-In Arabic: ${lesson.grammar.pointAr}
-Examples:
-${grammarExamples}
+GRAMMAR: ${lesson.grammar.point} — بالعربي: ${lesson.grammar.pointAr}
+Examples: ${grammarExamples}
 
-PRACTICE SENTENCES (ask student to repeat these):
-${practiceLines}
+PRACTICE SENTENCES: ${practiceLines}
 
-LESSON OBJECTIVES:
-${lesson.objectives.join(", ")}
-
-YOUR TEACHING METHOD:
-1. Start by greeting the student warmly and introducing today's lesson topic.
-2. Teach vocabulary ONE word at a time: say the word in English, give the Arabic meaning, give the example sentence, then say "Now repeat after me: [word]." Wait for their response.
-3. REPETITION RULE — this is mandatory:
-   - After the student repeats, evaluate if it was correct or close enough.
-   - If CORRECT: say "Well done! One more time: [word/sentence]" and ask them to repeat AGAIN. Only move to the next item after TWO successful repetitions.
-   - If WRONG or incomplete: say "Almost! Try again: [word/sentence]" and ask them to repeat. Do NOT move on until they get it right at least once more.
-   - Use the word [REPEAT_SUCCESS] or [MOVE_ON] invisibly at the end of your message to signal the app — do NOT include these in speech.
-   - After TWO successful repeats of a word or sentence, say "Perfect! Let's move on." and introduce the next item.
-4. After all vocabulary, introduce the grammar point simply. Give 2 examples. Ask them to make their own sentence.
-5. Run through each practice sentence the same way — say it, ask student to repeat, enforce 2 successful repeats.
-6. When the student uses Arabic phrases like "ما معنى هذه الكلمة؟" or "أعد من فضلك" or "لم أفهم", respond in Arabic to explain, then return to English.
-7. Keep responses SHORT — 2-3 sentences maximum before asking the student to respond or repeat.
-8. Be encouraging and patient. Use: "Excellent!", "Well done!", "Perfect!", "Almost — try again!", "برافو!" 
-9. When all vocabulary, grammar, and practice sentences are complete, say "Lesson complete! Well done, [name]. Are you ready for the next lesson?"
-10. NEVER overwhelm — one thing at a time, always wait for the student.`;
+RULES — follow every one:
+1. Greet in ONE short enthusiastic sentence. Start teaching the first word immediately. Do NOT list or announce how many words or items the lesson has.
+2. Teach one word at a time: say it, ${isLowLevel?"give Arabic in brackets immediately, ":""}give example, say: "Now repeat after me: [word]"
+3. REPETITION ENFORCEMENT (mandatory): Correct repeat → "Well done! One more time: [word]" — only advance after TWO successful repeats. Wrong → "Almost! Try again: [word]"
+4. After vocabulary: introduce grammar with 2 examples. Ask student to make their own sentence.
+5. Practice sentences: say each one, ask to repeat, enforce two successful repeats.
+6. If student writes Arabic (ما معنى / أعد / لم أفهم) → respond in Arabic, then return to English.
+7. Be ENTHUSIASTIC: "Great job!", "Excellent!", "You're doing amazing!", "برافو!", "Perfect!"
+8. 2-3 sentences max per response. Always end with something for the student to do.
+9. Never mention the number of words or items in the lesson.
+10. Lesson complete → "You did an amazing job today! Lesson complete! Ready for the next one?"`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -8380,8 +8371,7 @@ YOUR TEACHING METHOD:
     const isMoveOn=/\[MOVE_ON\]/i.test(text);
     const clean=text.replace(/\[REPEAT_SUCCESS\]/gi,"").replace(/\[MOVE_ON\]/gi,"").replace(/\*\*/g,"").replace(/\*/g,"").trim();
     setMessages(prev=>[...prev,{role:"bot",text:clean,id:Date.now()+Math.random()}]);
-    if(ttsEnabled)setTimeout(()=>speakText(stripForTTS(clean)),80);
-    // Update repeat counter
+    if(ttsEnabled)setTimeout(()=>speakLinda(stripForTTS(clean)),80);
     if(isSuccess){
       setRepeatSuccess(prev=>{
         const next=prev+1;
@@ -8445,7 +8435,10 @@ YOUR TEACHING METHOD:
 
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
-    if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){setError("Voice requires Google Chrome. Please type instead.");return;}
+    if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
+      setError("Voice requires Google Chrome. Please type instead.");
+      return;
+    }
     isRecordingRef.current=true;
     finalTranscriptRef.current="";
     setTranscript("");
@@ -8458,13 +8451,54 @@ YOUR TEACHING METHOD:
       rec.lang="en-US";rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
       const base=finalTranscriptRef.current;
       let uFinal="";
-      rec.onresult=(e)=>{uFinal="";let interim="";for(let i=0;i<e.results.length;i++){if(e.results[i].isFinal)uFinal+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}setTranscript([base,uFinal||interim].filter(s=>s.trim()).join(" ").trim());};
-      rec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return;setError("Mic error. Please type.");isRecordingRef.current=false;setIsRecording(false);};
-      rec.onend=()=>{if(uFinal.trim())finalTranscriptRef.current=[base,uFinal].filter(s=>s.trim()).join(" ").trim();if(isRecordingRef.current)run();else setIsRecording(false);};
+      rec.onresult=(e)=>{
+        uFinal="";let interim="";
+        for(let i=0;i<e.results.length;i++){
+          if(e.results[i].isFinal)uFinal+=e.results[i][0].transcript;
+          else interim+=e.results[i][0].transcript;
+        }
+        setTranscript([base,uFinal||interim].filter(s=>s.trim()).join(" ").trim());
+      };
+      rec.onerror=(e)=>{
+        if(e.error==="no-speech"||e.error==="aborted")return;
+        if(e.error==="not-allowed"){setError("Microphone access denied. Allow mic in browser settings.");}
+        else{setError("Mic error. Please type instead.");}
+        isRecordingRef.current=false;
+        setIsRecording(false);
+      };
+      rec.onend=()=>{
+        if(uFinal.trim())finalTranscriptRef.current=[base,uFinal].filter(s=>s.trim()).join(" ").trim();
+        if(isRecordingRef.current)run();
+        else setIsRecording(false);
+      };
       recognitionRef.current=rec;
       try{rec.start();}catch(e){requestAnimationFrame(()=>run());}
     };
     run();
+  };
+
+  const speakLinda=(text)=>{
+    if(!window.speechSynthesis)return;
+    const doSpeak=()=>{
+      window.speechSynthesis.cancel();
+      const utt=new SpeechSynthesisUtterance(text);
+      utt.lang="en-US"; // US English tends to have better female voices on more devices
+      utt.rate=1.05;    // slightly faster = more energetic
+      utt.pitch=1.35;   // higher pitch = clearly female and enthusiastic
+      const voices=window.speechSynthesis.getVoices();
+      const match=
+        voices.find(v=>/google us english female|zira|samantha|karen|moira|victoria/i.test(v.name))||
+        voices.find(v=>v.lang==="en-US"&&!/male|man/i.test(v.name))||
+        voices.find(v=>v.lang==="en-GB"&&/google uk english female|kate|serena/i.test(v.name))||
+        voices.find(v=>v.lang.startsWith("en")&&!/male|man/i.test(v.name))||
+        voices.find(v=>v.lang.startsWith("en"));
+      if(match){utt.voice=match;utt.lang=match.lang;}
+      if(window.speechSynthesis.paused)window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utt);
+    };
+    if(window.speechSynthesis.getVoices().length===0){
+      window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};
+    }else{doSpeak();}
   };
 
   const LindaAvatar=({size=44})=>(
