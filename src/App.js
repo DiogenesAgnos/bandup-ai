@@ -8088,207 +8088,695 @@ const STUDY_STEPS = {
 
 
 // ── LINDA — YOUR TEACHER ──────────────────────────────────────────
+// ── LINDA — YOUR TEACHER (complete v3) ──────────────────────────
 const LINDA_PROGRESS_KEY="ef_linda_progress";
-const loadLindaProgress=()=>{try{const d=localStorage.getItem(LINDA_PROGRESS_KEY);return d?JSON.parse(d):{level:"a1",completed:[],currentLesson:"a1_l1"};}catch{return{level:"a1",completed:[],currentLesson:"a1_l1"};}};
+const LINDA_SESSION_KEY="ef_linda_session";
+
+const loadLindaProgress=()=>{try{const d=localStorage.getItem(LINDA_PROGRESS_KEY);return d?JSON.parse(d):{level:"a1",completed:[],currentLesson:"a1_l1",phase:0};}catch{return{level:"a1",completed:[],currentLesson:"a1_l1",phase:0};}};
 const saveLindaProgress=(p)=>{try{localStorage.setItem(LINDA_PROGRESS_KEY,JSON.stringify(p));}catch{}};
+const saveLindaSession=(lessonId,phase,messages)=>{try{localStorage.setItem(LINDA_SESSION_KEY,JSON.stringify({lessonId,phase,messages,ts:Date.now()}));}catch{}};
+const loadLindaSession=()=>{try{const d=localStorage.getItem(LINDA_SESSION_KEY);return d?JSON.parse(d):null;}catch{return null;}};
+const clearLindaSession=()=>{try{localStorage.removeItem(LINDA_SESSION_KEY);}catch{}};
+
+const FREE_LINDA_LEVELS=["a1"];
+
+const PHASES=["vocabulary","fillblank","spelling","review"];
+const PHASE_LABELS=["📚 Vocabulary","✏️ Fill in the Blank","🔤 Spelling","💬 Review & Conversation"];
+const PHASE_LABELS_AR=["📚 المفردات","✏️ أكمل الجملة","🔤 التهجئة","💬 المراجعة والمحادثة"];
 
 const LINDA_CURRICULUM={
   a1:{
     name:"A1 — Beginner",nameAr:"مبتدئ",
     lessons:[
       {id:"a1_l1",title:"Greetings & Introductions",titleAr:"التحيات والتعريف بالنفس",
-        vocab:[{w:"Hello",ar:"مرحباً",ex:"Hello! My name is Sara."},{w:"Goodbye",ar:"مع السلامة",ex:"Goodbye! See you tomorrow."},{w:"Please",ar:"من فضلك",ex:"Can you help me, please?"},{w:"Thank you",ar:"شكراً",ex:"Thank you very much!"},{w:"Sorry",ar:"آسف",ex:"Sorry, I don't understand."},{w:"Yes / No",ar:"نعم / لا",ex:"Yes, I am a student. No, I am not."}],
-        grammar:{point:"Verb 'to be': I am / You are / He is / She is",pointAr:"فعل التكوين: أنا أكون، أنت تكون، هو/هي يكون",examples:["I am Ahmad.","You are my friend.","She is a teacher.","He is from Jordan."]},
-        practice:["Hello, my name is _____.","I am from _____.","Nice to meet you.","Thank you! Goodbye!"],
-        objectives:["Say hello and goodbye","Introduce yourself","Use 'I am' and 'You are'"]},
-      {id:"a1_l2",title:"Numbers & Days",titleAr:"الأرقام والأيام",
-        vocab:[{w:"One, Two, Three",ar:"واحد، اثنان، ثلاثة",ex:"I have one book."},{w:"Monday",ar:"الاثنين",ex:"I go to school on Monday."},{w:"Today",ar:"اليوم",ex:"Today is Monday."},{w:"Tomorrow",ar:"غداً",ex:"Tomorrow is Tuesday."},{w:"Week",ar:"أسبوع",ex:"There are seven days in a week."},{w:"Morning",ar:"الصباح",ex:"Good morning!"}],
-        grammar:{point:"There is / There are — describing what exists",pointAr:"'يوجد' للمفرد و'يوجد' للجمع",examples:["There is one teacher.","There are twenty students.","There is a book on the table."]},
-        practice:["Today is _____.","There are _____ days in a week.","Good morning! How are you?","Tomorrow is _____."],
-        objectives:["Count to 20","Name the days of the week","Use 'there is' and 'there are'"]},
-      {id:"a1_l3",title:"Family & People",titleAr:"العائلة والناس",
-        vocab:[{w:"Mother",ar:"أم / والدة",ex:"My mother is a doctor."},{w:"Father",ar:"أب / والد",ex:"My father works in a bank."},{w:"Brother",ar:"أخ",ex:"I have one brother."},{w:"Sister",ar:"أخت",ex:"My sister is ten years old."},{w:"Friend",ar:"صديق",ex:"This is my best friend."},{w:"Teacher",ar:"معلم / معلمة",ex:"My teacher is very kind."}],
-        grammar:{point:"Possessive adjectives: my, your, his, her",pointAr:"ضمائر الملكية: ملكي، ملكك، ملكه، ملكها",examples:["This is my book.","What is your name?","His car is red.","Her sister is tall."]},
-        practice:["My mother is _____.","I have _____ brothers and _____ sisters.","This is my friend. His/Her name is _____.","My teacher's name is _____."],
-        objectives:["Name family members","Use possessive adjectives","Describe people simply"]},
-      {id:"a1_l4",title:"Food & Drink",titleAr:"الطعام والشراب",
-        vocab:[{w:"Water",ar:"ماء",ex:"I drink water every day."},{w:"Bread",ar:"خبز",ex:"I eat bread for breakfast."},{w:"Rice",ar:"أرز",ex:"We eat rice for lunch."},{w:"Coffee",ar:"قهوة",ex:"I love coffee in the morning."},{w:"Fruit",ar:"فاكهة",ex:"Apples and oranges are fruit."},{w:"Hungry / Thirsty",ar:"جائع / عطشان",ex:"I am hungry. I want to eat."}],
-        grammar:{point:"I like / I don't like / I want",pointAr:"أحب / لا أحب / أريد",examples:["I like rice and bread.","I don't like coffee.","I want a glass of water.","Do you like fruit?"]},
-        practice:["I like _____ and _____.","I don't like _____.","I am hungry. I want to eat _____.","Do you like _____?"],
-        objectives:["Name common foods and drinks","Express likes and dislikes","Say what you want"]},
-      {id:"a1_l5",title:"Colors & Descriptions",titleAr:"الألوان والأوصاف",
-        vocab:[{w:"Red",ar:"أحمر",ex:"The apple is red."},{w:"Blue",ar:"أزرق",ex:"The sky is blue."},{w:"Big / Small",ar:"كبير / صغير",ex:"This is a big house."},{w:"Old / New",ar:"قديم / جديد",ex:"My phone is new."},{w:"Beautiful",ar:"جميل",ex:"This is a beautiful city."},{w:"Good / Bad",ar:"جيد / سيء",ex:"This is a good idea."}],
-        grammar:{point:"Adjectives come BEFORE the noun in English",pointAr:"في الإنجليزية، الصفة تأتي قبل الاسم (عكس العربية)",examples:["A red apple (not: an apple red)","A big house","A beautiful girl","A new car"]},
-        practice:["The _____ is _____ (color).","I have a _____ (big/small) _____.","This is a _____ (adjective) _____ (noun).","My house is _____ and _____."],
-        objectives:["Name basic colors","Use adjectives correctly","Describe objects and places"]},
+        vocab:[
+          {w:"Hello",ar:"مرحباً",ex:"Hello! My name is Sara.",exAr:"مرحباً! اسمي سارة."},
+          {w:"Goodbye",ar:"مع السلامة",ex:"Goodbye! See you tomorrow.",exAr:"مع السلامة! أراك غداً."},
+          {w:"Please",ar:"من فضلك",ex:"Can you help me, please?",exAr:"هل يمكنك مساعدتي من فضلك؟"},
+          {w:"Thank you",ar:"شكراً",ex:"Thank you very much!",exAr:"شكراً جزيلاً!"},
+          {w:"Sorry",ar:"آسف / عذراً",ex:"Sorry, I don't understand.",exAr:"آسف، لا أفهم."},
+          {w:"Yes",ar:"نعم",ex:"Yes, I am a student.",exAr:"نعم، أنا طالب."},
+          {w:"No",ar:"لا",ex:"No, I am not from here.",exAr:"لا، لست من هنا."},
+          {w:"My name is",ar:"اسمي",ex:"My name is Ahmad.",exAr:"اسمي أحمد."},
+        ],
+        grammar:{
+          point:"Verb 'to be': I am / You are / He is / She is / We are / They are",
+          pointAr:"فعل التكوين: أنا = I am / أنت = You are / هو = He is / هي = She is",
+          examples:[
+            "I am Ahmad. [أنا أحمد]",
+            "You are my friend. [أنت صديقي]",
+            "She is a teacher. [هي معلمة]",
+            "He is from Jordan. [هو من الأردن]",
+            "We are students. [نحن طلاب]",
+          ],
+          levelNote:"In Arabic, we often drop the verb 'to be' in the present tense (أنا طالب = I student). In English, we ALWAYS need 'am/is/are'."
+        },
+        fillBlank:[
+          {sentence:"___ am Ahmad.",answer:"I",hint:"subject pronoun for myself"},
+          {sentence:"___ are my friend.",answer:"You",hint:"subject pronoun for the person I speak to"},
+          {sentence:"She ___ a teacher.",answer:"is",hint:"'to be' for she/he"},
+          {sentence:"We ___ students.",answer:"are",hint:"'to be' for we/they"},
+          {sentence:"Hello! My ___ is Sara.",answer:"name",hint:"ما اسمك؟"},
+          {sentence:"___, I don't understand.",answer:"Sorry",hint:"عذراً / آسف"},
+        ],
+        spelling:["Hello","Goodbye","Please","Sorry","Thank","Student","Teacher","Name"],
+        conversation:[
+          "Tell me your name. Where are you from?",
+          "How do you say 'مرحباً' in English?",
+          "Make a sentence with 'I am' and your job or study.",
+          "How do you greet someone in the morning in English?",
+        ]
+      },
+      {id:"a1_l2",title:"Numbers, Days & Time",titleAr:"الأرقام والأيام والوقت",
+        vocab:[
+          {w:"One / Two / Three",ar:"واحد / اثنان / ثلاثة",ex:"I have three books.",exAr:"عندي ثلاثة كتب."},
+          {w:"Monday",ar:"الاثنين",ex:"I go to school on Monday.",exAr:"أذهب إلى المدرسة يوم الاثنين."},
+          {w:"Today",ar:"اليوم",ex:"Today is Tuesday.",exAr:"اليوم هو الثلاثاء."},
+          {w:"Tomorrow",ar:"غداً",ex:"Tomorrow is Wednesday.",exAr:"غداً هو الأربعاء."},
+          {w:"Morning",ar:"الصباح",ex:"Good morning!",exAr:"صباح الخير!"},
+          {w:"Evening",ar:"المساء",ex:"Good evening!",exAr:"مساء الخير!"},
+          {w:"Week",ar:"أسبوع",ex:"There are seven days in a week.",exAr:"يوجد سبعة أيام في الأسبوع."},
+          {w:"Year",ar:"سنة / عام",ex:"There are twelve months in a year.",exAr:"يوجد اثنا عشر شهراً في السنة."},
+        ],
+        grammar:{
+          point:"There is / There are — describing what exists",
+          pointAr:"There is = يوجد (مفرد) / There are = يوجد (جمع)",
+          examples:[
+            "There is one teacher in the class. [يوجد معلم واحد في الفصل]",
+            "There are twenty students. [يوجد عشرون طالباً]",
+            "There is a book on the table. [يوجد كتاب على الطاولة]",
+            "There are seven days in a week. [يوجد سبعة أيام في الأسبوع]",
+          ],
+          levelNote:"In Arabic we use 'يوجد' for both singular and plural. In English: 'There IS' for one thing, 'There ARE' for more than one."
+        },
+        fillBlank:[
+          {sentence:"___ is one teacher.",answer:"There",hint:"يوجد"},
+          {sentence:"There ___ seven days in a week.",answer:"are",hint:"للجمع"},
+          {sentence:"Today ___ Monday.",answer:"is",hint:"فعل التكوين للمفرد"},
+          {sentence:"Good ___!",answer:"morning",hint:"صباح الخير"},
+          {sentence:"Tomorrow ___ Tuesday.",answer:"is",hint:"فعل التكوين"},
+          {sentence:"There ___ twelve months in a year.",answer:"are",hint:"للجمع"},
+        ],
+        spelling:["Monday","Tuesday","Today","Tomorrow","Morning","Evening","Seven","Twelve"],
+        conversation:[
+          "What day is today?",
+          "How many days are in a week?",
+          "Say 'Good morning' and 'Good evening' in English.",
+          "Make a sentence with 'There are' about your class or your home.",
+        ]
+      },
+      {id:"a1_l3",title:"Family & Describing People",titleAr:"العائلة ووصف الناس",
+        vocab:[
+          {w:"Mother",ar:"أم / والدة",ex:"My mother is a doctor.",exAr:"والدتي طبيبة."},
+          {w:"Father",ar:"أب / والد",ex:"My father works in a bank.",exAr:"والدي يعمل في بنك."},
+          {w:"Brother",ar:"أخ",ex:"I have two brothers.",exAr:"عندي أخوان."},
+          {w:"Sister",ar:"أخت",ex:"My sister is ten years old.",exAr:"أختي عمرها عشر سنوات."},
+          {w:"Tall / Short",ar:"طويل / قصير",ex:"My brother is tall.",exAr:"أخي طويل."},
+          {w:"Young / Old",ar:"صغير / كبير في السن",ex:"My grandfather is old.",exAr:"جدي كبير في السن."},
+          {w:"Kind",ar:"لطيف / طيب",ex:"My mother is very kind.",exAr:"والدتي لطيفة جداً."},
+          {w:"Funny",ar:"مضحك",ex:"My brother is very funny.",exAr:"أخي مضحك جداً."},
+        ],
+        grammar:{
+          point:"Possessive adjectives: my, your, his, her, our, their",
+          pointAr:"ضمائر الملكية: my=ملكي / your=ملكك / his=ملكه / her=ملكها / our=ملكنا / their=ملكهم",
+          examples:[
+            "This is my book. [هذا كتابي]",
+            "What is your name? [ما اسمك؟]",
+            "His car is red. [سيارته حمراء]",
+            "Her sister is tall. [أختها طويلة]",
+            "Our teacher is kind. [معلمنا لطيف]",
+          ],
+          levelNote:"Arabic uses suffixes attached to nouns (كتابي/كتابك). English uses separate words before the noun (my book / your book)."
+        },
+        fillBlank:[
+          {sentence:"This is ___ book. (mine)",answer:"my",hint:"ملكي"},
+          {sentence:"What is ___ name? (asking you)",answer:"your",hint:"ملكك"},
+          {sentence:"___ mother is a doctor. (talking about a woman)",answer:"Her",hint:"ملكها"},
+          {sentence:"___ father works in a bank. (talking about a man)",answer:"His",hint:"ملكه"},
+          {sentence:"___ teacher is kind. (speaking as a group)",answer:"Our",hint:"ملكنا"},
+          {sentence:"My brother is very ___. (مضحك)",answer:"funny",hint:"مضحك"},
+        ],
+        spelling:["Mother","Father","Brother","Sister","Funny","Tall","Kind","Their"],
+        conversation:[
+          "Tell me about your family. How many brothers and sisters do you have?",
+          "Describe your mother or father. Are they tall or short? Are they kind?",
+          "Make a sentence with 'his' and a sentence with 'her'.",
+          "How do you say 'أختي طويلة' in English?",
+        ]
+      },
+      {id:"a1_l4",title:"Food, Drink & Likes",titleAr:"الطعام والشراب والتفضيلات",
+        vocab:[
+          {w:"Water",ar:"ماء",ex:"I drink water every day.",exAr:"أشرب الماء كل يوم."},
+          {w:"Bread",ar:"خبز",ex:"I eat bread for breakfast.",exAr:"آكل الخبز على الإفطار."},
+          {w:"Rice",ar:"أرز",ex:"We eat rice for lunch.",exAr:"نأكل الأرز على الغداء."},
+          {w:"Coffee",ar:"قهوة",ex:"I love coffee in the morning.",exAr:"أحب القهوة في الصباح."},
+          {w:"Hungry",ar:"جائع",ex:"I am very hungry right now.",exAr:"أنا جائع جداً الآن."},
+          {w:"Thirsty",ar:"عطشان",ex:"Are you thirsty?",exAr:"هل أنت عطشان؟"},
+          {w:"Delicious",ar:"لذيذ",ex:"This food is delicious!",exAr:"هذا الطعام لذيذ!"},
+          {w:"Breakfast",ar:"فطور / إفطار",ex:"I have breakfast at eight.",exAr:"أتناول الفطور الساعة الثامنة."},
+        ],
+        grammar:{
+          point:"I like / I don't like / I love / I hate / Do you like...?",
+          pointAr:"أحب = I like/love / لا أحب = I don't like / أكره = I hate / هل تحب = Do you like?",
+          examples:[
+            "I like rice and bread. [أحب الأرز والخبز]",
+            "I don't like coffee. [لا أحب القهوة]",
+            "I love chocolate! [أحب الشوكولاتة!]",
+            "Do you like tea? [هل تحب الشاي؟]",
+            "She hates onions. [هي تكره البصل]",
+          ],
+          levelNote:"In Arabic, 'أحب' can mean both 'like' and 'love'. In English, 'love' is stronger than 'like'. 'I love pizza' vs 'I like salad'."
+        },
+        fillBlank:[
+          {sentence:"I ___ rice. (أحب)",answer:"like",hint:"أحب بشكل عادي"},
+          {sentence:"I ___ don't ___ coffee.",answer:"do / like",hint:"النفي مع like"},
+          {sentence:"___ you like tea?",answer:"Do",hint:"سؤال عن الإعجاب"},
+          {sentence:"I am very ___. (جائع)",answer:"hungry",hint:"جائع بالإنجليزية"},
+          {sentence:"This food is ___! (لذيذ)",answer:"delicious",hint:"لذيذ"},
+          {sentence:"I have ___ at eight. (الفطور)",answer:"breakfast",hint:"وجبة الصباح"},
+        ],
+        spelling:["Water","Bread","Coffee","Hungry","Thirsty","Delicious","Breakfast","Dinner"],
+        conversation:[
+          "What do you like to eat for breakfast?",
+          "Do you like coffee or tea?",
+          "Tell me three things you love and one thing you hate.",
+          "Are you hungry now? What do you want to eat?",
+        ]
+      },
+      {id:"a1_l5",title:"Colors, Adjectives & Descriptions",titleAr:"الألوان والصفات والأوصاف",
+        vocab:[
+          {w:"Red / Blue / Green",ar:"أحمر / أزرق / أخضر",ex:"The apple is red.",exAr:"التفاحة حمراء."},
+          {w:"Big / Small",ar:"كبير / صغير",ex:"This is a big house.",exAr:"هذا بيت كبير."},
+          {w:"Beautiful",ar:"جميل",ex:"Petra is a beautiful city.",exAr:"البتراء مدينة جميلة."},
+          {w:"New / Old",ar:"جديد / قديم",ex:"I have a new phone.",exAr:"عندي هاتف جديد."},
+          {w:"Hot / Cold",ar:"حار / بارد",ex:"The weather is hot today.",exAr:"الجو حار اليوم."},
+          {w:"Fast / Slow",ar:"سريع / بطيء",ex:"This car is very fast.",exAr:"هذه السيارة سريعة جداً."},
+          {w:"Happy / Sad",ar:"سعيد / حزين",ex:"I am happy today!",exAr:"أنا سعيد اليوم!"},
+          {w:"Tired",ar:"متعب",ex:"I am very tired after work.",exAr:"أنا متعب جداً بعد العمل."},
+        ],
+        grammar:{
+          point:"Adjectives BEFORE nouns in English (opposite of Arabic word order)",
+          pointAr:"الصفة في الإنجليزية تأتي قبل الاسم — عكس العربية! بيت كبير = a big house (وليس a house big)",
+          examples:[
+            "a red apple [تفاحة حمراء] — red comes BEFORE apple",
+            "a beautiful city [مدينة جميلة] — beautiful comes BEFORE city",
+            "a big house [بيت كبير] — big comes BEFORE house",
+            "a new car [سيارة جديدة] — new comes BEFORE car",
+            "very + adjective: I am very happy [أنا سعيد جداً]",
+          ],
+          levelNote:"This is one of the most common mistakes Arab learners make! In Arabic: 'سيارة حمراء' (car red). In English: 'a red car' (red car). Always put the adjective FIRST."
+        },
+        fillBlank:[
+          {sentence:"I have a ___ car. (جديدة)",answer:"new",hint:"جديد — صفة قبل الاسم"},
+          {sentence:"The weather is ___ today. (حار)",answer:"hot",hint:"حار"},
+          {sentence:"She lives in a ___ house. (كبير)",answer:"big",hint:"كبير — صفة قبل الاسم"},
+          {sentence:"I am very ___ after work. (متعب)",answer:"tired",hint:"متعب"},
+          {sentence:"This is a ___ city. (جميلة)",answer:"beautiful",hint:"جميل — صفة قبل الاسم"},
+          {sentence:"The apple is ___. (أحمر)",answer:"red",hint:"الأحمر بالإنجليزية"},
+        ],
+        spelling:["Beautiful","Happy","Tired","Weather","Color","Small","Green","Yellow"],
+        conversation:[
+          "Describe your home — is it big or small? New or old?",
+          "What color is your car or phone?",
+          "How do you feel today — happy or tired?",
+          "Describe your city using three adjectives.",
+        ]
+      },
     ]
   },
   a2:{
     name:"A2 — Elementary",nameAr:"مبتدئ متقدم",
     lessons:[
-      {id:"a2_l1",title:"Daily Routines",titleAr:"الروتين اليومي",
-        vocab:[{w:"Wake up",ar:"يستيقظ",ex:"I wake up at 7 every morning."},{w:"Have breakfast",ar:"يتناول الفطور",ex:"I have breakfast at 8."},{w:"Go to work",ar:"يذهب إلى العمل",ex:"I go to work by car."},{w:"Come home",ar:"يعود إلى البيت",ex:"I come home at 6 pm."},{w:"Go to sleep",ar:"ينام",ex:"I go to sleep at 11."},{w:"Always / Usually / Sometimes / Never",ar:"دائماً / عادةً / أحياناً / أبداً",ex:"I always drink coffee in the morning."}],
-        grammar:{point:"Simple Present Tense — habits and routines",pointAr:"المضارع البسيط — للعادات والروتين اليومي",examples:["I wake up at 7 every day.","She goes to school at 8.","He doesn't eat breakfast.","Do you exercise every day?"]},
-        practice:["I always _____ in the morning.","I usually _____ after work.","She goes to _____ every day.","What time do you wake up?"],
-        objectives:["Describe daily routines","Use adverbs of frequency","Ask and answer about habits"]},
-      {id:"a2_l2",title:"Shopping & Money",titleAr:"التسوق والمال",
-        vocab:[{w:"How much?",ar:"كم سعره؟",ex:"How much is this shirt?"},{w:"Cheap / Expensive",ar:"رخيص / غالي",ex:"This phone is expensive."},{w:"Buy / Sell",ar:"يشتري / يبيع",ex:"I want to buy a new bag."},{w:"Price",ar:"سعر",ex:"The price is 10 dinars."},{w:"Pay",ar:"يدفع",ex:"Can I pay by card?"},{w:"Change",ar:"باقي / فكة",ex:"Here is your change."}],
-        grammar:{point:"Can / Can't — ability and requests",pointAr:"Can / Can't — للقدرة والطلب",examples:["Can I help you?","I can't afford this.","Can you show me a cheaper one?","You can pay by cash or card."]},
-        practice:["How much is this _____?","Can I see a _____ one please?","I can't pay more than _____ dinars.","Can you give me the change?"],
-        objectives:["Ask about prices","Use 'can' for requests","Understand shopping conversations"]},
-      {id:"a2_l3",title:"Directions & Places",titleAr:"الاتجاهات والأماكن",
-        vocab:[{w:"Turn left / right",ar:"اتجه يساراً / يميناً",ex:"Turn left at the traffic light."},{w:"Go straight",ar:"اذهب مباشرة",ex:"Go straight for two minutes."},{w:"Next to",ar:"بجانب",ex:"The bank is next to the school."},{w:"Opposite",ar:"مقابل",ex:"The pharmacy is opposite the mosque."},{w:"Near / Far",ar:"قريب / بعيد",ex:"Is the hotel near here?"},{w:"Street / Road",ar:"شارع / طريق",ex:"Take the second street on the right."}],
-        grammar:{point:"Imperative — giving instructions and directions",pointAr:"صيغة الأمر — لإعطاء التعليمات والاتجاهات",examples:["Turn left here.","Go straight and then turn right.","Take the first street.","Don't turn left — go straight."]},
-        practice:["Go straight and then _____.","Turn _____ at the _____.","The _____ is next to the _____.","Excuse me, how do I get to _____?"],
-        objectives:["Give and understand directions","Describe locations","Use the imperative form"]},
-      {id:"a2_l4",title:"Past Events",titleAr:"الأحداث الماضية",
-        vocab:[{w:"Yesterday",ar:"أمس",ex:"Yesterday was Monday."},{w:"Last week",ar:"الأسبوع الماضي",ex:"I visited my family last week."},{w:"Ago",ar:"منذ",ex:"I started this course three months ago."},{w:"Visit",ar:"يزور",ex:"I visited my friend yesterday."},{w:"Travel",ar:"يسافر",ex:"I travelled to Aqaba last summer."},{w:"Enjoy",ar:"يستمتع",ex:"I enjoyed the trip very much."}],
-        grammar:{point:"Simple Past Tense — regular and irregular verbs",pointAr:"الماضي البسيط — الأفعال المنتظمة وغير المنتظمة",examples:["I visited my family yesterday. (regular)","I went to Amman last week. (irregular)","She didn't come to class.","Did you enjoy the film?"]},
-        practice:["Yesterday I _____.","Last week I went to _____.","I didn't _____ last night.","Did you _____ yesterday?"],
-        objectives:["Talk about past events","Use simple past correctly","Ask questions about the past"]},
-      {id:"a2_l5",title:"Health & Body",titleAr:"الصحة والجسم",
-        vocab:[{w:"Headache",ar:"صداع",ex:"I have a bad headache today."},{w:"Tired",ar:"متعب",ex:"I am very tired today."},{w:"Doctor",ar:"دكتور / طبيب",ex:"I need to see a doctor."},{w:"Medicine",ar:"دواء",ex:"Take this medicine twice a day."},{w:"Rest",ar:"يرتاح",ex:"You need to rest for two days."},{w:"Fever",ar:"حمى / ارتفاع حرارة",ex:"The child has a fever."}],
-        grammar:{point:"Have got / Has got — possession and symptoms",pointAr:"Have got / Has got — للتعبير عن الامتلاك والأعراض",examples:["I've got a headache.","She's got a fever.","He hasn't got any medicine.","Have you got pain in your back?"]},
-        practice:["I've got a _____.","She has got a _____ and _____.","I need to see a doctor because _____.","Have you got _____?"],
-        objectives:["Describe health problems","Use 'have got' correctly","Talk to a doctor simply"]},
+      {id:"a2_l1",title:"Daily Routines & Habits",titleAr:"الروتين اليومي والعادات",
+        vocab:[
+          {w:"Wake up",ar:"يستيقظ",ex:"I wake up at 7 every morning.",exAr:"أستيقظ الساعة السابعة كل صباح."},
+          {w:"Have breakfast",ar:"يتناول الفطور",ex:"I have breakfast at 8.",exAr:"أتناول الفطور الساعة الثامنة."},
+          {w:"Go to work",ar:"يذهب إلى العمل",ex:"I go to work by car.",exAr:"أذهب إلى العمل بالسيارة."},
+          {w:"Exercise",ar:"يتمرن / يرياضة",ex:"I exercise every morning.",exAr:"أتمرن كل صباح."},
+          {w:"Come home",ar:"يعود إلى البيت",ex:"I come home at 6 pm.",exAr:"أعود إلى البيت الساعة السادسة مساءً."},
+          {w:"Always",ar:"دائماً",ex:"I always drink coffee in the morning.",exAr:"أشرب القهوة دائماً في الصباح."},
+          {w:"Usually",ar:"عادةً",ex:"I usually eat lunch at one.",exAr:"عادةً آكل الغداء الساعة الواحدة."},
+          {w:"Never",ar:"أبداً / لا... أبداً",ex:"I never eat fast food.",exAr:"لا آكل الأكل السريع أبداً."},
+        ],
+        grammar:{
+          point:"Simple Present Tense — habits, routines, and facts. Add -s/-es for he/she/it.",
+          pointAr:"المضارع البسيط — للعادات والحقائق. نضيف -s للفعل مع he/she/it. I go — She goes / I eat — He eats",
+          examples:[
+            "I wake up at 7. [أستيقظ الساعة 7]",
+            "She goes to school at 8. [هي تذهب للمدرسة الساعة 8]",
+            "He doesn't eat breakfast. [هو لا يتناول الفطور] — doesn't for he/she",
+            "Do you exercise every day? [هل تتمرن كل يوم؟]",
+            "She always drinks tea. [هي دائماً تشرب الشاي]",
+          ],
+          levelNote:"The -s at the end (she goes, he eats) is a very common mistake. You MUST add it with he/she/it. 'She go' is WRONG. 'She goes' is CORRECT."
+        },
+        fillBlank:[
+          {sentence:"She ___ to school every day.",answer:"goes",hint:"go مع she — لا تنسَ الـ s"},
+          {sentence:"I ___ usually wake up late.",answer:"don't",hint:"النفي مع I"},
+          {sentence:"He ___ eat breakfast.",answer:"doesn't",hint:"النفي مع he/she"},
+          {sentence:"___ you exercise every morning?",answer:"Do",hint:"سؤال مع I/you"},
+          {sentence:"I ___ go to bed at 11.",answer:"always",hint:"دائماً"},
+          {sentence:"She ___ never drinks coffee.",answer:"(remove 'She') — She never drinks coffee.",answer:"never",hint:"أبداً — بين الفاعل والفعل"},
+        ],
+        spelling:["Exercise","Breakfast","Usually","Always","Never","Morning","Evening","Routine"],
+        conversation:[
+          "Tell me about your morning routine. What do you do first?",
+          "Does your mother or father wake up early or late?",
+          "What do you always do after work or school?",
+          "Tell me something you never do.",
+        ]
+      },
+      {id:"a2_l2",title:"Shopping, Money & Requests",titleAr:"التسوق والمال والطلبات",
+        vocab:[
+          {w:"How much?",ar:"كم سعره؟",ex:"How much is this shirt?",exAr:"كم سعر هذا القميص؟"},
+          {w:"Cheap",ar:"رخيص",ex:"This bag is very cheap.",exAr:"هذه الحقيبة رخيصة جداً."},
+          {w:"Expensive",ar:"غالي",ex:"This phone is too expensive.",exAr:"هذا الهاتف غالٍ جداً."},
+          {w:"Buy",ar:"يشتري",ex:"I want to buy a new bag.",exAr:"أريد أن أشتري حقيبة جديدة."},
+          {w:"Price",ar:"سعر",ex:"What is the price of this?",exAr:"ما سعر هذا؟"},
+          {w:"Pay",ar:"يدفع",ex:"Can I pay by card?",exAr:"هل يمكنني الدفع بالبطاقة؟"},
+          {w:"Sale",ar:"تخفيض / تنزيلات",ex:"Everything is on sale today!",exAr:"كل شيء على تنزيلات اليوم!"},
+          {w:"Receipt",ar:"إيصال / فاتورة",ex:"Can I have a receipt, please?",exAr:"هل يمكنني الحصول على فاتورة من فضلك؟"},
+        ],
+        grammar:{
+          point:"Can / Can't — ability, requests, and permission",
+          pointAr:"Can = يستطيع / يمكن. Can't = لا يستطيع / لا يمكن. نستخدمها للطلب والقدرة والإذن",
+          examples:[
+            "Can I help you? [هل يمكنني مساعدتك؟]",
+            "I can't afford this. [لا أستطيع دفع ثمن هذا]",
+            "Can you show me a cheaper one? [هل يمكنك إريتي واحداً أرخص؟]",
+            "You can pay by cash or card. [يمكنك الدفع نقداً أو بالبطاقة]",
+            "Can I have a receipt, please? [هل يمكنني الحصول على فاتورة؟]",
+          ],
+          levelNote:"'Can' does NOT change with he/she — always 'can'. NOT 'she cans'. Also: Can I? = asking permission. Can you? = asking someone to do something."
+        },
+        fillBlank:[
+          {sentence:"___ much is this jacket?",answer:"How",hint:"كم سعره؟"},
+          {sentence:"Can I ___ by card?",answer:"pay",hint:"الدفع بالبطاقة"},
+          {sentence:"This is too ___. (غالي)",answer:"expensive",hint:"غالٍ جداً"},
+          {sentence:"Can you ___ me a cheaper one?",answer:"show",hint:"أرني"},
+          {sentence:"I can't ___ this — it's too expensive.",answer:"afford",hint:"لا أستطيع دفع هذا السعر"},
+          {sentence:"Everything is on ___ today!",answer:"sale",hint:"تنزيلات"},
+        ],
+        spelling:["Expensive","Cheap","Receipt","Payment","Shopping","Afford","Price","Discount"],
+        conversation:[
+          "You are in a shop. Ask how much a jacket costs.",
+          "Tell me: what was the last thing you bought? Was it cheap or expensive?",
+          "Can you make a sentence with 'I can't afford...'?",
+          "What is something you want to buy but can't afford right now?",
+        ]
+      },
+      {id:"a2_l3",title:"Giving Directions & Locations",titleAr:"إعطاء الاتجاهات والمواقع",
+        vocab:[
+          {w:"Turn left / right",ar:"اتجه يساراً / يميناً",ex:"Turn left at the traffic light.",exAr:"اتجه يساراً عند إشارة المرور."},
+          {w:"Go straight",ar:"اذهب مباشرة",ex:"Go straight for two minutes.",exAr:"اذهب مباشرة لمدة دقيقتين."},
+          {w:"Next to",ar:"بجانب",ex:"The bank is next to the school.",exAr:"البنك بجانب المدرسة."},
+          {w:"Opposite",ar:"مقابل",ex:"The pharmacy is opposite the mosque.",exAr:"الصيدلية مقابل المسجد."},
+          {w:"At the end of",ar:"في نهاية",ex:"The hotel is at the end of the street.",exAr:"الفندق في نهاية الشارع."},
+          {w:"Cross",ar:"يعبر",ex:"Cross the road at the traffic light.",exAr:"اعبر الطريق عند إشارة المرور."},
+          {w:"Far / Near",ar:"بعيد / قريب",ex:"Is the station near here?",exAr:"هل المحطة قريبة من هنا؟"},
+          {w:"Take the first / second street",ar:"خذ الشارع الأول / الثاني",ex:"Take the second street on the right.",exAr:"خذ الشارع الثاني على اليمين."},
+        ],
+        grammar:{
+          point:"Imperative — giving commands and instructions without a subject",
+          pointAr:"صيغة الأمر — نستخدمها لإعطاء التعليمات دون ذكر الفاعل. Turn left! Go straight! Don't stop!",
+          examples:[
+            "Turn left here. [اتجه يساراً هنا]",
+            "Go straight and then turn right. [اذهب مباشرة ثم اتجه يميناً]",
+            "Take the first street. [خذ الشارع الأول]",
+            "Don't turn left — go straight! [لا تتجه يساراً — اذهب مباشرة]",
+            "Cross the road carefully. [اعبر الطريق بحذر]",
+          ],
+          levelNote:"The imperative in English is simple — just use the base form of the verb with no subject: 'Go!', 'Turn!', 'Stop!'. For negative: 'Don't go!', 'Don't turn!'"
+        },
+        fillBlank:[
+          {sentence:"___ left at the traffic light.",answer:"Turn",hint:"اتجه — صيغة الأمر"},
+          {sentence:"The bank is ___ to the school.",answer:"next",hint:"بجانب"},
+          {sentence:"Go ___ for two minutes.",answer:"straight",hint:"مباشرة"},
+          {sentence:"The pharmacy is ___ the mosque.",answer:"opposite",hint:"مقابل"},
+          {sentence:"___ the road at the traffic light.",answer:"Cross",hint:"اعبر"},
+          {sentence:"Is the hotel ___ here?",answer:"near",hint:"قريب"},
+        ],
+        spelling:["Straight","Opposite","Traffic","Pharmacy","Direction","Corner","Street","Bridge"],
+        conversation:[
+          "Excuse me — how do I get to the nearest supermarket from here?",
+          "Describe how to get from your home to your work or school.",
+          "Tell me: is there a pharmacy near your home? Where is it?",
+          "Give me directions from the front door to the kitchen of your home!",
+        ]
+      },
+      {id:"a2_l4",title:"Past Events & Storytelling",titleAr:"الأحداث الماضية ورواية القصص",
+        vocab:[
+          {w:"Yesterday",ar:"أمس",ex:"Yesterday I went to the market.",exAr:"أمس ذهبت إلى السوق."},
+          {w:"Last week",ar:"الأسبوع الماضي",ex:"Last week I visited my family.",exAr:"الأسبوع الماضي زرت عائلتي."},
+          {w:"Ago",ar:"منذ",ex:"I started English three months ago.",exAr:"بدأت الإنجليزية منذ ثلاثة أشهر."},
+          {w:"Enjoy",ar:"يستمتع",ex:"I enjoyed the trip very much.",exAr:"استمتعت بالرحلة كثيراً."},
+          {w:"Meet",ar:"يقابل / يلتقي",ex:"I met my friend at the café.",exAr:"قابلت صديقي في المقهى."},
+          {w:"Forget",ar:"ينسى",ex:"I forgot my phone at home.",exAr:"نسيت هاتفي في البيت."},
+          {w:"Spend",ar:"يقضي (الوقت) / يُنفق (المال)",ex:"I spent the weekend at the beach.",exAr:"قضيت نهاية الأسبوع في الشاطئ."},
+          {w:"Arrive",ar:"يصل",ex:"We arrived late to the meeting.",exAr:"وصلنا متأخرين إلى الاجتماع."},
+        ],
+        grammar:{
+          point:"Simple Past Tense — regular verbs add -ed, irregular verbs change form",
+          pointAr:"الماضي البسيط: الأفعال المنتظمة تأخذ -ed (visit → visited). الأفعال غير المنتظمة تتغير (go → went / meet → met / forget → forgot)",
+          examples:[
+            "I visited my family. [زرت عائلتي] — regular: visit → visited",
+            "I went to Aqaba. [ذهبت إلى العقبة] — irregular: go → went",
+            "She didn't come to class. [هي لم تأت إلى الصف] — didn't + base verb",
+            "Did you enjoy the trip? [هل استمتعت بالرحلة؟]",
+            "I forgot my keys. [نسيت مفاتيحي] — irregular: forget → forgot",
+          ],
+          levelNote:"IMPORTANT: For negative and questions in past tense, use 'did/didn't' + the BASE verb (not the past form). 'I didn't went' is WRONG. 'I didn't go' is CORRECT."
+        },
+        fillBlank:[
+          {sentence:"I ___ to Amman last week.",answer:"went",hint:"go في الماضي — غير منتظم"},
+          {sentence:"She ___ her friend at the café.",answer:"met",hint:"meet في الماضي — غير منتظم"},
+          {sentence:"I ___ my phone at home.",answer:"forgot",hint:"forget في الماضي — غير منتظم"},
+          {sentence:"We ___ the trip very much.",answer:"enjoyed",hint:"enjoy في الماضي — منتظم"},
+          {sentence:"Did you ___ the film?",answer:"watch",hint:"الفعل الأساسي مع did"},
+          {sentence:"I ___ arrive late.",answer:"didn't",hint:"النفي في الماضي"},
+        ],
+        spelling:["Yesterday","Enjoyed","Arrived","Visited","Forgot","Bought","Thought","Brought"],
+        conversation:[
+          "Tell me about your last weekend. What did you do?",
+          "Did you enjoy it? Why or why not?",
+          "Where did you go last summer?",
+          "Tell me about something funny or interesting that happened to you recently.",
+        ]
+      },
+      {id:"a2_l5",title:"Health, Body & Seeing a Doctor",titleAr:"الصحة والجسم وزيارة الطبيب",
+        vocab:[
+          {w:"Headache",ar:"صداع",ex:"I have a bad headache today.",exAr:"عندي صداع شديد اليوم."},
+          {w:"Fever",ar:"حمى / ارتفاع حرارة",ex:"She has a high fever.",exAr:"عندها حمى شديدة."},
+          {w:"Tired",ar:"متعب",ex:"I am very tired today.",exAr:"أنا متعب جداً اليوم."},
+          {w:"Doctor",ar:"دكتور / طبيب",ex:"I need to see a doctor.",exAr:"أحتاج أن أرى طبيباً."},
+          {w:"Medicine",ar:"دواء",ex:"Take this medicine twice a day.",exAr:"خذ هذا الدواء مرتين يومياً."},
+          {w:"Rest",ar:"يرتاح",ex:"You need to rest for two days.",exAr:"تحتاج إلى الراحة ليومين."},
+          {w:"Pain",ar:"ألم",ex:"I have a pain in my back.",exAr:"عندي ألم في ظهري."},
+          {w:"Appointment",ar:"موعد",ex:"I have a doctor's appointment tomorrow.",exAr:"عندي موعد مع الطبيب غداً."},
+        ],
+        grammar:{
+          point:"Have got / Has got — possession and physical states",
+          pointAr:"Have got = لدي / Has got = لديه-لديها. نستخدمها للامتلاك والأعراض الجسدية",
+          examples:[
+            "I've got a headache. [عندي صداع]",
+            "She's got a fever. [عندها حمى]",
+            "He hasn't got any medicine. [ليس عنده دواء]",
+            "Have you got pain anywhere? [هل عندك ألم في مكان ما؟]",
+            "I've got a doctor's appointment. [عندي موعد مع الطبيب]",
+          ],
+          levelNote:"'Have got' = 'have' in meaning. 'I have a headache' and 'I've got a headache' mean the same thing. 'Have got' is more common in British English. The contracted form 'I've got' is very natural in speech."
+        },
+        fillBlank:[
+          {sentence:"I've ___ a terrible headache.",answer:"got",hint:"have got للأعراض"},
+          {sentence:"She ___ got a fever.",answer:"has",hint:"مع she — has not have"},
+          {sentence:"Have you got ___ in your back?",answer:"pain",hint:"ألم"},
+          {sentence:"He hasn't ___ any medicine.",answer:"got",hint:"النفي مع have got"},
+          {sentence:"I need to see a ___.",answer:"doctor",hint:"طبيب"},
+          {sentence:"You need to ___ for two days.",answer:"rest",hint:"يرتاح"},
+        ],
+        spelling:["Headache","Medicine","Appointment","Pharmacy","Doctor","Fever","Stomach","Shoulder"],
+        conversation:[
+          "You don't feel well today. Tell me your symptoms.",
+          "Have you got any allergies to medicine?",
+          "Tell me about a time you were sick. What happened?",
+          "Role play: You are at the doctor. I am the doctor. Start: 'Doctor, I've got...'",
+        ]
+      },
     ]
   },
   b1:{
     name:"B1 — Intermediate",nameAr:"متوسط",
     lessons:[
-      {id:"b1_l1",title:"Opinions & Discussions",titleAr:"الآراء والنقاشات",
-        vocab:[{w:"In my opinion",ar:"في رأيي",ex:"In my opinion, education is very important."},{w:"I agree / disagree",ar:"أوافق / لا أوافق",ex:"I agree with you on this point."},{w:"However",ar:"ومع ذلك / لكن",ex:"It's expensive; however, it's very good."},{w:"Moreover",ar:"علاوة على ذلك",ex:"Moreover, it helps the environment."},{w:"On the other hand",ar:"من ناحية أخرى",ex:"On the other hand, some people disagree."},{w:"Believe",ar:"يعتقد / يؤمن",ex:"I believe that education should be free."}],
-        grammar:{point:"Modal verbs for opinion: should, must, might, could",pointAr:"أفعال المساعدة للرأي: يجب / قد / يمكن",examples:["The government should invest more in education.","This might be a good solution.","We must protect the environment.","It could be true, but I'm not sure."]},
-        practice:["In my opinion, _____ should _____.","I agree that _____, however, _____.","On the other hand, some people think _____.","I believe that _____ is important because _____."],
-        objectives:["Express and defend opinions","Use discourse markers","Use modal verbs for opinion"]},
-      {id:"b1_l2",title:"Travel & Experiences",titleAr:"السفر والتجارب",
-        vocab:[{w:"Have been to",ar:"سبق له الذهاب إلى",ex:"I have been to Turkey twice."},{w:"Memorable",ar:"لا يُنسى",ex:"It was a very memorable experience."},{w:"Culture",ar:"ثقافة",ex:"Jordan has a rich culture and history."},{w:"Recommend",ar:"يوصي / ينصح",ex:"I highly recommend visiting Petra."},{w:"Worth",ar:"يستحق",ex:"It's worth the long journey."},{w:"Explore",ar:"يستكشف",ex:"We had two days to explore the city."}],
-        grammar:{point:"Present Perfect — experiences and life events",pointAr:"المضارع التام — للتعبير عن التجارب والأحداث",examples:["I have visited five countries.","Have you ever been to London?","She has never tried sushi.","We have just arrived."]},
-        practice:["I have been to _____ and it was _____.","Have you ever _____?","I have never _____ but I would like to.","I highly recommend _____ because _____."],
-        objectives:["Talk about travel experiences","Use present perfect correctly","Recommend places and activities"]},
-      {id:"b1_l3",title:"Work & Ambitions",titleAr:"العمل والطموحات",
-        vocab:[{w:"Career",ar:"مسيرة مهنية",ex:"She has a successful career in medicine."},{w:"Ambition",ar:"طموح",ex:"My ambition is to start my own business."},{w:"Promotion",ar:"ترقية",ex:"He received a promotion last month."},{w:"Colleague",ar:"زميل عمل",ex:"My colleagues are very supportive."},{w:"Deadline",ar:"موعد نهائي",ex:"The deadline is next Friday."},{w:"Skilled",ar:"ماهر / متمرس",ex:"She is highly skilled in communication."}],
-        grammar:{point:"Future forms: will, going to, present continuous for plans",pointAr:"صيغ المستقبل: will / going to / المضارع المستمر للخطط",examples:["I will finish this report today.","I'm going to apply for a new job.","She is meeting the manager tomorrow.","He won't accept a lower salary."]},
-        practice:["In the future, I am going to _____.","My ambition is to _____ one day.","I will _____ by the end of this year.","My dream job is _____ because _____."],
-        objectives:["Discuss work and career plans","Use future forms accurately","Talk about ambitions"]},
-      {id:"b1_l4",title:"Environment & Society",titleAr:"البيئة والمجتمع",
-        vocab:[{w:"Pollution",ar:"تلوث",ex:"Air pollution is a serious problem."},{w:"Recycle",ar:"يعيد التدوير",ex:"We should recycle paper and plastic."},{w:"Climate change",ar:"تغير المناخ",ex:"Climate change affects everyone."},{w:"Community",ar:"مجتمع",ex:"Our community needs more green spaces."},{w:"Awareness",ar:"وعي / إدراك",ex:"We need to raise awareness about this issue."},{w:"Solution",ar:"حل",ex:"There is no easy solution to this problem."}],
-        grammar:{point:"Passive voice — focus on action, not the person",pointAr:"المبني للمجهول — التركيز على الفعل لا على الفاعل",examples:["Trees are cut down every day.","Plastic bottles should be recycled.","A new law has been introduced.","The environment is being damaged by pollution."]},
-        practice:["_____ is caused by _____.","The environment is being damaged by _____.","A solution must be found to _____.","People should be educated about _____."],
-        objectives:["Discuss environmental issues","Use passive voice confidently","Give solutions and suggestions"]},
-      {id:"b1_l5",title:"Technology & Everyday Life",titleAr:"التكنولوجيا والحياة اليومية",
-        vocab:[{w:"Artificial intelligence",ar:"الذكاء الاصطناعي",ex:"Artificial intelligence is changing every industry."},{w:"Convenient",ar:"مريح / عملي",ex:"Online shopping is very convenient."},{w:"Distraction",ar:"إلهاء / تشتيت",ex:"Social media can be a big distraction."},{w:"Privacy",ar:"خصوصية",ex:"People are worried about their online privacy."},{w:"Addiction",ar:"إدمان",ex:"Screen addiction is a growing problem."},{w:"Benefit",ar:"فائدة / يفيد",ex:"Technology has many benefits for education."}],
-        grammar:{point:"Conditional type 1 — real future possibilities",pointAr:"الشرط من النوع الأول — للاحتمالات المستقبلية الحقيقية",examples:["If we use technology wisely, it will improve our lives.","If you study hard, you will pass the exam.","If the internet goes down, we won't be able to work.","What will happen if we ignore this problem?"]},
-        practice:["If _____, then _____ will _____.","Technology helps us to _____, however, _____.","If people use social media less, they will _____.","In my opinion, the biggest benefit of technology is _____."],
-        objectives:["Discuss technology pros and cons","Use first conditional correctly","Give balanced arguments"]},
+      {id:"b1_l1",title:"Expressing Opinions",titleAr:"التعبير عن الآراء",
+        vocab:[
+          {w:"In my opinion",ar:"في رأيي",ex:"In my opinion, education is very important.",exAr:"في رأيي، التعليم مهم جداً."},
+          {w:"I agree / disagree",ar:"أوافق / لا أوافق",ex:"I completely agree with you.",exAr:"أوافقك الرأي تماماً."},
+          {w:"However",ar:"ومع ذلك / لكن",ex:"It's expensive; however, it's worth it.",exAr:"إنه غالٍ، ومع ذلك يستحق."},
+          {w:"Moreover",ar:"علاوة على ذلك / فضلاً عن ذلك",ex:"Moreover, it helps the environment.",exAr:"علاوة على ذلك، يساعد البيئة."},
+          {w:"On the other hand",ar:"من ناحية أخرى",ex:"On the other hand, some people disagree.",exAr:"من ناحية أخرى، بعض الناس لا يوافقون."},
+          {w:"Believe",ar:"يعتقد / يؤمن",ex:"I believe that education should be free.",exAr:"أؤمن بأن التعليم يجب أن يكون مجانياً."},
+          {w:"Point of view",ar:"وجهة نظر",ex:"From my point of view, this is wrong.",exAr:"من وجهة نظري، هذا خطأ."},
+          {w:"Argue",ar:"يجادل / يحتج",ex:"Some people argue that technology is harmful.",exAr:"بعض الناس يجادلون بأن التكنولوجيا ضارة."},
+        ],
+        grammar:{
+          point:"Modal verbs for opinion and deduction: should, must, might, could, ought to",
+          pointAr:"أفعال المساعدة للرأي: should=يجب (رأي) / must=يجب (ضرورة) / might/could=قد / ought to=ينبغي",
+          examples:[
+            "The government should invest more in education.",
+            "This might be a good solution — we're not sure yet.",
+            "We must protect the environment — it's essential.",
+            "It could be true, but I'm not certain.",
+            "They ought to apologise for their mistake.",
+          ],
+          levelNote:"'Should' is softer than 'must'. 'You should exercise' = advice. 'You must stop' = strong obligation. 'Might' and 'could' show possibility, not certainty."
+        },
+        fillBlank:[
+          {sentence:"In my ___, education should be free.",answer:"opinion",hint:"في رأيي"},
+          {sentence:"The government ___ invest in schools.",answer:"should",hint:"رأي/نصيحة"},
+          {sentence:"I ___ with you on this point.",answer:"agree",hint:"أوافق"},
+          {sentence:"___ the other hand, some disagree.",answer:"On",hint:"من ناحية أخرى"},
+          {sentence:"This ___ be the right solution.",answer:"might",hint:"قد يكون"},
+          {sentence:"___, it helps the environment.",answer:"Moreover",hint:"علاوة على ذلك"},
+        ],
+        spelling:["Opinion","Disagree","However","Moreover","Believe","Argue","Certain","Solution"],
+        conversation:[
+          "What is your opinion on social media? Is it good or bad?",
+          "Do you agree that everyone should learn English? Why or why not?",
+          "Tell me something you believe strongly. Use 'In my opinion' and 'Moreover'.",
+          "Argue both sides: technology is good / technology is bad.",
+        ]
+      },
+      {id:"b1_l2",title:"Travel & Life Experiences",titleAr:"السفر وتجارب الحياة",
+        vocab:[
+          {w:"Have been to",ar:"سبق أن زرت",ex:"I have been to Turkey twice.",exAr:"سبق أن زرت تركيا مرتين."},
+          {w:"Memorable",ar:"لا يُنسى",ex:"It was a truly memorable experience.",exAr:"كانت تجربة لا تُنسى حقاً."},
+          {w:"Recommend",ar:"يوصي / ينصح",ex:"I highly recommend visiting Petra.",exAr:"أنصح بشدة بزيارة البتراء."},
+          {w:"Worth",ar:"يستحق",ex:"It's definitely worth the journey.",exAr:"يستحق الرحلة بكل تأكيد."},
+          {w:"Explore",ar:"يستكشف",ex:"We had time to explore the old city.",exAr:"كان لدينا وقت لاستكشاف المدينة القديمة."},
+          {w:"Adventure",ar:"مغامرة",ex:"Hiking Wadi Rum is a great adventure.",exAr:"المشي في وادي رم مغامرة رائعة."},
+          {w:"Breathtaking",ar:"يأخذ الأنفاس / رائع",ex:"The view was absolutely breathtaking.",exAr:"المنظر كان رائعاً بكل معنى الكلمة."},
+          {w:"Exhausted",ar:"منهك / مرهق تماماً",ex:"I was exhausted after the long flight.",exAr:"كنت منهكاً بعد الرحلة الطويلة."},
+        ],
+        grammar:{
+          point:"Present Perfect — experiences and things that happened (unspecified time)",
+          pointAr:"المضارع التام: have/has + past participle. للتحدث عن التجارب دون تحديد وقت معين",
+          examples:[
+            "I have visited five countries. [زرت خمس دول]",
+            "Have you ever been to London? [هل سبق أن ذهبت إلى لندن؟]",
+            "She has never tried sushi. [هي لم تجرّب السوشي قط]",
+            "We have just arrived. [وصلنا للتو]",
+            "I have already eaten. [لقد أكلت بالفعل]",
+          ],
+          levelNote:"Key words with present perfect: ever (هل سبق), never (لم يحدث قط), just (للتو), already (بالفعل), yet (حتى الآن — في الأسئلة والنفي). Use PAST SIMPLE when you give a specific time: 'I visited Turkey in 2022.'"
+        },
+        fillBlank:[
+          {sentence:"I have ___ to five countries.",answer:"been",hint:"been = زرت (have been to)"},
+          {sentence:"Have you ___ been to Europe?",answer:"ever",hint:"هل سبق أن"},
+          {sentence:"She has ___ tried sushi.",answer:"never",hint:"لم تجرب قط"},
+          {sentence:"We have ___ arrived.",answer:"just",hint:"للتو"},
+          {sentence:"I have ___ recommend visiting Petra.",answer:"always",hint:"دائماً"},
+          {sentence:"It was a truly ___ experience.",answer:"memorable",hint:"لا يُنسى"},
+        ],
+        spelling:["Memorable","Breathtaking","Exhausted","Adventure","Recommend","Experience","Journey","Explore"],
+        conversation:[
+          "Tell me about the best trip you've ever taken. Where did you go?",
+          "Have you ever eaten something strange or unusual?",
+          "Recommend a place in Jordan to visit. Use 'I highly recommend' and 'It's worth...'",
+          "Have you ever had a travel disaster? What happened?",
+        ]
+      },
+      {id:"b1_l3",title:"Work, Career & Future Plans",titleAr:"العمل والمسيرة المهنية والخطط المستقبلية",
+        vocab:[
+          {w:"Career",ar:"مسيرة مهنية",ex:"She has built a successful career in medicine.",exAr:"بنت مسيرة مهنية ناجحة في الطب."},
+          {w:"Ambition",ar:"طموح",ex:"My ambition is to start my own business.",exAr:"طموحي هو أن أبدأ مشروعي الخاص."},
+          {w:"Promotion",ar:"ترقية",ex:"He received a well-deserved promotion.",exAr:"حصل على ترقية مستحقة."},
+          {w:"Colleague",ar:"زميل / زميلة في العمل",ex:"My colleagues are very supportive.",exAr:"زملائي في العمل داعمون جداً."},
+          {w:"Deadline",ar:"موعد نهائي / آخر موعد",ex:"The deadline for this project is Friday.",exAr:"الموعد النهائي لهذا المشروع هو الجمعة."},
+          {w:"Resign",ar:"يستقيل",ex:"She resigned from her job last month.",exAr:"استقالت من عملها الشهر الماضي."},
+          {w:"Salary",ar:"راتب",ex:"He negotiated a higher salary.",exAr:"تفاوض على راتب أعلى."},
+          {w:"Freelance",ar:"عمل حر / مستقل",ex:"I work freelance from home.",exAr:"أعمل بشكل مستقل من المنزل."},
+        ],
+        grammar:{
+          point:"Future forms: will (predictions/decisions) / going to (plans) / present continuous (fixed arrangements)",
+          pointAr:"صيغ المستقبل: will = للقرارات الفورية والتوقعات / going to = للخطط المعروفة / present continuous = للمواعيد المحددة",
+          examples:[
+            "I will help you — decided right now. [سأساعدك — قرار فوري]",
+            "I'm going to apply for a new job next month. [planned before]",
+            "She is meeting the manager tomorrow at 10. [fixed appointment]",
+            "He won't accept a lower salary. [will not]",
+            "I think prices will rise next year. [prediction]",
+          ],
+          levelNote:"The most common mistake: using 'will' for everything. 'Going to' is for plans you already decided. 'I'm going to study tonight' (decided already) vs 'I'll help you' (just decided now)."
+        },
+        fillBlank:[
+          {sentence:"I ___ going to apply for a new job.",answer:"am",hint:"am/is/are + going to"},
+          {sentence:"She ___ meet the manager tomorrow.",answer:"will",hint:"قرار مستقبلي"},
+          {sentence:"My ___ is to start my own business.",answer:"ambition",hint:"طموح"},
+          {sentence:"The ___ for this project is Friday.",answer:"deadline",hint:"الموعد النهائي"},
+          {sentence:"I think prices ___ rise next year.",answer:"will",hint:"توقع مستقبلي"},
+          {sentence:"He received a ___ last month.",answer:"promotion",hint:"ترقية"},
+        ],
+        spelling:["Ambition","Promotion","Colleague","Deadline","Salary","Resign","Career","Freelance"],
+        conversation:[
+          "What are your plans for the next five years? Use 'going to' and 'will'.",
+          "Tell me about your current job or studies. What do you like and dislike?",
+          "What is your biggest professional ambition?",
+          "If you could change your career, what would you do?",
+        ]
+      },
+      {id:"b1_l4",title:"Environment & Global Issues",titleAr:"البيئة والقضايا العالمية",
+        vocab:[
+          {w:"Pollution",ar:"تلوث",ex:"Air pollution is a serious global problem.",exAr:"تلوث الهواء مشكلة عالمية خطيرة."},
+          {w:"Recycle",ar:"يُعيد التدوير",ex:"We should recycle paper, plastic and glass.",exAr:"يجب أن نُعيد تدوير الورق والبلاستيك والزجاج."},
+          {w:"Climate change",ar:"تغيُّر المناخ",ex:"Climate change is the biggest challenge of our time.",exAr:"تغيُّر المناخ هو أكبر تحدٍّ في عصرنا."},
+          {w:"Sustainable",ar:"مستدام",ex:"We need sustainable energy sources.",exAr:"نحن بحاجة إلى مصادر طاقة مستدامة."},
+          {w:"Carbon footprint",ar:"البصمة الكربونية",ex:"Flying increases your carbon footprint.",exAr:"السفر جواً يزيد بصمتك الكربونية."},
+          {w:"Awareness",ar:"وعي / إدراك",ex:"We need to raise awareness about this issue.",exAr:"نحتاج إلى رفع الوعي حول هذه المسألة."},
+          {w:"Consequence",ar:"نتيجة / عواقب",ex:"The consequences of inaction are severe.",exAr:"عواقب عدم التصرف وخيمة."},
+          {w:"Renewable energy",ar:"الطاقة المتجددة",ex:"Solar power is a form of renewable energy.",exAr:"الطاقة الشمسية شكل من أشكال الطاقة المتجددة."},
+        ],
+        grammar:{
+          point:"Passive voice — focus on the action, not the person who does it",
+          pointAr:"المبني للمجهول: be + past participle. نركز على الفعل لا على الفاعل. يُستخدم كثيراً في الكتابة الأكاديمية",
+          examples:[
+            "Trees are cut down every day. [تُقطع الأشجار كل يوم]",
+            "Plastic should be recycled. [يجب إعادة تدوير البلاستيك]",
+            "A new law has been introduced. [قانون جديد تم تقديمه]",
+            "The report was written by scientists. [كتب العلماء التقرير]",
+            "Thousands of species are being threatened. [تتعرض آلاف الأنواع للتهديد]",
+          ],
+          levelNote:"Passive = be + past participle. The past participle of regular verbs: recycle → recycled. Irregular: write → written, cut → cut, take → taken. You can add 'by + agent' if needed."
+        },
+        fillBlank:[
+          {sentence:"Trees ___ cut down every day.",answer:"are",hint:"المبني للمجهول المضارع"},
+          {sentence:"Plastic should be ___.",answer:"recycled",hint:"past participle of recycle"},
+          {sentence:"A new law has ___ introduced.",answer:"been",hint:"present perfect passive"},
+          {sentence:"___ change is the biggest challenge.",answer:"Climate",hint:"تغيُّر المناخ"},
+          {sentence:"We need to raise ___ about this issue.",answer:"awareness",hint:"وعي"},
+          {sentence:"The ___ of inaction are severe.",answer:"consequences",hint:"عواقب / نتائج"},
+        ],
+        spelling:["Pollution","Recycle","Sustainable","Renewable","Awareness","Consequence","Environment","Climate"],
+        conversation:[
+          "What do you personally do to help the environment?",
+          "In your opinion, who is responsible for climate change — governments or individuals?",
+          "Tell me about an environmental problem in Jordan or your city.",
+          "How should we raise awareness about pollution among young people?",
+        ]
+      },
+      {id:"b1_l5",title:"Technology & Modern Life",titleAr:"التكنولوجيا والحياة المعاصرة",
+        vocab:[
+          {w:"Artificial intelligence",ar:"الذكاء الاصطناعي",ex:"Artificial intelligence is transforming every industry.",exAr:"الذكاء الاصطناعي يُحوّل كل صناعة."},
+          {w:"Privacy",ar:"خصوصية",ex:"Online privacy is a growing concern.",exAr:"الخصوصية الإلكترونية قلق متزايد."},
+          {w:"Addiction",ar:"إدمان",ex:"Screen addiction affects millions.",exAr:"إدمان الشاشات يُؤثر على الملايين."},
+          {w:"Convenience",ar:"سهولة / راحة / عملية",ex:"Online shopping offers great convenience.",exAr:"التسوق الإلكتروني يوفر سهولة كبيرة."},
+          {w:"Distraction",ar:"إلهاء / تشتيت",ex:"Social media is a major distraction.",exAr:"وسائل التواصل الاجتماعي إلهاء كبير."},
+          {w:"Innovation",ar:"ابتكار / إبداع تقني",ex:"Innovation drives progress.",exAr:"الابتكار يقود التقدم."},
+          {w:"Hack",ar:"يخترق / اختراق",ex:"The company's data was hacked.",exAr:"تم اختراق بيانات الشركة."},
+          {w:"Update",ar:"تحديث / يُحدّث",ex:"Please update your software regularly.",exAr:"يرجى تحديث برنامجك بانتظام."},
+        ],
+        grammar:{
+          point:"First conditional — real future possibilities and consequences",
+          pointAr:"الشرط من النوع الأول: If + present simple → will + base verb. للاحتمالات الحقيقية في المستقبل",
+          examples:[
+            "If we use technology wisely, it will improve our lives.",
+            "If you don't update your software, you will get a virus.",
+            "If she studies hard, she will pass the exam.",
+            "What will happen if we ignore climate change?",
+            "If the internet goes down, we won't be able to work.",
+          ],
+          levelNote:"First conditional = real possibility. 'If it rains, I will stay home' — this could really happen. Second conditional = unreal/hypothetical: 'If I were rich, I would travel' — probably not real now."
+        },
+        fillBlank:[
+          {sentence:"If we use tech wisely, it ___ improve our lives.",answer:"will",hint:"first conditional نتيجة"},
+          {sentence:"If you don't update, you ___ get a virus.",answer:"will",hint:"نتيجة حقيقية محتملة"},
+          {sentence:"___ intelligence is transforming every industry.",answer:"Artificial",hint:"الذكاء..."},
+          {sentence:"Social media is a major ___.",answer:"distraction",hint:"إلهاء / تشتيت"},
+          {sentence:"Online ___ is a growing concern.",answer:"privacy",hint:"خصوصية"},
+          {sentence:"What will happen if we ___ this problem?",answer:"ignore",hint:"نتجاهل"},
+        ],
+        spelling:["Artificial","Innovation","Distraction","Privacy","Convenience","Addiction","Technology","Connected"],
+        conversation:[
+          "Do you think artificial intelligence will take your job in the future?",
+          "If you had no phone for a week, what would you miss most?",
+          "What are the biggest benefits and dangers of social media?",
+          "Tell me: if technology disappeared tomorrow, how would your life change?",
+        ]
+      },
     ]
   },
   b2:{
     name:"B2 — Upper Intermediate",nameAr:"فوق المتوسط",
     lessons:[
-      {id:"b2_l1",title:"Hypothetical Situations",titleAr:"المواقف الافتراضية",
-        vocab:[{w:"Hypothetical",ar:"افتراضي / نظري",ex:"Let's consider a hypothetical situation."},{w:"Consequence",ar:"نتيجة / عواقب",ex:"The consequences of this decision are serious."},{w:"Alternative",ar:"بديل",ex:"Is there an alternative to this approach?"},{w:"Assume",ar:"يفترض / يتحمل",ex:"Let's assume that the plan fails — then what?"},{w:"Nevertheless",ar:"بالرغم من ذلك",ex:"The plan is risky; nevertheless, we should try."},{w:"Perspective",ar:"منظور / وجهة نظر",ex:"From a different perspective, this makes sense."}],
-        grammar:{point:"Conditional type 2 & 3 — unreal and past hypotheticals",pointAr:"الشرط من النوع الثاني والثالث — للمواقف غير الحقيقية والماضية",examples:["If I were the president, I would reform the education system.","If she had studied harder, she would have passed.","Were it not for his help, I would have failed.","Had I known earlier, I would have acted differently."]},
-        practice:["If I were _____, I would _____.","If I had _____, I would have _____.","Had I known _____, I would have _____.","If _____ hadn't happened, _____ would be different."],
-        objectives:["Use conditionals 2 & 3 naturally","Discuss hypothetical outcomes","Analyse decisions and consequences"]},
-      {id:"b2_l2",title:"Academic & Formal Writing",titleAr:"الكتابة الأكاديمية والرسمية",
-        vocab:[{w:"Whereas",ar:"بينما / في حين أن",ex:"Some argue for change, whereas others resist it."},{w:"Subsequently",ar:"في ما بعد / لاحقاً",ex:"The policy was introduced; subsequently, crime rates fell."},{w:"Significant",ar:"ملحوظ / كبير الأهمية",ex:"There has been a significant increase in pollution."},{w:"Extent",ar:"مدى / نطاق",ex:"To what extent do you agree with this view?"},{w:"Argument",ar:"حجة / موقف",ex:"The main argument against this is clear."},{w:"Evaluate",ar:"يُقيّم / يقدّر",ex:"We need to evaluate the evidence carefully."}],
-        grammar:{point:"Reporting verbs — adding nuance to quoted ideas",pointAr:"أفعال الإبلاغ — لإضافة دقة عند الاستشهاد بالآراء",examples:["He argues that education should be free.","Researchers suggest that the trend will continue.","Critics claim that the policy has failed.","The report indicates a significant rise in costs."]},
-        practice:["Researchers suggest that _____.","Critics argue that _____, whereas others claim _____.","To what extent do you agree that _____?","The evidence indicates that _____ is _____."],
-        objectives:["Write and speak with academic precision","Use reporting verbs correctly","Structure complex arguments"]},
-      {id:"b2_l3",title:"Inversion & Emphasis",titleAr:"الانقلاب والتأكيد",
-        vocab:[{w:"Rarely",ar:"نادراً",ex:"Rarely do we see such talent."},{w:"Barely",ar:"بالكاد",ex:"I had barely arrived when the meeting started."},{w:"Not only... but also",ar:"ليس فقط... بل أيضاً",ex:"Not only is she intelligent, but she is also hardworking."},{w:"Under no circumstances",ar:"تحت أي ظرف من الظروف",ex:"Under no circumstances should you lie."},{w:"Emphasis",ar:"تأكيد / تشديد",ex:"The emphasis should be on quality, not speed."},{w:"Striking",ar:"لافت للنظر / ملفت",ex:"The most striking feature of the city is its history."}],
-        grammar:{point:"Fronted adverbials and inversion for emphasis",pointAr:"تقديم الظرف وقلب ترتيب الجملة للتأكيد",examples:["Never have I seen such a beautiful city.","Rarely does he make mistakes.","Not only did she win, but she also broke the record.","Under no circumstances will I accept this."]},
-        practice:["Never have I _____.","Not only did _____, but _____ also _____.","Rarely do we _____.","Under no circumstances should _____."],
-        objectives:["Use inversion for emphasis","Sound sophisticated in formal speech","Add drama and weight to statements"]},
-      {id:"b2_l4",title:"Discourse & Coherence",titleAr:"التماسك في النص",
-        vocab:[{w:"Concede",ar:"يُسلّم / يعترف",ex:"I concede that this approach has some merit."},{w:"Refute",ar:"يدحض / يرد على",ex:"She refuted his argument with clear evidence."},{w:"Substantiate",ar:"يُثبت / يؤكد بالدليل",ex:"Can you substantiate this claim?"},{w:"Elaborate",ar:"يوضح / يتوسع في الشرح",ex:"Could you elaborate on that point?"},{w:"Nonetheless",ar:"بالرغم من ذلك / مع ذلك",ex:"It was difficult; nonetheless, we succeeded."},{w:"Integral",ar:"أساسي / لا يتجزأ",ex:"Communication is integral to leadership."}],
-        grammar:{point:"Cleft sentences — It is... that / What... is",pointAr:"الجمل المنقسمة للتأكيد على جزء من الفكرة",examples:["It is education that transforms societies.","What we need is a long-term solution.","It was his dedication that made the difference.","What surprised me most was the lack of planning."]},
-        practice:["It is _____ that _____.","What we need is _____.","It was _____ that made the difference.","What surprised me was _____."],
-        objectives:["Structure sophisticated arguments","Use cleft sentences","Develop coherent extended discourse"]},
-      {id:"b2_l5",title:"Nuance & Register",titleAr:"الدقة وأسلوب الكلام",
-        vocab:[{w:"Colloquial",ar:"عامي / غير رسمي",ex:"That expression is very colloquial — avoid it in writing."},{w:"Formal register",ar:"أسلوب رسمي",ex:"In a formal register, we say 'commence' not 'start'."},{w:"Connotation",ar:"دلالة / معنى ضمني",ex:"'Cheap' and 'affordable' have different connotations."},{w:"Subtle",ar:"دقيق / خفي",ex:"There is a subtle difference between these two words."},{w:"Tone",ar:"نبرة / أسلوب",ex:"The tone of the email should be professional."},{w:"Imply",ar:"يُلمح / يُشير ضمناً",ex:"What does that imply about his intentions?"}],
-        grammar:{point:"Hedging language — softening claims in academic speech",pointAr:"لغة التخفيف — للتعبير عن عدم اليقين في الأسلوب الأكاديمي",examples:["This would appear to suggest a link.","It seems likely that costs will rise.","There may well be other explanations.","This could arguably be the most important factor."]},
-        practice:["This would appear to _____.","It seems likely that _____.","There may well be _____.","This could arguably be _____."],
-        objectives:["Control tone and register","Use hedging language","Distinguish formal from informal"]},
+      {id:"b2_l1",title:"Hypothetical Thinking & Conditionals",titleAr:"التفكير الافتراضي والجمل الشرطية",
+        vocab:[{w:"Hypothetical",ar:"افتراضي",ex:"Let's consider a hypothetical situation.",exAr:"لنفكر في موقف افتراضي."},{w:"Consequence",ar:"نتيجة / عاقبة",ex:"Every action has a consequence.",exAr:"لكل فعل نتيجة."},{w:"Assume",ar:"يفترض",ex:"Let's assume the plan fails — what then?",exAr:"لنفترض أن الخطة فشلت — ماذا بعد؟"},{w:"Nevertheless",ar:"بالرغم من ذلك",ex:"It's risky; nevertheless, we should try.",exAr:"إنه خطير، بالرغم من ذلك يجب أن نحاول."},{w:"Perspective",ar:"منظور / وجهة نظر",ex:"From a different perspective, this makes sense.",exAr:"من منظور مختلف، هذا منطقي."},{w:"Implication",ar:"تداعية / مدلول",ex:"The implications of this decision are serious.",exAr:"تداعيات هذا القرار خطيرة."},{w:"Alternative",ar:"بديل",ex:"Is there an alternative to this approach?",exAr:"هل يوجد بديل لهذا النهج؟"},{w:"Dilemma",ar:"معضلة / مأزق",ex:"It's a real dilemma — both options are bad.",exAr:"إنها معضلة حقيقية — كلا الخيارين سيئ."},],
+        grammar:{point:"Conditional 2 (unreal present) & 3 (unreal past)",pointAr:"الشرط 2: If + past simple → would + base — لمواقف غير حقيقية الآن. الشرط 3: If + past perfect → would have + pp — للماضي",examples:["If I were the president, I would reform the system. (I'm not the president)","If she had studied harder, she would have passed. (she didn't study hard)","Were it not for his help, I would have failed. (formal inversion)","Had I known earlier, I would have acted differently."],levelNote:"Conditional 2 uses 'were' (not 'was') even with I/he/she — 'If I WERE you' (not 'if I was'). This is a formal rule that's often tested."},
+        fillBlank:[{sentence:"If I ___ the president, I would change everything.",answer:"were",hint:"Cond. 2 — were لجميع الضمائر"},{sentence:"If she had studied, she ___ have passed.",answer:"would",hint:"Cond. 3 — would have"},{sentence:"It's a real ___. I don't know what to do.",answer:"dilemma",hint:"معضلة"},{sentence:"___ I known earlier, I would have helped.",answer:"Had",hint:"Inversion — شكل رسمي"},{sentence:"From a different ___, this makes sense.",answer:"perspective",hint:"منظور"},{sentence:"___, the plan has some merit.",answer:"Nevertheless",hint:"بالرغم من ذلك"},],
+        spelling:["Hypothetical","Nevertheless","Implication","Alternative","Perspective","Consequence","Dilemma","Assume"],
+        conversation:["If you could change one thing about your country, what would it be?","If you had been born in a different country, how would your life be different?","Present a dilemma and argue both sides.","What would you do if you discovered your best friend had lied to you?"]
+      },
+      {id:"b2_l2",title:"Academic Language & Reporting",titleAr:"اللغة الأكاديمية وصيغ الإبلاغ",vocab:[{w:"Whereas",ar:"بينما / في حين أن",ex:"Some support the idea, whereas others oppose it.",exAr:"البعض يدعم الفكرة بينما يعارضها آخرون."},{w:"Subsequently",ar:"في ما بعد / لاحقاً",ex:"The policy was introduced; subsequently, results improved.",exAr:"تم تقديم السياسة؛ لاحقاً تحسنت النتائج."},{w:"Significant",ar:"ملحوظ / بالغ الأهمية",ex:"There has been a significant rise in cases.",exAr:"كان هناك ارتفاع ملحوظ في الحالات."},{w:"Extent",ar:"مدى / نطاق",ex:"To what extent do you agree?",exAr:"إلى أي مدى توافق؟"},{w:"Evaluate",ar:"يُقيّم",ex:"We need to evaluate the evidence carefully.",exAr:"نحتاج إلى تقييم الأدلة بعناية."},{w:"Refute",ar:"يدحض / يرد على",ex:"She refuted his argument with clear evidence.",exAr:"دحضت حجته بأدلة واضحة."},{w:"Substantiate",ar:"يُثبت / يؤكد بالدليل",ex:"Can you substantiate this claim?",exAr:"هل يمكنك إثبات هذا الادعاء؟"},{w:"Concede",ar:"يُسلّم / يعترف بـ",ex:"I concede that point is valid.",exAr:"أُسلّم بأن هذه النقطة صحيحة."},],grammar:{point:"Reporting verbs — goes beyond 'say' and 'tell' to add nuance",pointAr:"أفعال الإبلاغ: تتجاوز 'said' وتضيف معنى إضافياً — argue/suggest/claim/indicate/conclude",examples:["He argues that education should be free. (making a case)","Researchers suggest that the trend will continue. (not 100% sure)","Critics claim that the policy has failed. (controversial)","The report indicates a significant rise. (objective finding)","She concedes that there are problems. (admitting)"],levelNote:"Choose reporting verbs carefully — 'claims' implies the speaker doubts it, 'states' is neutral, 'argues' means making a case. These choices completely change the tone."},fillBlank:[{sentence:"Researchers ___ that the trend will continue.",answer:"suggest",hint:"يقترح / يشير إلى"},{sentence:"Critics ___ that the policy has failed.",answer:"claim",hint:"يدّعي — مع شك"},{sentence:"She ___ that the point is valid.",answer:"concedes",hint:"يُسلّم / يعترف"},{sentence:"To what ___ do you agree?",answer:"extent",hint:"مدى"},{sentence:"Some support it, ___ others oppose it.",answer:"whereas",hint:"بينما"},{sentence:"Can you ___ that claim with evidence?",answer:"substantiate",hint:"يُثبت"},],spelling:["Significant","Evaluate","Whereas","Subsequently","Refute","Concede","Substantiate","Indicate"],conversation:["Present an argument about education using reporting verbs.","To what extent do you agree that social media is harmful?","Refute this: 'Young people don't work hard enough.'","Argue that Jordan's tourism should be developed further — substantiate your claim."]},
+      {id:"b2_l3",title:"Inversion & Emphasis",titleAr:"الانقلاب والتأكيد",vocab:[{w:"Rarely",ar:"نادراً",ex:"Rarely do we see such talent.",exAr:"نادراً ما نرى مثل هذه الموهبة."},{w:"Barely",ar:"بالكاد",ex:"I had barely arrived when it started.",exAr:"بالكاد وصلت حين بدأ."},{w:"Not only... but also",ar:"ليس فقط... بل أيضاً",ex:"Not only is she intelligent, but also creative.",exAr:"ليست فقط ذكية، بل أيضاً مبدعة."},{w:"Under no circumstances",ar:"تحت أي ظرف من الظروف",ex:"Under no circumstances should you lie.",exAr:"تحت أي ظرف من الظروف، لا يجب أن تكذب."},{w:"Striking",ar:"لافت للنظر",ex:"The most striking feature is its history.",exAr:"أبرز ما يميزها تاريخها."},{w:"Exceptional",ar:"استثنائي",ex:"This is an exceptional opportunity.",exAr:"هذه فرصة استثنائية."},{w:"Unprecedented",ar:"غير مسبوق",ex:"The growth was unprecedented.",exAr:"كان النمو غير مسبوق."},{w:"Emphatic",ar:"مُؤكَّد / تأكيدي",ex:"She gave an emphatic refusal.",exAr:"رفضت بشكل قاطع."},],grammar:{point:"Fronted adverbials and inversion for dramatic emphasis",pointAr:"تقديم الظرف + قلب ترتيب الفعل والفاعل للتأكيد والتأثير الدرامي",examples:["Never have I seen such beauty. (inverted: never + have + subject)","Rarely does he make mistakes.","Not only did she win, but she also broke the record.","Under no circumstances will I accept this.","Barely had I sat down when the phone rang."],levelNote:"After negative adverbials (never, rarely, barely, not only, under no circumstances), the auxiliary verb COMES BEFORE the subject — like a question structure. This is advanced formal English that immediately sounds sophisticated."},fillBlank:[{sentence:"Never ___ I seen such courage.",answer:"have",hint:"قلب الترتيب بعد Never"},{sentence:"Not only did she win, ___ she broke the record.",answer:"but",hint:"Not only... but also"},{sentence:"___ no circumstances will I accept this.",answer:"Under",hint:"تحت أي ظرف من الظروف"},{sentence:"Rarely ___ he make such mistakes.",answer:"does",hint:"قلب الترتيب بعد Rarely"},{sentence:"The growth was ___. Nothing like it before.",answer:"unprecedented",hint:"غير مسبوق"},{sentence:"This is an ___ opportunity.",answer:"exceptional",hint:"استثنائي"},],spelling:["Unprecedented","Exceptional","Emphatic","Striking","Circumstances","Fronted","Dramatic","Inversion"],conversation:["Use 'Never have I...' to tell me about something you've never done but want to.","Use 'Not only... but also' to describe a talented person you know.","Under no circumstances — what is something you absolutely refuse to do?","Describe an exceptional experience using three vocabulary words from today."]},
+      {id:"b2_l4",title:"Nuance, Register & Connotation",titleAr:"الدقة والأسلوب والمعنى الضمني",vocab:[{w:"Colloquial",ar:"عامي / غير رسمي",ex:"'Gonna' is colloquial for 'going to'.",exAr:"كلمة 'gonna' عامية تعني 'going to'."},{w:"Connotation",ar:"دلالة / معنى ضمني",ex:"'Cheap' and 'affordable' have different connotations.",exAr:"'Cheap' و 'affordable' لهما دلالات مختلفة."},{w:"Subtle",ar:"دقيق / خفي",ex:"There is a subtle difference between these words.",exAr:"هناك فرق دقيق بين هاتين الكلمتين."},{w:"Tone",ar:"نبرة / أسلوب",ex:"The tone of your email should be professional.",exAr:"يجب أن تكون نبرة بريدك الإلكتروني مهنية."},{w:"Imply",ar:"يُلمّح / يُشير ضمناً",ex:"What does that imply about his intentions?",exAr:"ماذا يُلمّح ذلك عن نواياه؟"},{w:"Formal / Informal",ar:"رسمي / غير رسمي",ex:"Use formal English in professional emails.",exAr:"استخدم الإنجليزية الرسمية في الرسائل المهنية."},{w:"Euphemism",ar:"تلطيف لفظي",ex:"'Passed away' is a euphemism for 'died'.",exAr:"'Passed away' تلطيف لفظي لكلمة 'مات'."},{w:"Derogatory",ar:"تحقيري / مسيء",ex:"Avoid derogatory language at all times.",exAr:"تجنّب اللغة التحقيرية في جميع الأوقات."},],grammar:{point:"Hedging language — making claims softer and more academic",pointAr:"لغة التخفيف: تُستخدم في الكتابة الأكاديمية لتليين الادعاءات وعدم الجزم",examples:["This would appear to suggest a link. (softer than 'this shows')","It seems likely that costs will rise. (not 100% certain)","There may well be other explanations. (possibility)","This could arguably be the most important factor. (academic hedging)","Broadly speaking, the results are positive. (general claim)"],levelNote:"Hedging is essential in academic English. It shows intellectual honesty — you're not overclaiming. Phrases like 'it seems', 'it appears', 'arguably', 'broadly speaking' are highly valued in formal writing and speaking."},fillBlank:[{sentence:"This would ___ to suggest a connection.",answer:"appear",hint:"تليين الادعاء"},{sentence:"It ___ likely that prices will rise.",answer:"seems",hint:"يبدو أن"},{sentence:"There ___ well be other reasons.",answer:"may",hint:"قد يكون"},{sentence:"'Passed away' is a ___ for 'died'.",answer:"euphemism",hint:"تلطيف لفظي"},{sentence:"'Cheap' and 'affordable' have different ___.",answer:"connotations",hint:"دلالات"},{sentence:"___ speaking, the results are positive.",answer:"Broadly",hint:"بشكل عام"},],spelling:["Connotation","Euphemism","Derogatory","Colloquial","Register","Implication","Nuance","Hedging"],conversation:["What is the difference in connotation between 'house' and 'home'?","Give me three euphemisms you know in English.","Rewrite this colloquially: 'I am going to meet my colleague tomorrow.'","When should you use formal English vs informal? Give examples."]},
+      {id:"b2_l5",title:"Discourse & Coherent Arguments",titleAr:"الخطاب وبناء الحجج المتماسكة",vocab:[{w:"Coherent",ar:"متماسك / منطقي",ex:"Present a coherent argument with clear evidence.",exAr:"قدّم حجة متماسكة مع أدلة واضحة."},{w:"Elaborate",ar:"يُوضّح / يتوسع في الشرح",ex:"Could you elaborate on that point?",exAr:"هل يمكنك التوسع في هذه النقطة؟"},{w:"Digress",ar:"يخرج عن الموضوع",ex:"Sorry, I digress — back to the point.",exAr:"آسف، خرجت عن الموضوع — لنعد."},{w:"Nonetheless",ar:"بالرغم من ذلك",ex:"It was difficult; nonetheless, we succeeded.",exAr:"كان صعباً، بالرغم من ذلك نجحنا."},{w:"Integral",ar:"أساسي / جوهري",ex:"Communication is integral to leadership.",exAr:"التواصل جوهري للقيادة."},{w:"Pivot",ar:"يتحول / يُغيّر اتجاهاً",ex:"Let me pivot to a different aspect.",exAr:"دعني أتحول إلى جانب مختلف."},{w:"Caveat",ar:"تحفظ / شرط / استثناء",ex:"One important caveat: this study is small.",exAr:"تحفظ مهم: هذه الدراسة صغيرة."},{w:"Substantive",ar:"جوهري / ذو مادة",ex:"We need a substantive discussion on this.",exAr:"نحتاج نقاشاً جوهرياً حول هذا."},],grammar:{point:"Cleft sentences — It is...that / What...is — for emphasis and focus",pointAr:"الجمل المنقسمة للتأكيد: It is + X + that... / What + clause + is...",examples:["It is education that transforms societies. (not money — education)","What we need is a long-term solution.","It was his dedication that made the difference.","What surprised me most was the lack of planning.","It is only through dialogue that we can resolve this."],levelNote:"Cleft sentences redirect the listener's focus. 'Education transforms societies' is a statement. 'It is EDUCATION that transforms societies' emphasises education specifically. Very useful in debates and formal discussions."},fillBlank:[{sentence:"It is ___ that transforms societies.",answer:"education",hint:"التركيز على التعليم"},{sentence:"What we need is a long-term ___.",answer:"solution",hint:"حل طويل الأمد"},{sentence:"Could you ___ on that point?",answer:"elaborate",hint:"يتوسع في الشرح"},{sentence:"It was difficult; ___, we succeeded.",answer:"nonetheless",hint:"بالرغم من ذلك"},{sentence:"Communication is ___ to good leadership.",answer:"integral",hint:"أساسي / جوهري"},{sentence:"One important ___: this study is small.",answer:"caveat",hint:"تحفظ"},],spelling:["Coherent","Elaborate","Nonetheless","Integral","Substantive","Caveat","Discourse","Argument"],conversation:["Present a coherent argument for or against free university education.","Use a cleft sentence ('It is...that') to make a strong point about something you believe.","Tell me about a topic, then deliberately digress, then say 'But I digress — back to...'","What is integral to a good education? Use at least 3 vocabulary words from today."]}
     ]
   },
   c1:{
     name:"C1 — Advanced",nameAr:"متقدم",
     lessons:[
-      {id:"c1_l1",title:"Critical Analysis",titleAr:"التحليل النقدي",
-        vocab:[{w:"Scrutinise",ar:"يتمحّص / يفحص بدقة",ex:"We must scrutinise the data before drawing conclusions."},{w:"Compelling",ar:"مقنع / لا يُقاوم",ex:"She made a compelling case for the reform."},{w:"Paradox",ar:"مفارقة / تناقض ظاهري",ex:"There is a paradox at the heart of this argument."},{w:"Implications",ar:"تداعيات / انعكاسات",ex:"The implications of this research are far-reaching."},{w:"Underpin",ar:"يدعم / يُشكّل الأساس",ex:"This assumption underpins the entire theory."},{w:"Dismantle",ar:"يُفكّك / يهدم الحجة",ex:"She dismantled his argument point by point."}],
-        grammar:{point:"Nominalisation — turning verbs into nouns for academic style",pointAr:"تحويل الأفعال إلى أسماء للأسلوب الأكاديمي",examples:["decide → the decision was made","analyse → the analysis revealed","conclude → the conclusion was that...","develop → the development of new strategies"]},
-        practice:["The analysis revealed that _____.","The implication of this is that _____.","There is a compelling argument for _____.","The development of _____ has led to _____."],
-        objectives:["Analyse arguments critically","Use nominalisation confidently","Construct sophisticated positions"]},
-      {id:"c1_l2",title:"Idiomatic & Natural Speech",titleAr:"التعابير الاصطلاحية والكلام الطبيعي",
-        vocab:[{w:"Cut corners",ar:"يختصر الطريق / لا يبذل الجهد الكافي",ex:"You can't cut corners when it comes to safety."},{w:"Bite the bullet",ar:"يتجرّع المر / يتحمل الأمر",ex:"We need to bite the bullet and make the tough decision."},{w:"Get to the point",ar:"يصل إلى الموضوع مباشرة",ex:"Stop giving me context — just get to the point."},{w:"On the fence",ar:"متردد / على الحياد",ex:"I'm still on the fence about this decision."},{w:"Groundbreaking",ar:"رائد / غير مسبوق",ex:"This is groundbreaking research."},{w:"Nuanced",ar:"دقيق / متعدد الأبعاد",ex:"Her analysis was nuanced and thorough."}],
-        grammar:{point:"Ellipsis and substitution — natural flowing speech",pointAr:"الحذف والإحالة — لجعل الكلام طبيعياً وسلساً",examples:["A: Do you want to come? B: I'd love to (instead of: I'd love to come).","A: Is he coming? B: I think so / I don't think so.","She works harder than he does.","It's a better solution than the previous one."]},
-        practice:["I'm still on the fence about _____.","We need to bite the bullet and _____.","This is groundbreaking because _____.","I think so / I don't think so — because _____."],
-        objectives:["Use idioms naturally and correctly","Speak with genuine fluency","Use ellipsis to sound natural"]},
-      {id:"c1_l3",title:"Persuasion & Rhetoric",titleAr:"الإقناع والخطابة",
-        vocab:[{w:"Rhetoric",ar:"بلاغة / خطابة",ex:"The speech was full of powerful rhetoric."},{w:"Allude to",ar:"يُلمّح إلى / يُشير إلى",ex:"She alluded to the scandal without naming anyone."},{w:"Invoke",ar:"يستدعي / يحتجّ بـ",ex:"He invoked his right to remain silent."},{w:"Assert",ar:"يؤكد / يُصرّح",ex:"I assert that this policy will fail."},{w:"Evocative",ar:"يستحضر المشاعر / مُعبّر",ex:"She used evocative language to move the audience."},{w:"Contend",ar:"يجادل / يدّعي",ex:"I contend that the evidence supports my view."}],
-        grammar:{point:"Rhetorical questions and triplets for persuasive effect",pointAr:"الأسئلة الخطابية وثلاثيات الأفكار للتأثير الإقناعي",examples:["Is this really the future we want for our children?","We need courage, commitment, and clarity.","Can we afford to wait? Can we afford to ignore this? Can we afford to fail?","This is not just a problem — it is a crisis, a challenge, and an opportunity."]},
-        practice:["Is this really the _____ we want?","We need _____, _____, and _____.","I contend that _____ is not merely _____ but _____.","Can we afford to _____?"],
-        objectives:["Deliver persuasive arguments","Use rhetorical devices effectively","Speak with confidence and authority"]},
-      {id:"c1_l4",title:"Complex Narratives",titleAr:"السرد المعقد",
-        vocab:[{w:"Chronicle",ar:"يُسجّل / يروي تاريخياً",ex:"The book chronicles the rise and fall of the empire."},{w:"Unravel",ar:"يتكشّف / ينكشف",ex:"The truth began to unravel slowly."},{w:"Pivotal",ar:"محوري / حاسم",ex:"This was a pivotal moment in history."},{w:"Culminate",ar:"يبلغ الذروة / ينتهي بـ",ex:"Years of work culminated in this discovery."},{w:"Foreshadow",ar:"يُمهّد لـ / ينذر بـ",ex:"The early signs foreshadowed the crisis."},{w:"Protagonist",ar:"البطل / الشخصية الرئيسية",ex:"The protagonist struggles with a moral dilemma."}],
-        grammar:{point:"Narrative tenses — past simple, past continuous, past perfect together",pointAr:"أزمنة السرد — استخدام الماضي البسيط والمستمر والتام معاً",examples:["I had been working for hours when the power went out.","While she was presenting, the news broke.","He had already left by the time they arrived.","Just as the situation was improving, everything collapsed."]},
-        practice:["I had already _____ when _____.","While _____ was happening, _____.","Just as _____ was _____, _____ happened.","This was a pivotal moment because _____."],
-        objectives:["Tell complex stories with precision","Use narrative tenses fluently","Build dramatic and coherent narratives"]},
-      {id:"c1_l5",title:"Lexical Precision",titleAr:"الدقة المعجمية",
-        vocab:[{w:"Ameliorate",ar:"يُحسّن / يُخفّف من حدّة",ex:"Measures must be taken to ameliorate the situation."},{w:"Exacerbate",ar:"يُفاقم / يزيد الوضع سوءاً",ex:"The drought exacerbated the food crisis."},{w:"Proliferate",ar:"يتكاثر / ينتشر بسرعة",ex:"Misinformation has proliferated online."},{w:"Curtail",ar:"يُقلّص / يحدّ من",ex:"They had to curtail their spending significantly."},{w:"Bolster",ar:"يعزّز / يدعم",ex:"New research bolsters the argument for reform."},{w:"Erode",ar:"يُضعف / يتآكل",ex:"Public trust has been eroded by corruption."}],
-        grammar:{point:"Collocation — words that naturally go together in English",pointAr:"التلازم اللغوي — الكلمات التي تأتي معاً بشكل طبيعي",examples:["make a decision (NOT do a decision)","heavy rain (NOT strong rain)","raise awareness (NOT increase awareness incorrectly)","reach a conclusion (NOT arrive a conclusion)"]},
-        practice:["The situation has been exacerbated by _____.","Public trust has been eroded by _____.","New policies have bolstered _____.","Misinformation has proliferated because _____."],
-        objectives:["Use precise and elevated vocabulary","Master collocations","Eliminate imprecise word choices"]},
+      {id:"c1_l1",title:"Critical Analysis & Argumentation",titleAr:"التحليل النقدي والجدل",vocab:[{w:"Scrutinise",ar:"يتمحّص / يفحص بدقة",ex:"We must scrutinise every claim carefully.",exAr:"يجب أن نتمحّص كل ادعاء بعناية."},{w:"Compelling",ar:"مقنع / لا يُقاوم",ex:"She made a compelling case for reform.",exAr:"قدّمت حجة مقنعة للإصلاح."},{w:"Paradox",ar:"مفارقة / تناقض ظاهري",ex:"There is a paradox at the heart of this argument.",exAr:"توجد مفارقة في صميم هذه الحجة."},{w:"Underpin",ar:"يدعم / يُشكّل الأساس",ex:"This assumption underpins the entire theory.",exAr:"هذا الافتراض يُشكّل أساس النظرية بأكملها."},{w:"Dismantle",ar:"يُفكّك / يهدم الحجة",ex:"She dismantled his argument point by point.",exAr:"فكّكت حجته نقطة بنقطة."},{w:"Far-reaching",ar:"بُعيد الأثر / واسع النطاق",ex:"The implications are far-reaching.",exAr:"التداعيات بعيدة الأثر."},{w:"Pivotal",ar:"محوري / حاسم",ex:"This was a pivotal moment in history.",exAr:"كانت هذه لحظة محورية في التاريخ."},{w:"Assertion",ar:"ادعاء / تأكيد قاطع",ex:"That assertion requires strong evidence.",exAr:"هذا الادعاء يتطلب أدلة قوية."},],grammar:{point:"Nominalisation — turning verbs/adjectives into nouns for academic style",pointAr:"التجريد: تحويل الأفعال والصفات إلى أسماء — يُعطي أسلوباً أكاديمياً أكثر تطوراً",examples:["decide → the decision was made (not 'they decided')","analyse → the analysis revealed (not 'they analysed')","develop → the development of new approaches","fail → the failure of the system","conclude → the conclusion reached was..."],levelNote:"Nominalisation makes writing sound formal and objective. Instead of 'they decided', we say 'the decision was made'. This removes the human agent and focuses on the action — very common in academic and professional writing."},fillBlank:[{sentence:"The ___ of the plan was unexpected.",answer:"failure",hint:"fail → failure (اسم)"},{sentence:"The ___ revealed important findings.",answer:"analysis",hint:"analyse → analysis"},{sentence:"The ___ was unanimous.",answer:"decision",hint:"decide → decision"},{sentence:"She made a ___ case for reform.",answer:"compelling",hint:"مقنع"},{sentence:"This was a ___ moment in history.",answer:"pivotal",hint:"محوري"},{sentence:"That ___ requires strong evidence.",answer:"assertion",hint:"ادعاء"},],spelling:["Nominalisation","Compelling","Scrutinise","Dismantle","Pivotal","Assertion","Paradox","Far-reaching"],conversation:["Scrutinise this claim: 'Social media has made people less happy.'","Make a compelling argument for improving public transport in your city.","What is the pivotal challenge facing education in the Arab world today?","Nominalise these verbs and use them in sentences: decide, develop, analyse, fail."]},
+      {id:"c1_l2",title:"Idiomatic English & Natural Fluency",titleAr:"التعابير الاصطلاحية والطلاقة الطبيعية",vocab:[{w:"Cut corners",ar:"يختصر الطريق على حساب الجودة",ex:"You can't cut corners on safety.",exAr:"لا يمكنك اختصار الطريق على حساب السلامة."},{w:"Bite the bullet",ar:"يتجرّع المر / يتحمل الأمر",ex:"We need to bite the bullet and make the tough decision.",exAr:"علينا أن نتجرّع المر ونتخذ القرار الصعب."},{w:"On the fence",ar:"متردد / على الحياد",ex:"I'm still on the fence about this.",exAr:"ما زلت مترددا في هذا الأمر."},{w:"Get the ball rolling",ar:"يبدأ / يُحرّك الأمور",ex:"Let's get the ball rolling on this project.",exAr:"لنبدأ في تحريك هذا المشروع."},{w:"Bite off more than you can chew",ar:"يأخذ أكثر مما يستطيع",ex:"Don't bite off more than you can chew.",exAr:"لا تأخذ أكثر مما تستطيع إنجازه."},{w:"The ball is in your court",ar:"الكرة في ملعبك / القرار بيدك",ex:"I've done my part — the ball is in your court.",exAr:"أنجزت دوري — القرار الآن بيدك."},{w:"Go back to the drawing board",ar:"يعود إلى نقطة البداية",ex:"The plan failed — we need to go back to the drawing board.",exAr:"فشلت الخطة — نحتاج للعودة إلى نقطة البداية."},{w:"A blessing in disguise",ar:"نعمة في ثوب نقمة",ex:"Losing that job was a blessing in disguise.",exAr:"فقدان ذلك العمل كان نعمة في ثوب نقمة."},],grammar:{point:"Ellipsis and substitution — natural flowing conversation",pointAr:"الحذف والإحالة: حذف أجزاء من الجملة يُعطي الكلام طابعاً طبيعياً في المحادثة",examples:["A: Do you want to come? B: I'd love to. (not: I'd love to come)","A: Is he coming? B: I think so. / I don't think so.","A: Can you help? B: I'll try to. (not: I'll try to help)","She works harder than he does. (not: than he works)","That's a better plan than the previous one. (not: than the previous plan)"],levelNote:"Native speakers constantly omit repeated information to avoid redundancy. 'I'd love to' is natural. 'I'd love to come' sounds slightly unnatural in quick conversation. This is advanced — mastering it makes you sound genuinely fluent."},fillBlank:[{sentence:"A: Do you want to come? B: I'd love ___.",answer:"to",hint:"حذف الفعل — طبيعي في المحادثة"},{sentence:"A: Is she coming? B: I think ___.",answer:"so",hint:"'so' تحل محل الجملة"},{sentence:"We need to go back to the drawing ___.",answer:"board",hint:"نعود لنقطة البداية"},{sentence:"The ball is in your ___. It's your decision.",answer:"court",hint:"القرار بيدك"},{sentence:"Losing that job was a blessing in ___.",answer:"disguise",hint:"نعمة في ثوب نقمة"},{sentence:"Don't ___ off more than you can chew.",answer:"bite",hint:"لا تأخذ أكثر مما تستطيع"},],spelling:["Disguise","Ellipsis","Substitution","Idiomatic","Redundancy","Fluency","Natural","Colloquial"],conversation:["Tell me about a time something that seemed bad turned out to be a blessing in disguise.","Use 'bite the bullet' in a real situation from your life.","Are you on the fence about anything in your life right now?","Tell me about a project that had to go back to the drawing board."]},
+      {id:"c1_l3",title:"Persuasion, Rhetoric & Public Speaking",titleAr:"الإقناع والبلاغة والخطابة",vocab:[{w:"Rhetoric",ar:"بلاغة / خطابة",ex:"His speech was full of powerful rhetoric.",exAr:"كان خطابه مليئاً ببلاغة قوية."},{w:"Assert",ar:"يؤكد / يُصرّح بقوة",ex:"I assert that this policy will fail.",exAr:"أؤكد بأن هذه السياسة ستفشل."},{w:"Contend",ar:"يجادل / يدّعي",ex:"I contend that the evidence supports my view.",exAr:"أجادل بأن الأدلة تدعم وجهة نظري."},{w:"Evocative",ar:"يستحضر المشاعر / مُعبّر",ex:"She used evocative language to move the audience.",exAr:"استخدمت لغة مؤثرة لتحريك المستمعين."},{w:"Invoke",ar:"يستدعي / يحتجّ بـ",ex:"He invoked his right to remain silent.",exAr:"احتجّ بحقه في التزام الصمت."},{w:"Allude",ar:"يُلمّح إلى",ex:"She alluded to the problem without naming it.",exAr:"لمّحت إلى المشكلة دون أن تسمّيها."},{w:"Resonate",ar:"يُلامس / يتردد صداه",ex:"His words resonated with the audience.",exAr:"تردّد صدى كلماته في نفوس المستمعين."},{w:"Compelling narrative",ar:"رواية مقنعة / قصة مؤثرة",ex:"A compelling narrative can change minds.",exAr:"الرواية المقنعة يمكنها تغيير العقول."},],grammar:{point:"Rhetorical questions and triplets (rule of three) for persuasive power",pointAr:"الأسئلة الخطابية وقاعدة الثلاثة: أدوات بلاغية قوية في الخطاب الإقناعي",examples:["Is this really the future we want? (rhetorical — no answer expected)","We need courage, commitment, and clarity. (triplet — rule of three)","Can we afford to wait? Can we afford to be silent? Can we afford to fail? (anaphora)","This is not just a problem — it is a crisis, a challenge, and an opportunity."],levelNote:"The rule of three is one of the most powerful tools in public speaking. Three is rhythmically satisfying — 'life, liberty, and the pursuit of happiness'. Two sounds incomplete, four sounds too many. Master this and your speeches will immediately sound more powerful."},fillBlank:[{sentence:"Is this really the ___ we want? (rhetorical)",answer:"future",hint:"المستقبل"},{sentence:"We need courage, commitment, and ___.",answer:"clarity",hint:"قاعدة الثلاثة — ابدأ بـ C"},{sentence:"I ___ that the evidence supports my view.",answer:"contend",hint:"أجادل / أدعي"},{sentence:"His words ___ with the audience.",answer:"resonated",hint:"تردّد صداه في النفوس"},{sentence:"She ___ to the problem without naming it.",answer:"alluded",hint:"لمّحت إلى"},{sentence:"A ___ narrative can change minds.",answer:"compelling",hint:"مقنعة / مؤثرة"},],spelling:["Rhetoric","Evocative","Resonate","Compelling","Contend","Anaphora","Persuasion","Invoke"],conversation:["Give me a 60-second persuasive speech on any topic using a rhetorical question and a triplet.","Tell me about a speech or film that resonated with you — why was it compelling?","Use 'I contend that...' and 'The evidence suggests...' to make an argument.","Allude to a problem in your workplace or school without naming it directly."]},
+      {id:"c1_l4",title:"Complex Narratives & Tense Control",titleAr:"السرد المعقد والتحكم في الأزمنة",vocab:[{w:"Chronicle",ar:"يُسجّل / يروي تاريخياً",ex:"The book chronicles the rise of the empire.",exAr:"يروي الكتاب صعود الإمبراطورية."},{w:"Unravel",ar:"يتكشّف / ينكشف تدريجياً",ex:"The truth began to unravel slowly.",exAr:"بدأت الحقيقة تتكشّف ببطء."},{w:"Culminate",ar:"يبلغ الذروة / ينتهي بـ",ex:"Years of work culminated in this discovery.",exAr:"سنوات من العمل بلغت ذروتها في هذا الاكتشاف."},{w:"Foreshadow",ar:"يُمهّد لـ / ينذر بـ",ex:"The early signs foreshadowed the crisis.",exAr:"المؤشرات المبكرة مهّدت للأزمة."},{w:"Protagonist",ar:"البطل / الشخصية الرئيسية",ex:"The protagonist faces a moral dilemma.",exAr:"البطل يواجه معضلة أخلاقية."},{w:"Ambiguous",ar:"غامض / يحتمل تفسيرات",ex:"The ending is deliberately ambiguous.",exAr:"النهاية غامضة عن قصد."},{w:"Unreliable narrator",ar:"الراوي غير الموثوق",ex:"The story uses an unreliable narrator.",exAr:"القصة تستخدم راوياً غير موثوق."},{w:"Subvert",ar:"يُقوّض / يعكس التوقعات",ex:"The film subverts our expectations.",exAr:"يُقوّض الفيلم توقعاتنا."},],grammar:{point:"Narrative tenses — past simple, past continuous, past perfect all working together",pointAr:"أزمنة السرد الثلاث: past simple (حدث) + past continuous (كان يحدث) + past perfect (كان قد حدث)",examples:["I had been working for hours when the power went out. (PP + PS)","While she was presenting, the news broke. (PC + PS)","He had already left by the time they arrived. (PP + PS)","Just as the situation was improving, everything collapsed. (PC + PS)","She realised she had forgotten her notes. (PS + PP)"],levelNote:"Think of it as three layers: past perfect = background (what had happened before), past continuous = ongoing action, past simple = the main event that interrupted or followed. Mastering these three together is what distinguishes B1 from C1 storytelling."},fillBlank:[{sentence:"I ___ been working for hours when the power went out.",answer:"had",hint:"past perfect — قبل الحدث الرئيسي"},{sentence:"While she ___ presenting, the news broke.",answer:"was",hint:"past continuous — كانت تفعل"},{sentence:"He had already ___ by the time they arrived.",answer:"left",hint:"past perfect — كان قد غادر"},{sentence:"Years of work ___ in this discovery.",answer:"culminated",hint:"بلغت ذروتها"},{sentence:"The early signs ___ the crisis.",answer:"foreshadowed",hint:"مهّدت لـ"},{sentence:"The truth began to ___ slowly.",answer:"unravel",hint:"تتكشّف"},],spelling:["Chronicle","Culminate","Foreshadow","Protagonist","Ambiguous","Narrative","Unreliable","Subvert"],conversation:["Tell me a story about something that happened to you using all three narrative tenses.","Describe a film or book whose ending was ambiguous — what did you think it meant?","Narrate a memorable event from your life: set the scene, describe what was happening, then the main event.","Create a character — who is your protagonist, what dilemma do they face?"]},
+      {id:"c1_l5",title:"Lexical Precision",titleAr:"الدقة المعجمية",vocab:[{w:"Ameliorate",ar:"يُحسّن / يُخفّف من حدة",ex:"Measures to ameliorate the situation are needed.",exAr:"هناك حاجة لتدابير لتحسين الوضع."},{w:"Exacerbate",ar:"يُفاقم / يزيد الوضع سوءاً",ex:"The drought exacerbated the food crisis.",exAr:"فاقم الجفاف أزمة الغذاء."},{w:"Proliferate",ar:"يتكاثر / ينتشر بسرعة",ex:"Misinformation has proliferated online.",exAr:"المعلومات الكاذبة تكاثرت على الإنترنت."},{w:"Curtail",ar:"يُقلّص / يحدّ من",ex:"They had to curtail their spending.",exAr:"كان عليهم تقليص إنفاقهم."},{w:"Bolster",ar:"يعزّز / يدعم",ex:"New evidence bolsters the argument.",exAr:"أدلة جديدة تعزّز الحجة."},{w:"Erode",ar:"يُضعف تدريجياً / يتآكل",ex:"Public trust has been eroded.",exAr:"ثقة الجمهور قد تآكلت."},{w:"Mitigate",ar:"يُخفّف / يُقلّل من",ex:"These steps will mitigate the risks.",exAr:"هذه الخطوات ستُخفّف المخاطر."},{w:"Catalyse",ar:"يُحفّز / يُسرّع العملية",ex:"The crisis catalysed political reform.",exAr:"الأزمة حفّزت الإصلاح السياسي."},],grammar:{point:"Collocation — words that naturally co-occur in English",pointAr:"التلازم اللغوي: كلمات تأتي معاً بشكل طبيعي في الإنجليزية. الخطأ هنا لا يُعتبر خطأً نحوياً لكنه يبدو غير طبيعي",examples:["make a decision (NOT do a decision)","heavy rain (NOT strong rain)","raise awareness (NOT increase awareness of something)","reach a conclusion (NOT arrive a conclusion)","deep concern (NOT big concern)","pose a challenge (NOT make a challenge)"],levelNote:"Collocations are what separate an advanced learner from a native speaker. The grammar might be correct, but 'do a decision' sounds immediately wrong to a native speaker. The only way to master collocations is exposure and practice — reading, listening, and paying attention."},fillBlank:[{sentence:"The drought ___ the food crisis.",answer:"exacerbated",hint:"فاقم الوضع"},{sentence:"Public trust has been ___.",answer:"eroded",hint:"تآكلت / ضُعّفت"},{sentence:"New evidence ___ the argument.",answer:"bolsters",hint:"يعزّز"},{sentence:"These steps will ___ the risks.",answer:"mitigate",hint:"يُخفّف"},{sentence:"Misinformation has ___ online.",answer:"proliferated",hint:"تكاثرت / انتشرت"},{sentence:"The crisis ___ political reform.",answer:"catalysed",hint:"حفّزت / أسرعت"},],spelling:["Exacerbate","Proliferate","Ameliorate","Mitigate","Catalyse","Curtail","Bolster","Collocation"],conversation:["Use 'exacerbate' and 'mitigate' to discuss a current global issue.","Correct these collocations: 'do a decision', 'strong rain', 'arrive a conclusion'.","How has social media bolstered or eroded trust in institutions?","Tell me about something that catalysed a change in your life."]},
     ]
   },
   c2:{
     name:"C2 — Proficiency",nameAr:"إتقان",
     lessons:[
-      {id:"c2_l1",title:"Mastering Tone & Subtext",titleAr:"إتقان النبرة والمعنى الضمني",
-        vocab:[{w:"Subtext",ar:"المعنى الضمني / ما وراء الكلام",ex:"There is a clear subtext of resentment in his speech."},{w:"Candid",ar:"صريح / مفتوح",ex:"I want to be candid with you about this situation."},{w:"Veiled",ar:"مُبهم / غير مباشر",ex:"Her criticism was veiled but clearly understood."},{w:"Ulterior",ar:"خفي / مبيّت",ex:"I suspected he had an ulterior motive."},{w:"Insinuate",ar:"يُلمّح / يُوحي ضمناً",ex:"Are you insinuating that I was wrong?"},{w:"Diplomatic",ar:"دبلوماسي / لبق",ex:"She gave a diplomatic response that said everything and nothing."}],
-        grammar:{point:"Stance marking — positioning yourself in discourse",pointAr:"تحديد الموقف — كيف تُعبّر عن موقفك في النص",examples:["Admittedly, the data is incomplete, but the conclusion holds.","It is worth noting that this study has limitations.","Intriguingly, the opposite result was observed.","One cannot help but notice the irony here."]},
-        practice:["Admittedly, _____, but _____.","It is worth noting that _____.","One cannot help but notice _____.","There is a clear subtext of _____ in _____."],
-        objectives:["Control what you imply vs state","Use stance marking naturally","Communicate with full sociolinguistic awareness"]},
-      {id:"c2_l2",title:"The Art of Precision",titleAr:"فن الدقة في التعبير",
-        vocab:[{w:"Ephemeral",ar:"عابر / زائل",ex:"Fame is ephemeral; impact is permanent."},{w:"Immutable",ar:"لا يتغير / ثابت",ex:"Some principles are immutable regardless of context."},{w:"Ambivalent",ar:"مزدوج المشاعر / متردد",ex:"I feel ambivalent about this development."},{w:"Precipitate",ar:"يُسرّع / يُعجّل بـ (فعل) / متسرّع (صفة)",ex:"His rash decision precipitated the crisis."},{w:"Meticulous",ar:"دقيق للغاية / متأنٍّ",ex:"She was meticulous in her preparation."},{w:"Paradoxically",ar:"بشكل متناقض / من المفارقات",ex:"Paradoxically, working less made him more productive."}],
-        grammar:{point:"Absolute constructions and dangling modifiers — advanced syntax",pointAr:"التراكيب المطلقة في الجملة — نحو متقدم",examples:["All things considered, the outcome was acceptable.","Weather permitting, we will proceed with the plan.","Having reviewed the data, we can now draw conclusions.","The project completed, the team disbanded."]},
-        practice:["All things considered, _____.","Having _____, we can now _____.","Paradoxically, _____ led to _____.","Weather permitting, _____."],
-        objectives:["Achieve near-native syntactic control","Use absolute constructions","Command the full range of English grammar"]},
-      {id:"c2_l3",title:"Stylistic Mastery",titleAr:"إتقان الأسلوب",
-        vocab:[{w:"Laconic",ar:"موجز / مُختصر",ex:"His laconic reply revealed nothing."},{w:"Verbose",ar:"مطوّل / كثير الكلام",ex:"The report was verbose and hard to follow."},{w:"Cogent",ar:"مقنع / قوي الحجة",ex:"She presented a cogent argument for reform."},{w:"Esoteric",ar:"غامض / لا يفهمه إلا القليلون",ex:"The topic is too esoteric for a general audience."},{w:"Eloquent",ar:"بليغ / فصيح",ex:"He is one of the most eloquent speakers I have heard."},{w:"Incisive",ar:"حاد / ثاقب",ex:"Her incisive analysis cut through the confusion."}],
-        grammar:{point:"Sentence rhythm and balance — periodic and cumulative sentences",pointAr:"إيقاع الجملة وتوازنها — الجملة التراكمية والختامية",examples:["Periodic: Despite all the obstacles, despite all the setbacks, despite all the doubters — he succeeded.","Cumulative: He ran, barely breathing, legs burning, with nothing left but will.","Balanced: The wise speak because they have something to say; fools speak because they have to say something.","Chiasmus: Ask not what your country can do for you — ask what you can do for your country."]},
-        practice:["Despite _____, despite _____, _____ succeeded.","She _____, barely _____, with nothing left but _____.","The wise _____, while fools _____.","Not _____, but _____."],
-        objectives:["Control sentence rhythm deliberately","Use periodic and cumulative sentences","Achieve stylistic elegance"]},
-      {id:"c2_l4",title:"Cross-Cultural Communication",titleAr:"التواصل بين الثقافات",
-        vocab:[{w:"Nuance",ar:"فروق دقيقة / دقة التعبير",ex:"The nuance of the situation was lost in translation."},{w:"Idiosyncrasy",ar:"خصوصية / طابع مميز",ex:"Every culture has its idiosyncrasies."},{w:"Interlocutor",ar:"محاور / طرف في الحوار",ex:"A skilled interlocutor listens as much as they speak."},{w:"Inflection",ar:"نبرة الصوت / تصريف",ex:"A change in inflection can completely change the meaning."},{w:"Etiquette",ar:"آداب / بروتوكول",ex:"Business etiquette varies significantly across cultures."},{w:"Proxemics",ar:"علم المسافة في التواصل",ex:"Proxemics — the study of personal space in communication."}],
-        grammar:{point:"Discourse markers at C2 — full range with exact nuance",pointAr:"علامات الخطاب في مستوى C2 — النطاق الكامل بدقة كاملة",examples:["Notwithstanding the above, the decision stands.","Be that as it may, we must proceed.","Suffice it to say that the outcome was catastrophic.","Not to put too fine a point on it — it was a disaster."]},
-        practice:["Notwithstanding _____, _____.","Be that as it may, _____.","Suffice it to say that _____.","Not to put too fine a point on it — _____."],
-        objectives:["Navigate intercultural communication","Use the full range of discourse markers","Communicate with complete sociolinguistic competence"]},
-      {id:"c2_l5",title:"Spontaneous & Sustained Discourse",titleAr:"الخطاب التلقائي والمستمر",
-        vocab:[{w:"Expound",ar:"يشرح بالتفصيل / يُفصّل",ex:"Could you expound on that point further?"},{w:"Digress",ar:"يخرج عن الموضوع",ex:"I digress — let me return to the main point."},{w:"Encompass",ar:"يشمل / يضم",ex:"The discussion encompassed several key areas."},{w:"Succinctly",ar:"بإيجاز / باختصار مُفيد",ex:"Could you summarise that more succinctly?"},{w:"Forthright",ar:"صريح / مباشر",ex:"I will be forthright — the results are disappointing."},{w:"Sustain",ar:"يُحافظ على / يُديم",ex:"She sustained the argument across thirty minutes of debate."}],
-        grammar:{point:"Full discourse management — opening, developing, signposting, closing",pointAr:"إدارة الخطاب الكاملة — الافتتاح والتطوير والتوجيه والختام",examples:["Opening: What I'd like to argue today is...","Signpost: This brings me to my second point...","Concede and recover: That's a fair point; however...","Close: To summarise, then, the key takeaway is..."]},
-        practice:["What I'd like to argue today is _____.","This brings me to my next point, which is _____.","That is a fair point; however, _____.","To summarise, the key takeaway is _____."],
-        objectives:["Sustain extended discourse independently","Manage a full structured talk","Achieve true C2 spoken proficiency"]},
+      {id:"c2_l1",title:"Mastering Tone, Subtext & Stance",titleAr:"إتقان النبرة والمعنى الضمني والموقف",vocab:[{w:"Subtext",ar:"المعنى الضمني / ما وراء الكلام",ex:"There is a clear subtext of resentment in his speech.",exAr:"يوجد معنى ضمني واضح للاستياء في خطابه."},{w:"Candid",ar:"صريح / مفتوح",ex:"I want to be completely candid with you.",exAr:"أريد أن أكون صريحاً معك تماماً."},{w:"Veiled",ar:"مُبهم / غير مباشر",ex:"Her criticism was veiled but understood.",exAr:"كان نقدها غير مباشر لكن مفهوماً."},{w:"Insinuate",ar:"يُلمّح / يُوحي ضمناً",ex:"Are you insinuating that I was dishonest?",exAr:"هل تُلمّح بأنني لم أكن صادقاً؟"},{w:"Diplomatic",ar:"دبلوماسي / لبق",ex:"She gave a diplomatic response that said everything and nothing.",exAr:"أعطت رداً دبلوماسياً قال كل شيء ولا شيء."},{w:"Stance",ar:"موقف / وجهة نظر",ex:"His stance on this issue is well known.",exAr:"موقفه من هذه المسألة معروف جيداً."},{w:"Equivocate",ar:"يُجيب بغموض / يتملّص",ex:"Stop equivocating — give a clear answer.",exAr:"توقف عن التملّص — أعطِ إجابة واضحة."},{w:"Forthright",ar:"صريح / مباشر",ex:"I will be forthright: the results are disappointing.",exAr:"سأكون صريحاً: النتائج مخيّبة للآمال."},],grammar:{point:"Stance marking — advanced discourse positioning",pointAr:"تحديد الموقف في الخطاب: عبارات تُحدّد موقف المتحدث من الفكرة",examples:["Admittedly, the data is incomplete, but the conclusion holds.","It is worth noting that this study has limitations.","Intriguingly, the opposite result was observed.","One cannot help but notice the irony here.","Curiously enough, this has never been studied before."],levelNote:"Stance markers tell the listener HOW you feel about what you're saying, not just WHAT you're saying. 'Admittedly' = I'm conceding. 'Intriguingly' = I find this interesting. 'One cannot help but notice' = this is obvious but I'm being subtle about it. These are the markers of true C2 discourse control."},fillBlank:[{sentence:"___, the data is incomplete, but the conclusion holds.",answer:"Admittedly",hint:"أعترف بأن..."},{sentence:"It is worth ___ that this has limitations.",answer:"noting",hint:"يستحق الإشارة إلى"},{sentence:"One cannot help but ___ the irony here.",answer:"notice",hint:"لا يسع المرء إلا أن يلاحظ"},{sentence:"Her criticism was ___ but clearly understood.",answer:"veiled",hint:"غير مباشرة"},{sentence:"Stop equivocating — give a ___ answer.",answer:"clear",hint:"إجابة واضحة"},{sentence:"I will be ___: the results disappoint me.",answer:"forthright",hint:"صريح / مباشر"},],spelling:["Equivocate","Forthright","Insinuate","Diplomatic","Subtext","Candid","Intriguingly","Admittedly"],conversation:["Deliver a 'diplomatic' message with a clear subtext about something you disagree with at work or school.","Use 'Admittedly... but...' to concede a point while maintaining your position.","Tell me something using a stance marker (Intriguingly / Curiously / Remarkably).","Describe a political speech you know that was full of veiled language and subtext."]},
+      {id:"c2_l2",title:"Stylistic Mastery & Sentence Architecture",titleAr:"إتقان الأسلوب وبناء الجملة",vocab:[{w:"Laconic",ar:"موجز / مُختصر إلى حد بعيد",ex:"His laconic reply revealed nothing.",exAr:"رده الموجز لم يكشف شيئاً."},{w:"Verbose",ar:"مطوّل / كثير الكلام دون فائدة",ex:"The report was verbose and hard to follow.",exAr:"كان التقرير مطوّلاً وصعب المتابعة."},{w:"Cogent",ar:"مقنع / قوي الحجة / متماسك",ex:"She presented a cogent argument for change.",exAr:"قدّمت حجة مقنعة للتغيير."},{w:"Incisive",ar:"حاد / ثاقب",ex:"Her incisive analysis cut through the confusion.",exAr:"تحليلها الحاد قطع عبر الفوضى."},{w:"Eloquent",ar:"بليغ / فصيح",ex:"He is one of the most eloquent speakers I've heard.",exAr:"إنه من أكثر المتكلمين بلاغةً سمعتهم."},{w:"Prosaic",ar:"عادي / رتيب / لا شعري",ex:"The writing was prosaic and uninspiring.",exAr:"الكتابة كانت عادية وغير ملهمة."},{w:"Cadence",ar:"إيقاع / وقع موسيقي للكلام",ex:"The speech had a beautiful cadence.",exAr:"للخطاب إيقاع جميل."},{w:"Aphorism",ar:"حكمة / مقولة موجزة",ex:"'Less is more' is a famous aphorism.",exAr:"'الأقل هو الأكثر' حكمة مشهورة."},],grammar:{point:"Periodic and cumulative sentences — controlling rhythm and structure",pointAr:"الجملة الختامية: الفكرة الرئيسية في النهاية (توتر ثم إطلاق). الجملة التراكمية: الفكرة أولاً ثم التفاصيل",examples:["Periodic (suspense): Despite all obstacles, despite all failures, despite all the voices of doubt — she succeeded.","Cumulative (detail): He ran, lungs burning, legs failing, with nothing left but pure will.","Balanced: The wise speak because they have something to say; fools speak because they have to say something.","Chiasmus: Ask not what your country can do for you — ask what you can do for your country."],levelNote:"Periodic sentences build suspense by withholding the main clause until the end. Cumulative sentences state the main idea then expand. Both create very different rhythmic effects. Mastering these is the difference between competent writing and genuinely elegant writing."},fillBlank:[{sentence:"Despite all obstacles, despite all failures, despite all doubt — ___ succeeded.",answer:"she",hint:"الفكرة الرئيسية في نهاية الجملة الختامية"},{sentence:"The wise speak because they have something to say; fools ___ because they have to.",answer:"speak",hint:"التوازن في الجملة"},{sentence:"Her ___ analysis cut through the confusion.",answer:"incisive",hint:"حاد / ثاقب"},{sentence:"He is one of the most ___ speakers I've heard.",answer:"eloquent",hint:"بليغ / فصيح"},{sentence:"The speech had a beautiful ___.",answer:"cadence",hint:"إيقاع"},{sentence:"His ___ reply revealed nothing.",answer:"laconic",hint:"موجز إلى حد بعيد"},],spelling:["Eloquent","Laconic","Verbose","Cogent","Incisive","Cadence","Aphorism","Chiasmus"],conversation:["Write a periodic sentence about a challenge you've overcome.","Give me an aphorism you live by — then analyse it.","Compare two speakers you know: one eloquent, one verbose. What makes the difference?","Compose a balanced sentence (X; Y) about hard work and talent."]},
+      {id:"c2_l3",title:"Spontaneous Discourse Management",titleAr:"إدارة الخطاب التلقائي",vocab:[{w:"Expound",ar:"يشرح بالتفصيل",ex:"Could you expound on that further?",exAr:"هل يمكنك الشرح بمزيد من التفصيل؟"},{w:"Digress",ar:"يخرج عن الموضوع",ex:"I digress — let me return to the main point.",exAr:"خرجت عن الموضوع — دعني أعود للنقطة الرئيسية."},{w:"Encompass",ar:"يشمل / يضم",ex:"The discussion encompassed several key areas.",exAr:"شمل النقاش عدة مجالات رئيسية."},{w:"Succinctly",ar:"بإيجاز / باختصار مُفيد",ex:"Can you summarise that more succinctly?",exAr:"هل يمكنك تلخيص ذلك باختصار أكثر؟"},{w:"Nuanced",ar:"دقيق / متعدد الأبعاد",ex:"Her analysis was nuanced and thorough.",exAr:"تحليلها كان دقيقاً وشاملاً."},{w:"Signpost",ar:"يُوجّه المستمع / يُشير إلى",ex:"Good speakers signpost their key points.",exAr:"المتحدثون الجيدون يُوجّهون المستمع إلى نقاطهم الرئيسية."},{w:"Tangent",ar:"موضوع جانبي / خروج عن الموضوع",ex:"I went off on a tangent — sorry.",exAr:"ذهبت في موضوع جانبي — آسف."},{w:"Synthesise",ar:"يُجمع / يُلخّص بتركيب",ex:"Let me synthesise the key points.",exAr:"دعني أُجمع النقاط الرئيسية."},],grammar:{point:"Full discourse management — opening, signposting, conceding, recovering, closing",pointAr:"إدارة الخطاب الكامل: الافتتاح والتوجيه والاعتراف والتعافي والختام",examples:["Opening: What I'd like to argue today is that...","Signpost: This brings me to my second point...","Concede and recover: That's a fair point; however...","Tangent recovery: But I digress — to return to my main argument...","Close: To synthesise, then, the key takeaway is..."],levelNote:"Discourse management is the ability to control a conversation or presentation — knowing how to open, how to signal what's coming, how to recover from a digression, how to concede gracefully and move on, and how to close with impact. This is what separates C2 speakers."},fillBlank:[{sentence:"What I'd like to ___ today is that education needs reform.",answer:"argue",hint:"الافتتاح الخطابي"},{sentence:"This brings me to my ___ point.",answer:"second",hint:"توجيه المستمع"},{sentence:"That's a fair point; ___...",answer:"however",hint:"اعتراف ثم استعادة"},{sentence:"But I ___ — to return to my argument...",answer:"digress",hint:"خرجت عن الموضوع"},{sentence:"To ___, the key takeaway is...",answer:"synthesise",hint:"الختام بتلخيص مُركَّب"},{sentence:"Her analysis was ___ and thorough.",answer:"nuanced",hint:"دقيق / متعدد الأبعاد"},],spelling:["Synthesise","Succinctly","Encompass","Signpost","Digress","Expound","Tangent","Nuanced"],conversation:["Give a 2-minute talk on any topic — practise opening, signposting, and closing.","Deliberately go off on a tangent, then recover gracefully.","Concede a point I make, then recover your original argument.","Synthesise everything you've learned in this lesson in 3 sentences."]}
     ]
   },
 };
 
-const FREE_LINDA_LEVELS=["a1"];
+const stripForTTSLinda=(text)=>{
+  return text
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu," ")
+    .replace(/[\u2600-\u27BF]/gu," ")
+    .replace(/\*\*/g,"").replace(/\*/g,"")
+    .replace(/#+\s*/g,"")
+    // Convert structural markers to natural pauses
+    .replace(/—\s*/g,". ")
+    .replace(/:\s+/g,". ")    // colon → pause
+    .replace(/\[.*?\]/g,"")   // remove Arabic in brackets (not needed in TTS)
+    .replace(/\(.*?\)/g,"")   // remove parenthetical hints
+    .replace(/\s+/g," ")
+    .trim();
+};
 
 const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
   const [progress,setProgress]=useState(()=>loadLindaProgress());
-  const [screen,setScreen]=useState("setup"); // setup | chat
-  const [messages,setMessages]=useState([]);
+  const [screen,setScreen]=useState(()=>{
+    const s=loadLindaSession();
+    return s?"chat":"setup";
+  });
+  const [messages,setMessages]=useState(()=>{
+    const s=loadLindaSession();
+    return s?.messages||[];
+  });
+  const [currentPhase,setCurrentPhase]=useState(()=>{
+    const s=loadLindaSession();
+    return s?.phase||0;
+  });
   const [isThinking,setIsThinking]=useState(false);
   const [isRecording,setIsRecording]=useState(false);
   const [transcript,setTranscript]=useState("");
   const [ttsEnabled,setTtsEnabled]=useState(true);
   const [error,setError]=useState("");
+  const [mobileTab,setMobileTab]=useState("chat");
   const [repeatTarget,setRepeatTarget]=useState(null);
   const [repeatSuccess,setRepeatSuccess]=useState(0);
-  const [mobileTab,setMobileTab]=useState("chat");
   const chatBoxRef=useRef(null);
   const messagesEndRef=useRef(null);
   const recognitionRef=useRef(null);
@@ -8298,19 +8786,34 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const isAr=uiLang==="ar";
 
-  useEffect(()=>{mountedRef.current=true;return()=>{mountedRef.current=false;window.speechSynthesis?.cancel();isRecordingRef.current=false;recognitionRef.current?.abort();};},[]); 
+  useEffect(()=>{
+    mountedRef.current=true;
+    return()=>{
+      mountedRef.current=false;
+      window.speechSynthesis?.cancel();
+      isRecordingRef.current=false;
+      recognitionRef.current?.abort();
+    };
+  },[]);
 
+  // Auto-scroll
   useEffect(()=>{
     if(screen!=="chat")return;
     const t=setTimeout(()=>{const el=chatBoxRef.current;if(el)el.scrollTop=el.scrollHeight;},80);
     return()=>clearTimeout(t);
   },[messages,isThinking]);
 
+  // Auto-save session
+  useEffect(()=>{
+    if(screen==="chat"&&messages.length>0){
+      saveLindaSession(progress.currentLesson,currentPhase,messages);
+    }
+  },[messages,currentPhase]);
+
   const levelData=LINDA_CURRICULUM[progress.level];
   const lessons=levelData?.lessons||[];
   const currentLesson=lessons.find(l=>l.id===progress.currentLesson)||lessons[0];
   const completedSet=new Set(progress.completed||[]);
-
   const levelLocked=(lvl)=>!isPro&&!FREE_LINDA_LEVELS.includes(lvl);
 
   const saveProgress=(updates)=>{
@@ -8319,37 +8822,59 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
     saveLindaProgress(next);
   };
 
-  const buildSystemPrompt=(lesson)=>{
+  const buildSystemPrompt=(lesson,phase)=>{
     if(!lesson)return "";
     const isLowLevel=["a1","a2"].includes(progress.level);
-    const vocab=lesson.vocab.map(v=>`${v.w} = "${v.ar}" — example: "${v.ex}"`).join("\n");
-    const grammarExamples=lesson.grammar.examples.join("\n");
-    const practiceLines=lesson.practice.join("\n");
-    return `You are Linda, a warm, enthusiastic, and patient English teacher for Arabic-speaking students.
+    const phaseInstructions={
+      0:`PHASE 1 — VOCABULARY TEACHING:
+Teach each vocabulary word one at a time. For each word:
+1. Say the word clearly: "Our first word is: [WORD]"${isLowLevel?' Then immediately give the Arabic: "[WORD] — [Arabic meaning]"':''}
+2. Give the example sentence
+3. Say: "Now repeat after me: [WORD]"
+4. After correct repeat → "Well done! One more time: [WORD]" (enforce TWO repeats)
+5. After two correct repeats → move to next word
+Vocabulary for this lesson:
+${lesson.vocab.map(v=>`${v.w} [${v.ar}] — Example: ${v.ex}`).join("\n")}
+After ALL vocabulary is covered and repeated, say: "Excellent! Now let's move to grammar."`,
+
+      1:`PHASE 2 — FILL IN THE BLANK:
+Present each fill-in-the-blank exercise one at a time.
+Format: "Fill in the blank: [sentence with ___ gap]. ${isLowLevel?"تلميح: [hint]":""}"
+Wait for the student's answer. If correct → praise and next. If wrong → give a hint and ask again.
+Exercises:
+${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence}" → answer: ${f.answer}. Hint: ${f.hint}`).join("\n")}
+After all exercises, say: "Brilliant work! Time for spelling practice."`,
+
+      2:`PHASE 3 — SPELLING CHALLENGE:
+Test spelling of key words from the lesson. Say: "I will say a word. Please spell it for me: [WORD]"
+Wait for their spelling. If correct → praise. If wrong → say the correct spelling letter by letter.
+Words to test: ${lesson.spelling.join(", ")}
+After all words, say: "Outstanding! Now let's have a real conversation."`,
+
+      3:`PHASE 4 — REVIEW CONVERSATION:
+Have a natural conversation that uses the vocabulary and grammar from the lesson.
+Discussion prompts to explore (one at a time):
+${lesson.conversation.map((c,i)=>`${i+1}. ${c}`).join("\n")}
+Grammar point to practise naturally: ${lesson.grammar.point}
+${lesson.grammar.levelNote?`Cultural/linguistic note for the student: ${lesson.grammar.levelNote}`:""}
+When conversation is complete and all prompts covered, say: "Lesson complete! You have done an amazing job today. Are you ready for the next lesson?"`,
+    };
+
+    return `You are Linda, a warm, enthusiastic English teacher for Arabic-speaking students. You NEVER introduce yourself or say your name in any message — the student already knows who you are.
 
 Student level: ${progress.level.toUpperCase()} — ${levelData.name}
 Current lesson: ${lesson.title} (${lesson.titleAr})
-${isLowLevel?`IMPORTANT: Low-level student. After EVERY English word or sentence, immediately add the Arabic meaning in brackets: Hello [مرحباً]. Keep sentences very short. Use Arabic generously to help them understand.`:"Use Arabic only when the student asks or seems confused."}
+${isLowLevel?"IMPORTANT: Use Arabic generously. After every English word or phrase, add Arabic in [brackets]. Keep sentences very short.":""}
 
-VOCABULARY to teach:
-${vocab}
+${phaseInstructions[phase]||phaseInstructions[0]}
 
-GRAMMAR: ${lesson.grammar.point} — بالعربي: ${lesson.grammar.pointAr}
-Examples: ${grammarExamples}
-
-PRACTICE SENTENCES: ${practiceLines}
-
-RULES — follow every one:
-1. Greet in ONE short enthusiastic sentence. Start teaching the first word immediately. Do NOT list or announce how many words or items the lesson has.
-2. Teach one word at a time: say it, ${isLowLevel?"give Arabic in brackets immediately, ":""}give example, say: "Now repeat after me: [word]"
-3. REPETITION ENFORCEMENT (mandatory): Correct repeat → "Well done! One more time: [word]" — only advance after TWO successful repeats. Wrong → "Almost! Try again: [word]"
-4. After vocabulary: introduce grammar with 2 examples. Ask student to make their own sentence.
-5. Practice sentences: say each one, ask to repeat, enforce two successful repeats.
-6. If student writes Arabic (ما معنى / أعد / لم أفهم) → respond in Arabic, then return to English.
-7. Be ENTHUSIASTIC: "Great job!", "Excellent!", "You're doing amazing!", "برافو!", "Perfect!"
-8. 2-3 sentences max per response. Always end with something for the student to do.
-9. Never mention the number of words or items in the lesson.
-10. Lesson complete → "You did an amazing job today! Lesson complete! Ready for the next one?"`;
+ALWAYS REMEMBER:
+- NEVER say your name (Linda) in any message — not even once
+- 2-3 sentences per response maximum
+- Be enthusiastic: "Excellent!", "Brilliant!", "Perfect!", "You're doing great!"
+- Never mention the number of words or items in the lesson
+- If student uses Arabic, respond in Arabic then return to English
+- English only for teaching (Arabic only for explanations when needed)`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -8357,48 +8882,83 @@ RULES — follow every one:
       const msgs=history.slice(-20);
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:220,system,messages:msgs})});
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,system,messages:msgs})});
       if(!mountedRef.current)return "";
       const data=await res.json();
       return data?.content?.[0]?.text||"";
     }catch{return "";}
   };
 
+  const speakLinda=(text)=>{
+    if(!window.speechSynthesis)return;
+    const doSpeak=()=>{
+      window.speechSynthesis.cancel();
+      const utt=new SpeechSynthesisUtterance(text);
+      utt.lang="en-US";utt.rate=1.0;utt.pitch=1.3;
+      const voices=window.speechSynthesis.getVoices();
+      const match=
+        voices.find(v=>/google us english female|zira|samantha|karen|moira|victoria/i.test(v.name))||
+        voices.find(v=>v.lang==="en-US"&&!/male|man/i.test(v.name))||
+        voices.find(v=>v.lang==="en-GB"&&/google uk english female|kate/i.test(v.name))||
+        voices.find(v=>v.lang.startsWith("en")&&!/male|man/i.test(v.name))||
+        voices.find(v=>v.lang.startsWith("en"));
+      if(match){utt.voice=match;utt.lang=match.lang;}
+      if(window.speechSynthesis.paused)window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utt);
+    };
+    if(window.speechSynthesis.getVoices().length===0){
+      window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};
+    }else{doSpeak();}
+  };
+
   const addLindaMessage=(text)=>{
     if(!mountedRef.current)return;
-    // Strip invisible signals before display/TTS
     const isSuccess=/\[REPEAT_SUCCESS\]/i.test(text);
     const isMoveOn=/\[MOVE_ON\]/i.test(text);
-    const clean=text.replace(/\[REPEAT_SUCCESS\]/gi,"").replace(/\[MOVE_ON\]/gi,"").replace(/\*\*/g,"").replace(/\*/g,"").trim();
+    // Remove name repetitions, clean markdown, remove signals
+    let clean=text
+      .replace(/\[REPEAT_SUCCESS\]/gi,"").replace(/\[MOVE_ON\]/gi,"")
+      .replace(/\[Linda\][:：]?\s*/gi,"")
+      .replace(/Linda[:：]\s*/gi,"")
+      .replace(/\*\*/g,"").replace(/\*/g,"")
+      .trim();
     setMessages(prev=>[...prev,{role:"bot",text:clean,id:Date.now()+Math.random()}]);
-    if(ttsEnabled)setTimeout(()=>speakLinda(stripForTTS(clean)),80);
+    if(ttsEnabled)setTimeout(()=>speakLinda(stripForTTSLinda(clean)),80);
+    // Repeat tracking
     if(isSuccess){
       setRepeatSuccess(prev=>{
         const next=prev+1;
-        if(next>=2)setRepeatTarget(null); // 2 successful repeats — move on
+        if(next>=2)setRepeatTarget(null);
         return next>=2?0:next;
       });
     }
     if(isMoveOn){setRepeatTarget(null);setRepeatSuccess(0);}
-    // Check if lesson is marked complete
-    if(/lesson complete|ready for the next lesson|shall we move on/i.test(clean)){
+    // Detect repeat targets
+    const repeatMatch=clean.match(/repeat after me[:\s]+[""]?([^"".\n?!]+)/i)||
+                      clean.match(/one more time[:\s]+[""]?([^"".\n?!]+)/i)||
+                      clean.match(/try again[:\s]+[""]?([^"".\n?!]+)/i);
+    if(repeatMatch)setRepeatTarget(repeatMatch[1].trim().replace(/[""]$/,""));
+    // Phase advancement detection
+    if(/now let's move to grammar|move to fill|now let's practise grammar/i.test(clean)){
+      setCurrentPhase(1);
+    }else if(/time for spelling|spelling practice|spelling challenge/i.test(clean)){
+      setCurrentPhase(2);
+    }else if(/have a real conversation|review conversation|let's talk/i.test(clean)){
+      setCurrentPhase(3);
+    }else if(/lesson complete|amazing job today|ready for the next lesson/i.test(clean)){
       if(currentLesson&&!completedSet.has(currentLesson.id)){
         const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
         const nextLesson=lessons[nextIdx];
         saveProgress({completed:[...progress.completed,currentLesson.id],currentLesson:nextLesson?.id||currentLesson.id});
       }
-    }
-    // Detect what Linda is asking the student to repeat — extract quoted phrase
-    const repeatMatch=clean.match(/repeat after me[:\s]+[""]?([^"".\n]+)[""]?/i)||
-                      clean.match(/(?:one more time|again)[:\s]+[""]?([^"".\n]+)[""]?/i)||
-                      clean.match(/try again[:\s]+[""]?([^"".\n]+)[""]?/i);
-    if(repeatMatch){
-      setRepeatTarget(repeatMatch[1].trim());
-      setRepeatSuccess(0);
+      clearLindaSession();
     }
   };
 
-  const getHistory=()=>messages.map(m=>({role:m.role==="user"?"user":"assistant",content:m.role==="user"?`[Student]: ${m.text}`:`[Linda]: ${m.text}`}));
+  const getHistory=()=>messages.map(m=>({
+    role:m.role==="user"?"user":"assistant",
+    content:m.role==="user"?m.text:m.text,
+  }));
 
   const sendMessage=async(text)=>{
     if(!text.trim()||isThinking)return;
@@ -8407,22 +8967,25 @@ RULES — follow every one:
     finalTranscriptRef.current="";
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
     setIsThinking(true);
-    const history=getHistory();
-    const reply=await callClaude(buildSystemPrompt(currentLesson),history,`[Student]: ${text.trim()}`);
+    const reply=await callClaude(buildSystemPrompt(currentLesson,currentPhase),getHistory(),text.trim());
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
 
-  const startLesson=async(lesson)=>{
+  const startLesson=async(lesson,resumeSession=false)=>{
     if(!lesson)return;
-    saveProgress({...progress,currentLesson:lesson.id});
+    if(!resumeSession){
+      clearLindaSession();
+      saveProgress({...progress,currentLesson:lesson.id});
+      setMessages([]);
+      setCurrentPhase(0);
+      setRepeatTarget(null);setRepeatSuccess(0);
+    }
     setScreen("chat");
-    setMessages([]);
-    setRepeatTarget(null);
-    setRepeatSuccess(0);
+    setMobileTab("chat");
+    if(resumeSession&&messages.length>0)return;
     setIsThinking(true);
-    const hist=loadLindaProgress().completed?.length>0?`The student has completed ${loadLindaProgress().completed.length} lessons previously.`:"This is a new student.";
-    const opening=`Welcome the student warmly as Linda. Tell them today's lesson is "${lesson.title}" (${lesson.titleAr}). In one sentence, mention what they will learn. Then start by teaching the first vocabulary word: "${lesson.vocab[0].w}" which means "${lesson.vocab[0].ar}". Give the example and ask them to repeat it.`;
-    const reply=await callClaude(buildSystemPrompt(lesson),[{role:"user",content:hist}],opening);
+    const opening=`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}"${["a1","a2"].includes(progress.level)?` — give its Arabic meaning [${lesson.vocab[0].ar}]`:""} with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
+    const reply=await callClaude(buildSystemPrompt(lesson,0),[],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
 
@@ -8436,14 +8999,11 @@ RULES — follow every one:
   const startRecording=()=>{
     window.speechSynthesis?.cancel();
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
-      setError("Voice requires Google Chrome. Please type instead.");
-      return;
+      setError("Voice input requires Google Chrome. Please type instead.");return;
     }
     isRecordingRef.current=true;
     finalTranscriptRef.current="";
-    setTranscript("");
-    setIsRecording(true);
-    setError("");
+    setTranscript("");setIsRecording(true);setError("");
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     const run=()=>{
       if(!isRecordingRef.current)return;
@@ -8451,108 +9011,73 @@ RULES — follow every one:
       rec.lang="en-US";rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
       const base=finalTranscriptRef.current;
       let uFinal="";
-      rec.onresult=(e)=>{
-        uFinal="";let interim="";
-        for(let i=0;i<e.results.length;i++){
-          if(e.results[i].isFinal)uFinal+=e.results[i][0].transcript;
-          else interim+=e.results[i][0].transcript;
-        }
-        setTranscript([base,uFinal||interim].filter(s=>s.trim()).join(" ").trim());
-      };
-      rec.onerror=(e)=>{
-        if(e.error==="no-speech"||e.error==="aborted")return;
-        if(e.error==="not-allowed"){setError("Microphone access denied. Allow mic in browser settings.");}
-        else{setError("Mic error. Please type instead.");}
-        isRecordingRef.current=false;
-        setIsRecording(false);
-      };
-      rec.onend=()=>{
-        if(uFinal.trim())finalTranscriptRef.current=[base,uFinal].filter(s=>s.trim()).join(" ").trim();
-        if(isRecordingRef.current)run();
-        else setIsRecording(false);
-      };
+      rec.onresult=(e)=>{uFinal="";let interim="";for(let i=0;i<e.results.length;i++){if(e.results[i].isFinal)uFinal+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}setTranscript([base,uFinal||interim].filter(s=>s.trim()).join(" ").trim());};
+      rec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return;if(e.error==="not-allowed"){setError("Microphone access denied. Allow mic in browser settings.");}else{setError("Mic error. Please type instead.");}isRecordingRef.current=false;setIsRecording(false);};
+      rec.onend=()=>{if(uFinal.trim())finalTranscriptRef.current=[base,uFinal].filter(s=>s.trim()).join(" ").trim();if(isRecordingRef.current)run();else setIsRecording(false);};
       recognitionRef.current=rec;
       try{rec.start();}catch(e){requestAnimationFrame(()=>run());}
     };
     run();
   };
 
-  const speakLinda=(text)=>{
-    if(!window.speechSynthesis)return;
-    const doSpeak=()=>{
-      window.speechSynthesis.cancel();
-      const utt=new SpeechSynthesisUtterance(text);
-      utt.lang="en-US"; // US English tends to have better female voices on more devices
-      utt.rate=1.05;    // slightly faster = more energetic
-      utt.pitch=1.35;   // higher pitch = clearly female and enthusiastic
-      const voices=window.speechSynthesis.getVoices();
-      const match=
-        voices.find(v=>/google us english female|zira|samantha|karen|moira|victoria/i.test(v.name))||
-        voices.find(v=>v.lang==="en-US"&&!/male|man/i.test(v.name))||
-        voices.find(v=>v.lang==="en-GB"&&/google uk english female|kate|serena/i.test(v.name))||
-        voices.find(v=>v.lang.startsWith("en")&&!/male|man/i.test(v.name))||
-        voices.find(v=>v.lang.startsWith("en"));
-      if(match){utt.voice=match;utt.lang=match.lang;}
-      if(window.speechSynthesis.paused)window.speechSynthesis.resume();
-      window.speechSynthesis.speak(utt);
-    };
-    if(window.speechSynthesis.getVoices().length===0){
-      window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};
-    }else{doSpeak();}
-  };
-
   const LindaAvatar=({size=44})=>(
-    <div style={{width:size,height:size,borderRadius:"50%",overflow:"hidden",flexShrink:0,border:"2px solid #a78bfa"}} dangerouslySetInnerHTML={{__html:`
-      <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="40" cy="40" r="38" fill="#f5f3ff" stroke="#a78bfa" strokeWidth="2"/>
-        <circle cx="40" cy="30" r="14" fill="#c4b5fd"/>
-        <ellipse cx="40" cy="62" rx="18" ry="12" fill="#7c3aed"/>
-        <circle cx="40" cy="30" r="11" fill="#ede9fe"/>
-        <ellipse cx="35" cy="28" rx="2" ry="2.5" fill="#4c1d95"/>
-        <ellipse cx="45" cy="28" rx="2" ry="2.5" fill="#4c1d95"/>
-        <path d="M34 35 Q40 40 46 35" stroke="#7c3aed" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <rect x="22" y="44" width="36" height="5" rx="2" fill="#6d28d9"/>
-        <path d="M27 50 Q40 59 53 50" fill="#7c3aed"/>
-      </svg>`}}/>
+    <div style={{width:size,height:size,borderRadius:"50%",overflow:"hidden",flexShrink:0,border:"2px solid #a78bfa"}} dangerouslySetInnerHTML={{__html:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="38" fill="#f5f3ff" stroke="#a78bfa" strokeWidth="2"/><circle cx="40" cy="30" r="14" fill="#c4b5fd"/><ellipse cx="40" cy="62" rx="18" ry="12" fill="#7c3aed"/><circle cx="40" cy="30" r="11" fill="#ede9fe"/><ellipse cx="35" cy="28" rx="2" ry="2.5" fill="#4c1d95"/><ellipse cx="45" cy="28" rx="2" ry="2.5" fill="#4c1d95"/><path d="M34 35 Q40 40 46 35" stroke="#7c3aed" strokeWidth="1.5" fill="none" strokeLinecap="round"/><rect x="22" y="44" width="36" height="5" rx="2" fill="#6d28d9"/><path d="M27 50 Q40 59 53 50" fill="#7c3aed"/></svg>`}}/>
   );
 
   const UserAvatar=()=>(
-    <div style={{width:40,height:40,borderRadius:"50%",background:"#ede9fe",border:"2px solid #a78bfa",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:15,color:"#7c3aed",flexShrink:0,...sty}}>
-      {isAr?"أ":"S"}
-    </div>
+    <div style={{width:38,height:38,borderRadius:"50%",background:"#ede9fe",border:"2px solid #a78bfa",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:14,color:"#7c3aed",flexShrink:0,...sty}}>S</div>
   );
+
+  // Check if there's a saved session to resume
+  const savedSession=loadLindaSession();
+  const canResume=savedSession&&savedSession.lessonId===progress.currentLesson;
 
   // SETUP SCREEN
   if(screen==="setup")return(
     <div style={{maxWidth:760,margin:"0 auto",padding:"24px 16px 60px",...sty}}>
-      <div style={{textAlign:"center",marginBottom:24}}>
+      <div style={{textAlign:"center",marginBottom:20}}>
         <LindaAvatar size={64}/>
         <h1 style={{fontFamily:"Georgia,serif",fontSize:24,color:T.text,margin:"12px 0 6px"}}>Your Teacher — Linda</h1>
         <p style={{fontSize:14,color:T.textMuted,margin:0,lineHeight:1.6}}>
-          {isAr?"معلمتك ليندا — تعلّم الإنجليزية من الصفر حتى مستوى الإتقان، بشرح بالعربية عند الحاجة":"Your personal English teacher — from A1 beginner to C2 proficiency, with Arabic explanations when you need them"}
+          {isAr?"معلمتك ليندا — تعلّم الإنجليزية من الصفر حتى الإتقان. كل درس يشمل: مفردات، أكمل الجملة، إملاء، ومحادثة.":"Your personal English teacher — A1 to C2. Each lesson includes vocabulary, fill-in-the-blank, spelling, and conversation."}
         </p>
       </div>
 
-      {/* Disclaimers */}
-      <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:20}}>
+      {canResume&&(
+        <div style={{background:"#faf5ff",border:"1px solid #a78bfa",borderRadius:12,padding:"14px 18px",marginBottom:16,display:"flex",alignItems:"center",gap:12,...sty}}>
+          <div style={{fontSize:24}}>📍</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:13,fontWeight:700,color:"#6d28d9",marginBottom:2}}>
+              {isAr?"يمكنك استكمال درسك السابق!":"You have an unfinished lesson!"}
+            </div>
+            <div style={{fontSize:12,color:T.textMuted}}>
+              {currentLesson?.title} — {PHASE_LABELS[savedSession.phase]}
+            </div>
+          </div>
+          <button onClick={()=>{setMessages(savedSession.messages||[]);setCurrentPhase(savedSession.phase||0);startLesson(currentLesson,true);}}
+            style={{padding:"8px 16px",background:"#7c3aed",color:"white",border:"none",borderRadius:8,fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>
+            {isAr?"استكمل ←":"Resume →"}
+          </button>
+        </div>
+      )}
+
+      <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:18}}>
         <div style={{background:"#f5f3ff",border:"1px solid #a78bfa",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#6d28d9",...sty}}>
-          <strong>{isAr?"ما الذي ستتعلمه مع ليندا:":"What Linda teaches:"}</strong>{" "}
-          {isAr?"مفردات + قواعد + نطق + جمل تطبيقية — درس تلو الآخر بشكل منظم":"Vocabulary, grammar, pronunciation, and practice sentences — lesson by lesson, structured and systematic"}
-          <div style={{direction:"rtl",marginTop:4,color:"#5b21b6",fontSize:11}}>إذا لم تفهم كلمة، قل: «ما معنى هذه الكلمة؟» — وإذا أردت إعادة، قل: «أعد من فضلك»</div>
+          <strong>{isAr?"كل درس يشمل 4 مراحل:":"Each lesson has 4 phases:"}</strong>{" "}
+          {isAr?"📚 مفردات → ✏️ أكمل الجملة → 🔤 الإملاء → 💬 المحادثة (حوالي 30 دقيقة)":"📚 Vocabulary → ✏️ Fill in the Blank → 🔤 Spelling → 💬 Conversation (~30 minutes)"}
+          <div style={{direction:"rtl",marginTop:4,fontSize:11}}>إذا توقفت في منتصف الدرس يمكنك العودة من نفس النقطة</div>
         </div>
         <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1d4ed8",...sty}}>
-          <strong>{isAr?"يتطلب Google Chrome":"Requires Google Chrome"}</strong> {isAr?"للصوت. المتصفحات الأخرى: كتابة فقط.":"for voice input and Linda's voice. Other browsers: text only."}
+          <strong>{isAr?"يتطلب Google Chrome":"Requires Google Chrome"}</strong> {isAr?"للصوت. غيره: كتابة فقط.":"for voice and Linda's voice."}
         </div>
-        {!isPro&&(
-          <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.primary,...sty}}>
-            {isAr?"المستوى A1 مجاني بالكامل. المستويات A2 إلى C2 تتطلب اشتراك Pro.":"Level A1 is completely free. Levels A2 through C2 require a Pro subscription."}
-          </div>
-        )}
+        {!isPro&&<div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.primary,...sty}}>
+          {isAr?"المستوى A1 مجاني بالكامل. A2 إلى C2 يتطلب Pro.":"Level A1 is free. A2 through C2 require Pro."}
+        </div>}
       </div>
 
       {/* Level selector */}
-      <div style={{marginBottom:20}}>
-        <div style={{fontSize:12,fontWeight:700,color:T.textMid,marginBottom:10,textTransform:"uppercase",letterSpacing:"0.06em",...sty}}>{isAr?"اختر مستواك:":"Choose your level:"}</div>
+      <div style={{marginBottom:18}}>
+        <div style={{fontSize:11,fontWeight:700,color:T.textMid,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em",...sty}}>{isAr?"اختر مستواك:":"Choose your level:"}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
           {Object.entries(LINDA_CURRICULUM).map(([lvl,data])=>{
             const locked=levelLocked(lvl);
@@ -8561,10 +9086,10 @@ RULES — follow every one:
             const total=data.lessons.length;
             return(
               <button key={lvl} onClick={()=>locked?onUpgrade():saveProgress({...progress,level:lvl,currentLesson:data.lessons[0].id})}
-                style={{padding:"12px 8px",borderRadius:10,border:`2px solid ${isActive?"#7c3aed":locked?T.border:T.border}`,background:isActive?"#f5f3ff":locked?T.bgMuted:"white",cursor:locked?"not-allowed":"pointer",textAlign:"center",...sty,transition:"all 0.15s"}}>
-                <div style={{fontSize:12,fontWeight:800,color:isActive?"#7c3aed":locked?T.textLight:T.text}}>{locked?"🔒 ":""}{lvl.toUpperCase()}</div>
-                <div style={{fontSize:11,color:isActive?"#6d28d9":T.textMuted,marginTop:2,lineHeight:1.3}}>{isAr?data.nameAr:data.name.split("—")[1]?.trim()}</div>
-                {doneCount>0&&<div style={{fontSize:10,color:T.green,marginTop:3}}>{doneCount}/{total} {isAr?"درساً":"lessons"} ✓</div>}
+                style={{padding:"12px 8px",borderRadius:10,border:`2px solid ${isActive?"#7c3aed":T.border}`,background:isActive?"#f5f3ff":locked?T.bgMuted:"white",cursor:locked?"not-allowed":"pointer",textAlign:"center",...sty}}>
+                <div style={{fontSize:13,fontWeight:800,color:isActive?"#7c3aed":locked?T.textLight:T.text}}>{locked?"🔒 ":""}{lvl.toUpperCase()}</div>
+                <div style={{fontSize:11,color:isActive?"#6d28d9":T.textMuted,marginTop:2}}>{isAr?data.nameAr:data.name.split("—")[1]?.trim()}</div>
+                {doneCount>0&&<div style={{fontSize:10,color:T.green,marginTop:3}}>{doneCount}/{total} ✓</div>}
               </button>
             );
           })}
@@ -8573,137 +9098,159 @@ RULES — follow every one:
 
       {/* Lesson list */}
       {levelData&&(
-        <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,overflow:"hidden",marginBottom:20}}>
-          <div style={{padding:"14px 18px",background:"#f5f3ff",borderBottom:`1px solid #e9d5ff`}}>
+        <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:14,overflow:"hidden",marginBottom:18}}>
+          <div style={{padding:"12px 18px",background:"#f5f3ff",borderBottom:"1px solid #e9d5ff"}}>
             <div style={{fontSize:14,fontWeight:700,color:"#6d28d9",...sty}}>{isAr?`دروس ${levelData.nameAr}`:`${levelData.name} Lessons`}</div>
           </div>
           {lessons.map((lesson,idx)=>{
             const done=completedSet.has(lesson.id);
             const isCurrent=lesson.id===progress.currentLesson;
             return(
-              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer",transition:"background 0.15s"}}
+              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer"}}
                 onClick={()=>startLesson(lesson)}>
                 <div style={{width:28,height:28,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,flexShrink:0}}>
                   {done?"✓":idx+1}
                 </div>
                 <div style={{flex:1}}>
                   <div style={{fontSize:13,fontWeight:isCurrent?700:500,color:done?T.textMuted:T.text,...sty}}>{isAr?lesson.titleAr:lesson.title}</div>
-                  <div style={{fontSize:11,color:T.textMuted,marginTop:1,...sty}}>{lesson.vocab.length} {isAr?"كلمات":"words"} · {lesson.grammar.point.split("—")[0].trim()}</div>
+                  <div style={{fontSize:11,color:T.textMuted,marginTop:1,...sty}}>
+                    {PHASE_LABELS.map((p,i)=><span key={i} style={{marginRight:8,color:done||completedSet.has(lesson.id)?T.green:"#a78bfa"}}>{p}</span>)}
+                  </div>
                 </div>
                 {isCurrent&&<div style={{fontSize:11,fontWeight:700,color:"#7c3aed",background:"#ede9fe",padding:"2px 8px",borderRadius:20,...sty}}>{isAr?"الدرس الحالي":"Current"}</div>}
-                {done&&<div style={{fontSize:11,color:T.green}}>✓</div>}
+                {done&&<span style={{fontSize:16}}>✅</span>}
               </div>
             );
           })}
         </div>
       )}
 
-      <button onClick={()=>{if(currentLesson)startLesson(currentLesson);}}
-        disabled={!currentLesson}
+      <button onClick={()=>startLesson(currentLesson)} disabled={!currentLesson}
         style={{width:"100%",padding:"14px",background:currentLesson?"#7c3aed":T.border,color:"white",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:currentLesson?"pointer":"not-allowed",...sty}}>
-        {isAr?`ابدأ الدرس: ${currentLesson?.titleAr||""}  ←`:`Start Lesson: ${currentLesson?.title||""} →`}
+        {isAr?`ابدأ: ${currentLesson?.titleAr||""} ←`:`Start: ${currentLesson?.title||""} →`}
       </button>
     </div>
   );
 
   // CHAT SCREEN
-  const guideItems=isAr?[
-    {phrase:"Could you repeat that, please?",ar:"هل يمكنك الإعادة؟"},
-    {phrase:"What is the meaning of this word?",ar:"ما معنى هذه الكلمة؟"},
-    {phrase:"Can you give me another example?",ar:"هل يمكنك إعطاء مثال آخر؟"},
-    {phrase:"I don't understand.",ar:"لم أفهم."},
-    {phrase:"How do you pronounce this?",ar:"كيف تنطق هذه؟"},
-    {phrase:"Can we do more practice?",ar:"هل يمكننا التدرب أكثر؟"},
-    {phrase:"I'm ready for the next lesson.",ar:"أنا مستعد للدرس التالي."},
-  ]:[
+  const guideItems=[
     {phrase:"Could you repeat that, please?",ar:"أعد من فضلك"},
     {phrase:"What is the meaning of this word?",ar:"ما معنى هذه الكلمة؟"},
     {phrase:"Can you give me another example?",ar:"مثال آخر؟"},
     {phrase:"I don't understand.",ar:"لم أفهم"},
-    {phrase:"How do you pronounce this?",ar:"كيف تنطق هذا؟"},
-    {phrase:"Can we do more practice?",ar:"تدرب أكثر؟"},
+    {phrase:"How do you spell this?",ar:"كيف تُهجَّأ؟"},
+    {phrase:"Can we practise more?",ar:"نتدرب أكثر؟"},
+    {phrase:"I'm ready for the next phase.",ar:"انتقل للمرحلة التالية"},
     {phrase:"I'm ready for the next lesson.",ar:"الدرس التالي"},
   ];
 
   return(
-    <div style={{maxWidth:900,margin:"0 auto",padding:"0 0 20px",...sty}}>
-      {/* Mobile tab toggle */}
-      <div style={{display:"flex",gap:0,marginBottom:12,border:`1px solid #a78bfa`,borderRadius:10,overflow:"hidden"}} className="md-hide">
+    <div style={{maxWidth:960,margin:"0 auto",padding:"0 0 20px",...sty}}>
+      {/* Mobile tabs */}
+      <div style={{display:"flex",gap:0,marginBottom:10,border:"1px solid #a78bfa",borderRadius:10,overflow:"hidden"}} className="md-hide">
         {["lessons","chat"].map(t=>(
           <button key={t} onClick={()=>setMobileTab(t)}
             style={{flex:1,padding:"10px",background:mobileTab===t?"#7c3aed":"white",color:mobileTab===t?"white":"#7c3aed",border:"none",fontWeight:700,fontSize:13,cursor:"pointer",...sty}}>
-            {t==="lessons"?(isAr?"قائمة الدروس":"Lessons"):(isAr?"المحادثة":"Chat")}
+            {t==="lessons"?(isAr?"الدروس":"Lessons"):(isAr?"المحادثة":"Chat")}
           </button>
         ))}
       </div>
 
-      <div style={{display:"flex",gap:16,alignItems:"flex-start"}}>
-        {/* Lesson list sidebar */}
-        <div style={{width:240,flexShrink:0,display:mobileTab==="lessons"?"block":"none"}} className="lesson-sidebar">
-          <div style={{background:"white",border:`1px solid #e9d5ff`,borderRadius:12,overflow:"hidden",position:"sticky",top:10}}>
-            <div style={{padding:"12px 14px",background:"#f5f3ff",borderBottom:`1px solid #e9d5ff`}}>
-              <div style={{fontSize:12,fontWeight:700,color:"#6d28d9",...sty}}>{isAr?`دروس ${levelData?.nameAr}`:levelData?.name}</div>
+      <div style={{display:"flex",gap:14,alignItems:"flex-start"}}>
+        {/* Sidebar */}
+        <div style={{width:230,flexShrink:0,display:mobileTab==="lessons"?"block":"none"}} className="lesson-sidebar">
+          <div style={{background:"white",border:"1px solid #e9d5ff",borderRadius:12,overflow:"hidden",position:"sticky",top:10}}>
+            <div style={{padding:"10px 14px",background:"#f5f3ff",borderBottom:"1px solid #e9d5ff"}}>
+              <div style={{fontSize:12,fontWeight:700,color:"#6d28d9",...sty}}>{isAr?levelData?.nameAr:levelData?.name}</div>
+            </div>
+            {/* Phase progress */}
+            <div style={{padding:"10px 14px",borderBottom:"1px solid #f3e8ff",background:"#faf5ff"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#7c3aed",marginBottom:6,...sty}}>{isAr?"مراحل الدرس الحالي:":"Current lesson phases:"}</div>
+              {PHASE_LABELS.map((label,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                  <div style={{width:16,height:16,borderRadius:"50%",background:currentPhase>i?"#7c3aed":currentPhase===i?"#c4b5fd":"#e9d5ff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,color:currentPhase>i?"white":"#6d28d9",flexShrink:0}}>
+                    {currentPhase>i?"✓":i+1}
+                  </div>
+                  <div style={{fontSize:11,color:currentPhase===i?"#6d28d9":currentPhase>i?T.green:T.textMuted,fontWeight:currentPhase===i?700:400,...sty}}>{isAr?PHASE_LABELS_AR[i]:label}</div>
+                </div>
+              ))}
             </div>
             {lessons.map((lesson,idx)=>{
               const done=completedSet.has(lesson.id);
               const isCurrent=lesson.id===currentLesson?.id;
               return(
-                <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:8,padding:"10px 12px",borderBottom:idx<lessons.length-1?`1px solid #f3e8ff`:"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer"}}
+                <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 12px",borderBottom:idx<lessons.length-1?"1px solid #f3e8ff":"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer"}}
                   onClick={()=>{startLesson(lesson);setMobileTab("chat");}}>
-                  <div style={{width:22,height:22,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:800,flexShrink:0}}>
+                  <div style={{width:20,height:20,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800,flexShrink:0}}>
                     {done?"✓":idx+1}
                   </div>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:11,fontWeight:isCurrent?700:500,color:done?T.textMuted:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...sty}}>{isAr?lesson.titleAr:lesson.title}</div>
+                  <div style={{fontSize:11,fontWeight:isCurrent?700:500,color:done?T.textMuted:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...sty}}>
+                    {isAr?lesson.titleAr:lesson.title}
                   </div>
                 </div>
               );
             })}
             <div style={{padding:"10px 12px"}}>
-              <button onClick={()=>{setScreen("setup");setMessages([]);window.speechSynthesis?.cancel();}}
+              <button onClick={()=>{setScreen("setup");window.speechSynthesis?.cancel();isRecordingRef.current=false;recognitionRef.current?.stop();}}
                 style={{width:"100%",padding:"7px",background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:7,fontSize:11,cursor:"pointer",color:T.textMid,...sty}}>
-                ← {isAr?"العودة للمستويات":"Back to levels"}
+                ← {isAr?"العودة للمستويات":"All levels"}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Chat + guide */}
+        {/* Main chat area */}
         <div style={{flex:1,minWidth:0,display:mobileTab==="chat"?"flex":"none",flexDirection:"column",gap:10}}>
           {/* Header */}
-          <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.border}`}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:"1px solid #e9d5ff"}}>
             <LindaAvatar size={34}/>
-            <div style={{flex:1}}>
+            <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:13,fontWeight:700,color:"#6d28d9"}}>Linda</div>
-              <div style={{fontSize:11,color:T.textMuted}}>{isAr?currentLesson?.titleAr:currentLesson?.title} · {progress.level.toUpperCase()}</div>
+              <div style={{fontSize:11,color:T.textMuted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                {isAr?currentLesson?.titleAr:currentLesson?.title} · {isAr?PHASE_LABELS_AR[currentPhase]:PHASE_LABELS[currentPhase]}
+              </div>
             </div>
             <button onClick={()=>{window.speechSynthesis?.cancel();setTtsEnabled(v=>!v);}}
-              style={{background:ttsEnabled?"#f5f3ff":T.bgMuted,border:`1px solid ${ttsEnabled?"#a78bfa":T.border}`,borderRadius:8,padding:"5px 8px",fontSize:12,cursor:"pointer",color:ttsEnabled?"#7c3aed":T.textMuted,...sty}}>
+              style={{background:ttsEnabled?"#f5f3ff":T.bgMuted,border:`1px solid ${ttsEnabled?"#a78bfa":T.border}`,borderRadius:8,padding:"5px 8px",fontSize:12,cursor:"pointer",color:ttsEnabled?"#7c3aed":T.textMuted,flexShrink:0}}>
               {ttsEnabled?"🔊":"🔇"}
             </button>
-            <button onClick={()=>{setScreen("setup");setMessages([]);window.speechSynthesis?.cancel();isRecordingRef.current=false;recognitionRef.current?.stop();}}
-              style={{background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",fontSize:12,cursor:"pointer",color:T.textMid,...sty}}>
+            <button onClick={()=>{setScreen("setup");window.speechSynthesis?.cancel();isRecordingRef.current=false;recognitionRef.current?.stop();}}
+              style={{background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",fontSize:12,cursor:"pointer",color:T.textMid,flexShrink:0,...sty}}>
               ← {isAr?"الدروس":"Lessons"}
             </button>
           </div>
 
-          {/* Guide panel */}
-          <div style={{background:"#f5f3ff",border:"1px solid #e9d5ff",borderRadius:10,padding:"10px 14px"}}>
-            <div style={{fontSize:11,fontWeight:700,color:"#6d28d9",marginBottom:7,...sty}}>
-              {isAr?"💡 عبارات مفيدة — قلها لليندا:":"💡 Useful phrases — say these to Linda:"}
+          {/* Guide */}
+          <div style={{background:"#f5f3ff",border:"1px solid #e9d5ff",borderRadius:10,padding:"9px 12px"}}>
+            <div style={{fontSize:11,fontWeight:700,color:"#6d28d9",marginBottom:6,...sty}}>
+              {isAr?"💡 قل هذا لليندا:":"💡 Say this to Linda:"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
               {guideItems.map((g,i)=>(
                 <button key={i} onClick={()=>sendMessage(g.phrase)}
-                  style={{background:"white",border:"1px solid #a78bfa",borderRadius:20,padding:"4px 10px",fontSize:11,cursor:"pointer",color:"#6d28d9",...sty,transition:"all 0.15s"}}>
+                  style={{background:"white",border:"1px solid #a78bfa",borderRadius:20,padding:"4px 10px",fontSize:11,cursor:"pointer",color:"#6d28d9",...sty}}>
                   {g.phrase} <span style={{color:T.textMuted,fontSize:10}}>({g.ar})</span>
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Repeat indicator */}
+          {repeatTarget&&(
+            <div style={{background:"#faf5ff",border:"1px solid #a78bfa",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",gap:10,...sty}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#6d28d9",marginBottom:3}}>🔁 {isAr?"كرر بعد ليندا:":"Repeat after Linda:"}</div>
+                <div style={{fontSize:15,color:"#4c1d95",fontWeight:600}}>"{repeatTarget}"</div>
+              </div>
+              <div style={{display:"flex",gap:5,flexShrink:0}}>
+                {[0,1].map(i=><div key={i} style={{width:16,height:16,borderRadius:"50%",background:repeatSuccess>i?"#7c3aed":"#e9d5ff",border:"2px solid #a78bfa",transition:"background 0.3s"}}/>)}
+              </div>
+              <div style={{fontSize:11,color:"#6d28d9",...sty}}>{repeatSuccess}/2</div>
+            </div>
+          )}
+
           {/* Messages */}
-          <div ref={chatBoxRef} style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:10,minHeight:280,maxHeight:"calc(100vh - 440px)",paddingBottom:8}}>
+          <div ref={chatBoxRef} style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:10,minHeight:260,maxHeight:"calc(100vh - 460px)",paddingBottom:8}}>
             {messages.map(msg=>{
               const isUser=msg.role==="user";
               return(
@@ -8731,33 +9278,17 @@ RULES — follow every one:
             <div ref={messagesEndRef}/>
           </div>
 
-          {/* Repeat progress indicator */}
-          {repeatTarget&&(
-            <div style={{background:"#faf5ff",border:"1px solid #a78bfa",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",gap:10,...sty}}>
-              <div style={{flex:1}}>
-                <div style={{fontSize:11,fontWeight:700,color:"#6d28d9",marginBottom:4}}>🔁 Repeat after Linda:</div>
-                <div style={{fontSize:14,color:"#4c1d95",fontWeight:600}}>"{repeatTarget}"</div>
-              </div>
-              <div style={{display:"flex",gap:5,flexShrink:0}}>
-                {[0,1].map(i=>(
-                  <div key={i} style={{width:16,height:16,borderRadius:"50%",background:repeatSuccess>i?"#7c3aed":"#e9d5ff",border:"2px solid #a78bfa",transition:"background 0.3s"}}/>
-                ))}
-              </div>
-              <div style={{fontSize:11,color:"#6d28d9",...sty}}>{repeatSuccess}/2</div>
-            </div>
-          )}
-
           {/* Input */}
-          <div style={{paddingTop:8,borderTop:`1px solid ${T.border}`}}>
+          <div style={{paddingTop:8,borderTop:"1px solid #e9d5ff"}}>
             {error&&<div style={{fontSize:12,color:T.red,marginBottom:5,...sty}}>{error}</div>}
             <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
               <textarea value={transcript} onChange={e=>setTranscript(e.target.value)}
                 onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!isRecording)sendMessage(transcript);}}}
-                placeholder={isAr?(isRecording?"جارٍ التسجيل... اضغط لإيقافه والإرسال":"اضغط الميكروفون للكلام أو اكتب هنا..."):(isRecording?"Listening... tap mic to stop and send":"Tap mic to speak or type here...")}
+                placeholder={isAr?(isRecording?"جارٍ التسجيل — اضغط ⏹ للإرسال":"اضغط الميكروفون أو اكتب هنا..."):(isRecording?"Listening... tap ⏹ to stop and send":"Tap mic or type here...")}
                 rows={2}
                 style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?"#a78bfa":T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               <button onClick={isRecording?stopRecording:startRecording}
-                style={{width:52,height:52,borderRadius:"50%",border:"none",background:isRecording?"#7c3aed":T.primary,color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?`0 0 0 4px #a78bfa`:`0 3px 10px ${T.primary}55`,transition:"all 0.2s"}}>
+                style={{width:52,height:52,borderRadius:"50%",border:"none",background:isRecording?"#7c3aed":"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
                 {isRecording?"⏹":"🎤"}
               </button>
             </div>
