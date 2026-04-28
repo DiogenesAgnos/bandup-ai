@@ -4372,7 +4372,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:16}}>
         <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1d4ed8",...sty}}>
-          <strong>Works on all browsers and devices — Chrome, Safari, Firefox, iPhone and Android.<br/>
+          <strong>Works on all browsers and devices — Chrome, Safari, Firefox, iPhone and Android.</strong><br/>
           <span style={{direction:"rtl",display:"block",marginTop:3,color:"#1e40af"}}>يعمل على جميع المتصفحات والأجهزة — Chrome وSafari وFirefox وiPhone وأندرويد.</span>
         </div>
         <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.amber,...sty}}>
