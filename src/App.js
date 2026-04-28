@@ -8894,7 +8894,7 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
       fillCorrect:"صحيح! ننتقل للتمرين التالي.",
       fillWrong:"حاول مرة أخرى. تلميح",
       fillDone:"ممتاز! الآن الإملاء.",
-      spellIntro:"اهجّ هذه الكلمة",
+      spellIntro:"هجّ هذه الكلمة",
       spellCorrect:"صحيح تماماً! ننتقل للكلمة التالية.",
       spellWrong:"الهجاء الصحيح هو",
       spellDone:"رائع! الآن نتحدث.",
@@ -8918,12 +8918,13 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
 
     const phaseInstructions={
       0:`PHASE 1 — VOCABULARY:
-For EACH word, follow this EXACT format — do not skip steps:
-1. "${instr.vocabIntro}: [WORD]"${isA1A2?` — then: "[WORD] ${instr.vocabMeaning}: [Arabic meaning]"`:`${isB1?` — then: "[WORD] ${instr.vocabMeaning}: [Arabic meaning]"`:""}`}
-2. "${instr.vocabExample}: [example sentence]" — say it ONCE only.
-3. "${instr.vocabRepeat}: [WORD]" — then STOP and wait for student.
+For EACH word, follow this EXACT format — speak naturally, include Arabic for ALL levels:
+1. Say the word clearly: "${instr.vocabIntro}: [WORD]" — then immediately add the Arabic meaning: "[WORD] ${instr.vocabMeaning}: [Arabic meaning]"
+2. Say the example: "${instr.vocabExample}: [example sentence]" — say it ONCE only, naturally.
+3. Say: "${instr.vocabRepeat}: [WORD]" — STOP and wait.
 4. After correct repeat: "${instr.vocabAgain} [WORD]" — wait again.
-5. After second correct repeat: "${instr.vocabNext}" — move immediately, no permission needed.
+5. After second correct repeat: "${instr.vocabNext}" — move immediately.
+${isA1A2?`IMPORTANT FOR A1/A2: Keep ALL surrounding words simple. If you explain anything, use simple Arabic sentences. Never use complex English words when teaching basic vocabulary.`:""}
 Vocabulary:
 ${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
 When ALL words done: "${instr.vocabDone}" — immediately present the first fill-in-the-blank.`,
@@ -9007,7 +9008,9 @@ ALWAYS:
     const doSpeak=()=>{
       window.speechSynthesis.cancel();
       const utt=new SpeechSynthesisUtterance(text);
-      utt.lang="en-US";utt.rate=1.0;utt.pitch=1.3;
+      utt.lang="en-US";
+      utt.rate=["a1","a2"].includes(progress.level)?0.82:1.0; // slower for beginners
+      utt.pitch=1.3;
       const voices=window.speechSynthesis.getVoices();
       const match=
         voices.find(v=>/google us english female|zira|samantha|karen|moira|victoria/i.test(v.name))||
