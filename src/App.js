@@ -9051,14 +9051,6 @@ ALWAYS:
       clearLindaSession();
     }
   };
-      if(currentLesson&&!completedSet.has(currentLesson.id)){
-        const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
-        const nextLesson=lessons[nextIdx];
-        saveProgress({completed:[...progress.completed,currentLesson.id],currentLesson:nextLesson?.id||currentLesson.id});
-      }
-      clearLindaSession();
-    }
-  };
 
   const getHistory=()=>messages.map(m=>({
     role:m.role==="user"?"user":"assistant",
