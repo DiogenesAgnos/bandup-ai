@@ -4529,12 +4529,18 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
             {isRecording?"⏹":"🎤"}
           </button>
         </div>
-        {isRecording
-          ?<div style={{fontSize:12,color:T.red,marginTop:4,...sty}}>Recording — tap ⏹ to stop and send</div>
-          :transcript.trim()&&<div style={{fontSize:12,color:T.textMuted,marginTop:4,...sty}}>Press Enter or tap mic after speaking to send</div>
-        }
+        {isRecording?(
+          <div style={{display:"flex",alignItems:"center",gap:8,fontSize:12,color:T.red,marginTop:4,...sty}}>
+            <div style={{display:"flex",gap:3,alignItems:"center"}}>
+              {[0,1,2,3].map(i=><div key={i} style={{width:3,borderRadius:2,background:T.red,animation:`soundwave 0.8s ${i*0.1}s ease-in-out infinite alternate`,minHeight:4}}/>)}
+            </div>
+            Recording — tap ⏹ to stop and send
+          </div>
+        ):transcript.trim()&&(
+          <div style={{fontSize:12,color:T.textMuted,marginTop:4,...sty}}>Press Enter or tap mic after speaking to send</div>
+        )}
       </div>
-      <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}`}</style>
+      <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes soundwave{0%{height:4px}100%{height:16px}}`}</style>
     </div>
   );
 };
@@ -8872,56 +8878,93 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
     const isA1A2=["a1","a2"].includes(progress.level);
     const isB1=progress.level==="b1";
     const isLowLevel=isA1A2||isB1;
+
+    // A1/A2: ALL instructional language in Arabic. English only for the actual words/sentences being taught.
+    const instr=isA1A2?{
+      vocabIntro:"كلمتنا الأولى هي",
+      vocabMeaning:"تعني بالعربي",
+      vocabExample:"مثال",
+      vocabRepeat:"كرر بعدي",
+      vocabAgain:"ممتاز! مرة أخرى",
+      vocabNext:"رائع! ننتقل للكلمة التالية.",
+      vocabDone:"أحسنت! الآن تمارين أكمل الجملة.",
+      fillIntro:"أكمل الجملة",
+      fillBlankWord:"الفراغ",
+      fillHint:"تلميح",
+      fillCorrect:"صحيح! ننتقل للتمرين التالي.",
+      fillWrong:"حاول مرة أخرى. تلميح",
+      fillDone:"ممتاز! الآن الإملاء.",
+      spellIntro:"اهجّ هذه الكلمة",
+      spellCorrect:"صحيح تماماً! ننتقل للكلمة التالية.",
+      spellWrong:"الهجاء الصحيح هو",
+      spellDone:"رائع! الآن نتحدث.",
+      convIntro:"سؤال",
+      lessonDone:"أحسنت جداً! انتهى الدرس. هل أنت مستعد للدرس التالي؟",
+    }:isB1?{
+      vocabIntro:"First word:",vocabMeaning:"— بالعربي",vocabExample:"Example:",vocabRepeat:"Repeat:",
+      vocabAgain:"Great! Once more:",vocabNext:"Perfect! Next word.",vocabDone:"Well done! Now fill-in-the-blank.",
+      fillIntro:"Fill in the blank",fillBlankWord:"blank",fillHint:"تلميح",fillCorrect:"Correct! Next.",
+      fillWrong:"Try again. Hint:",fillDone:"Excellent! Now spelling.",spellIntro:"Spell this word:",
+      spellCorrect:"Perfect! Next word.",spellWrong:"Correct spelling:",spellDone:"Outstanding! Now let's talk.",
+      convIntro:"Question:",lessonDone:"Lesson complete! Amazing work! Shall we move to the next lesson?",
+    }:{
+      vocabIntro:"First word:",vocabMeaning:"meaning:",vocabExample:"Example:",vocabRepeat:"Repeat:",
+      vocabAgain:"Great! Once more:",vocabNext:"Perfect! Next.",vocabDone:"Well done! Now fill-in-the-blank.",
+      fillIntro:"Fill in the blank",fillBlankWord:"blank",fillHint:"Hint:",fillCorrect:"Correct! Next.",
+      fillWrong:"Try again. Hint:",fillDone:"Excellent! Now spelling.",spellIntro:"Spell this word:",
+      spellCorrect:"Perfect! Next.",spellWrong:"Correct spelling:",spellDone:"Outstanding! Now let's talk.",
+      convIntro:"Question:",lessonDone:"Lesson complete! Amazing work! Shall we move to the next lesson?",
+    };
+
     const phaseInstructions={
       0:`PHASE 1 — VOCABULARY:
-For EACH word below, do this in order — do NOT skip any step:
-1. Say ONLY the word itself, then pause. Example: "Hello."${isA1A2?` Then say its Arabic meaning simply: "بالعربي: [Arabic]". Use very simple English around the word — avoid words the student may not know.`:""}${isB1?` Then give the Arabic meaning: "بالعربي: [Arabic]".`:""}
-2. Say the example sentence ONCE — do not repeat it twice.
-3. Say: "Now repeat: [WORD]" — NOTHING else after this. Wait for student.
-4. After first correct repeat: "Great! Once more: [WORD]" — wait again.
-5. After second correct repeat: "Perfect! Next word." — move to next word immediately without asking permission.
+For EACH word, follow this EXACT format — do not skip steps:
+1. "${instr.vocabIntro}: [WORD]"${isA1A2?` — then: "[WORD] ${instr.vocabMeaning}: [Arabic meaning]"`:`${isB1?` — then: "[WORD] ${instr.vocabMeaning}: [Arabic meaning]"`:""}`}
+2. "${instr.vocabExample}: [example sentence]" — say it ONCE only.
+3. "${instr.vocabRepeat}: [WORD]" — then STOP and wait for student.
+4. After correct repeat: "${instr.vocabAgain} [WORD]" — wait again.
+5. After second correct repeat: "${instr.vocabNext}" — move immediately, no permission needed.
 Vocabulary:
-${lesson.vocab.map(v=>`- ${v.w} [${v.ar}]: ${v.ex}`).join("\n")}
-When ALL words done: say "Well done! Now fill-in-the-blank exercises." then IMMEDIATELY present the first exercise without waiting.`,
+${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
+When ALL words done: "${instr.vocabDone}" — immediately present the first fill-in-the-blank.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
-Present ONE exercise at a time. Read the sentence but say the word BLANK (not underscore) for the gap.
-Example: "Fill in the blank: She blank to school." — say "blank" not "underscore".${isA1A2?` Then add the Arabic hint: "تلميح بالعربي: [hint in Arabic]"`:""}${isB1?` Then give a brief Arabic hint: "[hint]".`:""}
-If correct: praise and immediately present the next exercise without asking.
-If wrong: give a hint and ask again.
+Present ONE exercise at a time using this format:
+"${instr.fillIntro}: [sentence with the word '${instr.fillBlankWord}' replacing the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
+If correct: "${instr.fillCorrect}" — immediately next exercise.
+If wrong: "${instr.fillWrong}: [Arabic/English hint]" — ask again.
 Exercises:
-${lesson.fillBlank.map((f,i)=>`${i+1}. Sentence (read aloud replacing ___ with "blank"): "${f.sentence.replace(/___/g,"blank")}" — correct answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
-When ALL exercises done: say "Excellent! Now spelling." then immediately say: "Spell this word for me:" and give the FIRST word — do NOT reveal the word's spelling yourself.`,
+${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence.replace(/___/g,instr.fillBlankWord)}" — answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
+When ALL done: "${instr.fillDone}" — immediately present first spelling word.`,
 
       2:`PHASE 3 — SPELLING:
-CRITICAL RULE: You say the word ONLY as a sound — NEVER write or display it in your response. The student must spell it from hearing only.
-Say: "Spell this word:" then say the word aloud (but do NOT type it in your message — replace it with the description "the word I just said").
-Wait for their spelling. If correct: praise and move to next word immediately.
-If wrong: spell it letter by letter for them, then ask them to try once more.
-Words to test (say them but do NOT type them in your text): ${lesson.spelling.join(", ")}
-When ALL words done: say "Outstanding! Let's have a conversation now." then immediately ask the first conversation question.`,
+Say: "${instr.spellIntro} [WORD]"
+IMPORTANT: Write the word normally in your response so it can be spoken aloud — but wrap it in [SPELL] tags so the UI hides it visually. Example: "${instr.spellIntro} [SPELL]Hello[/SPELL]"
+Wait for their spelling. If correct: "${instr.spellCorrect}" — next word immediately.
+If wrong: "${instr.spellWrong} [SPELL][letter]-[letter]-[letter]...[/SPELL]" — then ask once more.
+Words: ${lesson.spelling.map(w=>`[SPELL]${w}[/SPELL]`).join(", ")}
+When ALL done: "${instr.spellDone}" — immediately ask first conversation question.`,
 
       3:`PHASE 4 — CONVERSATION:
-Have a natural conversation using today's vocabulary and grammar. Ask ONE question at a time from this list:
-${lesson.conversation.map((c,i)=>`${i+1}. ${c}`).join("\n")}
-Grammar to weave in naturally: ${lesson.grammar.point}
-${lesson.grammar.levelNote?`Linguistic note to share naturally: ${lesson.grammar.levelNote}`:""}
-${isLowLevel?"Use Arabic to explain any difficult concepts.":""}
-When all questions covered: say "Lesson complete! Amazing work today! Shall we move to the next lesson?"`,
+Ask ONE question at a time:
+${lesson.conversation.map((c,i)=>`${i+1}. ${instr.convIntro} ${c}`).join("\n")}
+Weave in grammar naturally: ${lesson.grammar.point}
+${lesson.grammar.levelNote?`Share this note naturally: ${lesson.grammar.levelNote}`:""}
+${isA1A2?"اشرح أي مفهوم صعب بالعربي.":isB1?"Use Arabic to explain difficult grammar points.":""}
+When done: "${instr.lessonDone}"`,
     };
 
     const lowLevelNote=isA1A2?`
-CRITICAL FOR A1/A2:
-- Use ONLY the simplest English words around vocabulary: say, word, now, repeat, good, next, try, again, example, means, Arabic, blank
-- Do NOT use words like: "pronunciation", "grammatically", "structure", "certainly", "regarding", "furthermore"
-- Every explanation should be so simple a child could understand it
-- Always add Arabic [في أقواس] after difficult English words
-- Full Arabic sentences when the student seems confused`
-    :isB1?`
-FOR B1: Add Arabic meaning [في أقواس] for all new vocabulary and when explaining grammar. Keep explanations clear.`:"";
+CRITICAL — YOU ARE TEACHING A1/A2 BEGINNERS:
+- Your INSTRUCTIONAL language must be Arabic. Only the English words/sentences being taught should be in English.
+- WRONG: "Hello! I am happy to see you! Here is our first word: Hello"
+- RIGHT: "أهلاً! كلمتنا الأولى هي: Hello — تعني بالعربي: مرحباً — مثال: Hello, my name is Sara. — كرر بعدي: Hello"
+- NEVER use English instructional phrases an A1 student wouldn't understand
+- ALL phase transitions, praise, and instructions in Arabic
+- Short, clear, Arabic-first always`:isB1?`
+FOR B1: Give Arabic meaning for all new vocabulary. Keep grammar explanations bilingual.`:"";
 
     return `You are Linda, an enthusiastic English teacher for Arabic-speaking students.
-
 Level: ${progress.level.toUpperCase()} — ${levelData.name}
 Lesson: ${lesson.title} (${lesson.titleAr})
 ${lowLevelNote}
@@ -8930,13 +8973,11 @@ ${phaseInstructions[phase]||phaseInstructions[0]}
 
 ALWAYS:
 - NEVER say your name
-- NEVER say "underscore" — say "blank" for gaps
-- NEVER write a spelling word in your text during Phase 3 — only say it
-- NEVER wait for the student to say "go ahead" — move between steps automatically
-- 2-3 sentences maximum per response
-- Be warm and enthusiastic: "Excellent!", "Brilliant!", "You're doing great!", "برافو!"
-- If student writes in Arabic: respond in Arabic then return to English
-- Auto-advance: after each correct answer, immediately present the next item`;
+- NEVER wait for permission to advance — move automatically after correct answers
+- NEVER say "underscore" — use "${instr.fillBlankWord}" for gaps
+- 2-3 sentences max per response
+- Be warm: "ممتاز!", "Excellent!", "Brilliant!", "برافو!"
+- If student writes Arabic: respond in Arabic then continue`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -8977,36 +9018,39 @@ ALWAYS:
     if(!mountedRef.current)return;
     const isSuccess=/\[REPEAT_SUCCESS\]/i.test(text);
     const isMoveOn=/\[MOVE_ON\]/i.test(text);
-    // Remove name repetitions, clean markdown, remove signals
-    let clean=text
+    // Strip signals and name prefix
+    let raw=text
       .replace(/\[REPEAT_SUCCESS\]/gi,"").replace(/\[MOVE_ON\]/gi,"")
-      .replace(/\[Linda\][:：]?\s*/gi,"")
-      .replace(/Linda[:：]\s*/gi,"")
-      .replace(/\*\*/g,"").replace(/\*/g,"")
-      .trim();
-    setMessages(prev=>[...prev,{role:"bot",text:clean,id:Date.now()+Math.random()}]);
-    if(ttsEnabled)setTimeout(()=>speakLinda(stripForTTSLinda(clean)),80);
+      .replace(/\[Linda\][:：]?\s*/gi,"").replace(/Linda[:：]\s*/gi,"")
+      .replace(/\*\*/g,"").replace(/\*/g,"").trim();
+    // Extract spelling words for TTS (keep them) but mark for visual blur
+    const ttsText=raw.replace(/\[SPELL\](.*?)\[\/SPELL\]/gi,"$1");
+    const displayText=raw; // keep [SPELL] tags — rendered as blurred in JSX
+    setMessages(prev=>[...prev,{role:"bot",text:displayText,id:Date.now()+Math.random()}]);
+    if(ttsEnabled)setTimeout(()=>speakLinda(stripForTTSLinda(ttsText)),80);
     // Repeat tracking
-    if(isSuccess){
-      setRepeatSuccess(prev=>{
-        const next=prev+1;
-        if(next>=2)setRepeatTarget(null);
-        return next>=2?0:next;
-      });
-    }
+    if(isSuccess){setRepeatSuccess(prev=>{const n=prev+1;if(n>=2)setRepeatTarget(null);return n>=2?0:n;});}
     if(isMoveOn){setRepeatTarget(null);setRepeatSuccess(0);}
     // Detect repeat targets
-    const repeatMatch=clean.match(/repeat after me[:\s]+[""]?([^"".\n?!]+)/i)||
-                      clean.match(/one more time[:\s]+[""]?([^"".\n?!]+)/i)||
-                      clean.match(/try again[:\s]+[""]?([^"".\n?!]+)/i);
-    if(repeatMatch)setRepeatTarget(repeatMatch[1].trim().replace(/[""]$/,""));
-    // Phase advancement detection — match new system prompt wording
-    if(/fill.in.the.blank|blank exercises|now fill|move to grammar/i.test(clean)&&currentPhase===0){
-      setCurrentPhase(1);
-    }else if(/now spelling|let's have a conversation|outstanding.*convers|time for.*convers|convers.*now/i.test(clean)&&currentPhase<=2){
-      if(/spelling|outstanding/i.test(clean)&&currentPhase===1)setCurrentPhase(2);
-      else if(/conversation|let's talk/i.test(clean)&&currentPhase===2)setCurrentPhase(3);
-    }else if(/lesson complete|amazing work today|shall we move to the next lesson/i.test(clean)){
+    const repeatMatch=raw.match(/كرر بعدي[:\s]+[""]?([^"".\n?!؟]+)/i)||
+                      raw.match(/مرة أخرى[:\s]+[""]?([^"".\n?!؟]+)/i)||
+                      raw.match(/repeat[:\s]+[""]?([^"".\n?!]+)/i)||
+                      raw.match(/once more[:\s]+[""]?([^"".\n?!]+)/i)||
+                      raw.match(/try again[:\s]+[""]?([^"".\n?!]+)/i);
+    if(repeatMatch)setRepeatTarget(repeatMatch[1].trim().replace(/[""]$/,"").replace(/\[SPELL\]|\[\/SPELL\]/gi,""));
+    // Phase advancement
+    if(/(أكمل الجملة|fill.in.the.blank|blank exercises)/i.test(raw)&&currentPhase===0)setCurrentPhase(1);
+    else if(/(الإملاء|now spelling|time for spell)/i.test(raw)&&currentPhase===1)setCurrentPhase(2);
+    else if(/(نتحدث|let's talk|conversation now|outstanding)/i.test(raw)&&currentPhase===2)setCurrentPhase(3);
+    else if(/(انتهى الدرس|lesson complete|amazing work)/i.test(raw)){
+      if(currentLesson&&!completedSet.has(currentLesson.id)){
+        const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
+        const next=lessons[nextIdx];
+        saveProgress({completed:[...progress.completed,currentLesson.id],currentLesson:next?.id||currentLesson.id});
+      }
+      clearLindaSession();
+    }
+  };
       if(currentLesson&&!completedSet.has(currentLesson.id)){
         const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
         const nextLesson=lessons[nextIdx];
@@ -9359,7 +9403,11 @@ ALWAYS:
                   <div style={{maxWidth:"80%",display:"flex",flexDirection:"column",alignItems:isUser?"flex-end":"flex-start"}}>
                     {!isUser&&<div style={{fontSize:10,fontWeight:700,color:"#7c3aed",marginBottom:2,...sty}}>Linda</div>}
                     <div style={{background:isUser?T.primaryLight:"#f5f3ff",border:`1px solid ${isUser?T.primaryBorder:"#e9d5ff"}`,borderRadius:isUser?"14px 14px 4px 14px":"14px 14px 14px 4px",padding:"10px 14px",fontSize:14,color:T.text,lineHeight:1.65,...sty}}>
-                      {msg.text}
+                      {!isUser?msg.text.split(/(\[SPELL\].*?\[\/SPELL\])/gi).map((part,i)=>{
+                        const m=part.match(/\[SPELL\](.*?)\[\/SPELL\]/i);
+                        if(m)return <span key={i} style={{filter:"blur(4px)",userSelect:"none",cursor:"default",background:"#e9d5ff",borderRadius:4,padding:"0 4px"}}>{m[1]}</span>;
+                        return <span key={i}>{part}</span>;
+                      }):msg.text}
                     </div>
                   </div>
                 </div>
@@ -9392,11 +9440,18 @@ ALWAYS:
                 {isRecording?"⏹":"🎤"}
               </button>
             </div>
-            {isRecording&&<div style={{fontSize:12,color:"#7c3aed",marginTop:4,...sty}}>{isAr?"جارٍ التسجيل — اضغط ⏹ للإيقاف والإرسال":"Recording — tap ⏹ to stop and send"}</div>}
+            {isRecording&&(
+              <div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",fontSize:12,color:"#7c3aed",...sty}}>
+                <div style={{display:"flex",gap:3,alignItems:"center"}}>
+                  {[0,1,2,3].map(i=><div key={i} style={{width:3,borderRadius:2,background:"#7c3aed",animation:`soundwave 0.8s ${i*0.1}s ease-in-out infinite alternate`,minHeight:4}}/>)}
+                </div>
+                {isAr?"جارٍ التسجيل — اضغط ⏹ للإيقاف والإرسال":"Recording — tap ⏹ to stop and send"}
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <style>{`.lesson-sidebar{display:block!important}.md-hide{display:none!important}@media(max-width:640px){.lesson-sidebar{display:none!important}.md-hide{display:flex!important}}`}</style>
+      <style>{`.lesson-sidebar{display:block!important}.md-hide{display:none!important}@media(max-width:640px){.lesson-sidebar{display:none!important}.md-hide{display:flex!important}}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes soundwave{0%{height:4px}100%{height:16px}}`}</style>
     </div>
   );
 };
