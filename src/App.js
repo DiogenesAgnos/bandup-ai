@@ -8938,12 +8938,22 @@ ${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence.replace(/___/g,instr.fillBl
 When ALL done: "${instr.fillDone}" — immediately present first spelling word.`,
 
       2:`PHASE 3 — SPELLING:
-Say: "${instr.spellIntro} [WORD]"
-IMPORTANT: Write the word normally in your response so it can be spoken aloud — but wrap it in [SPELL] tags so the UI hides it visually. Example: "${instr.spellIntro} [SPELL]Hello[/SPELL]"
-Wait for their spelling. If correct: "${instr.spellCorrect}" — next word immediately.
-If wrong: "${instr.spellWrong} [SPELL][letter]-[letter]-[letter]...[/SPELL]" — then ask once more.
-Words: ${lesson.spelling.map(w=>`[SPELL]${w}[/SPELL]`).join(", ")}
-When ALL done: "${instr.spellDone}" — immediately ask first conversation question.`,
+You MUST follow this exact format for EVERY spelling question — no exceptions:
+"Spell this word: [SPELL]WORD[/SPELL]"
+
+The [SPELL] tags make the word hidden visually but spoken aloud. The student hears it but cannot read it.
+
+MANDATORY: You MUST include [SPELL]WORD[/SPELL] in EVERY message where you ask for spelling. Never give hints, meanings, or descriptions instead of the word itself. Never say "the word means..." — just say the word.
+
+Example of CORRECT format: "Spell this word: [SPELL]Traffic[/SPELL]"
+Example of WRONG format: "The word means 'مرور' — spell it!" ← THIS IS WRONG, never do this.
+
+If correct: praise briefly + immediately give next word: "Well done! Next: [SPELL]NEXTWORD[/SPELL]"
+If wrong: spell it out: "It's [SPELL]T-R-A-F-F-I-C[/SPELL] — try once more: [SPELL]Traffic[/SPELL]"
+
+Words to test in order: ${lesson.spelling.map((w,i)=>`${i+1}. [SPELL]${w}[/SPELL]`).join(", ")}
+
+Start immediately with word 1. When ALL words done: say "Outstanding! Let's talk now." and immediately ask the first conversation question.`,
 
       3:`PHASE 4 — CONVERSATION:
 Ask ONE question at a time:
