@@ -4187,71 +4187,97 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     }catch(e){setReport("Could not generate report.");}
   };
 
-  // Recording: continuous:false (no Android replay) + zero-delay restart (no gaps)
-  // continuous:false means each session only ever has results from THIS utterance
-  // Android physically cannot duplicate results from a previous session
-  // onend fires during natural speech pauses — restart is instantaneous
-  const startRecording=()=>{
+  // Recording — Deepgram via MediaRecorder (works on all browsers including Safari/iPhone)
+  // Falls back to Web Speech API if MediaRecorder not available
+  const mediaRecorderRef=useRef(null);
+  const audioChunksRef=useRef([]);
+
+  const startRecording=async()=>{
     window.speechSynthesis?.cancel();
+    setError("");
+    setTranscript("");
+    finalTranscriptRef.current="";
+
+    // Try MediaRecorder first (works on Safari/Chrome/Firefox)
+    if(navigator.mediaDevices?.getUserMedia){
+      try{
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        audioChunksRef.current=[];
+        const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+          ?"audio/webm;codecs=opus"
+          :MediaRecorder.isTypeSupported("audio/mp4")
+          ?"audio/mp4"
+          :"audio/webm";
+        const mr=new MediaRecorder(stream,{mimeType});
+        mr.ondataavailable=(e)=>{if(e.data.size>0)audioChunksRef.current.push(e.data);};
+        mr.onstop=async()=>{
+          stream.getTracks().forEach(t=>t.stop());
+          const blob=new Blob(audioChunksRef.current,{type:mimeType});
+          if(blob.size<1000){setTranscript("");return;}
+          setIsThinking(true);
+          try{
+            const res=await fetch("/api/transcribe",{
+              method:"POST",
+              headers:{"Content-Type":mimeType},
+              body:blob,
+            });
+            const data=await res.json();
+            const text=data.transcript||"";
+            setTranscript(text);
+            if(text.trim())sendMessage(text);
+          }catch(err){
+            setError("Transcription failed. Please type instead.");
+          }
+          setIsThinking(false);
+        };
+        mr.start();
+        mediaRecorderRef.current=mr;
+        isRecordingRef.current=true;
+        setIsRecording(true);
+        return;
+      }catch(err){
+        // Permission denied or not supported — fall through to Web Speech
+        if(err.name==="NotAllowedError"){
+          setError("Microphone access denied. Allow mic in browser settings.");
+          return;
+        }
+      }
+    }
+
+    // Fallback: Web Speech API (Chrome only)
     if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
-      setError("Voice input requires Google Chrome. Please type instead.");
+      setError("Voice input not supported. Please type instead.");
       return;
     }
     isRecordingRef.current=true;
-    finalTranscriptRef.current="";
-    setTranscript("");
     setIsRecording(true);
-    setError("");
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     const run=()=>{
       if(!isRecordingRef.current)return;
       const rec=new SR();
-      rec.lang="en-US";
-      rec.continuous=false;       // one utterance per session — zero replay risk
-      rec.interimResults=true;    // live text while speaking
-      rec.maxAlternatives=1;
-      const base=finalTranscriptRef.current; // confirmed text before this utterance
-      let utteranceFinal="";
-      rec.onresult=(e)=>{
-        utteranceFinal="";
-        let interim="";
-        for(let i=0;i<e.results.length;i++){
-          // safe to iterate — e.results only has THIS session's results
-          if(e.results[i].isFinal)utteranceFinal+=e.results[i][0].transcript;
-          else interim+=e.results[i][0].transcript;
-        }
-        const display=[base,utteranceFinal||interim].filter(s=>s.trim()).join(" ").trim();
-        setTranscript(display);
-      };
-      rec.onerror=(e)=>{
-        if(e.error==="no-speech")return; // silence — onend will restart
-        if(e.error==="aborted")return;
-        setError("Microphone error. Please type your response.");
-        isRecordingRef.current=false;
-        setIsRecording(false);
-      };
-      rec.onend=()=>{
-        // Commit this utterance before restarting
-        if(utteranceFinal.trim()){
-          finalTranscriptRef.current=[base,utteranceFinal].filter(s=>s.trim()).join(" ").trim();
-        }
-        // Zero-delay restart — happens during the natural pause, user never notices
-        run();
-      };
+      rec.lang="en-US";rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
+      const base=finalTranscriptRef.current;
+      let uFinal="";
+      rec.onresult=(e)=>{uFinal="";let interim="";for(let i=0;i<e.results.length;i++){if(e.results[i].isFinal)uFinal+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}setTranscript([base,uFinal||interim].filter(s=>s.trim()).join(" ").trim());};
+      rec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return;setError("Mic error. Please type.");isRecordingRef.current=false;setIsRecording(false);};
+      rec.onend=()=>{if(uFinal.trim())finalTranscriptRef.current=[base,uFinal].filter(s=>s.trim()).join(" ").trim();if(isRecordingRef.current)run();else setIsRecording(false);};
       recognitionRef.current=rec;
-      try{rec.start();}catch(e){
-        // Already started guard — wait one frame and retry
-        requestAnimationFrame(()=>run());
-      }
+      try{rec.start();}catch(e){requestAnimationFrame(()=>run());}
     };
     run();
   };
 
   const stopRecording=()=>{
     isRecordingRef.current=false;
+    // Stop MediaRecorder if active (Deepgram path)
+    if(mediaRecorderRef.current&&mediaRecorderRef.current.state!=="inactive"){
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+    // Stop Web Speech fallback
     recognitionRef.current?.stop();
     setIsRecording(false);
-    // Auto-send whatever was recorded
     setTimeout(()=>{
       setTranscript(prev=>{
         if(prev.trim())sendMessage(prev);
@@ -4346,8 +4372,8 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:16}}>
         <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1d4ed8",...sty}}>
-          <strong>Requires Google Chrome</strong> for voice input and Sarah's voice. Other browsers: text only.<br/>
-          <span style={{direction:"rtl",display:"block",marginTop:3,color:"#1e40af"}}>يتطلب متصفح Google Chrome للصوت. المتصفحات الأخرى: كتابة فقط.</span>
+          <strong>Works on all browsers and devices — Chrome, Safari, Firefox, iPhone and Android.<br/>
+          <span style={{direction:"rtl",display:"block",marginTop:3,color:"#1e40af"}}>يعمل على جميع المتصفحات والأجهزة — Chrome وSafari وFirefox وiPhone وأندرويد.</span>
         </div>
         <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.amber,...sty}}>
           <strong>Grammar and vocabulary only.</strong> Pronunciation cannot be assessed through text.<br/>
@@ -9024,30 +9050,69 @@ ALWAYS:
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
 
+  const mediaRecorderRef=useRef(null);
+  const audioChunksRef=useRef([]);
+
   const stopRecording=()=>{
     isRecordingRef.current=false;
+    if(mediaRecorderRef.current&&mediaRecorderRef.current.state!=="inactive"){
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
     recognitionRef.current?.stop();
     setIsRecording(false);
     setTimeout(()=>{setTranscript(prev=>{if(prev.trim())sendMessage(prev);return prev;});},150);
   };
 
-  const startRecording=()=>{
+  const startRecording=async()=>{
     window.speechSynthesis?.cancel();
-    if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){
-      setError("Voice input requires Google Chrome. Please type instead.");return;
-    }
-    isRecordingRef.current=true;
+    setError("");
+    setTranscript("");
     finalTranscriptRef.current="";
-    setTranscript("");setIsRecording(true);setError("");
+
+    if(navigator.mediaDevices?.getUserMedia){
+      try{
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        audioChunksRef.current=[];
+        const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":MediaRecorder.isTypeSupported("audio/mp4")?"audio/mp4":"audio/webm";
+        const mr=new MediaRecorder(stream,{mimeType});
+        mr.ondataavailable=(e)=>{if(e.data.size>0)audioChunksRef.current.push(e.data);};
+        mr.onstop=async()=>{
+          stream.getTracks().forEach(t=>t.stop());
+          const blob=new Blob(audioChunksRef.current,{type:mimeType});
+          if(blob.size<1000){setTranscript("");return;}
+          setIsThinking(true);
+          try{
+            const res=await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":mimeType},body:blob});
+            const data=await res.json();
+            const text=data.transcript||"";
+            setTranscript(text);
+            if(text.trim())sendMessage(text);
+          }catch(err){setError("Transcription failed. Please type instead.");}
+          setIsThinking(false);
+        };
+        mr.start();
+        mediaRecorderRef.current=mr;
+        isRecordingRef.current=true;
+        setIsRecording(true);
+        return;
+      }catch(err){
+        if(err.name==="NotAllowedError"){setError("Microphone access denied. Allow mic in browser settings.");return;}
+      }
+    }
+
+    // Fallback Web Speech
+    if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){setError("Voice not supported. Please type instead.");return;}
+    isRecordingRef.current=true;setIsRecording(true);
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     const run=()=>{
       if(!isRecordingRef.current)return;
       const rec=new SR();
       rec.lang="en-US";rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
-      const base=finalTranscriptRef.current;
-      let uFinal="";
+      const base=finalTranscriptRef.current;let uFinal="";
       rec.onresult=(e)=>{uFinal="";let interim="";for(let i=0;i<e.results.length;i++){if(e.results[i].isFinal)uFinal+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}setTranscript([base,uFinal||interim].filter(s=>s.trim()).join(" ").trim());};
-      rec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return;if(e.error==="not-allowed"){setError("Microphone access denied. Allow mic in browser settings.");}else{setError("Mic error. Please type instead.");}isRecordingRef.current=false;setIsRecording(false);};
+      rec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return;setError("Mic error. Please type.");isRecordingRef.current=false;setIsRecording(false);};
       rec.onend=()=>{if(uFinal.trim())finalTranscriptRef.current=[base,uFinal].filter(s=>s.trim()).join(" ").trim();if(isRecordingRef.current)run();else setIsRecording(false);};
       recognitionRef.current=rec;
       try{rec.start();}catch(e){requestAnimationFrame(()=>run());}
