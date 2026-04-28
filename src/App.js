@@ -7890,7 +7890,15 @@ const UI = {
 const STUDY_STEPS = {
   ar: [
     {
-      num:1, free:true, view:"placement",
+      num:1, free:true, view:"teacher",
+      title:"معلمتك ليندا — ابدأ من هنا",
+      tag:"مجاني: المستوى A1 — Pro: جميع المستويات",
+      desc:"ليندا هي معلمتك الشخصية. تعلّمك الإنجليزية من الصفر حتى الإتقان — مفردات، قواعد، إملاء، ومحادثة. كل درس حوالي 30 دقيقة مع شرح بالعربي.",
+      tip:"ابدأ بالمستوى A1 حتى لو كان مستواك أعلى. ليندا ستعرف مستواك الحقيقي بعد بضعة دروس وتتكيّف معه.",
+      action:"ابدأ مع ليندا ←",
+    },
+    {
+      num:2, free:true, view:"placement",
       title:"اختبار تحديد المستوى",
       tag:"مرة واحدة مجاناً — إعادة الاختبار Pro",
       desc:"قبل أي شيء آخر، تحتاج أن تعرف مستواك الحقيقي. الاختبار يحدد مستواك من A1 إلى C2 مع تقدير لدرجة الآيلتس.",
@@ -7898,7 +7906,7 @@ const STUDY_STEPS = {
       action:"ابدأ الاختبار ←",
     },
     {
-      num:2, free:true, view:"vocabulary",
+      num:3, free:true, view:"vocabulary",
       title:"صفحة المفردات",
       tag:"مجاني: الكتابة والقراءة — Pro: جميع الأقسام",
       desc:"تصفّح مفردات الكتابة والقراءة مجاناً. ركّز على الكلمات التي لا تعرفها — هذا وحده يكفي للبدء.",
@@ -7906,7 +7914,7 @@ const STUDY_STEPS = {
       action:"افتح المفردات ←",
     },
     {
-      num:3, free:true, view:"pronunciation",
+      num:4, free:true, view:"pronunciation",
       title:"النطق الصحيح",
       tag:"مجاني: 50 كلمة أكاديمية — Pro: 289 كلمة",
       desc:"لكل كلمة كتبتها في دفترك، افتح هذه الصفحة واستمع لنطقها الصحيح. تبدأ بالكلمات الأكاديمية مجاناً.",
@@ -7914,7 +7922,7 @@ const STUDY_STEPS = {
       action:"افتح النطق ←",
     },
     {
-      num:4, free:true, view:"game",
+      num:5, free:true, view:"game",
       title:"ألعاب الآيلتس",
       tag:"مجاني: لعبة الإملاء — Pro: جميع الألعاب",
       desc:"ابدأ بلعبة الإملاء مجاناً يومياً. تحوّل ما قرأته في الخطوات السابقة إلى معرفة فعلية. باقي الألعاب متاحة لمشتركي Pro.",
@@ -7922,7 +7930,7 @@ const STUDY_STEPS = {
       action:"العب الآن ←",
     },
     {
-      num:5, free:true, view:"reading",
+      num:6, free:true, view:"reading",
       title:"اختبارات القراءة",
       tag:"اختبار B1 مجاني — باقي الاختبارات Pro",
       desc:"إذا كان مستواك أقل من الدرجة السادسة، ابدأ باختبار المستوى الأساسي. إذا كنت في الدرجة السادسة أو أعلى، انتقل مباشرة للاختبارات الأكاديمية أو التدريب العام.",
@@ -7930,7 +7938,7 @@ const STUDY_STEPS = {
       action:"افتح القراءة ←",
     },
     {
-      num:6, free:"5 فحوصات مجانية", view:"grammar",
+      num:7, free:"5 فحوصات مجانية", view:"grammar",
       title:"فحص القواعد والإملاء",
       tag:"5 فحوصات مجانية — Pro غير محدود",
       desc:"اكتب فقرة قصيرة من 100 إلى 150 كلمة عن أي موضوع. أرسلها هنا واقرأ كل خطأ رُصد بعناية.",
@@ -7938,7 +7946,7 @@ const STUDY_STEPS = {
       action:"افتح القواعد ←",
     },
     {
-      num:7, free:"تحليلان مجانيان", view:"analyze",
+      num:8, free:"تحليلان مجانيان", view:"analyze",
       title:"تحليل المقالة",
       tag:"تحليلان مجانيان — Pro غير محدود",
       desc:"اكتب مقالتك الأولى الكاملة — 250 كلمة على الأقل. أرسلها هنا واحصل على درجتك الكاملة مع تفصيل كل معيار.",
@@ -7946,7 +7954,7 @@ const STUDY_STEPS = {
       action:"حلّل مقالتك ←",
     },
     {
-      num:8, free:"جزئياً مجاني", view:"toolkit",
+      num:9, free:"جزئياً مجاني", view:"toolkit",
       title:"أدوات الآيلتس",
       tag:"الروابط والقواعد مجانية — Pro للكل",
       desc:"ادرس الروابط والقوالب. هذه ليست اختصارات — هي الهيكل الذي يبني عليه الطالب الناجح في الدرجات العليا.",
@@ -7954,7 +7962,7 @@ const STUDY_STEPS = {
       action:"افتح الأدوات ←",
     },
     {
-      num:9, free:true, view:"speaking",
+      num:10, free:true, view:"speaking",
       title:"تدريب المحادثة مع سارة",
       tag:"مجاني — 7 دقائق للمستخدمين المجانيين",
       desc:"تدرّب على المحادثة مع سارة وهي تصحح أخطاءك النحوية والمفردات في الوقت الفعلي. اختر وضع الآيلتس أو المحادثة الحرة.",
@@ -7962,7 +7970,7 @@ const STUDY_STEPS = {
       action:"ابدأ المحادثة ←",
     },
     {
-      num:10, free:false, view:"exercises",
+      num:11, free:false, view:"exercises",
       title:"التمارين التدريبية",
       tag:"Pro فقط",
       desc:"قم بحل مجموعة تمارين واحدة على الأقل يومياً — قواعد، إملاء، بناء جمل، مفردات. هذه هي التدريبات التي تحوّل الفهم إلى عادة.",
@@ -7970,7 +7978,7 @@ const STUDY_STEPS = {
       action:"افتح التمارين ←",
     },
     {
-      num:11, free:false, view:"practice",
+      num:12, free:false, view:"practice",
       title:"تدريب الكتابة",
       tag:"Pro فقط",
       desc:"اكتب مقالة موقوتة أسبوعياً. استخدم التغذية الراجعة أثناء الكتابة، ثم أرسل النسخة النهائية لتحليل المقالة للحصول على الدرجة الكاملة.",
@@ -7978,7 +7986,7 @@ const STUDY_STEPS = {
       action:"افتح التدريب ←",
     },
     {
-      num:12, free:false, view:"progress",
+      num:13, free:false, view:"progress",
       title:"تتبّع تقدمك",
       tag:"Pro فقط",
       desc:"راجع هذه الصفحة كل أسبوعين. تاريخ درجاتك محفوظ تلقائياً — ستلاحظ الاتجاه بوضوح.",
@@ -7988,15 +7996,23 @@ const STUDY_STEPS = {
   ],
   en: [
     {
-      num:1, free:true, view:"placement",
+      num:1, free:true, view:"teacher",
+      title:"Your Teacher — Linda",
+      tag:"Free: A1 level · Pro: all levels",
+      desc:"Linda is your personal English teacher. She teaches vocabulary, grammar, spelling, and conversation — one structured lesson at a time with Arabic explanations. Each lesson takes about 30 minutes.",
+      tip:"Start with A1 even if you think your level is higher. Linda adapts to your real level after a few lessons and will push you forward.",
+      action:"Start with Linda →",
+    },
+    {
+      num:2, free:true, view:"placement",
       title:"Placement Test",
       tag:"One attempt free — retaking is Pro",
-      desc:"Before anything else, you need to know your actual level. The test places you from A1 to C2 with an estimated IELTS band score.",
-      tip:"Don't guess — answer honestly. The result is your starting point, not a judgement. Everything that comes after depends on getting this right.",
+      desc:"Take this test to confirm your level from A1 to C2 with an estimated IELTS band score. Use it alongside Linda to track your progress.",
+      tip:"Don't guess — answer honestly. The result is your starting point, not a judgement.",
       action:"Take the test →",
     },
     {
-      num:2, free:true, view:"vocabulary",
+      num:3, free:true, view:"vocabulary",
       title:"Vocabulary Page",
       tag:"Free: Writing & Reading · Pro: all categories",
       desc:"Browse Writing Task 2 and Reading vocabulary for free. Focus on words you don't know — that alone is enough to get started.",
@@ -8004,7 +8020,7 @@ const STUDY_STEPS = {
       action:"Open vocabulary →",
     },
     {
-      num:3, free:true, view:"pronunciation",
+      num:4, free:true, view:"pronunciation",
       title:"Pronunciation",
       tag:"Free: 50 academic words · Pro: 289 words",
       desc:"For every word you wrote in your notebook, come here and listen to how it's actually pronounced. The academic category is free to start.",
@@ -8012,7 +8028,7 @@ const STUDY_STEPS = {
       action:"Open pronunciation →",
     },
     {
-      num:4, free:true, view:"game",
+      num:5, free:true, view:"game",
       title:"IELTS Games",
       tag:"Free: Spelling game · Pro: all 5 games",
       desc:"Start with the free Spelling game daily. It turns what you studied passively in Steps 2 and 3 into active knowledge. All 5 games unlock with Pro.",
@@ -8020,7 +8036,7 @@ const STUDY_STEPS = {
       action:"Play now →",
     },
     {
-      num:5, free:true, view:"reading",
+      num:6, free:true, view:"reading",
       title:"Reading Tests",
       tag:"B1 test free — full tests Pro",
       desc:"If your placement result was below Band 6, start with the B1 test. If you're Band 6 or above, go straight to Academic or General Training tests.",
@@ -8028,7 +8044,7 @@ const STUDY_STEPS = {
       action:"Open reading →",
     },
     {
-      num:6, free:"5 free checks", view:"grammar",
+      num:7, free:"5 free checks", view:"grammar",
       title:"Grammar & Spelling Checker",
       tag:"5 checks free — Pro unlimited",
       desc:"Write a short paragraph of 100–150 words on any topic. Submit it here and read every flagged error carefully.",
@@ -8036,7 +8052,7 @@ const STUDY_STEPS = {
       action:"Open grammar →",
     },
     {
-      num:7, free:"2 free analyses", view:"analyze",
+      num:8, free:"2 free analyses", view:"analyze",
       title:"Essay Analysis",
       tag:"2 analyses free — Pro unlimited",
       desc:"Write your first full essay — minimum 250 words. Submit it and get your complete score with detailed breakdown across all four IELTS criteria.",
@@ -8044,7 +8060,7 @@ const STUDY_STEPS = {
       action:"Analyse your essay →",
     },
     {
-      num:8, free:"Partially free", view:"toolkit",
+      num:9, free:"Partially free", view:"toolkit",
       title:"IELTS Toolkit",
       tag:"Linking words & grammar free — Pro for all",
       desc:"Study the linking words and essay templates. These are not shortcuts — they are the scaffolding that Band 7+ essays are built on.",
@@ -8052,7 +8068,7 @@ const STUDY_STEPS = {
       action:"Open toolkit →",
     },
     {
-      num:9, free:true, view:"speaking",
+      num:10, free:true, view:"speaking",
       title:"Speaking Practice with Sarah",
       tag:"Free — 7 minutes per session",
       desc:"Have a real conversation with Sarah and get live grammar and vocabulary corrections. Choose IELTS mode or free conversation on any topic.",
@@ -8060,7 +8076,7 @@ const STUDY_STEPS = {
       action:"Start speaking →",
     },
     {
-      num:10, free:false, view:"exercises",
+      num:11, free:false, view:"exercises",
       title:"Practice Exercises",
       tag:"Pro only",
       desc:"Do at least one exercise set per day — grammar, spelling, sentence building, vocabulary. These drills turn understanding into habit.",
@@ -8068,7 +8084,7 @@ const STUDY_STEPS = {
       action:"Open exercises →",
     },
     {
-      num:11, free:false, view:"practice",
+      num:12, free:false, view:"practice",
       title:"Writing Practice",
       tag:"Pro only",
       desc:"Write a timed essay every week. Use the live coaching feedback during writing, then submit the final version to Essay Analysis for a full score.",
@@ -8076,7 +8092,7 @@ const STUDY_STEPS = {
       action:"Open writing practice →",
     },
     {
-      num:12, free:false, view:"progress",
+      num:13, free:false, view:"progress",
       title:"Progress Tracker",
       tag:"Pro only",
       desc:"Check this page every two weeks. Your score history is saved automatically — you will see the trend clearly.",
@@ -8746,11 +8762,14 @@ const stripForTTSLinda=(text)=>{
     .replace(/[\u2600-\u27BF]/gu," ")
     .replace(/\*\*/g,"").replace(/\*/g,"")
     .replace(/#+\s*/g,"")
-    // Convert structural markers to natural pauses
+    .replace(/_{2,}/g," blank ")   // ___ → "blank" so it reads naturally
+    .replace(/_/g," ")
     .replace(/—\s*/g,". ")
-    .replace(/:\s+/g,". ")    // colon → pause
-    .replace(/\[.*?\]/g,"")   // remove Arabic in brackets (not needed in TTS)
-    .replace(/\(.*?\)/g,"")   // remove parenthetical hints
+    .replace(/:\s+/g,". ")
+    .replace(/\[.*?\]/g,"")        // remove Arabic in brackets
+    .replace(/\(.*?\)/g,"")        // remove parentheticals
+    // Prevent double-word: "Hello Hello" → "Hello"
+    .replace(/\b(\w+)\s+\1\b/gi,"$1")
     .replace(/\s+/g," ")
     .trim();
 };
@@ -8824,57 +8843,74 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
 
   const buildSystemPrompt=(lesson,phase)=>{
     if(!lesson)return "";
-    const isLowLevel=["a1","a2"].includes(progress.level);
+    const isA1A2=["a1","a2"].includes(progress.level);
+    const isB1=progress.level==="b1";
+    const isLowLevel=isA1A2||isB1;
     const phaseInstructions={
-      0:`PHASE 1 — VOCABULARY TEACHING:
-Teach each vocabulary word one at a time. For each word:
-1. Say the word clearly: "Our first word is: [WORD]"${isLowLevel?' Then immediately give the Arabic: "[WORD] — [Arabic meaning]"':''}
-2. Give the example sentence
-3. Say: "Now repeat after me: [WORD]"
-4. After correct repeat → "Well done! One more time: [WORD]" (enforce TWO repeats)
-5. After two correct repeats → move to next word
-Vocabulary for this lesson:
-${lesson.vocab.map(v=>`${v.w} [${v.ar}] — Example: ${v.ex}`).join("\n")}
-After ALL vocabulary is covered and repeated, say: "Excellent! Now let's move to grammar."`,
+      0:`PHASE 1 — VOCABULARY:
+For EACH word below, do this in order — do NOT skip any step:
+1. Say ONLY the word itself, then pause. Example: "Hello."${isA1A2?` Then say its Arabic meaning simply: "بالعربي: [Arabic]". Use very simple English around the word — avoid words the student may not know.`:""}${isB1?` Then give the Arabic meaning: "بالعربي: [Arabic]".`:""}
+2. Say the example sentence ONCE — do not repeat it twice.
+3. Say: "Now repeat: [WORD]" — NOTHING else after this. Wait for student.
+4. After first correct repeat: "Great! Once more: [WORD]" — wait again.
+5. After second correct repeat: "Perfect! Next word." — move to next word immediately without asking permission.
+Vocabulary:
+${lesson.vocab.map(v=>`- ${v.w} [${v.ar}]: ${v.ex}`).join("\n")}
+When ALL words done: say "Well done! Now fill-in-the-blank exercises." then IMMEDIATELY present the first exercise without waiting.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
-Present each fill-in-the-blank exercise one at a time.
-Format: "Fill in the blank: [sentence with ___ gap]. ${isLowLevel?"تلميح: [hint]":""}"
-Wait for the student's answer. If correct → praise and next. If wrong → give a hint and ask again.
+Present ONE exercise at a time. Read the sentence but say the word BLANK (not underscore) for the gap.
+Example: "Fill in the blank: She blank to school." — say "blank" not "underscore".${isA1A2?` Then add the Arabic hint: "تلميح بالعربي: [hint in Arabic]"`:""}${isB1?` Then give a brief Arabic hint: "[hint]".`:""}
+If correct: praise and immediately present the next exercise without asking.
+If wrong: give a hint and ask again.
 Exercises:
-${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence}" → answer: ${f.answer}. Hint: ${f.hint}`).join("\n")}
-After all exercises, say: "Brilliant work! Time for spelling practice."`,
+${lesson.fillBlank.map((f,i)=>`${i+1}. Sentence (read aloud replacing ___ with "blank"): "${f.sentence.replace(/___/g,"blank")}" — correct answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
+When ALL exercises done: say "Excellent! Now spelling." then immediately say: "Spell this word for me:" and give the FIRST word — do NOT reveal the word's spelling yourself.`,
 
-      2:`PHASE 3 — SPELLING CHALLENGE:
-Test spelling of key words from the lesson. Say: "I will say a word. Please spell it for me: [WORD]"
-Wait for their spelling. If correct → praise. If wrong → say the correct spelling letter by letter.
-Words to test: ${lesson.spelling.join(", ")}
-After all words, say: "Outstanding! Now let's have a real conversation."`,
+      2:`PHASE 3 — SPELLING:
+CRITICAL RULE: You say the word ONLY as a sound — NEVER write or display it in your response. The student must spell it from hearing only.
+Say: "Spell this word:" then say the word aloud (but do NOT type it in your message — replace it with the description "the word I just said").
+Wait for their spelling. If correct: praise and move to next word immediately.
+If wrong: spell it letter by letter for them, then ask them to try once more.
+Words to test (say them but do NOT type them in your text): ${lesson.spelling.join(", ")}
+When ALL words done: say "Outstanding! Let's have a conversation now." then immediately ask the first conversation question.`,
 
-      3:`PHASE 4 — REVIEW CONVERSATION:
-Have a natural conversation that uses the vocabulary and grammar from the lesson.
-Discussion prompts to explore (one at a time):
+      3:`PHASE 4 — CONVERSATION:
+Have a natural conversation using today's vocabulary and grammar. Ask ONE question at a time from this list:
 ${lesson.conversation.map((c,i)=>`${i+1}. ${c}`).join("\n")}
-Grammar point to practise naturally: ${lesson.grammar.point}
-${lesson.grammar.levelNote?`Cultural/linguistic note for the student: ${lesson.grammar.levelNote}`:""}
-When conversation is complete and all prompts covered, say: "Lesson complete! You have done an amazing job today. Are you ready for the next lesson?"`,
+Grammar to weave in naturally: ${lesson.grammar.point}
+${lesson.grammar.levelNote?`Linguistic note to share naturally: ${lesson.grammar.levelNote}`:""}
+${isLowLevel?"Use Arabic to explain any difficult concepts.":""}
+When all questions covered: say "Lesson complete! Amazing work today! Shall we move to the next lesson?"`,
     };
 
-    return `You are Linda, a warm, enthusiastic English teacher for Arabic-speaking students. You NEVER introduce yourself or say your name in any message — the student already knows who you are.
+    const lowLevelNote=isA1A2?`
+CRITICAL FOR A1/A2:
+- Use ONLY the simplest English words around vocabulary: say, word, now, repeat, good, next, try, again, example, means, Arabic, blank
+- Do NOT use words like: "pronunciation", "grammatically", "structure", "certainly", "regarding", "furthermore"
+- Every explanation should be so simple a child could understand it
+- Always add Arabic [في أقواس] after difficult English words
+- Full Arabic sentences when the student seems confused`
+    :isB1?`
+FOR B1: Add Arabic meaning [في أقواس] for all new vocabulary and when explaining grammar. Keep explanations clear.`:"";
 
-Student level: ${progress.level.toUpperCase()} — ${levelData.name}
-Current lesson: ${lesson.title} (${lesson.titleAr})
-${isLowLevel?"IMPORTANT: Use Arabic generously. After every English word or phrase, add Arabic in [brackets]. Keep sentences very short.":""}
+    return `You are Linda, an enthusiastic English teacher for Arabic-speaking students.
+
+Level: ${progress.level.toUpperCase()} — ${levelData.name}
+Lesson: ${lesson.title} (${lesson.titleAr})
+${lowLevelNote}
 
 ${phaseInstructions[phase]||phaseInstructions[0]}
 
-ALWAYS REMEMBER:
-- NEVER say your name (Linda) in any message — not even once
-- 2-3 sentences per response maximum
-- Be enthusiastic: "Excellent!", "Brilliant!", "Perfect!", "You're doing great!"
-- Never mention the number of words or items in the lesson
-- If student uses Arabic, respond in Arabic then return to English
-- English only for teaching (Arabic only for explanations when needed)`;
+ALWAYS:
+- NEVER say your name
+- NEVER say "underscore" — say "blank" for gaps
+- NEVER write a spelling word in your text during Phase 3 — only say it
+- NEVER wait for the student to say "go ahead" — move between steps automatically
+- 2-3 sentences maximum per response
+- Be warm and enthusiastic: "Excellent!", "Brilliant!", "You're doing great!", "برافو!"
+- If student writes in Arabic: respond in Arabic then return to English
+- Auto-advance: after each correct answer, immediately present the next item`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -8938,14 +8974,13 @@ ALWAYS REMEMBER:
                       clean.match(/one more time[:\s]+[""]?([^"".\n?!]+)/i)||
                       clean.match(/try again[:\s]+[""]?([^"".\n?!]+)/i);
     if(repeatMatch)setRepeatTarget(repeatMatch[1].trim().replace(/[""]$/,""));
-    // Phase advancement detection
-    if(/now let's move to grammar|move to fill|now let's practise grammar/i.test(clean)){
+    // Phase advancement detection — match new system prompt wording
+    if(/fill.in.the.blank|blank exercises|now fill|move to grammar/i.test(clean)&&currentPhase===0){
       setCurrentPhase(1);
-    }else if(/time for spelling|spelling practice|spelling challenge/i.test(clean)){
-      setCurrentPhase(2);
-    }else if(/have a real conversation|review conversation|let's talk/i.test(clean)){
-      setCurrentPhase(3);
-    }else if(/lesson complete|amazing job today|ready for the next lesson/i.test(clean)){
+    }else if(/now spelling|let's have a conversation|outstanding.*convers|time for.*convers|convers.*now/i.test(clean)&&currentPhase<=2){
+      if(/spelling|outstanding/i.test(clean)&&currentPhase===1)setCurrentPhase(2);
+      else if(/conversation|let's talk/i.test(clean)&&currentPhase===2)setCurrentPhase(3);
+    }else if(/lesson complete|amazing work today|shall we move to the next lesson/i.test(clean)){
       if(currentLesson&&!completedSet.has(currentLesson.id)){
         const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
         const nextLesson=lessons[nextIdx];
