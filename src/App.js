@@ -639,8 +639,8 @@ const AuthModal=({onClose,onSuccess})=>{
       if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
       setLoading(false);
       // Supabase may require email confirmation — handle both cases
-      if(data.session){ onSuccess(toSession(data.user)); }
-      else{ setSuccess("Account created! Check your email to confirm, then sign in."); }
+      if(data.session){ if(window.gtag)window.gtag('event','sign_up',{method:'email'}); onSuccess(toSession(data.user)); }
+      else{ if(window.gtag)window.gtag('event','sign_up',{method:'email_confirmation'}); setSuccess("Account created! Check your email to confirm, then sign in."); }
     }catch(e){
       console.error("Auth error:", e);
       setError("Something went wrong. Please try again.");
@@ -7258,7 +7258,7 @@ const PlacementTest = ({uiLang="ar", onNavigate, isPro=false}) => {
 
   const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
 
-  const startReading = () => { setScreen("reading"); startTimer(setReadingTime, finishReading); };
+  const startReading = () => { trackEvent('placement_test_start'); setScreen("reading"); startTimer(setReadingTime, finishReading); };
   const finishReading = () => { if(timerRef.current) clearInterval(timerRef.current); setScreen("grammar"); startTimer(setGrammarTime, finishGrammar); };
   const finishGrammar = () => { if(timerRef.current) clearInterval(timerRef.current); calcResults(); };
 
@@ -10328,12 +10328,13 @@ export default function IELTSBot(){
   const sampleWordCount=result?.sampleEssay?countWords(result.sampleEssay):0;
 
   const handleProSuccess=(activatedEmail)=>{
-    // Re-fetch Pro status from Supabase to confirm server-side activation
     const emailToCheck = activatedEmail || session?.email;
     if(emailToCheck) fetchProStatus(emailToCheck).then(setProUser);
-    else setProUser(true); // fallback
+    else setProUser(true);
     setShowPaywall(false);
     trackEvent('upgrade_to_pro');
+    // GA4 purchase event — Google Ads uses this for ROAS tracking
+    trackEvent('purchase',{currency:'USD',value:35,transaction_id:Date.now().toString()});
   };
   const handleImageUpload=(e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=(ev)=>{ setImage(ev.target.result.split(",")[1]); setImagePreview(ev.target.result); }; reader.readAsDataURL(file); };
 
@@ -10432,7 +10433,7 @@ export default function IELTSBot(){
                   <button onClick={()=>setShowManageSub(true)} style={{fontSize:11,color:T.textMuted,fontFamily:"'Cairo',system-ui",textDecoration:"underline",cursor:"pointer",background:"none",border:"none",padding:0}}>إدارة الاشتراك</button>
                 </div>
               ):(
-                <button className="upgrade-btn" onClick={()=>setShowPaywall(true)} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].getPro}</button>
+                <button className="upgrade-btn" onClick={()=>{trackEvent('get_pro_click',{location:'header'});setShowPaywall(true);}} style={{background:T.primary,color:"white",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo',system-ui"}}>{UI[uiLang].getPro}</button>
               )}
               {session?(
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
