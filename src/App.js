@@ -4120,7 +4120,10 @@ RESPONSE RULES:
 6. Never repeat a question already asked in this conversation.
 7. English only.
 8. If no topic chosen yet: ask what they want to talk about, OR offer a choice of 3-4 IELTS topics by name so they can pick.
-9. If user wants IELTS practice: offer them a list of available topics to choose from. Then work through Part 1 questions on that topic, transition to Part 2 (ask them to speak for 2 minutes — if they stop early, tell them to continue), then Part 3 discussion.`;
+9. If user wants IELTS practice: offer them a list of available topics to choose from. Then work through Part 1 questions on that topic, transition to Part 2 (ask them to speak for 2 minutes — if they stop early, tell them to continue), then Part 3 discussion.
+10. SPEECH-TO-TEXT CAPITALIZATION: The user speaks via microphone and words are transcribed automatically. Speech recognition software often auto-capitalizes words mid-sentence (e.g. "I Eat Traditional Arabic Food"). NEVER correct or comment on capitalization — it comes from the software, not the user. Completely ignore capitalization in all user input.
+11. SHORT ANSWER COACHING: If the user gives a response shorter than 8 words during IELTS practice, gently prompt them to expand: say something like "In IELTS Speaking, longer answers score higher — can you tell me more about that?"`;"
+
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -8840,22 +8843,22 @@ const LINDA_CURRICULUM={
 
 const stripForTTSLinda=(text)=>{
   return text
-    .replace(/[\u{1F300}-\u{1FAFF}]/gu," ")
-    .replace(/[\u2600-\u27BF]/gu," ")
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu,\" \")
+    .replace(/[\u2600-\u27BF]/gu,\" \")
+    .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+/g,\" \")
     .replace(/\*\*/g,"").replace(/\*/g,"")
     .replace(/#+\s*/g,"")
-    .replace(/_{2,}/g," blank ")   // ___ → "blank" so it reads naturally
+    .replace(/_{2,}/g," blank ")
     .replace(/_/g," ")
-    .replace(/—\s*/g,". ")
+    .replace(/\u2014\s*/g,". ")
     .replace(/:\s+/g,". ")
-    .replace(/\[.*?\]/g,"")        // remove Arabic in brackets
-    .replace(/\(.*?\)/g,"")        // remove parentheticals
-    // Prevent double-word: "Hello Hello" → "Hello"
+    .replace(/\[.*?\]/g,"")
+    .replace(/\(.*?\)/g,"")
     .replace(/\b(\w+)\s+\1\b/gi,"$1")
     .replace(/\s+/g," ")
+    .replace(/^[^a-zA-Z0-9]+/,"")
     .trim();
 };
-
 const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
   const [progress,setProgress]=useState(()=>loadLindaProgress());
   const [screen,setScreen]=useState(()=>{
@@ -8986,7 +8989,10 @@ When ALL words done: "${instr.vocabDone}" — immediately present first fill-in-
 Present ONE exercise at a time using this format:
 "${instr.fillIntro}: [sentence with the word '${instr.fillBlankWord}' replacing the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
 If correct: "${instr.fillCorrect}" — immediately next exercise.
-If wrong: "${instr.fillWrong}: [Arabic/English hint]" — ask again.
+If wrong on FIRST attempt: "${instr.fillWrong}: [Arabic/English hint]" — give ONE more chance. Do NOT reveal the answer yet.
+If wrong on SECOND attempt: reveal the correct answer briefly, then immediately move to the next exercise.
+If correct on SECOND attempt: say "${instr.fillCorrect}" and immediately move to the next exercise without pausing.
+CRITICAL: NEVER correct on the first wrong attempt. Always give exactly one second chance first.
 Exercises:
 ${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence.replace(/___/g,instr.fillBlankWord)}" — answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
 When ALL done: "${instr.fillDone}" — immediately present first spelling word.`,
@@ -9445,7 +9451,7 @@ ALWAYS:
                   {isUser?<UserAvatar/>:<LindaAvatar size={32}/>}
                   <div style={{maxWidth:"80%",display:"flex",flexDirection:"column",alignItems:isUser?"flex-end":"flex-start"}}>
                     {!isUser&&<div style={{fontSize:10,fontWeight:700,color:"#7c3aed",marginBottom:2,...sty}}>Linda</div>}
-                    <div style={{background:isUser?T.primaryLight:"#f5f3ff",border:`1px solid ${isUser?T.primaryBorder:"#e9d5ff"}`,borderRadius:isUser?"14px 14px 4px 14px":"14px 14px 14px 4px",padding:"10px 14px",fontSize:14,color:T.text,lineHeight:1.65,...sty}}>
+                    <div style={{background:isUser?T.primaryLight:"#f5f3ff",border:`1px solid ${isUser?T.primaryBorder:"#e9d5ff"}`,borderRadius:isUser?"14px 14px 4px 14px":"14px 14px 14px 4px",padding:"10px 14px",fontSize:14,color:T.text,lineHeight:1.65,...sty,direction:"auto",unicodeBidi:"plaintext"}}>
                       {!isUser?msg.text.split(/(\[SPELL\].*?\[\/SPELL\])/gi).map((part,i)=>{
                         const m=part.match(/\[SPELL\](.*?)\[\/SPELL\]/i);
                         if(m)return <span key={i} style={{filter:"blur(4px)",userSelect:"none",cursor:"default",background:"#e9d5ff",borderRadius:4,padding:"0 4px"}}>{m[1]}</span>;
@@ -9478,10 +9484,24 @@ ALWAYS:
                 placeholder={isAr?(isRecording?"جارٍ التسجيل — اضغط ⏹ للإرسال":"اضغط الميكروفون أو اكتب هنا..."):(isRecording?"Listening... tap ⏹ to stop and send":"Tap mic or type here...")}
                 rows={2}
                 style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?"#a78bfa":T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
-              <button onClick={isRecording?stopRecording:startRecording}
-                style={{width:52,height:52,borderRadius:"50%",border:"none",background:isRecording?"#7c3aed":"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
-                {isRecording?"⏹":"🎤"}
-              </button>
+              {transcript.trim()&&!isRecording&&(
+                <button onClick={()=>sendMessage(transcript)}
+                  style={{width:52,height:52,borderRadius:"50%",border:"none",background:"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
+                  ➤
+                </button>
+              )}
+              {!transcript.trim()&&(
+                <button onClick={isRecording?stopRecording:startRecording}
+                  style={{width:52,height:52,borderRadius:"50%",border:"none",background:"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
+                  {isRecording?"⏹":"🎤"}
+                </button>
+              )}
+              {transcript.trim()&&isRecording&&(
+                <button onClick={stopRecording}
+                  style={{width:52,height:52,borderRadius:"50%",border:"none",background:"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 0 0 4px #a78bfa",transition:"all 0.2s"}}>
+                  ⏹
+                </button>
+              )}
             </div>
             {isRecording&&(
               <div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",fontSize:12,color:"#7c3aed",...sty}}>
