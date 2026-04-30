@@ -10139,19 +10139,41 @@ export default function IELTSBot(){
     return()=>window.removeEventListener("scroll",onScroll);
   },[]);
 
-  // ── Nav scroll hint: hide once user swipes the nav ──
+  // ── Nav scroll hint: progress thumb + fade hide when fully scrolled ──
   useEffect(()=>{
     const navEl=document.querySelector(".nav-grouped");
-    const hint=document.querySelector(".nav-scroll-hint");
-    if(!navEl||!hint)return;
-    const onNavScroll=()=>{
-      // RTL: scrollLeft is 0 or negative; LTR: scrollLeft is positive
+    const thumb=document.querySelector(".nav-scroll-thumb");
+    const fadeEnd=document.querySelector(".nav-fade-end");
+    if(!navEl)return;
+    const update=()=>{
+      const maxScroll=navEl.scrollWidth-navEl.clientWidth;
+      if(maxScroll<=0)return;
       const scrolled=Math.abs(navEl.scrollLeft);
-      if(scrolled>20) hint.classList.add("hidden");
-      else hint.classList.remove("hidden");
+      const pct=scrolled/maxScroll; // 0→1
+      const thumbW=Math.max(15,Math.round((navEl.clientWidth/navEl.scrollWidth)*100));
+      const trackW=navEl.clientWidth-16;
+      const maxOffset=trackW*(1-thumbW/100);
+      if(thumb){
+        thumb.style.width=thumbW+"%";
+        // RTL scrolls negative on some browsers
+        const offset=navEl.scrollLeft<0
+          ? maxOffset*(1-pct)   // RTL
+          : maxOffset*pct;      // LTR
+        thumb.style.transform=`translateX(${offset}px)`;
+      }
+      // Hide the edge fade once fully scrolled
+      if(fadeEnd){
+        fadeEnd.style.opacity=pct>0.92?"0":"1";
+        fadeEnd.style.transition="opacity 0.2s";
+      }
     };
-    navEl.addEventListener("scroll",onNavScroll,{passive:true});
-    return()=>navEl.removeEventListener("scroll",onNavScroll);
+    update();
+    navEl.addEventListener("scroll",update,{passive:true});
+    window.addEventListener("resize",update,{passive:true});
+    return()=>{
+      navEl.removeEventListener("scroll",update);
+      window.removeEventListener("resize",update);
+    };
   },[mainView]);
 
   // ── Initialize Paddle.js ──
@@ -10551,16 +10573,19 @@ export default function IELTSBot(){
             <div className="nav-scroll-hint" style={{position:"absolute",right:0,top:0,bottom:0,width:48,background:"linear-gradient(to right, transparent, rgba(180,0,0,0.85))",pointerEvents:"none",zIndex:2,borderRadius:"0 4px 4px 0"}}/>
             {/* Desktop: grouped with dividers */}
             <div style={{position:"relative"}}>
-            {/* Scroll hint — flips side based on language direction */}
-            <div className="nav-scroll-hint" style={{
+            {/* Scroll hint — strong edge fade + animated progress bar below */}
+            {/* Right/Left fade indicating more content */}
+            <div className="nav-scroll-hint nav-fade-end" style={{
               position:"absolute",
               ...(uiLang==="ar"
-                ? {left:0, background:"linear-gradient(to left, transparent, rgba(180,0,0,0.95))", justifyContent:"flex-start", paddingLeft:6}
-                : {right:0, background:"linear-gradient(to right, transparent, rgba(180,0,0,0.95))", justifyContent:"flex-end", paddingRight:6}
+                ? {left:0, background:"linear-gradient(to left, rgba(180,0,0,0) 0%, rgba(160,0,0,0.7) 50%, rgba(150,0,0,0.97) 100%)"}
+                : {right:0, background:"linear-gradient(to right, rgba(180,0,0,0) 0%, rgba(160,0,0,0.7) 50%, rgba(150,0,0,0.97) 100%)"}
               ),
-              top:0,bottom:0,width:48,zIndex:10,pointerEvents:"none",display:"flex",alignItems:"center"
-            }}>
-              <span style={{color:"rgba(255,255,255,0.9)",fontSize:18,lineHeight:1}}>{uiLang==="ar"?"‹":"›"}</span>
+              top:0,bottom:4,width:56,zIndex:10,pointerEvents:"none"
+            }}/>
+            {/* Scroll progress bar — white track, scrolls with nav */}
+            <div className="nav-scroll-hint nav-scroll-track" style={{position:"absolute",bottom:0,left:uiLang==="ar"?"auto":8,right:uiLang==="ar"?8:"auto",width:"calc(100% - 16px)",height:3,background:"rgba(255,255,255,0.15)",borderRadius:2,zIndex:11,overflow:"hidden",pointerEvents:"none"}}>
+              <div className="nav-scroll-thumb" style={{height:"100%",background:"rgba(255,255,255,0.7)",borderRadius:2,width:"30%",transition:"transform 0.1s linear"}}/>
             </div>
             <div className="nav-tabs nav-grouped" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"nowrap",overflowX:"auto"}}>
               {/* Always visible */}
