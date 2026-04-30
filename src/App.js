@@ -864,7 +864,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
 
         {/* Tab switcher */}
         <div style={{display:"flex",gap:6,marginBottom:20}}>
-          {tabBtn("cliq","🏦","CLIQ 🇯🇴")}
+          {tabBtn("cliq","🏦","🇯🇴 In Jordan")}
           {tabBtn("international","💳","International")}
         </div>
 
