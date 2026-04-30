@@ -4639,6 +4639,10 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
   const mountedRef = useRef(true);
   const autoAdvanceRef = useRef(null);   // callback fired after transcription finishes
   const speakFiredRef = useRef("");       // guard: tracks which phase we already spoke for
+  const p2FinishedRef = useRef(false);   // guard: finishP2 fires only once
+  const [isPaused, setIsPaused] = useState(false);
+  const prepPausedAt = useRef(0);
+  const speakPausedAt = useRef(0);
 
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const T2 = T; // use same theme
@@ -4649,7 +4653,7 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
     const shuffled = [...SPEAKING_PART1].sort(()=>0.5-Math.random()).slice(0,3);
     const pairIdx = Math.floor(Math.random() * Math.min(SPEAKING_PART2.length, SPEAKING_PART3.length));
     setTestPair({p1topics: shuffled, p2: SPEAKING_PART2[pairIdx], p3: SPEAKING_PART3[pairIdx]});
-    return ()=>{ mountedRef.current=false; clearInterval(prepTimerRef.current); clearInterval(speakTimerRef.current); };
+    return ()=>{ mountedRef.current=false; clearInterval(prepTimerRef.current); clearInterval(speakTimerRef.current); cancelElevenLabs(); };
   },[]);
 
   // ── Recording (same Deepgram/WebSpeech pattern as Sarah) ──
@@ -4718,6 +4722,7 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
 
   // ── Examiner reads question via ElevenLabs, then sets isSpeaking=false ──
   const examinerSpeak = (text, onDone) => {
+    cancelElevenLabs();          // always stop any previous speech before starting new one
     setIsSpeaking(true);
     speakElevenLabs(stripForTTS(text), SARAH_VOICE_ID, ()=>{ if(mountedRef.current){setIsSpeaking(false); if(onDone)onDone();}});
   };
@@ -4778,6 +4783,8 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
   };
 
   const finishP2 = (textOverride) => {
+    if(p2FinishedRef.current) return;   // guard: prevent double-call from timer + button
+    p2FinishedRef.current = true;
     clearInterval(speakTimerRef.current);
     const doFinish = (text) => {
       const ans = (text||transcript||finalTranscriptRef.current||"").trim();
@@ -4794,6 +4801,32 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
       stopRecording(doFinish);
     } else {
       doFinish(textOverride||"");
+    }
+  };
+
+  // ── Pause / Resume ──
+  const pauseTest = () => {
+    cancelElevenLabs();
+    if(isRecordingRef.current) stopRecording();
+    if(prepTimerRef.current){ clearInterval(prepTimerRef.current); prepPausedAt.current=prepLeft; }
+    if(speakTimerRef.current){ clearInterval(speakTimerRef.current); speakPausedAt.current=speakLeft; }
+    setIsPaused(true); setIsSpeaking(false);
+  };
+  const resumeTest = () => {
+    setIsPaused(false);
+    // Resume Part 2 prep timer if it was running
+    if(phase==="p2_prep" && prepPausedAt.current>0){
+      setPrepLeft(prepPausedAt.current);
+      prepTimerRef.current=setInterval(()=>setPrepLeft(prev=>{
+        if(prev<=1){clearInterval(prepTimerRef.current);setPrepDone(true);return 0;}return prev-1;
+      }),1000);
+    }
+    // Resume Part 2 speak timer if it was running
+    if(phase==="p2_speak" && speakPausedAt.current>0){
+      setSpeakLeft(speakPausedAt.current);
+      speakTimerRef.current=setInterval(()=>setSpeakLeft(prev=>{
+        if(prev<=1){clearInterval(speakTimerRef.current);if(mountedRef.current)finishP2();return 0;}return prev-1;
+      }),1000);
     }
   };
 
@@ -4870,6 +4903,32 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
       if(q) examinerSpeak(q);
     }
   },[phase, p1TopicIdx, p1QuestionIdx, p3QuestionIdx, testPair]);
+
+  // ── Pause bar (shown during active test phases) ──
+  const activePhases = ["p1_name","p1_asking","p1_transition","p2_brief","p2_prep","p2_speak","p3_brief","p3_asking","p2_ending"];
+  const PauseBar = () => activePhases.includes(phase) ? (
+    <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
+      <button onClick={isPaused?resumeTest:pauseTest}
+        style={{background:isPaused?"#16a34a":"#f1f5f9",color:isPaused?"white":T2.textMid,border:`1px solid ${isPaused?"#16a34a":T2.border}`,borderRadius:8,padding:"6px 14px",fontSize:12,fontWeight:600,cursor:"pointer",...sty,display:"flex",alignItems:"center",gap:6}}>
+        {isPaused?"▶ Resume Test":"⏸ Pause"}
+      </button>
+    </div>
+  ) : null;
+
+  // ── Paused overlay ──
+  const PausedOverlay = () => isPaused ? (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{background:"white",borderRadius:16,padding:"40px 48px",textAlign:"center",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
+        <div style={{fontSize:40,marginBottom:12}}>⏸</div>
+        <h3 style={{fontFamily:"Georgia,serif",fontSize:22,color:T2.text,margin:"0 0 8px"}}>Test Paused</h3>
+        <p style={{...sty,fontSize:14,color:T2.textMuted,margin:"0 0 24px"}}>Your progress is saved. Timers are frozen.</p>
+        <button onClick={resumeTest}
+          style={{background:"#dc2626",color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",...sty,boxShadow:"0 4px 14px rgba(220,38,38,0.3)"}}>
+          ▶ Resume Test
+        </button>
+      </div>
+    </div>
+  ) : null;
 
   // ── Progress bar helper ──
   const Progress = () => {
@@ -4954,7 +5013,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   // NAME COLLECTION (examiner intro)
   if(phase==="p1_name") return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
-      <Progress/>
+      <PausedOverlay/><Progress/><PauseBar/>
       <ExaminerBubble text="Good morning. My name is Sarah. Could you tell me your full name, please?" />
       <MicBtn onDone={(text)=>{ const ans=(text||transcript||"").trim(); answersRef.current.push({part:"Part 1 Intro",question:"Could you tell me your full name?",answer:ans||"[No response]"}); setTranscript(""); finalTranscriptRef.current=""; speakFiredRef.current=""; setP1TopicIdx(0); setP1QuestionIdx(0); setPhase("p1_asking"); }}/>
     </div>
@@ -4963,7 +5022,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   // PART 1
   if(["p1_brief","p1_asking","p1_answer","p1_transition"].includes(phase)) return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
-      <Progress/>
+      <PausedOverlay/><Progress/><PauseBar/>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
         <span style={{...sty,fontSize:13,color:T2.textMuted}}>Part 1 · Topic: <strong style={{color:T2.text}}>{currentP1Topic?.topic}</strong></span>
         <span style={{...sty,fontSize:12,color:T2.textMuted}}>Question {p1Done+1} of {p1Total}</span>
@@ -4988,7 +5047,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   // PART 2 PREP
   if(phase==="p2_prep") return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
-      <Progress/>
+      <PausedOverlay/><Progress/><PauseBar/>
       <div style={{textAlign:"center",marginBottom:16}}>
         <div style={{fontSize:44,fontWeight:900,color:prepLeft<=10?"#dc2626":"#1e293b",fontVariantNumeric:"tabular-nums",fontFamily:"Georgia,serif"}}>{prepLeft}s</div>
         <div style={{...sty,fontSize:12,color:T2.textMuted}}>Preparation time remaining</div>
@@ -5018,7 +5077,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   // PART 2 SPEAK
   if(phase==="p2_speak") return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
-      <Progress/>
+      <PausedOverlay/><Progress/><PauseBar/>
       <ExaminerBubble text="All right. Remember, you have one to two minutes. Please begin speaking now."/>
       <div style={{textAlign:"center",marginBottom:16}}>
         <div style={{fontSize:44,fontWeight:900,color:speakLeft<=20?"#dc2626":"#16a34a",fontVariantNumeric:"tabular-nums",fontFamily:"Georgia,serif"}}>{Math.floor(speakLeft/60)}:{String(speakLeft%60).padStart(2,"0")}</div>
@@ -5045,9 +5104,12 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   // PART 3
   if(["p2_ending","p3_brief","p3_asking"].includes(phase)) return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
-      <Progress/>
+      <PausedOverlay/><Progress/><PauseBar/>
       {phase==="p2_ending"
-        ? <div style={{textAlign:"center",padding:"30px 0",...sty,color:T2.textMuted,fontSize:14}}>🔊 End of Part 2...</div>
+        ? <div style={{textAlign:"center",padding:"30px 20px"}}>
+            <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:12,padding:"16px 20px",marginBottom:16,...sty,fontSize:14,color:"#166534",fontWeight:600}}>✅ Your Part 2 answer has been recorded</div>
+            <div style={{...sty,fontSize:13,color:T2.textMuted}}>🔊 Moving to Part 3...</div>
+          </div>
         : <>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
               <span style={{...sty,fontSize:13,color:T2.textMuted}}>Part 3 · Discussion</span>
