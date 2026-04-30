@@ -10573,19 +10573,18 @@ export default function IELTSBot(){
             <div className="nav-scroll-hint" style={{position:"absolute",right:0,top:0,bottom:0,width:48,background:"linear-gradient(to right, transparent, rgba(180,0,0,0.85))",pointerEvents:"none",zIndex:2,borderRadius:"0 4px 4px 0"}}/>
             {/* Desktop: grouped with dividers */}
             <div style={{position:"relative"}}>
-            {/* Scroll hint — strong edge fade + animated progress bar below */}
-            {/* Right/Left fade indicating more content */}
+            {/* Scroll hint — white fade on trailing edge + white progress bar */}
             <div className="nav-scroll-hint nav-fade-end" style={{
               position:"absolute",
               ...(uiLang==="ar"
-                ? {left:0, background:"linear-gradient(to left, rgba(180,0,0,0) 0%, rgba(160,0,0,0.7) 50%, rgba(150,0,0,0.97) 100%)"}
-                : {right:0, background:"linear-gradient(to right, rgba(180,0,0,0) 0%, rgba(160,0,0,0.7) 50%, rgba(150,0,0,0.97) 100%)"}
+                ? {left:0, background:"linear-gradient(to left, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.55) 100%)"}
+                : {right:0, background:"linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.55) 100%)"}
               ),
-              top:0,bottom:4,width:56,zIndex:10,pointerEvents:"none"
+              top:0,bottom:4,width:64,zIndex:10,pointerEvents:"none"
             }}/>
-            {/* Scroll progress bar — white track, scrolls with nav */}
-            <div className="nav-scroll-hint nav-scroll-track" style={{position:"absolute",bottom:0,left:uiLang==="ar"?"auto":8,right:uiLang==="ar"?8:"auto",width:"calc(100% - 16px)",height:3,background:"rgba(255,255,255,0.15)",borderRadius:2,zIndex:11,overflow:"hidden",pointerEvents:"none"}}>
-              <div className="nav-scroll-thumb" style={{height:"100%",background:"rgba(255,255,255,0.7)",borderRadius:2,width:"30%",transition:"transform 0.1s linear"}}/>
+            {/* Scroll progress bar — white track */}
+            <div className="nav-scroll-hint nav-scroll-track" style={{position:"absolute",bottom:0,left:8,right:8,height:4,background:"rgba(255,255,255,0.2)",borderRadius:2,zIndex:11,overflow:"hidden",pointerEvents:"none"}}>
+              <div className="nav-scroll-thumb" style={{height:"100%",background:"rgba(255,255,255,0.85)",borderRadius:2,width:"30%",transition:"transform 0.1s linear"}}/>
             </div>
             <div className="nav-tabs nav-grouped" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"nowrap",overflowX:"auto"}}>
               {/* Always visible */}
@@ -11387,8 +11386,8 @@ export default function IELTSBot(){
           .nav-grouped span { font-size: 9px !important; padding: 0 3px !important; }
           /* Dividers slimmer */
           .nav-grouped > div[style*="width:1"] { margin: 0 2px !important; }
-          /* Scroll hint — desktop hides it */
-          .nav-scroll-hint { display: none; }
+          /* Scroll hint — visible on all screen sizes */
+          .nav-scroll-hint { display: block; }
 
           /* HERO */
           .hero-inner { flex-direction: column-reverse !important; min-height: auto !important; padding: 20px 16px 24px !important; }
@@ -11438,8 +11437,7 @@ export default function IELTSBot(){
           .features-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
         }
         @media (max-width: 768px) {
-          .nav-scroll-hint { display: flex !important; }
-          .nav-scroll-hint.hidden { display: none !important; }
+          .nav-scroll-hint.hidden { opacity: 0 !important; }
         }
 
         @media (max-width: 380px) {
