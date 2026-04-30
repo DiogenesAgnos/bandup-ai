@@ -798,7 +798,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
           from_email:cliqForm.email.trim(),
           country:cliqForm.mobile.trim(),
           age_group:"CLIQ Payment",
-          message:`New CLIQ Pro upgrade request:\n\nName: ${cliqForm.name.trim()}\nEmail: ${cliqForm.email.trim()}\nMobile: ${cliqForm.mobile.trim()}\nAmount: 25 JOD\nCLIQ Alias: Efool2026`,
+          message:`New CLIQ Pro upgrade request:\n\nName: ${cliqForm.name.trim()}\nEmail: ${cliqForm.email.trim()}\nMobile: ${cliqForm.mobile.trim()}\nAmount: 25 JOD\nCLIQ Alias: EFOOL2026`,
           to_email:"diogenes.agnos@gmail.com"
         });
       }catch(emailErr){ console.warn("EmailJS failed (non-critical):",emailErr); }
@@ -904,7 +904,7 @@ const PaywallModal=({onClose,onSuccess,session,initialTab="cliq",onRegister})=>{
                 </div>
                 <div style={{fontSize:13,color:T.textMid,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>
                   افتح تطبيق البنك ← كليك ← أرسل أموال<br/>
-                  أرسل <strong style={{color:T.text}}>٢٥ دينار</strong> إلى الاسم المستعار: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:15,direction:"ltr",display:"inline-block"}}>Efool2026</strong>
+                  أرسل <strong style={{color:T.text}}>٢٥ دينار</strong> إلى الاسم المستعار: <strong style={{color:T.primary,fontFamily:"monospace",fontSize:15,direction:"ltr",display:"inline-block"}}>EFOOL2026</strong>
                 </div>
               </div>
 
