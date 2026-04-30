@@ -4087,12 +4087,13 @@ const ConversationPractice=({isPro,onUpgrade,session,onAuth})=>{
     };
     const ieltsTopicList=IELTS_TOPICS.map(t=>`- ${t.topic}: ${t.questions.join(" / ")}`).join("\n");
     const historyContext=pastHistory?`
-RETURNING USER — past session info:
+RETURNING USER — last session summary:
 Name: ${pastHistory.name}
-Level at last session: ${pastHistory.level}
-Words/phrases they struggled with: ${pastHistory.struggles||"none noted"}
-Words they learned: ${pastHistory.learned||"none noted"}
-Greet them warmly as a returning student. Reference something specific from their past progress if relevant.`:"";
+Level: ${pastHistory.level}
+Last session: ${pastHistory.date?new Date(pastHistory.date).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"recently"}
+Summary: ${pastHistory.summary||"Previous session on record — greet them warmly as a returning student."}
+Open with a SPECIFIC personal reference from the summary — mention an actual topic, a real mistake they made, or a word they learned. Never say "last time" in a generic way.`:""
+;
 
     return `You are Sarah, a warm, professional English conversation coach and IELTS examiner helping ${userName} practise speaking.
 ${historyContext}
@@ -4187,7 +4188,7 @@ RESPONSE RULES:
     setIsThinking(true);
     const isReturning=!!pastHistory;
     const opening=isReturning
-      ?`Welcome ${userName} back warmly. You know them — they practised before at ${pastHistory.level} level. Briefly acknowledge their return, then ask what they'd like to work on today.`
+      ?`Welcome ${userName} back. You have a session summary about them in your system prompt. Open with ONE specific reference from it (a topic, a mistake, or a word). Then ask if they want to continue from where they left off or try something new. Keep it to 2 sentences.`
       :`Greet ${userName} warmly as Sarah. Say you are here to practise English together. Ask what they would like to talk about, or offer to ask IELTS-style questions if they want to practise for the exam.`;
     const reply=await callClaude(buildSystemPrompt(),[],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addSarahMessage(reply);}
@@ -4230,11 +4231,18 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       const data=await res.json();
       const reportText=data?.content?.[0]?.text||"Could not generate report.";
       setReport(reportText);
-      // Save history summary for next session
-      saveSarahHistory({name:userName,level,date:new Date().toISOString(),
-        struggles:messages.filter(m=>m.role==="bot"&&/say|phrasing|natural|word|tip/i.test(m.text)).slice(-3).map(m=>m.text).join("; "),
-        learned:messages.filter(m=>m.role==="bot"&&/richer|stronger|better word/i.test(m.text)).map(m=>m.text).join("; ")
-      });
+      // Generate a rich session summary for next session's greeting
+      try{
+        const sumRes=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:120,
+            system:"You are summarising an English practice session for an AI coach's memory. Write exactly 3 sentences, plain text, no labels. Sentence 1: topics and questions covered. Sentence 2: the student's main grammar or vocabulary errors (be specific — quote the mistakes). Sentence 3: vocabulary or phrases introduced, and where the conversation ended.",
+            messages:[{role:"user",content:`Summarise this session for the coach's memory:\n\n${convo}`}]})});
+        const sumData=await sumRes.json();
+        const summary=sumData?.content?.[0]?.text||null;
+        saveSarahHistory({name:userName,level,date:new Date().toISOString(),summary});
+      }catch(e){
+        saveSarahHistory({name:userName,level,date:new Date().toISOString(),summary:null});
+      }
       setPastHistory(loadSarahHistory());
     }catch(e){setReport("Could not generate report.");}
   };
