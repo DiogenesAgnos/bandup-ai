@@ -4637,6 +4637,8 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
   const [report, setReport] = useState(null);
   const [scoring, setScoring] = useState(false);
   const mountedRef = useRef(true);
+  const autoAdvanceRef = useRef(null);   // callback fired after transcription finishes
+  const speakFiredRef = useRef("");       // guard: tracks which phase we already spoke for
 
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const T2 = T; // use same theme
@@ -4664,13 +4666,14 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
         mr.onstop=async()=>{
           stream.getTracks().forEach(t=>t.stop());
           const blob = new Blob(audioChunksRef.current,{type:mimeType});
-          if(blob.size<500){setTranscript("");setIsRecording(false);return;}
+          if(blob.size<500){setTranscript("");setIsRecording(false);if(autoAdvanceRef.current){autoAdvanceRef.current("");autoAdvanceRef.current=null;}return;}
           try{
             const res = await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":mimeType},body:blob});
             const data = await res.json();
             const text = data.transcript||"";
             setTranscript(text); setIsRecording(false);
-          }catch{setIsRecording(false);}
+            if(autoAdvanceRef.current){autoAdvanceRef.current(text); autoAdvanceRef.current=null;}
+          }catch{setIsRecording(false); if(autoAdvanceRef.current){autoAdvanceRef.current("");autoAdvanceRef.current=null;}}
         };
         mr.start(); mediaRecorderRef.current=mr; isRecordingRef.current=true; setIsRecording(true); return;
       }catch(err){
@@ -4693,10 +4696,17 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
     run();
   };
 
-  const stopRecording = () => {
+  const stopRecording = (advanceFn) => {
+    if(advanceFn) autoAdvanceRef.current = advanceFn;
     isRecordingRef.current=false;
-    if(mediaRecorderRef.current&&mediaRecorderRef.current.state!=="inactive"){mediaRecorderRef.current.stop(); setIsRecording(false); return;}
+    if(mediaRecorderRef.current&&mediaRecorderRef.current.state!=="inactive"){
+      mediaRecorderRef.current.stop(); // onstop fires autoAdvanceRef
+      setIsRecording(false); return;
+    }
+    // WebSpeech path: fire advance immediately after stop with current transcript
+    const finalText = finalTranscriptRef.current.trim();
     recognitionRef.current?.stop(); setIsRecording(false);
+    if(autoAdvanceRef.current){ setTimeout(()=>{ autoAdvanceRef.current?.(finalText); autoAdvanceRef.current=null; }, 200); }
   };
 
   // ── Save current answer and advance ──
@@ -4718,19 +4728,27 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
   const p1Total = 3*3; // 3 topics × 3 questions
   const p1Done = p1TopicIdx*3 + p1QuestionIdx;
 
-  const advanceP1 = () => {
-    if(isRecording) stopRecording();
+  const advanceP1 = (textOverride) => {
     const q = currentP1Topic?.questions[p1QuestionIdx]?.q||"";
-    saveAnswer("Part 1",q);
+    // Save answer (textOverride comes from autoAdvance callback)
+    const ans = (textOverride||transcript||finalTranscriptRef.current||"").trim();
+    answersRef.current.push({part:"Part 1", question:q, answer:ans||"[No response recorded]"});
+    setTranscript(""); finalTranscriptRef.current="";
     const nextQ = p1QuestionIdx+1;
     if(nextQ < (currentP1Topic?.questions.length||3)){
       setP1QuestionIdx(nextQ);
-      setTranscript(""); setPhase("p1_asking");
+      setPhase("p1_asking");
     } else {
       const nextT = p1TopicIdx+1;
       if(nextT < 3){
-        setP1TopicIdx(nextT); setP1QuestionIdx(0);
-        setTranscript(""); setPhase("p1_asking");
+        // New topic — examiner says transition phrase first
+        const newTopic = testPair?.p1topics[nextT]?.topic||"";
+        setPhase("p1_transition");
+        examinerSpeak("Thank you. Now let\'s talk about "+newTopic+".", ()=>{
+          speakFiredRef.current="";
+          setP1TopicIdx(nextT); setP1QuestionIdx(0);
+          setPhase("p1_asking");
+        });
       } else {
         setPhase("p2_brief");
       }
@@ -4759,23 +4777,36 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
     },1000);
   };
 
-  const finishP2 = () => {
-    if(isRecordingRef.current) stopRecording();
+  const finishP2 = (textOverride) => {
     clearInterval(speakTimerRef.current);
-    const ans = transcript.trim()||finalTranscriptRef.current.trim();
-    answersRef.current.push({part:"Part 2",question:testPair?.p2?.topic||"Long Turn",answer:ans||"[No response recorded]"});
-    setTranscript(""); finalTranscriptRef.current="";
-    setPhase("p3_brief");
+    const doFinish = (text) => {
+      const ans = (text||transcript||finalTranscriptRef.current||"").trim();
+      answersRef.current.push({part:"Part 2",question:testPair?.p2?.topic||"Long Turn",answer:ans||"[No response recorded]"});
+      setTranscript(""); finalTranscriptRef.current="";
+      setPhase("p2_ending");
+      const p3topic = testPair?.p2?.topic?.replace("Describe a ","")?.replace("Describe an ","")||"that topic";
+      examinerSpeak("Thank you. That is the end of Part 2. We will now move on to Part 3, where I will ask you some more general questions related to "+p3topic+".", ()=>{
+        speakFiredRef.current="";
+        setPhase("p3_asking");
+      });
+    };
+    if(isRecordingRef.current){
+      stopRecording(doFinish);
+    } else {
+      doFinish(textOverride||"");
+    }
   };
 
   // ── Part 3 advance ──
-  const advanceP3 = () => {
-    if(isRecording) stopRecording();
+  const advanceP3 = (textOverride) => {
     const q = testPair?.p3?.questions[p3QuestionIdx]?.q||"";
-    saveAnswer("Part 3",q);
+    const ans = (textOverride||transcript||finalTranscriptRef.current||"").trim();
+    answersRef.current.push({part:"Part 3", question:q, answer:ans||"[No response recorded]"});
+    setTranscript(""); finalTranscriptRef.current="";
     const next = p3QuestionIdx+1;
     if(next < (testPair?.p3?.questions.length||3)){
-      setP3QuestionIdx(next); setTranscript(""); setPhase("p3_asking");
+      speakFiredRef.current="";
+      setP3QuestionIdx(next); setPhase("p3_asking");
     } else {
       setPhase("scoring");
       generateReport();
@@ -4818,19 +4849,22 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
 
   // ── Phase transitions that need examiner speech ──
   useEffect(()=>{
+    // Guard: only fire once per unique phase+question combination
+    const key = phase+":"+p1TopicIdx+":"+p1QuestionIdx+":"+p3QuestionIdx;
+    if(speakFiredRef.current===key) return;
+    speakFiredRef.current=key;
+
     if(phase==="p1_asking" && testPair){
       const q = testPair.p1topics[p1TopicIdx]?.questions[p1QuestionIdx]?.q;
       if(q) examinerSpeak(q);
     }
     if(phase==="p2_brief"){
-      examinerSpeak("Now I'd like you to talk about a topic for one to two minutes. You have one minute to prepare. Here is your task card.", ()=>{ setPhase("p2_prep"); startPrepTimer(); });
+      examinerSpeak("Now I would like you to talk about a topic for one to two minutes. You have one minute to prepare. Here is your task card.", ()=>{ setPhase("p2_prep"); startPrepTimer(); });
     }
     if(phase==="p2_speak"){
       examinerSpeak("All right. Remember, you have one to two minutes. Please begin speaking now.", ()=>{ startSpeakTimer(); });
     }
-    if(phase==="p3_brief"){
-      examinerSpeak("We've been talking about " + (testPair?.p2?.topic?.replace("Describe a ","")?.replace("Describe an ","")||"that topic") + ". I'd like to discuss some more general questions related to this.", ()=>{ setPhase("p3_asking"); });
-    }
+    // p3_brief is now handled inside finishP2 — no examinerSpeak here
     if(phase==="p3_asking" && testPair){
       const q = testPair.p3?.questions[p3QuestionIdx]?.q;
       if(q) examinerSpeak(q);
@@ -4855,23 +4889,20 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   };
 
   // ── Mic button ──
-  const MicBtn = ({onDone, doneLabel="✓ Done — Next Question"}) => (
+  // MicBtn: tap once to start recording, tap again to stop + auto-advance
+  const MicBtn = ({onDone}) => (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12,marginTop:20}}>
       {transcript && <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"12px 16px",fontSize:13,color:"#166534",lineHeight:1.6,width:"100%",maxWidth:500,textAlign:"left",...sty}}><strong>Your answer:</strong> {transcript}</div>}
       {error && <div style={{color:"#dc2626",fontSize:12,...sty}}>{error}</div>}
-      <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",justifyContent:"center"}}>
-        <button onClick={isRecording?stopRecording:startRecording}
-          style={{width:64,height:64,borderRadius:"50%",border:"none",background:isRecording?"#dc2626":"#7c3aed",color:"white",fontSize:24,cursor:"pointer",boxShadow:isRecording?"0 0 0 6px rgba(220,38,38,0.25)":"0 4px 12px rgba(124,58,237,0.4)",transition:"all 0.2s"}}>
-          {isRecording?"⏹":"🎤"}
-        </button>
-        {!isRecording && (
-          <button onClick={onDone}
-            style={{background:"#dc2626",color:"white",border:"none",borderRadius:10,padding:"14px 24px",fontSize:14,fontWeight:700,cursor:"pointer",...sty,boxShadow:"0 3px 10px rgba(220,38,38,0.3)"}}>
-            {doneLabel}
-          </button>
-        )}
-      </div>
-      {isRecording && <p style={{...sty,fontSize:12,color:"#7c3aed",margin:0,animation:"pulse 1.5s infinite"}}>🔴 Recording... tap ⏹ when done</p>}
+      <button
+        onClick={isRecording ? ()=>stopRecording(onDone) : startRecording}
+        disabled={isSpeaking}
+        style={{width:70,height:70,borderRadius:"50%",border:"none",background:isRecording?"#dc2626":isSpeaking?"#cbd5e1":"#7c3aed",color:"white",fontSize:26,cursor:isSpeaking?"not-allowed":"pointer",boxShadow:isRecording?"0 0 0 8px rgba(220,38,38,0.2)":isSpeaking?"none":"0 4px 14px rgba(124,58,237,0.4)",transition:"all 0.2s"}}>
+        {isRecording?"⏹":isSpeaking?"🔊":"🎤"}
+      </button>
+      <p style={{...sty,fontSize:12,margin:0,color:isRecording?"#dc2626":isSpeaking?"#64748b":"#7c3aed",textAlign:"center"}}>
+        {isRecording?"🔴 Recording — tap to stop and send":isSpeaking?"Examiner is speaking...":"Tap to answer"}
+      </p>
     </div>
   );
 
@@ -4925,12 +4956,12 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
       <Progress/>
       <ExaminerBubble text="Good morning. My name is Sarah. Could you tell me your full name, please?" />
-      <MicBtn onDone={()=>{ saveAnswer("Part 1 Intro","Could you tell me your full name?"); setP1TopicIdx(0); setP1QuestionIdx(0); setPhase("p1_asking"); }} doneLabel="✓ Done — Start Part 1"/>
+      <MicBtn onDone={(text)=>{ const ans=(text||transcript||"").trim(); answersRef.current.push({part:"Part 1 Intro",question:"Could you tell me your full name?",answer:ans||"[No response]"}); setTranscript(""); finalTranscriptRef.current=""; speakFiredRef.current=""; setP1TopicIdx(0); setP1QuestionIdx(0); setPhase("p1_asking"); }}/>
     </div>
   );
 
   // PART 1
-  if(phase==="p1_brief"||phase==="p1_asking"||phase==="p1_answer") return (
+  if(["p1_brief","p1_asking","p1_answer","p1_transition"].includes(phase)) return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
       <Progress/>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
@@ -4938,8 +4969,10 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
         <span style={{...sty,fontSize:12,color:T2.textMuted}}>Question {p1Done+1} of {p1Total}</span>
       </div>
       <div style={{background:"#f1f5f9",borderRadius:6,height:4,marginBottom:20}}><div style={{height:4,borderRadius:6,background:"#dc2626",width:`${((p1Done+1)/p1Total)*100}%`,transition:"width 0.3s"}}/></div>
-      <ExaminerBubble text={currentP1Q?.q||"..."} />
-      <MicBtn onDone={advanceP1}/>
+      {phase==="p1_transition"
+        ? <div style={{textAlign:"center",padding:"30px 0",...sty,color:T2.textMuted,fontSize:14}}>🔊 Moving to next topic...</div>
+        : <><ExaminerBubble text={currentP1Q?.q||"..."}/><MicBtn onDone={advanceP1}/></>
+      }
     </div>
   );
 
@@ -5001,26 +5034,29 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
           style={{width:60,height:60,borderRadius:"50%",border:"none",background:isRecording?"#dc2626":"#7c3aed",color:"white",fontSize:22,cursor:"pointer",boxShadow:isRecording?"0 0 0 6px rgba(220,38,38,0.25)":"0 4px 12px rgba(124,58,237,0.4)"}}>
           {isRecording?"⏹":"🎤"}
         </button>
-        {speakLeft<=120&&speakLeft>0&&(
-          <button onClick={finishP2}
-            style={{background:"#dc2626",color:"white",border:"none",borderRadius:10,padding:"14px 20px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
-            ✓ I've Finished
-          </button>
-        )}
+        <button onClick={()=>{if(isRecordingRef.current){stopRecording((text)=>finishP2(text));}else{finishP2();}}}
+          style={{background:"#dc2626",color:"white",border:"none",borderRadius:10,padding:"14px 20px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+          ✓ I've Finished Speaking
+        </button>
       </div>
     </div>
   );
 
   // PART 3
-  if(phase==="p3_brief"||phase==="p3_asking") return (
+  if(["p2_ending","p3_brief","p3_asking"].includes(phase)) return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
       <Progress/>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-        <span style={{...sty,fontSize:13,color:T2.textMuted}}>Part 3 · Discussion</span>
-        <span style={{...sty,fontSize:12,color:T2.textMuted}}>Question {p3QuestionIdx+1} of {testPair?.p3?.questions.length||3}</span>
-      </div>
-      <ExaminerBubble text={testPair?.p3?.questions[p3QuestionIdx]?.q||"..."} />
-      <MicBtn onDone={advanceP3} doneLabel={p3QuestionIdx<(testPair?.p3?.questions.length||3)-1?"✓ Done — Next Question":"✓ Done — Finish Test"}/>
+      {phase==="p2_ending"
+        ? <div style={{textAlign:"center",padding:"30px 0",...sty,color:T2.textMuted,fontSize:14}}>🔊 End of Part 2...</div>
+        : <>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <span style={{...sty,fontSize:13,color:T2.textMuted}}>Part 3 · Discussion</span>
+              <span style={{...sty,fontSize:12,color:T2.textMuted}}>Question {p3QuestionIdx+1} of {testPair?.p3?.questions.length||3}</span>
+            </div>
+            <ExaminerBubble text={testPair?.p3?.questions[p3QuestionIdx]?.q||"..."}/>
+            <MicBtn onDone={advanceP3}/>
+          </>
+      }
     </div>
   );
 
