@@ -8843,22 +8843,24 @@ const LINDA_CURRICULUM={
 
 const stripForTTSLinda=(text)=>{
   return text
-    .replace(/[\u{1F300}-\u{1FAFF}]/gu,\" \")
-    .replace(/[\u2600-\u27BF]/gu,\" \")
-    .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+/g,\" \")
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu," ")
+    .replace(/[\u2600-\u27BF]/gu," ")
     .replace(/\*\*/g,"").replace(/\*/g,"")
     .replace(/#+\s*/g,"")
-    .replace(/_{2,}/g," blank ")
+    .replace(/_{2,}/g," blank ")   // ___ → "blank" so it reads naturally
     .replace(/_/g," ")
-    .replace(/\u2014\s*/g,". ")
+    .replace(/—\s*/g,". ")
     .replace(/:\s+/g,". ")
-    .replace(/\[.*?\]/g,"")
-    .replace(/\(.*?\)/g,"")
+    .replace(/\[.*?\]/g,"")        // remove Arabic in brackets
+    .replace(/\(.*?\)/g,"")        // remove parentheticals
+    // Prevent double-word: "Hello Hello" → "Hello"
     .replace(/\b(\w+)\s+\1\b/gi,"$1")
     .replace(/\s+/g," ")
+    .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+/g," ")
     .replace(/^[^a-zA-Z0-9]+/,"")
     .trim();
 };
+
 const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
   const [progress,setProgress]=useState(()=>loadLindaProgress());
   const [screen,setScreen]=useState(()=>{
