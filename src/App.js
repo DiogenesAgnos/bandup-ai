@@ -2563,7 +2563,7 @@ const DictationExercises = ({canAnswer}) => {
 
   const speak=()=>{
     if(!window.speechSynthesis)return;
-    window.speechSynthesis.cancel();
+    cancelElevenLabs();
     const u=new SpeechSynthesisUtterance(current.text);
     u.lang="en-GB";u.rate=0.82;u.pitch=1;
     const voices=window.speechSynthesis.getVoices();
@@ -2584,7 +2584,7 @@ const DictationExercises = ({canAnswer}) => {
     return cWords.map((w,i)=>({w,ok:normalise(w)===normalise(uWords[i]||""),userW:uWords[i]||"(missing)"}));
   };
 
-  const next=()=>{setQIdx(i=>i+1);setTyped("");setSubmitted(false);setPlayCount(0);window.speechSynthesis?.cancel();};
+  const next=()=>{setQIdx(i=>i+1);setTyped("");setSubmitted(false);setPlayCount(0);cancelElevenLabs();};
 
   return(
     <div>
@@ -3911,19 +3911,53 @@ const stripForTTS=(text)=>text
   .replace(/[^\w\s.,!?;:'"-]/g," ")
   .replace(/\s+/g," ").trim();
 
-const speakText=(text,onEnd)=>{
+const SARAH_VOICE_ID="6fZce9LFNG3iEITDfqZZ";
+const LINDA_VOICE_ID="8vf2Pg7VZD0Piv8GA8v9";
+
+// ElevenLabs TTS — falls back to browser TTS if API fails
+const speakElevenLabs=async(text,voiceId,onEnd)=>{
+  try{
+    const res=await fetch("/api/tts",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text,voiceId}),
+    });
+    if(!res.ok)throw new Error("TTS API failed");
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const audio=new Audio(url);
+    audio.onended=()=>{URL.revokeObjectURL(url);if(onEnd)onEnd();};
+    audio.onerror=()=>{URL.revokeObjectURL(url);if(onEnd)onEnd();};
+    // Store reference so we can cancel if needed
+    window._currentELAudio=audio;
+    await audio.play();
+  }catch(e){
+    // Fallback to browser TTS
+    speakTextFallback(text,onEnd);
+  }
+};
+
+const cancelElevenLabs=()=>{
+  if(window._currentELAudio){
+    window._currentELAudio.pause();
+    window._currentELAudio.src="";
+    window._currentELAudio=null;
+  }
+  cancelElevenLabs();
+};
+
+const speakTextFallback=(text,onEnd)=>{
   if(!window.speechSynthesis)return;
   const doSpeak=()=>{
-    window.speechSynthesis.cancel();
+    cancelElevenLabs();
     const utt=new SpeechSynthesisUtterance(text);
     utt.lang="en-GB";utt.rate=0.88;utt.pitch=1.1;
     const voices=window.speechSynthesis.getVoices();
-    // Explicit priority list — covers Chrome desktop, Chrome Android, Safari iOS
     const match=
       voices.find(v=>/google uk english female/i.test(v.name))||
-      voices.find(v=>/samantha/i.test(v.name))||           // iOS Safari
-      voices.find(v=>/karen/i.test(v.name))||              // iOS Australian female
-      voices.find(v=>/moira/i.test(v.name))||              // iOS Irish female
+      voices.find(v=>/samantha/i.test(v.name))||
+      voices.find(v=>/karen/i.test(v.name))||
+      voices.find(v=>/moira/i.test(v.name))||
       voices.find(v=>v.lang==="en-GB"&&!/male|man/i.test(v.name))||
       voices.find(v=>/google us english female|zira/i.test(v.name))||
       voices.find(v=>v.lang==="en-US"&&!/male|man/i.test(v.name))||
@@ -3938,6 +3972,8 @@ const speakText=(text,onEnd)=>{
     window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};
   }else{doSpeak();}
 };
+
+const speakText=(text,onEnd)=>speakElevenLabs(text,SARAH_VOICE_ID,onEnd);
 
 // IELTS topic structure for user selection
 const IELTS_TOPICS=SPEAKING_PART1.map(t=>({
@@ -3984,7 +4020,7 @@ const ConversationPractice=({isPro,onUpgrade})=>{
     mountedRef.current=true;
     return()=>{
       mountedRef.current=false;
-      window.speechSynthesis?.cancel();
+      cancelElevenLabs();
       isRecordingRef.current=false;
       recognitionRef.current?.abort();
       clearInterval(sessionTimerRef.current);
@@ -4002,7 +4038,7 @@ const ConversationPractice=({isPro,onUpgrade})=>{
         saveTimerMs(next);
         if(next>=sessionLimit){
           clearInterval(sessionTimerRef.current);
-          window.speechSynthesis?.cancel();
+          cancelElevenLabs();
           isRecordingRef.current=false;
           recognitionRef.current?.abort();
           if(mountedRef.current){
@@ -4105,7 +4141,7 @@ RESPONSE RULES:
   const sendMessage=async(text)=>{
     if(!text.trim()||isThinking||sessionEnded)return;
     setShowMicHint(false);
-    window.speechSynthesis?.cancel();
+    cancelElevenLabs();
     setTranscript("");
     finalTranscriptRef.current="";
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
@@ -4142,7 +4178,7 @@ RESPONSE RULES:
   };
 
   const generateReport=async()=>{
-    window.speechSynthesis?.cancel();
+    cancelElevenLabs();
     isRecordingRef.current=false;
     recognitionRef.current?.abort();
     clearInterval(sessionTimerRef.current);
@@ -4193,7 +4229,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
   const audioChunksRef=useRef([]);
 
   const startRecording=async()=>{
-    window.speechSynthesis?.cancel();
+    cancelElevenLabs();
     setError("");
     setTranscript("");
     finalTranscriptRef.current="";
@@ -4444,7 +4480,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
           isPausedRef.current=next;
           if(next){
             // Pausing — stop voice and recording
-            window.speechSynthesis?.cancel();
+            cancelElevenLabs();
             if(isRecording){isRecordingRef.current=false;recognitionRef.current?.stop();setIsRecording(false);}
           }
         }}
@@ -4452,7 +4488,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
           style={{background:isPaused?T.amber:T.bgMuted,border:`1px solid ${isPaused?T.amberBorder:T.border}`,borderRadius:8,padding:"5px 8px",fontSize:13,cursor:"pointer",color:isPaused?T.amber:T.textMid,flexShrink:0,...sty}}>
           {isPaused?"▶":"⏸"}
         </button>
-        <button onClick={()=>{window.speechSynthesis?.cancel();setTtsEnabled(v=>!v);}}
+        <button onClick={()=>{cancelElevenLabs();setTtsEnabled(v=>!v);}}
           title={ttsEnabled?"Mute Sarah":"Unmute Sarah"}
           style={{background:ttsEnabled?T.primaryLight:T.bgMuted,border:`1px solid ${ttsEnabled?T.primaryBorder:T.border}`,borderRadius:8,padding:"5px 8px",fontSize:12,cursor:"pointer",color:ttsEnabled?T.primary:T.textMuted,flexShrink:0,...sty}}>
           {ttsEnabled?"🔊":"🔇"}
@@ -8841,7 +8877,7 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
     mountedRef.current=true;
     return()=>{
       mountedRef.current=false;
-      window.speechSynthesis?.cancel();
+      cancelElevenLabs();
       isRecordingRef.current=false;
       recognitionRef.current?.abort();
     };
@@ -9003,29 +9039,7 @@ ALWAYS:
     }catch{return "";}
   };
 
-  const speakLinda=(text)=>{
-    if(!window.speechSynthesis)return;
-    const doSpeak=()=>{
-      window.speechSynthesis.cancel();
-      const utt=new SpeechSynthesisUtterance(text);
-      utt.lang="en-US";
-      utt.rate=["a1","a2"].includes(progress.level)?0.82:1.0; // slower for beginners
-      utt.pitch=1.3;
-      const voices=window.speechSynthesis.getVoices();
-      const match=
-        voices.find(v=>/google us english female|zira|samantha|karen|moira|victoria/i.test(v.name))||
-        voices.find(v=>v.lang==="en-US"&&!/male|man/i.test(v.name))||
-        voices.find(v=>v.lang==="en-GB"&&/google uk english female|kate/i.test(v.name))||
-        voices.find(v=>v.lang.startsWith("en")&&!/male|man/i.test(v.name))||
-        voices.find(v=>v.lang.startsWith("en"));
-      if(match){utt.voice=match;utt.lang=match.lang;}
-      if(window.speechSynthesis.paused)window.speechSynthesis.resume();
-      window.speechSynthesis.speak(utt);
-    };
-    if(window.speechSynthesis.getVoices().length===0){
-      window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};
-    }else{doSpeak();}
-  };
+  const speakLinda=(text)=>speakElevenLabs(text,LINDA_VOICE_ID);
 
   const addLindaMessage=(text)=>{
     if(!mountedRef.current)return;
@@ -9072,7 +9086,7 @@ ALWAYS:
 
   const sendMessage=async(text)=>{
     if(!text.trim()||isThinking)return;
-    window.speechSynthesis?.cancel();
+    cancelElevenLabs();
     setTranscript("");
     finalTranscriptRef.current="";
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
@@ -9115,7 +9129,7 @@ ALWAYS:
   };
 
   const startRecording=async()=>{
-    window.speechSynthesis?.cancel();
+    cancelElevenLabs();
     setError("");
     setTranscript("");
     finalTranscriptRef.current="";
@@ -9340,7 +9354,7 @@ ALWAYS:
               );
             })}
             <div style={{padding:"10px 12px"}}>
-              <button onClick={()=>{setScreen("setup");window.speechSynthesis?.cancel();isRecordingRef.current=false;recognitionRef.current?.stop();}}
+              <button onClick={()=>{setScreen("setup");cancelElevenLabs();isRecordingRef.current=false;recognitionRef.current?.stop();}}
                 style={{width:"100%",padding:"7px",background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:7,fontSize:11,cursor:"pointer",color:T.textMid,...sty}}>
                 ← {isAr?"العودة للمستويات":"All levels"}
               </button>
@@ -9359,11 +9373,11 @@ ALWAYS:
                 {isAr?currentLesson?.titleAr:currentLesson?.title} · {isAr?PHASE_LABELS_AR[currentPhase]:PHASE_LABELS[currentPhase]}
               </div>
             </div>
-            <button onClick={()=>{window.speechSynthesis?.cancel();setTtsEnabled(v=>!v);}}
+            <button onClick={()=>{cancelElevenLabs();setTtsEnabled(v=>!v);}}
               style={{background:ttsEnabled?"#f5f3ff":T.bgMuted,border:`1px solid ${ttsEnabled?"#a78bfa":T.border}`,borderRadius:8,padding:"5px 8px",fontSize:12,cursor:"pointer",color:ttsEnabled?"#7c3aed":T.textMuted,flexShrink:0}}>
               {ttsEnabled?"🔊":"🔇"}
             </button>
-            <button onClick={()=>{setScreen("setup");window.speechSynthesis?.cancel();isRecordingRef.current=false;recognitionRef.current?.stop();}}
+            <button onClick={()=>{setScreen("setup");cancelElevenLabs();isRecordingRef.current=false;recognitionRef.current?.stop();}}
               style={{background:T.bgMuted,border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",fontSize:12,cursor:"pointer",color:T.textMid,flexShrink:0,...sty}}>
               ← {isAr?"الدروس":"Lessons"}
             </button>
@@ -9914,7 +9928,7 @@ const PronunciationPage=({uiLang="ar",isPro=false,onUpgrade})=>{
 
   const fallbackSpeak=(word)=>{
     if(!window.speechSynthesis){setSpeaking("");return;}
-    window.speechSynthesis.cancel();
+    cancelElevenLabs();
     const utt=new SpeechSynthesisUtterance(word);
     utt.lang="en-GB";utt.rate=0.8;utt.pitch=1;
     const voices=window.speechSynthesis.getVoices();
