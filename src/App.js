@@ -3992,7 +3992,7 @@ const IELTS_TOPICS=SPEAKING_PART1.map(t=>({
   questions:t.questions.map(q=>q.q)
 }));
 
-const ConversationPractice=({isPro,onUpgrade})=>{
+const ConversationPractice=({isPro,onUpgrade,session,onAuth})=>{
   const [screen,setScreen]=useState("setup");
   const [mode,setMode]=useState("free");
   const [level,setLevel]=useState(()=>{try{return localStorage.getItem("ef_sarah_level")||"b1";}catch{return "b1";}});
@@ -4164,6 +4164,8 @@ RESPONSE RULES:
 
   const startConversation=async()=>{
     if(!userName.trim())return;
+    // Require account to use Sarah
+    if(!session){if(onAuth)onAuth();return;}
     if(hasTimeLimit&&getSessionUsed()){
       setSessionBlockedToday(true);
       return;
@@ -4592,7 +4594,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     </div>
   );
 };
-const SpeakingPage = ({isPro, onUpgrade}) => {
+const SpeakingPage = ({isPro, onUpgrade, session, onAuth}) => {
   const [tab, setTab] = useState("chat");
   const [expandedP1, setExpandedP1] = useState(null);
   const [expandedP2, setExpandedP2] = useState(null);
@@ -4752,7 +4754,7 @@ const SpeakingPage = ({isPro, onUpgrade}) => {
 
       {/* CHAT TAB — shown first by default */}
       {tab==="chat"&&(
-        <ConversationPractice isPro={isPro} onUpgrade={onUpgrade}/>
+        <ConversationPractice isPro={isPro} onUpgrade={onUpgrade} session={session} onAuth={onAuth}/>
       )}
 
     </div>
@@ -8854,7 +8856,7 @@ const stripForTTSLinda=(text)=>{
     .trim();
 };
 
-const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
+const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
   const [progress,setProgress]=useState(()=>loadLindaProgress());
   const [screen,setScreen]=useState(()=>{
     const s=loadLindaSession();
@@ -9038,8 +9040,11 @@ ALWAYS:
 - NEVER wait for permission to advance — move automatically after correct answers
 - NEVER say "underscore" — use "${instr.fillBlankWord}" for gaps
 - 2-3 sentences max per response
-- Be warm: "ممتاز!", "Excellent!", "Brilliant!", "برافو!"
-- If student writes Arabic: respond in Arabic then continue`;
+- Be warm and enthusiastic: "Excellent! 🌟", "Well done!", "One more time!", "Perfect! 🎉", "Brilliant! 💫", "ممتاز!", "برافو!"
+- If student writes Arabic: respond briefly in Arabic then continue
+- LENIENT repeat evaluation: if the student says the right word(s) even with extra words, typos, or slight mistakes, count it as correct. Example: student says "one 23" when asked to repeat "One, Two, Three" — this is CORRECT (speech-to-text error). Be generous.
+- When giving an example sentence at A1/A2 level, always add the Arabic translation in brackets on the same line: "I have three books. (عندي ثلاثة كتب)"
+- Be conversational and natural — speak like an enthusiastic human teacher, not a robot listing items`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -9111,6 +9116,7 @@ ALWAYS:
   };
 
   const startLesson=async(lesson,resumeSession=false)=>{
+    if(!session){if(onAuth)onAuth();return;}
     if(!lesson)return;
     if(!resumeSession){
       clearLindaSession();
@@ -11085,8 +11091,8 @@ export default function IELTSBot(){
         {mainView==="toolkit"&&<ToolkitContent isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="grammar"&&<GrammarChecker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="teacher"&&<LindaPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} uiLang={uiLang}/>}
+        {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} session={session} onAuth={()=>setShowAuth(true)}/>}
+        {mainView==="teacher"&&<LindaPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} uiLang={uiLang} session={session} onAuth={()=>setShowAuth(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView} isPro={proUser}/>}
