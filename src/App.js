@@ -4605,6 +4605,509 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     </div>
   );
 };
+
+// ── IELTS MOCK SPEAKING TEST ─────────────────────────────────────────────────
+const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
+  const [phase, setPhase] = useState("intro");
+  // Part 1: cycle through 3 topics × 3 questions each
+  const [p1TopicIdx, setP1TopicIdx] = useState(0);
+  const [p1QuestionIdx, setP1QuestionIdx] = useState(0);
+  // Part 2 & 3 share an index (cue card ↔ discussion set)
+  const [testPair, setTestPair] = useState(null); // {p2: SPEAKING_PART2[i], p3: SPEAKING_PART3[i], p1topics:[...]}
+  const [p3QuestionIdx, setP3QuestionIdx] = useState(0);
+  // Recording
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [error, setError] = useState("");
+  const isRecordingRef = useRef(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recognitionRef = useRef(null);
+  const finalTranscriptRef = useRef("");
+  // Answers log
+  const answersRef = useRef([]);
+  // Part 2 timers
+  const [prepLeft, setPrepLeft] = useState(60);
+  const [speakLeft, setSpeakLeft] = useState(120);
+  const prepTimerRef = useRef(null);
+  const speakTimerRef = useRef(null);
+  const [prepDone, setPrepDone] = useState(false);
+  // Report
+  const [report, setReport] = useState(null);
+  const [scoring, setScoring] = useState(false);
+  const mountedRef = useRef(true);
+
+  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+  const T2 = T; // use same theme
+
+  useEffect(()=>{
+    mountedRef.current = true;
+    // Pick 3 random Part 1 topics + 1 paired Part2/3
+    const shuffled = [...SPEAKING_PART1].sort(()=>0.5-Math.random()).slice(0,3);
+    const pairIdx = Math.floor(Math.random() * Math.min(SPEAKING_PART2.length, SPEAKING_PART3.length));
+    setTestPair({p1topics: shuffled, p2: SPEAKING_PART2[pairIdx], p3: SPEAKING_PART3[pairIdx]});
+    return ()=>{ mountedRef.current=false; clearInterval(prepTimerRef.current); clearInterval(speakTimerRef.current); };
+  },[]);
+
+  // ── Recording (same Deepgram/WebSpeech pattern as Sarah) ──
+  const startRecording = async () => {
+    cancelElevenLabs();
+    setError(""); setTranscript(""); finalTranscriptRef.current="";
+    if(navigator.mediaDevices?.getUserMedia){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        audioChunksRef.current = [];
+        const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":MediaRecorder.isTypeSupported("audio/mp4")?"audio/mp4":"audio/webm";
+        const mr = new MediaRecorder(stream,{mimeType});
+        mr.ondataavailable=(e)=>{if(e.data.size>0)audioChunksRef.current.push(e.data);};
+        mr.onstop=async()=>{
+          stream.getTracks().forEach(t=>t.stop());
+          const blob = new Blob(audioChunksRef.current,{type:mimeType});
+          if(blob.size<500){setTranscript("");setIsRecording(false);return;}
+          try{
+            const res = await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":mimeType},body:blob});
+            const data = await res.json();
+            const text = data.transcript||"";
+            setTranscript(text); setIsRecording(false);
+          }catch{setIsRecording(false);}
+        };
+        mr.start(); mediaRecorderRef.current=mr; isRecordingRef.current=true; setIsRecording(true); return;
+      }catch(err){
+        if(err.name==="NotAllowedError"){setError("Microphone access denied."); return;}
+      }
+    }
+    // WebSpeech fallback
+    if(!("webkitSpeechRecognition" in window)&&!("SpeechRecognition" in window)){setError("Voice input not supported. Please use Chrome."); return;}
+    isRecordingRef.current=true; setIsRecording(true);
+    const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+    const run=()=>{
+      if(!isRecordingRef.current)return;
+      const rec = new SR(); rec.lang="en-US"; rec.continuous=false; rec.interimResults=true;
+      const base = finalTranscriptRef.current; let uFinal="";
+      rec.onresult=(e)=>{uFinal="";let interim="";for(let i=0;i<e.results.length;i++){if(e.results[i].isFinal)uFinal+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}setTranscript([base,uFinal||interim].filter(s=>s.trim()).join(" ").trim());};
+      rec.onerror=(e)=>{if(e.error==="no-speech"||e.error==="aborted")return; isRecordingRef.current=false; setIsRecording(false);};
+      rec.onend=()=>{if(uFinal.trim())finalTranscriptRef.current=[base,uFinal].filter(s=>s.trim()).join(" ").trim();if(isRecordingRef.current)run();else setIsRecording(false);};
+      recognitionRef.current=rec; try{rec.start();}catch{requestAnimationFrame(()=>run());}
+    };
+    run();
+  };
+
+  const stopRecording = () => {
+    isRecordingRef.current=false;
+    if(mediaRecorderRef.current&&mediaRecorderRef.current.state!=="inactive"){mediaRecorderRef.current.stop(); setIsRecording(false); return;}
+    recognitionRef.current?.stop(); setIsRecording(false);
+  };
+
+  // ── Save current answer and advance ──
+  const saveAnswer = (partLabel, question) => {
+    const ans = transcript.trim()||finalTranscriptRef.current.trim();
+    answersRef.current.push({part:partLabel, question, answer:ans||"[No response recorded]"});
+    setTranscript(""); finalTranscriptRef.current="";
+  };
+
+  // ── Examiner reads question via ElevenLabs, then sets isSpeaking=false ──
+  const examinerSpeak = (text, onDone) => {
+    setIsSpeaking(true);
+    speakElevenLabs(stripForTTS(text), SARAH_VOICE_ID, ()=>{ if(mountedRef.current){setIsSpeaking(false); if(onDone)onDone();}});
+  };
+
+  // ── Part 1 helpers ──
+  const currentP1Topic = testPair?.p1topics[p1TopicIdx];
+  const currentP1Q = currentP1Topic?.questions[p1QuestionIdx];
+  const p1Total = 3*3; // 3 topics × 3 questions
+  const p1Done = p1TopicIdx*3 + p1QuestionIdx;
+
+  const advanceP1 = () => {
+    if(isRecording) stopRecording();
+    const q = currentP1Topic?.questions[p1QuestionIdx]?.q||"";
+    saveAnswer("Part 1",q);
+    const nextQ = p1QuestionIdx+1;
+    if(nextQ < (currentP1Topic?.questions.length||3)){
+      setP1QuestionIdx(nextQ);
+      setTranscript(""); setPhase("p1_asking");
+    } else {
+      const nextT = p1TopicIdx+1;
+      if(nextT < 3){
+        setP1TopicIdx(nextT); setP1QuestionIdx(0);
+        setTranscript(""); setPhase("p1_asking");
+      } else {
+        setPhase("p2_brief");
+      }
+    }
+  };
+
+  // ── Part 2 prep timer ──
+  const startPrepTimer = () => {
+    setPrepLeft(60); setPrepDone(false);
+    prepTimerRef.current = setInterval(()=>{
+      setPrepLeft(prev=>{
+        if(prev<=1){ clearInterval(prepTimerRef.current); setPrepDone(true); return 0; }
+        return prev-1;
+      });
+    },1000);
+  };
+
+  // ── Part 2 speak timer ──
+  const startSpeakTimer = () => {
+    setSpeakLeft(120);
+    speakTimerRef.current = setInterval(()=>{
+      setSpeakLeft(prev=>{
+        if(prev<=1){ clearInterval(speakTimerRef.current); if(mountedRef.current) finishP2(); return 0; }
+        return prev-1;
+      });
+    },1000);
+  };
+
+  const finishP2 = () => {
+    if(isRecordingRef.current) stopRecording();
+    clearInterval(speakTimerRef.current);
+    const ans = transcript.trim()||finalTranscriptRef.current.trim();
+    answersRef.current.push({part:"Part 2",question:testPair?.p2?.topic||"Long Turn",answer:ans||"[No response recorded]"});
+    setTranscript(""); finalTranscriptRef.current="";
+    setPhase("p3_brief");
+  };
+
+  // ── Part 3 advance ──
+  const advanceP3 = () => {
+    if(isRecording) stopRecording();
+    const q = testPair?.p3?.questions[p3QuestionIdx]?.q||"";
+    saveAnswer("Part 3",q);
+    const next = p3QuestionIdx+1;
+    if(next < (testPair?.p3?.questions.length||3)){
+      setP3QuestionIdx(next); setTranscript(""); setPhase("p3_asking");
+    } else {
+      setPhase("scoring");
+      generateReport();
+    }
+  };
+
+  // ── Score the test ──
+  const generateReport = async () => {
+    setScoring(true);
+    const fullTranscript = answersRef.current.map(a=>`[${a.part}] Examiner: "${a.question}"\nCandidate: "${a.answer}"`).join("\n\n");
+    const sys = `You are an expert IELTS Speaking examiner. Score this candidate's responses strictly according to official IELTS Speaking band descriptors.
+
+Return ONLY valid JSON in this exact format:
+{
+  "fluency": {"band": 6.5, "comment": "2-3 specific sentences about fluency and coherence with examples from their speech"},
+  "lexical": {"band": 6.0, "comment": "2-3 specific sentences about vocabulary range and accuracy with examples"},
+  "grammar": {"band": 6.5, "comment": "2-3 specific sentences about grammatical range and accuracy with examples"},
+  "pronunciation": {"band": 6.0, "comment": "2-3 sentences estimating pronunciation based on word choices and sentence construction"},
+  "overall": 6.5,
+  "summary": "3-4 sentences: overall performance, strongest area, priority to improve, honest band estimate",
+  "topTips": ["specific actionable tip 1", "specific actionable tip 2", "specific actionable tip 3"]
+}
+
+Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciation on spelling patterns, complexity of words attempted, and sentence rhythm visible in text.`;
+
+    try{
+      const res = await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:900,system:sys,
+          messages:[{role:"user",content:`Score this IELTS Speaking test transcript:\n\n${fullTranscript}`}]})});
+      const data = await res.json();
+      const raw = data?.content?.[0]?.text||"";
+      const clean = raw.replace(/```json|```/g,"").trim();
+      const parsed = JSON.parse(clean);
+      if(mountedRef.current){setReport(parsed); setPhase("results");}
+    }catch(e){
+      if(mountedRef.current){setReport({error:true}); setPhase("results");}
+    }
+    setScoring(false);
+  };
+
+  // ── Phase transitions that need examiner speech ──
+  useEffect(()=>{
+    if(phase==="p1_asking" && testPair){
+      const q = testPair.p1topics[p1TopicIdx]?.questions[p1QuestionIdx]?.q;
+      if(q) examinerSpeak(q);
+    }
+    if(phase==="p2_brief"){
+      examinerSpeak("Now I'd like you to talk about a topic for one to two minutes. You have one minute to prepare. Here is your task card.", ()=>{ setPhase("p2_prep"); startPrepTimer(); });
+    }
+    if(phase==="p2_speak"){
+      examinerSpeak("All right. Remember, you have one to two minutes. Please begin speaking now.", ()=>{ startSpeakTimer(); });
+    }
+    if(phase==="p3_brief"){
+      examinerSpeak("We've been talking about " + (testPair?.p2?.topic?.replace("Describe a ","")?.replace("Describe an ","")||"that topic") + ". I'd like to discuss some more general questions related to this.", ()=>{ setPhase("p3_asking"); });
+    }
+    if(phase==="p3_asking" && testPair){
+      const q = testPair.p3?.questions[p3QuestionIdx]?.q;
+      if(q) examinerSpeak(q);
+    }
+  },[phase, p1TopicIdx, p1QuestionIdx, p3QuestionIdx, testPair]);
+
+  // ── Progress bar helper ──
+  const Progress = () => {
+    const parts = [{label:"Part 1",active:["p1_brief","p1_asking","p1_answer"].includes(phase)},
+                   {label:"Part 2",active:["p2_brief","p2_prep","p2_speak"].includes(phase)},
+                   {label:"Part 3",active:["p3_brief","p3_asking","p3_answer"].includes(phase)}];
+    const done = phase==="results"||phase==="scoring";
+    return (
+      <div style={{display:"flex",gap:0,marginBottom:24,borderRadius:8,overflow:"hidden",border:`1px solid ${T2.border}`}}>
+        {parts.map((p,i)=>(
+          <div key={i} style={{flex:1,padding:"8px 0",textAlign:"center",background:p.active?"#dc2626":done?"#16a34a":"#f1f5f9",color:p.active||done?"white":T2.textMuted,fontSize:12,fontWeight:p.active?700:500,...sty,borderRight:i<2?`1px solid ${T2.border}`:"none",transition:"background 0.3s"}}>
+            {p.label}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // ── Mic button ──
+  const MicBtn = ({onDone, doneLabel="✓ Done — Next Question"}) => (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12,marginTop:20}}>
+      {transcript && <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"12px 16px",fontSize:13,color:"#166534",lineHeight:1.6,width:"100%",maxWidth:500,textAlign:"left",...sty}}><strong>Your answer:</strong> {transcript}</div>}
+      {error && <div style={{color:"#dc2626",fontSize:12,...sty}}>{error}</div>}
+      <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",justifyContent:"center"}}>
+        <button onClick={isRecording?stopRecording:startRecording}
+          style={{width:64,height:64,borderRadius:"50%",border:"none",background:isRecording?"#dc2626":"#7c3aed",color:"white",fontSize:24,cursor:"pointer",boxShadow:isRecording?"0 0 0 6px rgba(220,38,38,0.25)":"0 4px 12px rgba(124,58,237,0.4)",transition:"all 0.2s"}}>
+          {isRecording?"⏹":"🎤"}
+        </button>
+        {!isRecording && (
+          <button onClick={onDone}
+            style={{background:"#dc2626",color:"white",border:"none",borderRadius:10,padding:"14px 24px",fontSize:14,fontWeight:700,cursor:"pointer",...sty,boxShadow:"0 3px 10px rgba(220,38,38,0.3)"}}>
+            {doneLabel}
+          </button>
+        )}
+      </div>
+      {isRecording && <p style={{...sty,fontSize:12,color:"#7c3aed",margin:0,animation:"pulse 1.5s infinite"}}>🔴 Recording... tap ⏹ when done</p>}
+    </div>
+  );
+
+  // ── Examiner bubble ──
+  const ExaminerBubble = ({text}) => (
+    <div style={{display:"flex",alignItems:"flex-start",gap:12,marginBottom:20}}>
+      <div style={{width:40,height:40,borderRadius:"50%",background:"#1e293b",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🎓</div>
+      <div style={{background:"#1e293b",color:"white",borderRadius:"0 14px 14px 14px",padding:"12px 16px",fontSize:14,lineHeight:1.7,maxWidth:480,...sty}}>
+        {isSpeaking?<span style={{opacity:0.7}}>🔊 Speaking...</span>:text}
+      </div>
+    </div>
+  );
+
+  // ────────── RENDER ──────────
+  if(!testPair) return <div style={{textAlign:"center",padding:40,...sty,color:T2.textMuted}}>Preparing your test...</div>;
+
+  // INTRO
+  if(phase==="intro") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
+      <div style={{textAlign:"center",marginBottom:32}}>
+        <div style={{fontSize:48,marginBottom:12}}>🎓</div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:26,color:T2.text,margin:"0 0 8px"}}>IELTS Speaking Mock Test</h2>
+        <p style={{...sty,fontSize:14,color:T2.textMuted,lineHeight:1.7,margin:"0 0 24px"}}>A full simulated IELTS Speaking test — timed, scored, and evaluated on all four official criteria. <strong>No corrections will be given during the test.</strong></p>
+      </div>
+      <div style={{background:"#f8fafc",border:`1px solid ${T2.border}`,borderRadius:12,padding:20,marginBottom:24}}>
+        {[{part:"Part 1",desc:"Introduction & Interview",time:"4–5 minutes",detail:"Personal questions on familiar topics. Answer naturally in 2–3 sentences."},
+          {part:"Part 2",desc:"Individual Long Turn",time:"3–4 minutes",detail:"You'll receive a cue card. 1 minute to prepare, then speak for 1–2 minutes."},
+          {part:"Part 3",desc:"Two-Way Discussion",time:"4–5 minutes",detail:"Abstract questions related to your Part 2 topic. Give detailed, analytical answers."}
+        ].map((p,i)=>(
+          <div key={i} style={{display:"flex",gap:14,marginBottom:i<2?16:0,paddingBottom:i<2?16:0,borderBottom:i<2?`1px solid ${T2.border}`:"none"}}>
+            <div style={{width:36,height:36,borderRadius:"50%",background:"#dc2626",color:"white",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,flexShrink:0,...sty}}>{i+1}</div>
+            <div>
+              <div style={{...sty,fontWeight:700,fontSize:14,color:T2.text}}>{p.part} — {p.desc} <span style={{fontWeight:500,color:T2.textMuted}}>· {p.time}</span></div>
+              <div style={{...sty,fontSize:13,color:T2.textMuted,marginTop:2}}>{p.detail}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{background:"#fffbeb",border:"1px solid #fcd34d",borderRadius:10,padding:"12px 16px",marginBottom:24,...sty,fontSize:13,color:"#92400e",lineHeight:1.6}}>
+        ⚠️ <strong>Exam conditions apply.</strong> Find a quiet space. Speak clearly and in full sentences. The examiner will not correct you during the test — feedback comes at the end.
+      </div>
+      <button onClick={()=>{setPhase("p1_brief"); setTimeout(()=>{ examinerSpeak("Good morning. My name is Sarah. Could you tell me your full name, please?", ()=>setPhase("p1_name")); },300);}}
+        style={{width:"100%",background:"#dc2626",color:"white",border:"none",borderRadius:12,padding:"18px",fontSize:16,fontWeight:800,cursor:"pointer",...sty,boxShadow:"0 6px 20px rgba(220,38,38,0.3)"}}>
+        Start Mock Test →
+      </button>
+    </div>
+  );
+
+  // NAME COLLECTION (examiner intro)
+  if(phase==="p1_name") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
+      <Progress/>
+      <ExaminerBubble text="Good morning. My name is Sarah. Could you tell me your full name, please?" />
+      <MicBtn onDone={()=>{ saveAnswer("Part 1 Intro","Could you tell me your full name?"); setP1TopicIdx(0); setP1QuestionIdx(0); setPhase("p1_asking"); }} doneLabel="✓ Done — Start Part 1"/>
+    </div>
+  );
+
+  // PART 1
+  if(phase==="p1_brief"||phase==="p1_asking"||phase==="p1_answer") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
+      <Progress/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+        <span style={{...sty,fontSize:13,color:T2.textMuted}}>Part 1 · Topic: <strong style={{color:T2.text}}>{currentP1Topic?.topic}</strong></span>
+        <span style={{...sty,fontSize:12,color:T2.textMuted}}>Question {p1Done+1} of {p1Total}</span>
+      </div>
+      <div style={{background:"#f1f5f9",borderRadius:6,height:4,marginBottom:20}}><div style={{height:4,borderRadius:6,background:"#dc2626",width:`${((p1Done+1)/p1Total)*100}%`,transition:"width 0.3s"}}/></div>
+      <ExaminerBubble text={currentP1Q?.q||"..."} />
+      <MicBtn onDone={advanceP1}/>
+    </div>
+  );
+
+  // PART 2 BRIEF (examiner already speaking — just show transition)
+  if(phase==="p2_brief") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
+      <Progress/>
+      <ExaminerBubble text="Now I'd like you to talk about a topic for one to two minutes. You have one minute to prepare. Here is your task card."/>
+      <div style={{textAlign:"center",padding:20,...sty,color:T2.textMuted,fontSize:13}}>Preparing cue card...</div>
+    </div>
+  );
+
+  // PART 2 PREP
+  if(phase==="p2_prep") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
+      <Progress/>
+      <div style={{textAlign:"center",marginBottom:16}}>
+        <div style={{fontSize:44,fontWeight:900,color:prepLeft<=10?"#dc2626":"#1e293b",fontVariantNumeric:"tabular-nums",fontFamily:"Georgia,serif"}}>{prepLeft}s</div>
+        <div style={{...sty,fontSize:12,color:T2.textMuted}}>Preparation time remaining</div>
+      </div>
+      {/* Cue card */}
+      <div style={{background:"#fffbeb",border:"2px solid #f59e0b",borderRadius:12,padding:"20px 24px",marginBottom:20,boxShadow:"0 4px 16px rgba(0,0,0,0.06)"}}>
+        <div style={{...sty,fontSize:11,fontWeight:700,color:"#92400e",letterSpacing:"0.5px",textTransform:"uppercase",marginBottom:10}}>📋 Task Card</div>
+        <div style={{...sty,fontSize:15,fontWeight:700,color:"#1e293b",marginBottom:12}}>{testPair.p2.topic}</div>
+        <div style={{...sty,fontSize:13,color:"#44403c",lineHeight:1.9,whiteSpace:"pre-line"}}>{testPair.p2.cue}</div>
+      </div>
+      <div style={{...sty,fontSize:12,color:T2.textMuted,textAlign:"center",marginBottom:12}}>You may make notes mentally. When ready, tap the button below — or wait for the timer.</div>
+      {(prepDone||prepLeft<=0) && (
+        <button onClick={()=>setPhase("p2_speak")}
+          style={{width:"100%",background:"#dc2626",color:"white",border:"none",borderRadius:10,padding:16,fontSize:14,fontWeight:700,cursor:"pointer",...sty,animation:"pulse 1s infinite"}}>
+          🎤 Start Speaking Now
+        </button>
+      )}
+      {!prepDone && prepLeft>0 && (
+        <button onClick={()=>{ clearInterval(prepTimerRef.current); setPrepDone(true); setPhase("p2_speak"); }}
+          style={{width:"100%",background:"#f8fafc",color:T2.textMid,border:`1px solid ${T2.border}`,borderRadius:10,padding:14,fontSize:14,fontWeight:600,cursor:"pointer",...sty}}>
+          I'm ready to speak early
+        </button>
+      )}
+    </div>
+  );
+
+  // PART 2 SPEAK
+  if(phase==="p2_speak") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
+      <Progress/>
+      <ExaminerBubble text="All right. Remember, you have one to two minutes. Please begin speaking now."/>
+      <div style={{textAlign:"center",marginBottom:16}}>
+        <div style={{fontSize:44,fontWeight:900,color:speakLeft<=20?"#dc2626":"#16a34a",fontVariantNumeric:"tabular-nums",fontFamily:"Georgia,serif"}}>{Math.floor(speakLeft/60)}:{String(speakLeft%60).padStart(2,"0")}</div>
+        <div style={{...sty,fontSize:12,color:T2.textMuted}}>Speaking time · Stop at any time after 1 minute</div>
+      </div>
+      {/* Cue card (small reminder) */}
+      <div style={{background:"#fffbeb",border:"1px solid #fcd34d",borderRadius:10,padding:"12px 16px",marginBottom:16,fontSize:12,...sty,color:"#78350f"}}>
+        <strong>{testPair.p2.topic}</strong><br/><span style={{opacity:0.8}}>{testPair.p2.cue.split("\n").slice(0,3).join(" · ")}</span>
+      </div>
+      {transcript && <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"10px 14px",fontSize:13,color:"#166534",lineHeight:1.6,marginBottom:12,...sty}}>{transcript}</div>}
+      <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+        <button onClick={isRecording?stopRecording:startRecording}
+          style={{width:60,height:60,borderRadius:"50%",border:"none",background:isRecording?"#dc2626":"#7c3aed",color:"white",fontSize:22,cursor:"pointer",boxShadow:isRecording?"0 0 0 6px rgba(220,38,38,0.25)":"0 4px 12px rgba(124,58,237,0.4)"}}>
+          {isRecording?"⏹":"🎤"}
+        </button>
+        {speakLeft<=120&&speakLeft>0&&(
+          <button onClick={finishP2}
+            style={{background:"#dc2626",color:"white",border:"none",borderRadius:10,padding:"14px 20px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
+            ✓ I've Finished
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  // PART 3
+  if(phase==="p3_brief"||phase==="p3_asking") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
+      <Progress/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+        <span style={{...sty,fontSize:13,color:T2.textMuted}}>Part 3 · Discussion</span>
+        <span style={{...sty,fontSize:12,color:T2.textMuted}}>Question {p3QuestionIdx+1} of {testPair?.p3?.questions.length||3}</span>
+      </div>
+      <ExaminerBubble text={testPair?.p3?.questions[p3QuestionIdx]?.q||"..."} />
+      <MicBtn onDone={advanceP3} doneLabel={p3QuestionIdx<(testPair?.p3?.questions.length||3)-1?"✓ Done — Next Question":"✓ Done — Finish Test"}/>
+    </div>
+  );
+
+  // SCORING
+  if(phase==="scoring") return (
+    <div style={{maxWidth:560,margin:"0 auto",padding:"60px 24px",textAlign:"center"}}>
+      <div style={{fontSize:48,marginBottom:16}}>⏳</div>
+      <h3 style={{fontFamily:"Georgia,serif",fontSize:22,color:T2.text,marginBottom:8}}>Scoring your test...</h3>
+      <p style={{...sty,fontSize:14,color:T2.textMuted,lineHeight:1.6}}>Your responses are being evaluated against official IELTS Speaking band descriptors. This takes about 15 seconds.</p>
+      <div style={{marginTop:24,display:"flex",justifyContent:"center",gap:6}}>
+        {["Fluency","Lexical Resource","Grammar","Pronunciation"].map((c,i)=>(
+          <div key={i} style={{background:T2.border,borderRadius:4,padding:"4px 10px",fontSize:11,...sty,color:T2.textMuted,animation:`pulse ${1+i*0.2}s infinite`}}>{c}</div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // RESULTS
+  if(phase==="results") return (
+    <div style={{maxWidth:600,margin:"0 auto",padding:"24px 24px 80px"}}>
+      <div style={{textAlign:"center",marginBottom:28}}>
+        <div style={{fontSize:40,marginBottom:8}}>📊</div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T2.text,margin:"0 0 6px"}}>Your Mock Test Results</h2>
+        {report&&!report.error&&<div style={{display:"inline-block",background:"#dc2626",color:"white",borderRadius:20,padding:"6px 20px",fontSize:18,fontWeight:900,fontFamily:"Georgia,serif",boxShadow:"0 4px 14px rgba(220,38,38,0.3)"}}>Overall Band {report.overall}</div>}
+      </div>
+      {report?.error ? (
+        <div style={{textAlign:"center",padding:24,...sty,color:T2.textMuted}}>Could not generate report. Please try again.</div>
+      ) : report && (
+        <>
+          {/* 4 Criteria */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+            {[
+              {key:"fluency",label:"Fluency & Coherence",color:"#7c3aed"},
+              {key:"lexical",label:"Lexical Resource",color:"#0891b2"},
+              {key:"grammar",label:"Grammatical Range",color:"#16a34a"},
+              {key:"pronunciation",label:"Pronunciation",color:"#ea580c"},
+            ].map(c=>(
+              <div key={c.key} style={{background:"white",border:`1px solid ${T2.border}`,borderRadius:12,padding:16,boxShadow:T2.shadow}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                  <span style={{...sty,fontSize:12,fontWeight:700,color:c.color}}>{c.label}</span>
+                  <span style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:900,color:c.color}}>{report[c.key]?.band}</span>
+                </div>
+                <div style={{background:"#f1f5f9",borderRadius:4,height:4,marginBottom:8}}><div style={{height:4,borderRadius:4,background:c.color,width:`${((report[c.key]?.band||0)/9)*100}%`}}/></div>
+                <p style={{...sty,fontSize:12,color:T2.textMid,lineHeight:1.6,margin:0}}>{report[c.key]?.comment}</p>
+              </div>
+            ))}
+          </div>
+          {/* Summary */}
+          <div style={{background:"#fafafa",border:`1px solid ${T2.border}`,borderRadius:12,padding:20,marginBottom:16}}>
+            <h4 style={{...sty,fontSize:14,fontWeight:700,color:T2.text,margin:"0 0 10px"}}>📝 Examiner's Summary</h4>
+            <p style={{...sty,fontSize:13,color:T2.textMid,lineHeight:1.75,margin:0}}>{report.summary}</p>
+          </div>
+          {/* Top tips */}
+          <div style={{background:"#fffbeb",border:"1px solid #fcd34d",borderRadius:12,padding:20,marginBottom:24}}>
+            <h4 style={{...sty,fontSize:14,fontWeight:700,color:"#92400e",margin:"0 0 12px"}}>🎯 Top 3 Things to Work On</h4>
+            {report.topTips?.map((tip,i)=>(
+              <div key={i} style={{display:"flex",gap:10,marginBottom:i<2?10:0}}>
+                <span style={{...sty,fontWeight:800,color:"#dc2626",fontSize:14,flexShrink:0}}>{i+1}.</span>
+                <span style={{...sty,fontSize:13,color:"#78350f",lineHeight:1.6}}>{tip}</span>
+              </div>
+            ))}
+          </div>
+          {/* Your answers */}
+          <details style={{marginBottom:16}}>
+            <summary style={{...sty,fontSize:13,fontWeight:700,color:T2.text,cursor:"pointer",padding:"12px 16px",background:"#f8fafc",borderRadius:8,border:`1px solid ${T2.border}`,listStyle:"none"}}>📋 View Your Full Transcript</summary>
+            <div style={{marginTop:8,border:`1px solid ${T2.border}`,borderRadius:8,overflow:"hidden"}}>
+              {answersRef.current.map((a,i)=>(
+                <div key={i} style={{padding:"12px 16px",borderBottom:i<answersRef.current.length-1?`1px solid ${T2.border}`:"none"}}>
+                  <div style={{...sty,fontSize:11,fontWeight:700,color:"#dc2626",marginBottom:3,textTransform:"uppercase",letterSpacing:"0.3px"}}>{a.part}</div>
+                  <div style={{...sty,fontSize:13,fontWeight:600,color:T2.text,marginBottom:4}}>Q: {a.question}</div>
+                  <div style={{...sty,fontSize:13,color:T2.textMid,lineHeight:1.6}}>{a.answer}</div>
+                </div>
+              ))}
+            </div>
+          </details>
+        </>
+      )}
+      <button onClick={()=>{ answersRef.current=[]; setPhase("intro"); setP1TopicIdx(0); setP1QuestionIdx(0); setP3QuestionIdx(0); setReport(null); setTranscript(""); const shuffled=[...SPEAKING_PART1].sort(()=>0.5-Math.random()).slice(0,3); const pairIdx=Math.floor(Math.random()*Math.min(SPEAKING_PART2.length,SPEAKING_PART3.length)); setTestPair({p1topics:shuffled,p2:SPEAKING_PART2[pairIdx],p3:SPEAKING_PART3[pairIdx]}); }}
+        style={{width:"100%",background:"#f1f5f9",color:T2.textMid,border:`1px solid ${T2.border}`,borderRadius:10,padding:14,fontSize:14,fontWeight:600,cursor:"pointer",...sty}}>
+        🔄 Take Another Test
+      </button>
+    </div>
+  );
+
+  return null;
+};
+
 const SpeakingPage = ({isPro, onUpgrade, session, onAuth}) => {
   const [tab, setTab] = useState("chat");
   const [expandedP1, setExpandedP1] = useState(null);
@@ -4613,6 +5116,7 @@ const SpeakingPage = ({isPro, onUpgrade, session, onAuth}) => {
   const [showAnswer, setShowAnswer] = useState({});
 
   const tabs = [
+    {id:"mock",label:"🎓 Mock Test",free:true},
     {id:"chat",label:"🎤 Speaking Practice",free:true},
     {id:"examples",label:"📝 Models & Tips",free:true},
     {id:"vocabulary",label:"📚 Vocabulary",free:false},
@@ -4637,6 +5141,11 @@ const SpeakingPage = ({isPro, onUpgrade, session, onAuth}) => {
           </button>
         ))}
       </div>
+
+      {/* MOCK TEST TAB */}
+      {tab==="mock"&&(
+        <MockSpeakingTest isPro={isPro} onUpgrade={onUpgrade} session={session} onAuth={onAuth}/>
+      )}
 
       {/* EXAMPLES TAB */}
       {tab==="examples"&&(
