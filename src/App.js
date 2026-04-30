@@ -10139,6 +10139,21 @@ export default function IELTSBot(){
     return()=>window.removeEventListener("scroll",onScroll);
   },[]);
 
+  // ── Nav scroll hint: hide once user swipes the nav ──
+  useEffect(()=>{
+    const navEl=document.querySelector(".nav-grouped");
+    const hint=document.querySelector(".nav-scroll-hint");
+    if(!navEl||!hint)return;
+    const onNavScroll=()=>{
+      // RTL: scrollLeft is 0 or negative; LTR: scrollLeft is positive
+      const scrolled=Math.abs(navEl.scrollLeft);
+      if(scrolled>20) hint.classList.add("hidden");
+      else hint.classList.remove("hidden");
+    };
+    navEl.addEventListener("scroll",onNavScroll,{passive:true});
+    return()=>navEl.removeEventListener("scroll",onNavScroll);
+  },[mainView]);
+
   // ── Initialize Paddle.js ──
   useEffect(()=>{
     if(window.Paddle) return; // already loaded
@@ -10531,8 +10546,22 @@ export default function IELTSBot(){
 
         {/* TIER 2 — Red navbar: grouped navigation */}
         <div style={{background:T.primary}}>
-          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px",position:"relative"}}>
+            {/* Scroll hint fade — mobile only */}
+            <div className="nav-scroll-hint" style={{position:"absolute",right:0,top:0,bottom:0,width:48,background:"linear-gradient(to right, transparent, rgba(180,0,0,0.85))",pointerEvents:"none",zIndex:2,borderRadius:"0 4px 4px 0"}}/>
             {/* Desktop: grouped with dividers */}
+            <div style={{position:"relative"}}>
+            {/* Scroll hint — flips side based on language direction */}
+            <div className="nav-scroll-hint" style={{
+              position:"absolute",
+              ...(uiLang==="ar"
+                ? {left:0, background:"linear-gradient(to left, transparent, rgba(180,0,0,0.95))", justifyContent:"flex-start", paddingLeft:6}
+                : {right:0, background:"linear-gradient(to right, transparent, rgba(180,0,0,0.95))", justifyContent:"flex-end", paddingRight:6}
+              ),
+              top:0,bottom:0,width:48,zIndex:10,pointerEvents:"none",display:"flex",alignItems:"center"
+            }}>
+              <span style={{color:"rgba(255,255,255,0.9)",fontSize:18,lineHeight:1}}>{uiLang==="ar"?"‹":"›"}</span>
+            </div>
             <div className="nav-tabs nav-grouped" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"nowrap",overflowX:"auto"}}>
               {/* Always visible */}
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
@@ -10566,6 +10595,7 @@ export default function IELTSBot(){
               <MainTab label={UI[uiLang].studyplan} active={mainView==="studyplan"} onClick={()=>{switchView("studyplan");trackEvent("nav_click",{page:"studyplan"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
+            </div>{/* end scroll hint wrapper */}
           </div>
         </div>
       </div>
@@ -11327,11 +11357,13 @@ export default function IELTSBot(){
             padding-bottom: 2px !important;
           }
           .nav-grouped::-webkit-scrollbar { display: none !important; }
-          .nav-grouped button { font-size: 11px !important; padding: 6px 8px !important; white-space: nowrap !important; min-height: 38px !important; height: 38px !important; }
+          .nav-grouped button { font-size: 13px !important; padding: 6px 10px !important; white-space: nowrap !important; min-height: 40px !important; height: 40px !important; }
           /* Group labels smaller on mobile */
-          .nav-grouped span { font-size: 8px !important; padding: 0 3px !important; }
+          .nav-grouped span { font-size: 9px !important; padding: 0 3px !important; }
           /* Dividers slimmer */
           .nav-grouped > div[style*="width:1"] { margin: 0 2px !important; }
+          /* Scroll hint — desktop hides it */
+          .nav-scroll-hint { display: none; }
 
           /* HERO */
           .hero-inner { flex-direction: column-reverse !important; min-height: auto !important; padding: 20px 16px 24px !important; }
@@ -11379,6 +11411,10 @@ export default function IELTSBot(){
 
         @media (max-width: 480px) {
           .features-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+        }
+        @media (max-width: 768px) {
+          .nav-scroll-hint { display: flex !important; }
+          .nav-scroll-hint.hidden { display: none !important; }
         }
 
         @media (max-width: 380px) {
