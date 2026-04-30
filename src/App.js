@@ -3915,12 +3915,26 @@ const SARAH_VOICE_ID="6fZce9LFNG3iEITDfqZZ";
 const LINDA_VOICE_ID="8vf2Pg7VZD0Piv8GA8v9";
 
 // ElevenLabs TTS — falls back to browser TTS if API fails
+// Strip Arabic and markdown before sending to ElevenLabs
+const stripForEL=(text)=>text
+  .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+/g," ") // remove Arabic
+  .replace(/\[.*?\]/g," ")   // remove [bracketed content]
+  .replace(/\*\*/g,"").replace(/\*/g,"")
+  .replace(/#{1,6}\s*/g,"")
+  .replace(/_{2,}/g," blank ")
+  .replace(/:\s+/g,". ")
+  .replace(/—\s*/g,". ")
+  .replace(/\b(\w+)\s+\1\b/gi,"$1") // remove immediate duplicates
+  .replace(/\s+/g," ").trim();
+
 const speakElevenLabs=async(text,voiceId,onEnd)=>{
+  const clean=stripForEL(text);
+  if(!clean)return;
   try{
     const res=await fetch("/api/tts",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({text,voiceId}),
+      body:JSON.stringify({text:clean,voiceId}),
     });
     if(!res.ok)throw new Error("TTS API failed");
     const blob=await res.blob();
@@ -3928,28 +3942,25 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
     const audio=new Audio(url);
     audio.onended=()=>{URL.revokeObjectURL(url);if(onEnd)onEnd();};
     audio.onerror=()=>{URL.revokeObjectURL(url);if(onEnd)onEnd();};
-    // Store reference so we can cancel if needed
     window._currentELAudio=audio;
     await audio.play();
   }catch(e){
-    // Fallback to browser TTS
     speakTextFallback(text,onEnd);
   }
 };
 
 const cancelElevenLabs=()=>{
   if(window._currentELAudio){
-    window._currentELAudio.pause();
-    window._currentELAudio.src="";
+    try{window._currentELAudio.pause();window._currentELAudio.src="";}catch(e){}
     window._currentELAudio=null;
   }
-  cancelElevenLabs();
+  try{window.speechSynthesis?.cancel();}catch(e){}
 };
 
 const speakTextFallback=(text,onEnd)=>{
   if(!window.speechSynthesis)return;
   const doSpeak=()=>{
-    cancelElevenLabs();
+    window.speechSynthesis.cancel();
     const utt=new SpeechSynthesisUtterance(text);
     utt.lang="en-GB";utt.rate=0.88;utt.pitch=1.1;
     const voices=window.speechSynthesis.getVoices();
@@ -4249,8 +4260,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
         mr.onstop=async()=>{
           stream.getTracks().forEach(t=>t.stop());
           const blob=new Blob(audioChunksRef.current,{type:mimeType});
-          if(blob.size<1000){setTranscript("");return;}
-          setIsThinking(true);
+          if(blob.size<1000){setTranscript("");setIsRecording(false);return;}
           try{
             const res=await fetch("/api/transcribe",{
               method:"POST",
@@ -4260,11 +4270,13 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
             const data=await res.json();
             const text=data.transcript||"";
             setTranscript(text);
+            setIsRecording(false);
             if(text.trim())sendMessage(text);
+            else setError("Couldn't hear that clearly. Please try again or type.");
           }catch(err){
+            setIsRecording(false);
             setError("Transcription failed. Please type instead.");
           }
-          setIsThinking(false);
         };
         mr.start();
         mediaRecorderRef.current=mr;
@@ -8954,16 +8966,19 @@ const LindaPage=({isPro,onUpgrade,uiLang="en"})=>{
 
     const phaseInstructions={
       0:`PHASE 1 — VOCABULARY:
-For EACH word, follow this EXACT format — speak naturally, include Arabic for ALL levels:
-1. Say the word clearly: "${instr.vocabIntro}: [WORD]" — then immediately add the Arabic meaning: "[WORD] ${instr.vocabMeaning}: [Arabic meaning]"
-2. Say the example: "${instr.vocabExample}: [example sentence]" — say it ONCE only, naturally.
-3. Say: "${instr.vocabRepeat}: [WORD]" — STOP and wait.
-4. After correct repeat: "${instr.vocabAgain} [WORD]" — wait again.
-5. After second correct repeat: "${instr.vocabNext}" — move immediately.
-${isA1A2?`IMPORTANT FOR A1/A2: Keep ALL surrounding words simple. If you explain anything, use simple Arabic sentences. Never use complex English words when teaching basic vocabulary.`:""}
+You are an enthusiastic English teacher. Teach in English — Arabic appears only as a tiny translation hint in brackets.
+
+For EACH word follow this format exactly:
+1. Warm greeting + introduce the lesson topic in ONE sentence (first word only). Example: "Welcome! Today we're learning about greetings and introductions. Let's start!"
+2. Introduce word: "Our first word is [WORD] — it means (${isLowLevel?"[Arabic translation]":"[meaning]"}). For example: [example sentence]. Now repeat after me: [WORD]"
+3. After correct repeat: "Excellent! One more time: [WORD]"
+4. After second correct repeat: "Perfect! Next word:" — move immediately.
+5. If wrong: "Almost! Try again: [WORD]"
+
+IMPORTANT: Write Arabic only inside small brackets like (يعني: مرحبا) — never write full Arabic sentences. Keep 80% of your message in English. Be warm and enthusiastic.
 Vocabulary:
 ${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
-When ALL words done: "${instr.vocabDone}" — immediately present the first fill-in-the-blank.`,
+When ALL words done: "${instr.vocabDone}" — immediately present first fill-in-the-blank.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
 Present ONE exercise at a time using this format:
@@ -9144,16 +9159,19 @@ ALWAYS:
         mr.onstop=async()=>{
           stream.getTracks().forEach(t=>t.stop());
           const blob=new Blob(audioChunksRef.current,{type:mimeType});
-          if(blob.size<1000){setTranscript("");return;}
-          setIsThinking(true);
+          if(blob.size<1000){setTranscript("");setIsRecording(false);return;}
           try{
             const res=await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":mimeType},body:blob});
             const data=await res.json();
             const text=data.transcript||"";
             setTranscript(text);
+            setIsRecording(false);
             if(text.trim())sendMessage(text);
-          }catch(err){setError("Transcription failed. Please type instead.");}
-          setIsThinking(false);
+            else setError("Couldn't hear that. Please try again or type.");
+          }catch(err){
+            setIsRecording(false);
+            setError("Transcription failed. Please type instead.");
+          }
         };
         mr.start();
         mediaRecorderRef.current=mr;
@@ -10003,6 +10021,26 @@ const PronunciationPage=({uiLang="ar",isPro=false,onUpgrade})=>{
     </div>
   );
 };
+
+// ── ERROR BOUNDARY ──────────────────────────────
+class ErrorBoundary extends React.Component{
+  constructor(props){super(props);this.state={hasError:false};}
+  static getDerivedStateFromError(){return{hasError:true};}
+  componentDidCatch(e){console.error("App error:",e);cancelElevenLabs();}
+  render(){
+    if(this.state.hasError)return(
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100vh",fontFamily:"'Cairo',system-ui",gap:16}}>
+        <div style={{fontSize:32}}>😕</div>
+        <div style={{fontSize:16,color:"#333"}}>Something went wrong. Please refresh the page.</div>
+        <button onClick={()=>{this.setState({hasError:false});window.location.reload();}}
+          style={{padding:"10px 24px",background:"#c0392b",color:"white",border:"none",borderRadius:8,fontSize:14,cursor:"pointer"}}>
+          Refresh
+        </button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
 
 // ── MAIN APP ──────────────────────────────────
 export default function IELTSBot(){
