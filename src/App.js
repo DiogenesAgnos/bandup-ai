@@ -11250,7 +11250,7 @@ export default function IELTSBot(){
           <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:uiLang==="ar"?"rtl":"ltr",textAlign:"center"}}>
 
             {/* ── Launch Offer Sticker ── */}
-            <div style={{display:"inline-flex",flexDirection:"column",alignItems:"center",background:"linear-gradient(135deg,#fbbf24,#f59e0b)",borderRadius:16,padding:"10px 24px 12px",marginBottom:28,boxShadow:"0 6px 24px rgba(0,0,0,0.25), 0 0 0 3px rgba(255,255,255,0.25)",position:"relative",border:"2px solid rgba(255,255,255,0.5)"}}>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",background:"linear-gradient(135deg,#fbbf24,#f59e0b)",borderRadius:16,padding:"10px 24px 12px",marginBottom:28,boxShadow:"0 6px 24px rgba(0,0,0,0.25), 0 0 0 3px rgba(255,255,255,0.25)",position:"relative",border:"2px solid rgba(255,255,255,0.5)",maxWidth:420,margin:"0 auto 28px"}}>
               {/* Ribbon label */}
               <span style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:13,color:"#7f1200",letterSpacing:"0.5px",textTransform:"uppercase",marginBottom:4}}>
                 {uiLang==="ar"?"🔥 عرض الإطلاق — وقت محدود":"🔥 Launch Offer — Limited Time"}
