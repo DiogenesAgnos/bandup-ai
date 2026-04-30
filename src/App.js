@@ -3911,7 +3911,7 @@ const stripForTTS=(text)=>text
   .replace(/[^\w\s.,!?;:'"-]/g," ")
   .replace(/\s+/g," ").trim();
 
-const SARAH_VOICE_ID="6fZce9LFNG3iEITDfqZZ";
+const SARAH_VOICE_ID="8vf2Pg7VZD0Piv8GA8v9";
 const LINDA_VOICE_ID="8vf2Pg7VZD0Piv8GA8v9";
 
 // ElevenLabs TTS — falls back to browser TTS if API fails
