@@ -26,6 +26,55 @@ const fetchProStatus = async (email) => {
   } catch { return false; }
 };
 
+// ── Device session helpers (max 2 concurrent devices per Pro account) ──
+const MAX_DEVICES = 2;
+
+const generateDeviceToken = () => {
+  const existing = localStorage.getItem("ef_device_token");
+  if(existing) return existing;
+  const token = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)+Date.now().toString(36);
+  localStorage.setItem("ef_device_token", token);
+  return token;
+};
+
+const registerDevice = async (email) => {
+  if(!email) return;
+  const token = generateDeviceToken();
+  try {
+    const { data } = await supabase.from("profiles").select("active_sessions").eq("email", email.toLowerCase().trim()).single();
+    let sessions = Array.isArray(data?.active_sessions) ? data.active_sessions : [];
+    // If token already registered, nothing to do
+    if(sessions.includes(token)) return;
+    // Add new token, keep max MAX_DEVICES (drop oldest if over limit)
+    sessions = [...sessions, token];
+    if(sessions.length > MAX_DEVICES) sessions = sessions.slice(sessions.length - MAX_DEVICES);
+    await supabase.from("profiles").update({ active_sessions: sessions }).eq("email", email.toLowerCase().trim());
+  } catch(e) { console.warn("Session register failed", e); }
+};
+
+const unregisterDevice = async (email) => {
+  if(!email) return;
+  const token = localStorage.getItem("ef_device_token");
+  if(!token) return;
+  try {
+    const { data } = await supabase.from("profiles").select("active_sessions").eq("email", email.toLowerCase().trim()).single();
+    const sessions = (Array.isArray(data?.active_sessions) ? data.active_sessions : []).filter(t => t !== token);
+    await supabase.from("profiles").update({ active_sessions: sessions }).eq("email", email.toLowerCase().trim());
+  } catch(e) { console.warn("Session unregister failed", e); }
+};
+
+const checkDeviceSession = async (email) => {
+  if(!email) return true; // no session check for free users
+  const token = localStorage.getItem("ef_device_token");
+  if(!token) return false;
+  try {
+    const { data } = await supabase.from("profiles").select("active_sessions,is_pro").eq("email", email.toLowerCase().trim()).single();
+    if(!data?.is_pro) return true; // free users — no restriction
+    const sessions = Array.isArray(data?.active_sessions) ? data.active_sessions : [];
+    return sessions.includes(token);
+  } catch { return true; } // fail open — don't block on network error
+};
+
 const STRIPE_CONFIGURED = true;
 const PADDLE_TOKEN = "live_ec699d44651befed9506c7e7bd2";
 const PADDLE_PRICE_ID = "pri_01kmz7cbtkca44p95qp25jw59z";
@@ -623,6 +672,8 @@ const AuthModal=({onClose,onSuccess})=>{
         if(error){ setError(error.message); setLoading(false); return; }
         if(rememberMe){ try{ localStorage.setItem("bandup_saved_email", email.toLowerCase().trim()); }catch{} }
         else{ try{ localStorage.removeItem("bandup_saved_email"); }catch{} }
+        generateDeviceToken(); // ensure token exists before registering
+        await registerDevice(email.trim());
         setLoading(false);
         onSuccess(toSession(data.user));
         return;
@@ -10695,6 +10746,7 @@ export default function IELTSBot(){
   const lastScrollY=useRef(0);
   const analyzeRef=useRef(null);
   const [proUser, setProUser] = useState(false);
+  const [deviceWarning, setDeviceWarning] = useState(false);
   const [heroTab, setHeroTab] = useState(0);
   const usesLeft = FREE_USES_LIMIT - uses;
 
@@ -10706,7 +10758,10 @@ export default function IELTSBot(){
         const sess = toSession(sbSess.user);
         setSession(sess);
         setUses(getStoredUses(sess.email));
-        fetchProStatus(sess.email).then(setProUser);
+        fetchProStatus(sess.email).then(isPro => {
+          setProUser(isPro);
+          if(isPro) checkDeviceSession(sess.email).then(valid => { if(!valid) setDeviceWarning(true); });
+        });
       }
     });
     // Listen for login/logout events
@@ -10715,7 +10770,10 @@ export default function IELTSBot(){
         const sess = toSession(sbSess.user);
         setSession(sess);
         setUses(getStoredUses(sess.email));
-        fetchProStatus(sess.email).then(setProUser);
+        fetchProStatus(sess.email).then(isPro => {
+          setProUser(isPro);
+          if(isPro) checkDeviceSession(sess.email).then(valid => { if(!valid) setDeviceWarning(true); });
+        });
       } else {
         setSession(null);
         setProUser(false);
@@ -10834,6 +10892,7 @@ export default function IELTSBot(){
   };
 
   const handleSignOut=async()=>{
+    if(session?.email) await unregisterDevice(session.email);
     await supabase.auth.signOut();
     setSession(null);
     setUses(0);
@@ -11230,6 +11289,23 @@ export default function IELTSBot(){
           </div>
         </div>
       </div>
+
+      {/* ── Device session warning banner ── */}
+      {deviceWarning&&proUser&&(
+        <div style={{background:"#fef3c7",borderBottom:"1px solid #fcd34d",padding:"10px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,direction:uiLang==="ar"?"rtl":"ltr"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>⚠️</span>
+            <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#92400e",fontWeight:600}}>
+              {uiLang==="ar"
+                ?"يبدو أن حسابك مفتوح على أكثر من جهازين. إذا لم تكن أنت، يرجى تغيير كلمة المرور."
+                :"Your Pro account appears to be active on more than 2 devices. If this wasn't you, please change your password."}
+            </span>
+          </div>
+          <button onClick={()=>setDeviceWarning(false)} style={{background:"transparent",border:"1px solid #f59e0b",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:600,color:"#92400e",cursor:"pointer",fontFamily:"'Cairo',system-ui",flexShrink:0}}>
+            {uiLang==="ar"?"تجاهل":"Dismiss"}
+          </button>
+        </div>
+      )}
 
       {/* Writing sub-nav */}
       {["analyze","practice","grammar"].includes(mainView)&&(
