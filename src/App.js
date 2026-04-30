@@ -9938,41 +9938,16 @@ const PronunciationPage=({uiLang="ar",isPro=false,onUpgrade})=>{
   const playWord=async(word)=>{
     if(speaking===word)return;
     setSpeaking(word);
-    // Try cached URL first
-    let url=audioCache[word];
-    if(!url){
-      try{
-        const res=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-        if(res.ok){
-          const data=await res.json();
-          const phonetics=(data[0]?.phonetics||[]);
-          const found=phonetics.find(p=>p.audio&&p.audio.includes("uk"))||
-                       phonetics.find(p=>p.audio&&p.audio.includes("us"))||
-                       phonetics.find(p=>p.audio&&p.audio.length>0);
-          if(found?.audio){
-            url=found.audio.startsWith("http")?found.audio:"https:"+found.audio;
-            setAudioCache(prev=>({...prev,[word]:url}));
-          }
-        }
-      }catch(e){}
-    }
-    if(url){
-      try{
-        if(audioRef.current){audioRef.current.pause();audioRef.current=null;}
-        const audio=new Audio(url);
-        audioRef.current=audio;
-        audio.onended=()=>setSpeaking("");
-        audio.onerror=()=>{
-          fallbackSpeak(word);
-        };
-        await audio.play();
-        return;
-      }catch(e){}
-    }
-    fallbackSpeak(word);
+    await speakElevenLabs(word,SARAH_VOICE_ID,()=>setSpeaking(""));
   };
 
-  const fallbackSpeak=(word)=>{
+  const fallbackSpeak=async(word)=>{
+    // Try ElevenLabs (Sarah's voice) first
+    try{
+      await speakElevenLabs(word,SARAH_VOICE_ID,()=>setSpeaking(""));
+      return;
+    }catch(e){}
+    // Final fallback: browser TTS
     if(!window.speechSynthesis){setSpeaking("");return;}
     cancelElevenLabs();
     const utt=new SpeechSynthesisUtterance(word);
