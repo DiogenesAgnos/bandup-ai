@@ -7868,7 +7868,7 @@ const UI = {
     // Nav
     home:"🏠 الرئيسية", writing:"✍️ الكتابة", vocab:"📝 المفردات", placement:"📋 تحديد المستوى", speaking:"🗣️ تدريب المحادثة",
     reading:"📖 القراءة", game:"🎮 ألعاب", toolkit:"📚 أدوات",
-    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق", studyplan:"🗺️ الخطة الدراسية", teacher:"👩‍🏫 معلمتك",
+    progress:"📈 تقدمي", contact:"✉️ اتصل بنا", pronunciation:"🔊 النطق", studyplan:"🗺️ الخطة الدراسية", teacher:"👩‍🏫 تعلّمي مع ليندا",
     // Account
     signIn:"تسجيل الدخول ←", getPro:"🔓 احصل على Pro", signOut:"تسجيل الخروج",
     manageSubscription:"إدارة الاشتراك",
@@ -7924,7 +7924,7 @@ const UI = {
     // Nav
     home:"🏠 Home", writing:"✍️ Writing", vocab:"📝 Vocabulary", placement:"📋 Placement Test", speaking:"🗣️ Speaking Practice",
     reading:"📖 Reading", game:"🎮 Games", toolkit:"📚 Toolkit",
-    progress:"📈 Progress", contact:"✉️ Contact", pronunciation:"🔊 Pronunciation", studyplan:"🗺️ Study Plan", teacher:"👩‍🏫 Your Teacher",
+    progress:"📈 Progress", contact:"✉️ Contact", pronunciation:"🔊 Pronunciation", studyplan:"🗺️ Study Plan", teacher:"👩‍🏫 Learn with Linda",
     // Account
     signIn:"Sign In →", getPro:"🔓 Get Pro", signOut:"Sign Out",
     manageSubscription:"Manage Subscription",
@@ -8090,7 +8090,7 @@ const STUDY_STEPS = {
   en: [
     {
       num:1, free:true, view:"teacher",
-      title:"Your Teacher — Linda",
+      title:"Learn with Linda",
       tag:"Free: A1 level · Pro: all levels",
       desc:"Linda is your personal English teacher. She teaches vocabulary, grammar, spelling, and conversation — one structured lesson at a time with Arabic explanations. Each lesson takes about 30 minutes.",
       tip:"Start with A1 even if you think your level is higher. Linda adapts to your real level after a few lessons and will push you forward.",
@@ -10529,23 +10529,41 @@ export default function IELTSBot(){
           </div>
         </div>
 
-        {/* TIER 2 — Red navbar: navigation links */}
+        {/* TIER 2 — Red navbar: grouped navigation */}
         <div style={{background:T.primary}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px"}}>
-            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"wrap"}}>
+            {/* Desktop: grouped with dividers */}
+            <div className="nav-tabs nav-grouped" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"nowrap",overflowX:"auto"}}>
+              {/* Always visible */}
               <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
               <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
-              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              {/* Divider */}
+              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
+              {/* LEARN */}
+              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"تعلّم":"LEARN"}</span>
               <MainTab label={UI[uiLang].teacher} active={mainView==="teacher"} onClick={()=>{switchView("teacher");trackEvent("nav_click",{page:"teacher"});}}/>
-              <MainTab label={UI[uiLang].exercises} active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
+              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              {/* Divider */}
+              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
+              {/* PRACTICE */}
+              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"تدرّب":"PRACTISE"}</span>
+              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
               <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
+              <MainTab label={UI[uiLang].exercises} active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
               <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
+              {/* Divider */}
+              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
+              {/* TOOLS */}
+              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"أدوات":"TOOLS"}</span>
               <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
+              <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
               <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              {/* Divider */}
+              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
+              {/* TRACK */}
+              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"تتبّع":"TRACK"}</span>
               <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
               <MainTab label={UI[uiLang].studyplan} active={mainView==="studyplan"} onClick={()=>{switchView("studyplan");trackEvent("nav_click",{page:"studyplan"});}}/>
-              <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
               <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
             </div>
           </div>
@@ -11295,13 +11313,25 @@ export default function IELTSBot(){
           .mobile-top-controls { display: flex !important; }
           .sticky-nav div[style*="height:56"] { padding: 0 12px !important; }
 
-          /* NAV TIER 2 — show all tabs as wrapping rows, no hamburger */
+          /* NAV TIER 2 — grouped nav, no hamburger */
           .hamburger-btn { display: none !important; }
           .mobile-lang-toggle { display: none !important; }
           .mobile-consult-btn { display: none !important; }
-          .nav-tabs { display: flex !important; flex-wrap: wrap !important; width: 100% !important; }
-          .nav-tabs button { font-size: 11px !important; padding: 8px 7px !important; white-space: nowrap !important; min-height: 36px !important; }
           .sticky-nav { position: sticky !important; top: 0 !important; }
+          /* Grouped nav: scrollable single row on mobile */
+          .nav-grouped {
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none !important;
+            padding-bottom: 2px !important;
+          }
+          .nav-grouped::-webkit-scrollbar { display: none !important; }
+          .nav-grouped button { font-size: 11px !important; padding: 6px 8px !important; white-space: nowrap !important; min-height: 38px !important; height: 38px !important; }
+          /* Group labels smaller on mobile */
+          .nav-grouped span { font-size: 8px !important; padding: 0 3px !important; }
+          /* Dividers slimmer */
+          .nav-grouped > div[style*="width:1"] { margin: 0 2px !important; }
 
           /* HERO */
           .hero-inner { flex-direction: column-reverse !important; min-height: auto !important; padding: 20px 16px 24px !important; }
