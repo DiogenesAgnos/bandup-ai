@@ -27,7 +27,7 @@ const fetchProStatus = async (email) => {
 };
 
 // ── Device session helpers (max 2 concurrent devices per Pro account) ──
-const MAX_DEVICES = 2;
+const MAX_DEVICES = 1;
 
 const generateDeviceToken = () => {
   const existing = localStorage.getItem("ef_device_token");
@@ -41,14 +41,8 @@ const registerDevice = async (email) => {
   if(!email) return;
   const token = generateDeviceToken();
   try {
-    const { data } = await supabase.from("profiles").select("active_sessions").eq("email", email.toLowerCase().trim()).single();
-    let sessions = Array.isArray(data?.active_sessions) ? data.active_sessions : [];
-    // If token already registered, nothing to do
-    if(sessions.includes(token)) return;
-    // Add new token, keep max MAX_DEVICES (drop oldest if over limit)
-    sessions = [...sessions, token];
-    if(sessions.length > MAX_DEVICES) sessions = sessions.slice(sessions.length - MAX_DEVICES);
-    await supabase.from("profiles").update({ active_sessions: sessions }).eq("email", email.toLowerCase().trim());
+    // Always overwrite — only one device allowed. Previous device gets kicked.
+    await supabase.from("profiles").update({ active_sessions: [token] }).eq("email", email.toLowerCase().trim());
   } catch(e) { console.warn("Session register failed", e); }
 };
 
@@ -64,15 +58,15 @@ const unregisterDevice = async (email) => {
 };
 
 const checkDeviceSession = async (email) => {
-  if(!email) return true; // no session check for free users
+  if(!email) return true;
   const token = localStorage.getItem("ef_device_token");
   if(!token) return false;
   try {
     const { data } = await supabase.from("profiles").select("active_sessions,is_pro").eq("email", email.toLowerCase().trim()).single();
     if(!data?.is_pro) return true; // free users — no restriction
     const sessions = Array.isArray(data?.active_sessions) ? data.active_sessions : [];
-    return sessions.includes(token);
-  } catch { return true; } // fail open — don't block on network error
+    return sessions.includes(token); // false = another device has taken over
+  } catch { return true; } // fail open on network error
 };
 
 const STRIPE_CONFIGURED = true;
@@ -10891,6 +10885,23 @@ export default function IELTSBot(){
     setShowPaywall(false);
   };
 
+  // ── Poll every 60s — force logout if another device took over ──
+  useEffect(()=>{
+    if(!session?.email||!proUser) return;
+    const interval = setInterval(async()=>{
+      const valid = await checkDeviceSession(session.email);
+      if(!valid){
+        clearInterval(interval);
+        // Force sign out
+        await supabase.auth.signOut();
+        setSession(null); setProUser(false); setMenuOpen(false);
+        setDeviceWarning(true); // repurpose to show kicked message
+        switchView("home");
+      }
+    }, 60000); // check every 60 seconds
+    return ()=>clearInterval(interval);
+  },[session?.email, proUser]);
+
   const handleSignOut=async()=>{
     if(session?.email) await unregisterDevice(session.email);
     await supabase.auth.signOut();
@@ -11297,8 +11308,8 @@ export default function IELTSBot(){
             <span style={{fontSize:18}}>⚠️</span>
             <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#92400e",fontWeight:600}}>
               {uiLang==="ar"
-                ?"يبدو أن حسابك مفتوح على أكثر من جهازين. إذا لم تكن أنت، يرجى تغيير كلمة المرور."
-                :"Your Pro account appears to be active on more than 2 devices. If this wasn't you, please change your password."}
+                ?"تم تسجيل دخول حسابك من جهاز آخر. تم تسجيل خروجك تلقائياً. إذا لم تكن أنت، يرجى تغيير كلمة المرور فوراً."
+                :"Your account was accessed from another device and you have been signed out. If this wasn't you, change your password immediately."}
             </span>
           </div>
           <button onClick={()=>setDeviceWarning(false)} style={{background:"transparent",border:"1px solid #f59e0b",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:600,color:"#92400e",cursor:"pointer",fontFamily:"'Cairo',system-ui",flexShrink:0}}>
