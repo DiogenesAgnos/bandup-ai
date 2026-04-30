@@ -10689,7 +10689,7 @@ export default function IELTSBot(){
   const [session,setSession]=useState(null);
   const [uses,setUses]=useState(0);
   const [lang,setLang]=useState("en");
-  const [uiLang,setUiLang]=useState(()=>{try{return localStorage.getItem("ef_ui_lang")||"en";}catch{return "en";}}); // Website UI language
+  const [uiLang,setUiLang]=useState(()=>{try{return localStorage.getItem("ef_ui_lang")||"ar";}catch{return "ar";}}); // Website UI language
   const [menuOpen,setMenuOpen]=useState(false);
   const [navVisible,setNavVisible]=useState(true);
   const lastScrollY=useRef(0);
@@ -11248,6 +11248,30 @@ export default function IELTSBot(){
           {/* Subtle pattern overlay */}
           <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
           <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:uiLang==="ar"?"rtl":"ltr",textAlign:"center"}}>
+
+            {/* ── Launch Offer Sticker ── */}
+            <div style={{display:"inline-flex",flexDirection:"column",alignItems:"center",background:"linear-gradient(135deg,#fbbf24,#f59e0b)",borderRadius:16,padding:"10px 24px 12px",marginBottom:28,boxShadow:"0 6px 24px rgba(0,0,0,0.25), 0 0 0 3px rgba(255,255,255,0.25)",position:"relative",border:"2px solid rgba(255,255,255,0.5)"}}>
+              {/* Ribbon label */}
+              <span style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:13,color:"#7f1200",letterSpacing:"0.5px",textTransform:"uppercase",marginBottom:4}}>
+                {uiLang==="ar"?"🔥 عرض الإطلاق — وقت محدود":"🔥 Launch Offer — Limited Time"}
+              </span>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                {/* Struck-through original price */}
+                <span style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700,color:"rgba(127,18,0,0.6)",textDecoration:"line-through"}}>
+                  "50 JOD / $75"
+                </span>
+                {/* Arrow */}
+                <span style={{fontSize:14,color:"#7f1200",fontWeight:900}}>→</span>
+                {/* Current price */}
+                <span style={{fontFamily:"Georgia,serif",fontSize:26,fontWeight:900,color:"#7f1200"}}>
+                  "25 JOD / $35"
+                </span>
+              </div>
+              <span style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"rgba(127,18,0,0.75)",fontWeight:600,marginTop:2}}>
+                {uiLang==="ar"?"لكل 3 أشهر · سعر الإطلاق":"per 3 months · introductory price"}
+              </span>
+            </div>
+
             <div style={{display:"inline-block",background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"5px 18px",fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo',system-ui",fontWeight:600,marginBottom:24}}>
               {uiLang==="ar"?"🎓 تعلّم الإنجليزية  ·  ارفع درجتك في الآيلتس":"🎓 English Learning  ·  IELTS Preparation"}
             </div>
