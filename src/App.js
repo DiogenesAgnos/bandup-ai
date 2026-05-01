@@ -4587,26 +4587,12 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
   // SETUP SCREEN
   if(screen==="setup")return(
     <div style={{maxWidth:520,margin:"0 auto",padding:"20px 0",...sty}}>
-      <div style={{background:T.greenBg,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"12px 14px",marginBottom:10,fontSize:13,color:"#065f46",...sty}}>
-        <strong>What Sarah does:</strong> She has a real conversation with you, corrects your grammar and vocabulary naturally as you speak, and gives you a full report at the end. You can also ask her for IELTS-style practice questions.
-        <div style={{direction:"rtl",marginTop:6,color:"#047857",fontSize:12}}>سارة تتحدث معك وتصحح أخطاء القواعد والمفردات أثناء المحادثة، وتعطيك تقريراً في النهاية. يمكنك طلب أسئلة على طراز الآيلتس منها.</div>
-      </div>
-      <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:16}}>
-        <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1d4ed8",...sty}}>
-          <strong>Works on all browsers and devices — Chrome, Safari, Firefox, iPhone and Android.</strong><br/>
-          <span style={{direction:"rtl",display:"block",marginTop:3,color:"#1e40af"}}>يعمل على جميع المتصفحات والأجهزة — Chrome وSafari وFirefox وiPhone وأندرويد.</span>
+      {!isPro&&(
+        <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.primary,...sty,marginBottom:12}}>
+          <strong>Free users:</strong> One free 7-minute session. Pro = unlimited sessions and all levels.<br/>
+          <span style={{direction:"rtl",display:"block",marginTop:3}}>المجاني: جلسة واحدة مجانية مدتها 7 دقائق. Pro = جلسات غير محدودة بجميع المستويات.</span>
         </div>
-        <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.amber,...sty}}>
-          <strong>Grammar and vocabulary only.</strong> Pronunciation cannot be assessed through text.<br/>
-          <span style={{direction:"rtl",display:"block",marginTop:3}}>تحسين القواعد والمفردات فقط — النطق لا يمكن تقييمه.</span>
-        </div>
-        {!isPro&&(
-          <div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.primary,...sty}}>
-            <strong>Free users:</strong> One free 7-minute session. Pro = unlimited sessions and all levels.<br/>
-            <span style={{direction:"rtl",display:"block",marginTop:3}}>المجاني: جلسة واحدة مجانية مدتها 7 دقائق. Pro = جلسات غير محدودة بجميع المستويات.</span>
-          </div>
-        )}
-      </div>
+      )}
       <div style={{textAlign:"center",marginBottom:16}}>
         <SarahAvatar size={58}/>
         <h2 style={{fontFamily:"Georgia,serif",fontSize:19,color:T.text,margin:"10px 0 4px"}}>Conversation with Sarah</h2>
