@@ -1688,6 +1688,18 @@ const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
 
 // ── Dictation Sentences ──────────────────────────────────────────
 const DICTATION_SENTENCES = [
+  // ── A2 ──
+  {text:"I go to school every day.",level:"A2"},
+  {text:"She likes to read books in the evening.",level:"A2"},
+  {text:"We live in a small house near the park.",level:"A2"},
+  {text:"He is very good at playing football.",level:"A2"},
+  {text:"They eat lunch at one o'clock.",level:"A2"},
+  {text:"My father works in a big office.",level:"A2"},
+  {text:"The children are playing in the garden.",level:"A2"},
+  {text:"I want to learn English because it is important.",level:"A2"},
+  {text:"She has two brothers and one sister.",level:"A2"},
+  {text:"We go to the market on Saturdays.",level:"A2"},
+  // ── B1 ──
   {text:"Many students find it difficult to manage their time effectively.",level:"B1"},
   {text:"Governments should invest more money in public transport.",level:"B1"},
   {text:"Air pollution is a serious problem in most large cities.",level:"B1"},
@@ -2330,8 +2342,8 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
           const isOpen = openCat === catIdx;
           return (
             <div key={catIdx}>
-              <div onClick={() => (freePreview&&catIdx>0)?onUpgrade():setOpenCat(isOpen ? null : catIdx)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: (freePreview&&catIdx>0)?"#fafafa":isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${(freePreview&&catIdx>0)?T.border:isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: (freePreview&&catIdx>0)?"not-allowed":"pointer", transition: "all 0.15s", opacity:(freePreview&&catIdx>0)?0.6:1 }}>
+              <div onClick={() => (freePreview&&catIdx>=2)?onUpgrade():setOpenCat(isOpen ? null : catIdx)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: (freePreview&&catIdx>=2)?"#fafafa":isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${(freePreview&&catIdx>=2)?T.border:isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: (freePreview&&catIdx>=2)?"not-allowed":"pointer", transition: "all 0.15s", opacity:(freePreview&&catIdx>=2)?0.6:1 }}>
                 <span style={{ fontSize: 20 }}>{cat.icon}</span>
                 <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.category}</span>
                 {score.attempted > 0 && (
@@ -2340,7 +2352,7 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
                   </span>
                 )}
                 <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.exercises.length}q</span>
-                {freePreview&&catIdx>0&&<span style={{fontSize:11}}>🔒</span>}
+                {freePreview&&catIdx>=2&&<span style={{fontSize:11}}>🔒</span>}
                 <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
               </div>
               {isOpen && (
@@ -2528,42 +2540,10 @@ const BAND_QUIZ = [
 const ExercisesHub = ({isPro, onUpgrade}) => {
   // Free users can access Grammar (cat 1) and Dictation freely — no teaser gate
   const [activeExTab, setActiveExTab] = useState("grammar");
-  const [timeLeft, setTimeLeft] = useState(Infinity);
-  const [paused, setPaused] = useState(true);
-  const timerRef = useRef(null);
-
-  const startTimer = useCallback(() => {
-    if(isPro) return;
-    setPaused(false);
-    if(timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        const next = prev - 1;
-        if(next <= 0) { clearInterval(timerRef.current); setPaused(true); saveExerciseTimer(0); return 0; }
-        saveExerciseTimer(next);
-        return next;
-      });
-    }, 1000);
-  }, [isPro]);
-
-  const pauseTimer = useCallback(() => {
-    if(timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = null;
-    setPaused(true);
-    if(!isPro) saveExerciseTimer(timeLeft);
-  }, [isPro, timeLeft]);
-
-  useEffect(() => { return () => { if(timerRef.current) clearInterval(timerRef.current); }; }, []);
-
-  const formatTime = (s) => {
-    if(s === Infinity) return "∞";
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec < 10 ? "0" : ""}${sec}`;
-  };
-
-  const canAnswer = isPro || (!paused && timeLeft > 0);
-  const timeExpired = !isPro && timeLeft <= 0;
+  const FREE_EX_TABS = ["grammar","dictation"];
+  const canAnswer = isPro || FREE_EX_TABS.includes(activeExTab);
+  const timeExpired = false;
+  const paused = false;
 
   const TABS = [
     { key:"grammar", icon:"📐", label:"Grammar Drills", freePreview:true },
@@ -2587,91 +2567,10 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
         </p>
       </div>
 
-      {/* Sticky Timer */}
-      {!isPro && (
-        <div style={{ position: "sticky", top: 64, zIndex: 100, marginBottom: 16 }}>
-          <div style={{ background: timeExpired ? T.redBg : paused ? T.amberBg : T.greenBg, border: `1px solid ${timeExpired ? T.redBorder : paused ? T.amberBorder : T.greenBorder}`, borderRadius: 10, padding: "10px 16px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 24, fontWeight: 900, color: timeLeft < 300 ? T.red : paused ? T.amber : T.green, fontFamily: "'Cairo','Source Sans Pro',system-ui", minWidth: 54, flexShrink: 0 }}>
-                  {formatTime(timeLeft)}
-                </span>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: timeExpired ? T.red : paused ? T.amber : T.green, fontFamily: "'Cairo','Source Sans Pro',system-ui", lineHeight: 1.3 }}>
-                    {timeExpired ? "⏰ Session expired — upgrade to Pro to continue" : paused ? "⏸ Timer paused — press Play to begin your session" : "▶ Session active — exercises unlocked"}
-                  </div>
-                  {!timeExpired && (
-                    <div style={{ fontSize: 11, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginTop: 2 }}>
-                      Pro feature · Upgrade for unlimited access to all exercises
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                {!timeExpired && (
-                  <button onClick={paused ? startTimer : pauseTimer}
-                    style={{ background: paused ? T.green : T.amber, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
-                    {paused ? "▶ Play" : "⏸ Pause"}
-                  </button>
-                )}
-                {timeExpired && (
-                  <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
-                    🔓 Upgrade to Pro
-                  </button>
-                )}
-              </div>
-            </div>
-            {!timeExpired && (
-              <div style={{ marginTop: 8, background: "rgba(0,0,0,0.08)", borderRadius: 4, height: 5 }}>
-                <div style={{ width: `${(timeLeft / EXERCISE_TIMER_LIMIT) * 100}%`, background: timeLeft < 300 ? T.red : paused ? T.amber : T.green, borderRadius: 4, height: 5, transition: "width 1s linear" }}/>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-      {isPro && (
-        <div style={{ marginBottom: 16, background: T.greenBg, border: `1px solid ${T.greenBorder}`, borderRadius: 10, padding: "10px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 20 }}>✅</span>
-          <span style={{ fontSize: 13, color: T.green, fontWeight: 700, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Pro — Unlimited exercise access. No timer restrictions.</span>
-        </div>
-      )}
-
-      {/* Exercise type tabs */}
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
-        {TABS.map(t => {
-          const tabLocked = !isPro && !t.freePreview;
-          return(
-          <button key={t.key} onClick={() => tabLocked?onUpgrade():setActiveExTab(t.key)}
-            style={{ background: activeExTab === t.key ? T.primaryLight : T.bgGray, border: `1px solid ${activeExTab === t.key ? T.primaryBorder : T.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: activeExTab === t.key ? 700 : 400, color: activeExTab === t.key ? T.primary : tabLocked?T.textLight:T.textMid, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", display: "flex", alignItems: "center", gap: 5, opacity:tabLocked?0.65:1 }}>
-            <span>{tabLocked?"🔒":t.icon}</span>{t.label}
-            {t.freePreview&&!isPro&&<span style={{fontSize:9,background:"#dcfce7",color:"#16a34a",borderRadius:4,padding:"1px 5px",fontWeight:700,marginLeft:2}}>FREE</span>}
-          </button>
-          );
-        })}
-      </div>
-
-      {/* Expired overlay message */}
-      {timeExpired && !isPro && (
-        <Card style={{ background: T.redBg, border: `1px solid ${T.redBorder}`, textAlign: "center", padding: "28px 24px", marginBottom: 16 }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>⏰</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginBottom: 8 }}>Your free 30-minute session has ended</div>
-          <p style={{ color: T.textMid, fontSize: 13, fontFamily: "'Cairo','Source Sans Pro',system-ui", margin: "0 0 16px", lineHeight: 1.6 }}>Upgrade to Pro for unlimited practice time — all exercise types, all categories, no restrictions.</p>
-          <button onClick={onUpgrade} style={{ background: T.primary, color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>🔓 Upgrade to Pro — $35</button>
-        </Card>
-      )}
 
       {/* Content area */}
-      {/* Free tabs (grammar/dictation) never blur or get blocked */}
-      <div style={{ opacity: (timeExpired && !isPro && !["grammar","dictation"].includes(activeExTab)) ? 0.4 : 1, pointerEvents: (timeExpired && !isPro && !["grammar","dictation"].includes(activeExTab)) ? "none" : "auto", filter: (!isPro && paused && !timeExpired && !["grammar","dictation"].includes(activeExTab)) ? "blur(4px)" : "none", transition: "filter 0.3s ease", userSelect: (!isPro && paused && !timeExpired && !["grammar","dictation"].includes(activeExTab)) ? "none" : "auto", position: "relative" }}>
-        {!isPro && paused && !timeExpired && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-            <div style={{ background: "rgba(255,255,255,0.85)", borderRadius: 12, padding: "16px 28px", textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.12)", backdropFilter: "blur(2px)" }}>
-              <div style={{ fontSize: 28, marginBottom: 6 }}>⏸</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>Timer paused</div>
-              <div style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginTop: 2 }}>Press Play to resume</div>
-            </div>
-          </div>
-        )}
+      <div style={{ position: "relative" }}>
+
         {activeExTab === "grammar" && <GrammarExercisesInner isPro={isPro} canAnswer={isPro||true} onUpgrade={onUpgrade} freePreview={!isPro} />}
         {activeExTab === "paraphrase" && <ParaphraseExercises canAnswer={canAnswer} />}
         {activeExTab === "linking" && <LinkingWordsQuiz canAnswer={canAnswer} />}
@@ -2687,7 +2586,7 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
 
 
 // ── Dictation Component ──────────────────────────────────────────
-const DictationExercises = ({canAnswer}) => {
+const DictationExercises = ({canAnswer=true, freePreview=false}) => {
   const [level,setLevel]=useState("B1");
   const [qIdx,setQIdx]=useState(0);
   const [typed,setTyped]=useState("");
@@ -2698,16 +2597,8 @@ const DictationExercises = ({canAnswer}) => {
   const current=sentences[qIdx%sentences.length];
 
   const speak=()=>{
-    if(!window.speechSynthesis)return;
     cancelElevenLabs();
-    const u=new SpeechSynthesisUtterance(current.text);
-    u.lang="en-GB";u.rate=0.82;u.pitch=1;
-    const voices=window.speechSynthesis.getVoices();
-    const pick=voices.find(v=>v.lang.startsWith("en-GB")&&v.name.includes("Female"))
-      ||voices.find(v=>v.lang.startsWith("en-GB"))
-      ||voices.find(v=>v.lang.startsWith("en-US"))||null;
-    if(pick)u.voice=pick;
-    window.speechSynthesis.speak(u);
+    speakElevenLabs(current.text, LINDA_VOICE_ID, ()=>{});
     setPlayCount(p=>p+1);
   };
 
@@ -2728,7 +2619,7 @@ const DictationExercises = ({canAnswer}) => {
         <p style={{...sty,color:"#0369a1",fontSize:13,margin:"0 0 10px"}}>🎧 <strong>Dictation</strong> — Click Play, listen carefully, then type exactly what you hear. Builds spelling, grammar and listening together.</p>
         <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
           <span style={{...sty,fontSize:12,color:"#0369a1",fontWeight:600}}>Level:</span>
-          {["B1","B2","C1"].map(l=>(
+          {["A2","B1","B2","C1"].map(l=>(
             <button key={l} onClick={()=>{setLevel(l);setQIdx(0);setTyped("");setSubmitted(false);setPlayCount(0);}}
               style={{...sty,padding:"4px 12px",borderRadius:6,border:`1px solid ${level===l?"#0369a1":"#bae6fd"}`,background:level===l?"#0369a1":"white",color:level===l?"white":"#0369a1",fontWeight:level===l?700:400,fontSize:12,cursor:"pointer"}}>
               {l}
