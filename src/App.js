@@ -11519,7 +11519,7 @@ export default function IELTSBot(){
                   style={{width:"100%",background:T.bgGray,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"12px 14px",resize:"vertical",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}/>
               </div>
               <div>
-                {isSampleEssay&&(
+                {essay===SAMPLE_ESSAY_TEXT&&(
                   <div style={{background:"#fefce8",border:"1px solid #fbbf24",borderRadius:10,padding:"10px 14px",marginBottom:12,direction:"ltr"}}>
                     <div style={{fontSize:12,color:"#92400e",fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.6}}>
                       <span style={{fontWeight:700}}>⚠️ Demo Essay: </span>
