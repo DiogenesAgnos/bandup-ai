@@ -10881,7 +10881,6 @@ export default function IELTSBot(){
       }
     };
     document.head.appendChild(script);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);  // run once only — sessionRef handles live session access inside the callback
 
   const handleAuthSuccess=(sess)=>{
@@ -10933,7 +10932,6 @@ export default function IELTSBot(){
       analyzeCallbackRef.current=null;
       analyze();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[topic,essay]);
 
   // Fix black screen: reload app if React crashes when returning from background
