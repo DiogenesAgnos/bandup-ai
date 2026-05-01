@@ -590,6 +590,121 @@ const TabBtn=({label,active,onClick,badge})=>(
   </button>
 );
 
+// ── Dropdown Nav Bar ─────────────────────────────────────────────────────────
+const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
+  const [openGroup, setOpenGroup] = React.useState(null);
+  const isAr = uiLang === "ar";
+  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+
+  const groups = [
+    {
+      id:"home",
+      label:isAr?"🏠 الرئيسية":"🏠 Home",
+      single:true,
+      view:"home",
+      active: mainView==="home"
+    },
+    {
+      id:"learn",
+      label:isAr?"📚 تعلّم ▾":"📚 Learn ▾",
+      active: ["teacher","speaking"].includes(mainView),
+      items:[
+        {label:isAr?"👩‍🏫 تعلّمي مع ليندا":"👩‍🏫 Learn with Linda", view:"teacher", icon:"👩‍🏫"},
+        {label:isAr?"🎤 تدريب المحادثة":"🎤 Speaking Practice", view:"speaking", icon:"🎤"},
+        {label:isAr?"📋 اختبار تحديد المستوى":"📋 Placement Test", view:"placement", icon:"📋"},
+      ]
+    },
+    {
+      id:"practise",
+      label:isAr?"✏️ تدرّب ▾":"✏️ Practise ▾",
+      active: ["analyze","practice","grammar","reading","exercises","game"].includes(mainView),
+      items:[
+        {label:isAr?"✍️ الكتابة والتحليل":"✍️ Writing & Analysis", view:"analyze", icon:"✍️"},
+        {label:isAr?"📖 اختبارات القراءة":"📖 Reading Tests", view:"reading", icon:"📖"},
+        {label:isAr?"💪 تمارين":"💪 Exercises", view:"exercises", icon:"💪"},
+        {label:isAr?"🎮 ألعاب تعليمية":"🎮 Games", view:"game", icon:"🎮"},
+      ]
+    },
+    {
+      id:"tools",
+      label:isAr?"🛠️ أدوات ▾":"🛠️ Tools ▾",
+      active: ["vocabulary","pronunciation","toolkit"].includes(mainView),
+      items:[
+        {label:isAr?"📚 المفردات":"📚 Vocabulary", view:"vocabulary", icon:"📚"},
+        {label:isAr?"🔊 النطق":"🔊 Pronunciation", view:"pronunciation", icon:"🔊"},
+        {label:isAr?"🧰 أدوات آيلتس":"🧰 IELTS Toolkit", view:"toolkit", icon:"🧰"},
+      ]
+    },
+    {
+      id:"track",
+      label:isAr?"📈 تتبّع ▾":"📈 Track ▾",
+      active: ["progress","studyplan","contact"].includes(mainView),
+      items:[
+        {label:isAr?"📈 تقدمي":"📈 My Progress", view:"progress", icon:"📈"},
+        {label:isAr?"🗺️ الخطة الدراسية":"🗺️ Study Plan", view:"studyplan", icon:"🗺️"},
+        {label:isAr?"✉️ اتصل بنا":"✉️ Contact", view:"contact", icon:"✉️"},
+      ]
+    },
+  ];
+
+  const handleNav = (view) => {
+    switchView(view);
+    trackEvent("nav_click",{page:view});
+    setOpenGroup(null);
+  };
+
+  // Close dropdown when clicking outside
+  React.useEffect(()=>{
+    if(!openGroup) return;
+    const close = (e) => {
+      if(!e.target.closest(".nav-dropdown-group")) setOpenGroup(null);
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("touchstart", close);
+    return ()=>{ document.removeEventListener("mousedown", close); document.removeEventListener("touchstart", close); };
+  },[openGroup]);
+
+  return (
+    <div style={{background:T.primary,position:"relative",zIndex:200}}>
+      <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px"}}>
+        <div style={{display:"flex",alignItems:"stretch",direction:isAr?"rtl":"ltr",gap:0,flexWrap:"wrap"}}>
+          {groups.map(group=>(
+            <div key={group.id} className="nav-dropdown-group" style={{position:"relative"}}>
+              {group.single ? (
+                <button onClick={()=>handleNav(group.view)}
+                  style={{height:52,padding:"0 16px",background:"transparent",border:"none",borderBottom:group.active?`3px solid ${T.accent}`:"3px solid transparent",borderTop:"3px solid transparent",color:group.active?T.accent:"rgba(255,255,255,0.88)",fontSize:14,fontWeight:group.active?700:500,cursor:"pointer",whiteSpace:"nowrap",...sty,transition:"color 0.15s"}}>
+                  {group.label}
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={()=>setOpenGroup(openGroup===group.id?null:group.id)}
+                    style={{height:52,padding:"0 16px",background:openGroup===group.id?"rgba(0,0,0,0.15)":"transparent",border:"none",borderBottom:group.active?`3px solid ${T.accent}`:"3px solid transparent",borderTop:"3px solid transparent",color:group.active?T.accent:openGroup===group.id?"white":"rgba(255,255,255,0.88)",fontSize:14,fontWeight:group.active?700:500,cursor:"pointer",whiteSpace:"nowrap",...sty,transition:"all 0.15s",display:"flex",alignItems:"center",gap:4}}>
+                    {group.label}
+                  </button>
+                  {openGroup===group.id&&(
+                    <div style={{position:"absolute",top:"100%",[isAr?"right":"left"]:0,background:"white",borderRadius:"0 0 12px 12px",boxShadow:"0 8px 24px rgba(0,0,0,0.18)",minWidth:220,zIndex:300,overflow:"hidden",border:`1px solid ${T.border}`,borderTop:"none"}}>
+                      {group.items.map((item,i)=>(
+                        <button key={item.view} onClick={()=>handleNav(item.view)}
+                          style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"12px 18px",background:mainView===item.view?"#fef2f2":"white",border:"none",borderBottom:i<group.items.length-1?`1px solid ${T.border}`:"none",cursor:"pointer",textAlign:isAr?"right":"left",...sty,fontSize:14,fontWeight:mainView===item.view?700:500,color:mainView===item.view?T.primary:T.text,transition:"background 0.1s"}}>
+                          <span style={{fontSize:16,flexShrink:0}}>{item.icon}</span>
+                          <span>{item.label}</span>
+                          {mainView===item.view&&<span style={{marginLeft:"auto",marginRight:isAr?"auto":0,width:6,height:6,borderRadius:"50%",background:T.primary,flexShrink:0}}/>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 const MainTab=({label,active,onClick,badge})=>(
   <button onClick={onClick} style={{
     background: "transparent",
@@ -8888,7 +9003,8 @@ const saveLindaSession=(lessonId,phase,messages)=>{try{localStorage.setItem(LIND
 const loadLindaSession=()=>{try{const d=localStorage.getItem(LINDA_SESSION_KEY);return d?JSON.parse(d):null;}catch{return null;}};
 const clearLindaSession=()=>{try{localStorage.removeItem(LINDA_SESSION_KEY);}catch{}};
 
-const FREE_LINDA_LEVELS=["a1"];
+const FREE_LINDA_LEVELS=["a1","b2"];
+const FREE_B2_LESSONS=1; // only first lesson of B2 is free
 
 const PHASES=["vocabulary","fillblank","spelling","review"];
 const PHASE_LABELS=["📚 Vocabulary","✏️ Fill in the Blank","🔤 Spelling","💬 Review & Conversation"];
@@ -9972,8 +10088,10 @@ ALWAYS:
             const done=completedSet.has(lesson.id);
             const isCurrent=lesson.id===progress.currentLesson;
             return(
-              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer"}}
-                onClick={()=>startLesson(lesson)}>
+              {/* B2 lesson 1 free, rest need Pro */}
+              {(()=>{const b2Locked=progress.level==="b2"&&!isPro&&idx>=FREE_B2_LESSONS; return(
+              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:b2Locked?"#fafafa":isCurrent?"#faf5ff":"white",cursor:b2Locked?"not-allowed":"pointer",opacity:b2Locked?0.6:1}}
+                onClick={()=>b2Locked?onUpgrade():startLesson(lesson)}>
                 <div style={{width:28,height:28,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,flexShrink:0}}>
                   {done?"✓":idx+1}
                 </div>
@@ -9985,7 +10103,9 @@ ALWAYS:
                 </div>
                 {isCurrent&&<div style={{fontSize:11,fontWeight:700,color:"#7c3aed",background:"#ede9fe",padding:"2px 8px",borderRadius:20,...sty}}>{isAr?"الدرس الحالي":"Current"}</div>}
                 {done&&<span style={{fontSize:16}}>✅</span>}
+                {(()=>{const b2Locked=progress.level==="b2"&&!isPro&&idx>=FREE_B2_LESSONS; return b2Locked?<span style={{fontSize:12}}>🔒</span>:null;})()}
               </div>
+              );})()}
             );
           })}
         </div>
@@ -10809,42 +10929,7 @@ export default function IELTSBot(){
     return()=>window.removeEventListener("scroll",onScroll);
   },[]);
 
-  // ── Nav scroll hint: progress thumb + fade hide when fully scrolled ──
-  useEffect(()=>{
-    const navEl=document.querySelector(".nav-grouped");
-    const thumb=document.querySelector(".nav-scroll-thumb");
-    const fadeEnd=document.querySelector(".nav-fade-end");
-    if(!navEl)return;
-    const update=()=>{
-      const maxScroll=navEl.scrollWidth-navEl.clientWidth;
-      if(maxScroll<=0)return;
-      const scrolled=Math.abs(navEl.scrollLeft);
-      const pct=scrolled/maxScroll; // 0→1
-      const thumbW=Math.max(15,Math.round((navEl.clientWidth/navEl.scrollWidth)*100));
-      const trackW=navEl.clientWidth-16;
-      const maxOffset=trackW*(1-thumbW/100);
-      if(thumb){
-        thumb.style.width=thumbW+"%";
-        // RTL scrolls negative on some browsers
-        const offset=navEl.scrollLeft<0
-          ? maxOffset*(1-pct)   // RTL
-          : maxOffset*pct;      // LTR
-        thumb.style.transform=`translateX(${offset}px)`;
-      }
-      // Hide the edge fade once fully scrolled
-      if(fadeEnd){
-        fadeEnd.style.opacity=pct>0.92?"0":"1";
-        fadeEnd.style.transition="opacity 0.2s";
-      }
-    };
-    update();
-    navEl.addEventListener("scroll",update,{passive:true});
-    window.addEventListener("resize",update,{passive:true});
-    return()=>{
-      navEl.removeEventListener("scroll",update);
-      window.removeEventListener("resize",update);
-    };
-  },[mainView]);
+  // Nav scroll hint removed — replaced with dropdown nav
 
   // ── Initialize Paddle.js ──
   useEffect(()=>{
@@ -11254,60 +11339,8 @@ export default function IELTSBot(){
           </div>
         </div>
 
-        {/* TIER 2 — Red navbar: grouped navigation */}
-        <div style={{background:T.primary}}>
-          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px",position:"relative"}}>
-            {/* Desktop: grouped with dividers */}
-            <div style={{position:"relative"}}>
-            {/* Scroll hint — white fade on trailing edge + white progress bar */}
-            <div className="nav-scroll-hint nav-fade-end" style={{
-              position:"absolute",
-              ...(uiLang==="ar"
-                ? {left:0, background:"linear-gradient(to left, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.55) 100%)"}
-                : {right:0, background:"linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.55) 100%)"}
-              ),
-              top:0,bottom:4,width:64,zIndex:10,pointerEvents:"none"
-            }}/>
-            {/* Scroll progress bar — white track */}
-            <div className="nav-scroll-hint nav-scroll-track" style={{position:"absolute",bottom:0,left:8,right:8,height:4,background:"rgba(255,255,255,0.2)",borderRadius:2,zIndex:11,overflow:"hidden",pointerEvents:"none"}}>
-              <div className="nav-scroll-thumb" style={{height:"100%",background:"rgba(255,255,255,0.85)",borderRadius:2,width:"30%",transition:"transform 0.1s linear"}}/>
-            </div>
-            <div className="nav-tabs nav-grouped" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"nowrap",overflowX:"auto"}}>
-              {/* Always visible */}
-              <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
-              <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
-              {/* Divider */}
-              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
-              {/* LEARN */}
-              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"تعلّم":"LEARN"}</span>
-              <MainTab label={UI[uiLang].teacher} active={mainView==="teacher"} onClick={()=>{switchView("teacher");trackEvent("nav_click",{page:"teacher"});}}/>
-              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
-              {/* Divider */}
-              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
-              {/* PRACTICE */}
-              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"تدرّب":"PRACTISE"}</span>
-              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
-              <MainTab label={UI[uiLang].exercises} active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
-              <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
-              {/* Divider */}
-              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
-              {/* TOOLS */}
-              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"أدوات":"TOOLS"}</span>
-              <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
-              <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
-              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              {/* Divider */}
-              <div style={{width:1,height:28,background:"rgba(255,255,255,0.25)",margin:"0 4px",flexShrink:0}}/>
-              {/* TRACK */}
-              <span style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontFamily:"'Cairo',system-ui",fontWeight:600,padding:"0 6px",textTransform:"uppercase",letterSpacing:"0.5px",flexShrink:0,whiteSpace:"nowrap"}}>{uiLang==="ar"?"تتبّع":"TRACK"}</span>
-              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
-              <MainTab label={UI[uiLang].studyplan} active={mainView==="studyplan"} onClick={()=>{switchView("studyplan");trackEvent("nav_click",{page:"studyplan"});}}/>
-              <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
-            </div>
-            </div>{/* end scroll hint wrapper */}
-          </div>
-        </div>
+        {/* TIER 2 — Red navbar: dropdown groups */}
+        <NavDropdownBar mainView={mainView} switchView={switchView} trackEvent={trackEvent} uiLang={uiLang} UI={UI} T={T}/>
       </div>
 
       {/* ── Device session warning banner ── */}
