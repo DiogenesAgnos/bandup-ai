@@ -9791,7 +9791,9 @@ ALWAYS:
     if(!lesson)return;
     if(!resumeSession){
       clearLindaSession();
-      saveProgress({...progress,currentLesson:lesson.id});
+      // Ensure progress level is set correctly for this lesson
+      const lessonLevel=lesson.id.split("_")[0];
+      saveProgress({...progress,level:lessonLevel,currentLesson:lesson.id});
       setMessages([]);
       setCurrentPhase(0);
       setRepeatTarget(null);setRepeatSuccess(0);
@@ -9800,7 +9802,10 @@ ALWAYS:
     setMobileTab("chat");
     if(resumeSession&&messages.length>0)return;
     setIsThinking(true);
-    const opening=`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}"${["a1","a2"].includes(progress.level)?` — give its Arabic meaning [${lesson.vocab[0].ar}]`:""} with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
+    const isA1A2Open=["a1","a2"].includes(progress.level);
+    const opening=isA1A2Open
+      ?`ابدأ الدرس الآن. رحّب بالطالب بجملة واحدة بالعربي. ثم علّمه الكلمة الأولى: "${lesson.vocab[0].w}" — تعني "${lesson.vocab[0].ar}". مثال بالعربي: "${lesson.vocab[0].exAr}". اطلب منه أن يكرر الكلمة.`
+      :`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}" with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
     const reply=await callClaude(buildSystemPrompt(lesson,0),[],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
