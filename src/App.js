@@ -2556,17 +2556,6 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
     { key:"builder", icon:"🔤", label:"Sentence Builder" },
   ];
 
-  const TABS = [
-    { key:"grammar", icon:"📐", label:"Grammar Drills", freePreview:true },
-    { key:"paraphrase", icon:"🔄", label:"Paraphrasing" },
-    { key:"linking", icon:"🔗", label:"Linking Words" },
-    { key:"vocab", icon:"📖", label:"Vocabulary Upgrade" },
-    { key:"errors", icon:"🔍", label:"Error Correction" },
-    { key:"bandcheck", icon:"🎯", label:"Band Self-Check" },
-    { key:"dictation", icon:"🎧", label:"Dictation", freePreview:true },
-    { key:"builder", icon:"🔤", label:"Sentence Builder" },
-  ];
-
   return (
     <div>
       {/* Header */}
