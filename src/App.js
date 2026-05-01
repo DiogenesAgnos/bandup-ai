@@ -10087,9 +10087,8 @@ ALWAYS:
           {lessons.map((lesson,idx)=>{
             const done=completedSet.has(lesson.id);
             const isCurrent=lesson.id===progress.currentLesson;
+            const b2Locked=progress.level==="b2"&&!isPro&&idx>=FREE_B2_LESSONS;
             return(
-              {/* B2 lesson 1 free, rest need Pro */}
-              {(()=>{const b2Locked=progress.level==="b2"&&!isPro&&idx>=FREE_B2_LESSONS; return(
               <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:b2Locked?"#fafafa":isCurrent?"#faf5ff":"white",cursor:b2Locked?"not-allowed":"pointer",opacity:b2Locked?0.6:1}}
                 onClick={()=>b2Locked?onUpgrade():startLesson(lesson)}>
                 <div style={{width:28,height:28,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,flexShrink:0}}>
@@ -10103,9 +10102,8 @@ ALWAYS:
                 </div>
                 {isCurrent&&<div style={{fontSize:11,fontWeight:700,color:"#7c3aed",background:"#ede9fe",padding:"2px 8px",borderRadius:20,...sty}}>{isAr?"الدرس الحالي":"Current"}</div>}
                 {done&&<span style={{fontSize:16}}>✅</span>}
-                {(()=>{const b2Locked=progress.level==="b2"&&!isPro&&idx>=FREE_B2_LESSONS; return b2Locked?<span style={{fontSize:12}}>🔒</span>:null;})()}
+                {b2Locked&&<span style={{fontSize:12}}>🔒</span>}
               </div>
-              );})()}
             );
           })}
         </div>
