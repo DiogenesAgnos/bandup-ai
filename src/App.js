@@ -690,10 +690,18 @@ const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
                   <button
                     onClick={(e)=>{
                       if(openGroup===group.id){ setOpenGroup(null); return; }
-                      // Measure button position — if dropdown would overflow right side, anchor to right instead
                       const rect=e.currentTarget.getBoundingClientRect();
-                      const wouldOverflow=(rect.left+220)>window.innerWidth;
-                      setAlignRight(prev=>({...prev,[group.id]:isAr?!wouldOverflow:wouldOverflow}));
+                      let shouldAnchorRight;
+                      if(isAr){
+                        // RTL: nav flows right→left, dropdown grows leftward from button's right edge
+                        // Check if it would overflow the LEFT side of the screen
+                        shouldAnchorRight=(rect.right-220)>=0;
+                      } else {
+                        // LTR: dropdown grows rightward from button's left edge
+                        // Check if it would overflow the RIGHT side
+                        shouldAnchorRight=(rect.left+220)>window.innerWidth;
+                      }
+                      setAlignRight(prev=>({...prev,[group.id]:shouldAnchorRight}));
                       setOpenGroup(group.id);
                     }}
                     style={{height:52,padding:"0 16px",background:openGroup===group.id?"rgba(0,0,0,0.15)":"transparent",border:"none",borderBottom:group.active?`3px solid ${T.accent}`:"3px solid transparent",borderTop:"3px solid transparent",color:group.active?T.accent:openGroup===group.id?"white":"rgba(255,255,255,0.88)",fontSize:14,fontWeight:group.active?700:500,cursor:"pointer",whiteSpace:"nowrap",...sty,transition:"all 0.15s",display:"flex",alignItems:"center",gap:4}}>
