@@ -9601,11 +9601,14 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
     saveLindaProgress(next);
   };
 
-  const buildSystemPrompt=(lesson,phase)=>{
+  const buildSystemPromptWithLevel=(lesson,phase,prog)=>buildSystemPromptInner(lesson,phase,prog||progress);
+  const buildSystemPrompt=(lesson,phase)=>buildSystemPromptInner(lesson,phase,progress);
+  const buildSystemPromptInner=(lesson,phase,prog)=>{
     if(!lesson)return "";
-    const isA1A2=["a1","a2"].includes(progress.level);
-    const isB1=progress.level==="b1";
+    const isA1A2=["a1","a2"].includes(prog.level);
+    const isB1=prog.level==="b1";
     const isLowLevel=isA1A2||isB1;
+    const levelData=LINDA_CURRICULUM[prog.level]||LINDA_CURRICULUM["a1"];
 
     // A1/A2: ALL instructional language in Arabic. English only for the actual words/sentences being taught.
     const instr=isA1A2?{
@@ -9701,7 +9704,7 @@ CRITICAL — YOU ARE TEACHING A1/A2 BEGINNERS:
 FOR B1: Give Arabic meaning for all new vocabulary. Keep grammar explanations bilingual.`:"";
 
     return `You are Linda, an enthusiastic English teacher for Arabic-speaking students.
-Level: ${progress.level.toUpperCase()} — ${levelData.name}
+Level: ${prog.level.toUpperCase()} — ${levelData.name}
 Lesson: ${lesson.title} (${lesson.titleAr})
 ${lowLevelNote}
 
@@ -9789,10 +9792,9 @@ ALWAYS:
 
   const startLesson=async(lesson,resumeSession=false)=>{
     if(!lesson)return;
+    const lessonLevel=lesson.id.split("_")[0]; // derive level from lesson ID directly
     if(!resumeSession){
       clearLindaSession();
-      // Ensure progress level is set correctly for this lesson
-      const lessonLevel=lesson.id.split("_")[0];
       saveProgress({...progress,level:lessonLevel,currentLesson:lesson.id});
       setMessages([]);
       setCurrentPhase(0);
@@ -9802,11 +9804,14 @@ ALWAYS:
     setMobileTab("chat");
     if(resumeSession&&messages.length>0)return;
     setIsThinking(true);
-    const isA1A2Open=["a1","a2"].includes(progress.level);
+    const isA1A2Open=["a1","a2"].includes(lessonLevel); // use lessonLevel, not stale progress.level
     const opening=isA1A2Open
       ?`ابدأ الدرس الآن. رحّب بالطالب بجملة واحدة بالعربي. ثم علّمه الكلمة الأولى: "${lesson.vocab[0].w}" — تعني "${lesson.vocab[0].ar}". مثال بالعربي: "${lesson.vocab[0].exAr}". اطلب منه أن يكرر الكلمة.`
       :`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}" with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
-    const reply=await callClaude(buildSystemPrompt(lesson,0),[],opening);
+    // Build system prompt with correct level
+    const leveledProgress={...progress,level:lessonLevel};
+    const sys=buildSystemPromptWithLevel(lesson,0,leveledProgress);
+    const reply=await callClaude(sys,[],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
 
