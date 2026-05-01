@@ -9605,6 +9605,7 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
   const buildSystemPrompt=(lesson,phase)=>buildSystemPromptInner(lesson,phase,progress);
   const buildSystemPromptInner=(lesson,phase,prog)=>{
     if(!lesson)return "";
+    try{
     const isA1A2=["a1","a2"].includes(prog.level);
     const isB1=prog.level==="b1";
     const isLowLevel=isA1A2||isB1;
@@ -9720,18 +9721,22 @@ ALWAYS:
 - LENIENT repeat evaluation: if the student says the right word(s) even with extra words, typos, or slight mistakes, count it as correct. Example: student says "one 23" when asked to repeat "One, Two, Three" — this is CORRECT (speech-to-text error). Be generous.
 - When giving an example sentence at A1/A2 level, always add the Arabic translation in brackets on the same line: "I have three books. (عندي ثلاثة كتب)"
 - Be conversational and natural — speak like an enthusiastic human teacher, not a robot listing items`;
+    }catch(e){console.error("Linda system prompt error:",e);return "You are Linda, an enthusiastic English teacher. Teach the current lesson warmly and naturally.";}
   };
 
   const callClaude=async(system,history,userMsg)=>{
     try{
       const msgs=history.slice(-12);
       if(userMsg)msgs.push({role:"user",content:userMsg});
-      const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),20000); // 20s timeout
+      const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},signal:controller.signal,
         body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,system,messages:msgs})});
+      clearTimeout(timeout);
       if(!mountedRef.current)return "";
       const data=await res.json();
       return data?.content?.[0]?.text||"";
-    }catch{return "";}
+    }catch(e){console.error("Linda API error:",e);return "";}
   };
 
   const speakLinda=(text)=>speakElevenLabs(text,LINDA_VOICE_ID);
@@ -9812,7 +9817,11 @@ ALWAYS:
     const leveledProgress={...progress,level:lessonLevel};
     const sys=buildSystemPromptWithLevel(lesson,0,leveledProgress);
     const reply=await callClaude(sys,[],opening);
-    if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
+    if(mountedRef.current){
+      setIsThinking(false);
+      if(reply) addLindaMessage(reply);
+      else addLindaMessage(isA1A2Open?"عذراً، حدث خطأ. اضغط على الدرس مرة أخرى للمحاولة.":"Sorry, something went wrong. Please tap the lesson again to retry.");
+    }
   };
 
   const mediaRecorderRef=useRef(null);
