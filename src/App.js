@@ -10635,8 +10635,6 @@ const PronunciationPage=({uiLang="ar",isPro=false,onUpgrade})=>{
   const [search,setSearch]=useState("");
   const [cat,setCat]=useState("all");
   const [speaking,setSpeaking]=useState("");
-  const [audioCache,setAudioCache]=useState({});
-  const audioRef=useRef(null);
   const isAr=uiLang==="ar";
   const dir=isAr?"rtl":"ltr";
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
@@ -10660,57 +10658,12 @@ const PronunciationPage=({uiLang="ar",isPro=false,onUpgrade})=>{
     return list;
   },[cat,search,isPro]);
 
-  const playWord=async(word)=>{
-    if(speaking===word)return;
-    setSpeaking(word);
-    // Try cached URL first
-    let url=audioCache[word];
-    if(!url){
-      try{
-        const res=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-        if(res.ok){
-          const data=await res.json();
-          const phonetics=(data[0]?.phonetics||[]);
-          const found=phonetics.find(p=>p.audio&&p.audio.includes("uk"))||
-                       phonetics.find(p=>p.audio&&p.audio.includes("us"))||
-                       phonetics.find(p=>p.audio&&p.audio.length>0);
-          if(found?.audio){
-            url=found.audio.startsWith("http")?found.audio:"https:"+found.audio;
-            setAudioCache(prev=>({...prev,[word]:url}));
-          }
-        }
-      }catch(e){}
-    }
-    if(url){
-      try{
-        if(audioRef.current){audioRef.current.pause();audioRef.current=null;}
-        const audio=new Audio(url);
-        audioRef.current=audio;
-        audio.onended=()=>setSpeaking("");
-        audio.onerror=()=>{
-          fallbackSpeak(word);
-        };
-        await audio.play();
-        return;
-      }catch(e){}
-    }
-    fallbackSpeak(word);
-  };
-
-  const fallbackSpeak=(word)=>{
-    if(!window.speechSynthesis){setSpeaking("");return;}
+  // Use ElevenLabs (same voice as Sarah/Linda) — single clean voice, no multi-voice conflict
+  const playWord=(word)=>{
+    if(speaking===word){ cancelElevenLabs(); setSpeaking(""); return; }
     cancelElevenLabs();
-    const utt=new SpeechSynthesisUtterance(word);
-    utt.lang="en-GB";utt.rate=0.8;utt.pitch=1;
-    const voices=window.speechSynthesis.getVoices();
-    const match=voices.find(v=>v.lang==="en-GB"&&/google|natural|daniel/i.test(v.name))||
-                 voices.find(v=>v.lang==="en-GB")||
-                 voices.find(v=>v.lang==="en-US"&&/google|natural/i.test(v.name))||
-                 voices.find(v=>v.lang.startsWith("en"));
-    if(match)utt.voice=match;
-    utt.onend=()=>setSpeaking("");
-    utt.onerror=()=>setSpeaking("");
-    window.speechSynthesis.speak(utt);
+    setSpeaking(word);
+    speakElevenLabs(word, SARAH_VOICE_ID, ()=>setSpeaking(""));
   };
 
   return(
@@ -10956,9 +10909,6 @@ export default function IELTSBot(){
     }
   };
 
-  // Fix 11 + 12: removed unused isSampleEssay state; trigger analyze directly via analyzeCallbackRef
-  // instead of the fragile setTimeout + .click() pattern
-  const analyzeCallbackRef = useRef(null);
   const trySampleEssay=()=>{
     setTaskType("task2");
     setTopic(SAMPLE_ESSAY_TOPIC);
@@ -10967,19 +10917,9 @@ export default function IELTSBot(){
     clearLastResult();
     setError("");
     switchView("analyze");
-    // Schedule analyze to run after React re-renders with the new state
-    analyzeCallbackRef.current = "pending";
   };
 
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setError(newLang==="ar"?"تم تغيير اللغة. اضغط 'Analyze' مجدداً لرؤية التعليقات بالعربية.":"Language changed. Click 'Analyze' again to see feedback in English."); } };
-
-  // Fix 11: runs analyze once after trySampleEssay has updated state — no fake .click() needed
-  useEffect(()=>{
-    if(analyzeCallbackRef.current==="pending"&&topic===SAMPLE_ESSAY_TOPIC&&essay===SAMPLE_ESSAY_TEXT){
-      analyzeCallbackRef.current=null;
-      analyze();
-    }
-  },[topic,essay]);
 
   // Fix black screen: reload app if React crashes when returning from background
   useEffect(()=>{
