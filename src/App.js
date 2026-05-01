@@ -4178,7 +4178,7 @@ RESPONSE RULES:
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const res=await fetch("/api/analyze",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:160,system,messages:msgs})
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:150,system,messages:msgs})
       });
       if(!mountedRef.current)return "";
       const data=await res.json();
@@ -9631,58 +9631,40 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
       convIntro:"Question:",lessonDone:"Lesson complete! Amazing work! Shall we move to the next lesson?",
     };
 
+    // Only build the CURRENT phase instruction — saves ~70% of prompt tokens
     const phaseInstructions={
       0:`PHASE 1 — VOCABULARY:
 You are an enthusiastic English teacher. Teach in English — Arabic appears only as a tiny translation hint in brackets.
-
-For EACH word follow this format exactly:
-1. Warm greeting + introduce the lesson topic in ONE sentence (first word only). Example: "Welcome! Today we're learning about greetings and introductions. Let's start!"
-2. Introduce word: "Our first word is [WORD] — it means (${isLowLevel?"[Arabic translation]":"[meaning]"}). For example: [example sentence]. Now repeat after me: [WORD]"
-3. After correct repeat: "Excellent! One more time: [WORD]"
-4. After second correct repeat: "Perfect! Next word:" — move immediately.
-5. If wrong: "Almost! Try again: [WORD]"
-
-IMPORTANT: Write Arabic only inside small brackets like (يعني: مرحبا) — never write full Arabic sentences. Keep 80% of your message in English. Be warm and enthusiastic.
+For EACH word: 1) Introduce with meaning + example. 2) Ask student to repeat. 3) After correct repeat say "Once more:" 4) After second correct repeat move to next word immediately. 5) If wrong: "Almost! Try again: [WORD]"
+Arabic only inside brackets like (يعني: مرحبا). Keep 80% English. Be warm and enthusiastic.
 Vocabulary:
 ${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
 When ALL words done: "${instr.vocabDone}" — immediately present first fill-in-the-blank.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
-Present ONE exercise at a time using this format:
-"${instr.fillIntro}: [sentence with the word '${instr.fillBlankWord}' replacing the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
-If correct: "${instr.fillCorrect}" — immediately next exercise.
-If wrong on FIRST attempt: "${instr.fillWrong}: [Arabic/English hint]" — give ONE more chance. Do NOT reveal the answer yet.
-If wrong on SECOND attempt: reveal the correct answer briefly, then immediately move to the next exercise.
-If correct on SECOND attempt: say "${instr.fillCorrect}" and immediately move to the next exercise without pausing.
-CRITICAL: NEVER correct on the first wrong attempt. Always give exactly one second chance first.
+Present ONE exercise at a time: "${instr.fillIntro}: [sentence with '${instr.fillBlankWord}' for the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
+If correct: "${instr.fillCorrect}" — next exercise immediately.
+If wrong FIRST time: "${instr.fillWrong}: [hint]" — give ONE more chance only.
+If wrong SECOND time: reveal answer, move on immediately.
+NEVER correct on first attempt — always give one second chance first.
 Exercises:
 ${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence.replace(/___/g,instr.fillBlankWord)}" — answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
-When ALL done: "${instr.fillDone}" — immediately present first spelling word.`,
+When ALL done: "${instr.fillDone}" — present first spelling word immediately.`,
 
       2:`PHASE 3 — SPELLING:
-You MUST follow this exact format for EVERY spelling question — no exceptions:
-"Spell this word: [SPELL]WORD[/SPELL]"
-
-The [SPELL] tags make the word hidden visually but spoken aloud. The student hears it but cannot read it.
-
-MANDATORY: You MUST include [SPELL]WORD[/SPELL] in EVERY message where you ask for spelling. Never give hints, meanings, or descriptions instead of the word itself. Never say "the word means..." — just say the word.
-
-Example of CORRECT format: "Spell this word: [SPELL]Traffic[/SPELL]"
-Example of WRONG format: "The word means 'مرور' — spell it!" ← THIS IS WRONG, never do this.
-
-If correct: praise briefly + immediately give next word: "Well done! Next: [SPELL]NEXTWORD[/SPELL]"
-If wrong: spell it out: "It's [SPELL]T-R-A-F-F-I-C[/SPELL] — try once more: [SPELL]Traffic[/SPELL]"
-
-Words to test in order: ${lesson.spelling.map((w,i)=>`${i+1}. [SPELL]${w}[/SPELL]`).join(", ")}
-
-Start immediately with word 1. When ALL words done: say "Outstanding! Let's talk now." and immediately ask the first conversation question.`,
+ALWAYS use this exact format: "Spell this word: [SPELL]WORD[/SPELL]"
+[SPELL] tags hide the word visually but it is spoken aloud. NEVER describe or hint the word — just say it.
+If correct: praise + next word: "Well done! Next: [SPELL]NEXTWORD[/SPELL]"
+If wrong: "It's [SPELL]W-O-R-D[/SPELL] — try once more: [SPELL]Word[/SPELL]"
+Words: ${lesson.spelling.map((w,i)=>`${i+1}. [SPELL]${w}[/SPELL]`).join(", ")}
+Start with word 1 immediately. When ALL done: "Outstanding! Let's talk now." then ask first conversation question.`,
 
       3:`PHASE 4 — CONVERSATION:
 Ask ONE question at a time:
 ${lesson.conversation.map((c,i)=>`${i+1}. ${instr.convIntro} ${c}`).join("\n")}
 Weave in grammar naturally: ${lesson.grammar.point}
-${lesson.grammar.levelNote?`Share this note naturally: ${lesson.grammar.levelNote}`:""}
-${isA1A2?"اشرح أي مفهوم صعب بالعربي.":isB1?"Use Arabic to explain difficult grammar points.":""}
+${lesson.grammar.levelNote?`Note: ${lesson.grammar.levelNote}`:""}
+${isA1A2?"اشرح أي مفهوم صعب بالعربي.":isB1?"Use Arabic for difficult grammar points.":""}
 When done: "${instr.lessonDone}"`,
     };
 
@@ -9717,7 +9699,7 @@ ALWAYS:
 
   const callClaude=async(system,history,userMsg)=>{
     try{
-      const msgs=history.slice(-20);
+      const msgs=history.slice(-12);
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,system,messages:msgs})});
