@@ -2556,6 +2556,17 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
     { key:"builder", icon:"🔤", label:"Sentence Builder" },
   ];
 
+  const TABS = [
+    { key:"grammar", icon:"📐", label:"Grammar Drills", freePreview:true },
+    { key:"paraphrase", icon:"🔄", label:"Paraphrasing" },
+    { key:"linking", icon:"🔗", label:"Linking Words" },
+    { key:"vocab", icon:"📖", label:"Vocabulary Upgrade" },
+    { key:"errors", icon:"🔍", label:"Error Correction" },
+    { key:"bandcheck", icon:"🎯", label:"Band Self-Check" },
+    { key:"dictation", icon:"🎧", label:"Dictation", freePreview:true },
+    { key:"builder", icon:"🔤", label:"Sentence Builder" },
+  ];
+
   return (
     <div>
       {/* Header */}
@@ -2567,6 +2578,20 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
         </p>
       </div>
 
+
+      {/* Tab buttons */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
+        {TABS.map(t => {
+          const tabLocked = !isPro && !t.freePreview;
+          return(
+          <button key={t.key} onClick={() => tabLocked?onUpgrade():setActiveExTab(t.key)}
+            style={{ background: activeExTab === t.key ? T.primaryLight : T.bgGray, border: `1px solid ${activeExTab === t.key ? T.primaryBorder : T.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: activeExTab === t.key ? 700 : 400, color: activeExTab === t.key ? T.primary : tabLocked?T.textLight:T.textMid, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", display: "flex", alignItems: "center", gap: 5, opacity:tabLocked?0.65:1 }}>
+            <span>{tabLocked?"🔒":t.icon}</span>{t.label}
+            {t.freePreview&&!isPro&&<span style={{fontSize:9,background:"#dcfce7",color:"#16a34a",borderRadius:4,padding:"1px 5px",fontWeight:700,marginLeft:2}}>FREE</span>}
+          </button>
+          );
+        })}
+      </div>
 
       {/* Content area */}
       <div style={{ position: "relative" }}>
@@ -3139,6 +3164,7 @@ const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade, freePreview=false})
   };
   const handleAnswer = (catIdx, exIdx, optIdx) => {
     if(!canAnswer) return;
+    if(freePreview && catIdx >= 2) return; // locked category
     const key = `${catIdx}-${exIdx}`;
     if(answers[key]!==undefined) return;
     setAnswers(prev=>({...prev,[key]:optIdx}));
