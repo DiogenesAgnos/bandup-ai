@@ -9715,12 +9715,17 @@ ALWAYS:
 - NEVER say your name
 - NEVER wait for permission to advance — move automatically after correct answers
 - NEVER say "underscore" — use "${instr.fillBlankWord}" for gaps
-- 2-3 sentences max per response
-- Be warm and enthusiastic: "Excellent! 🌟", "Well done!", "One more time!", "Perfect! 🎉", "Brilliant! 💫", "ممتاز!", "برافو!"
-- If student writes Arabic: respond briefly in Arabic then continue
-- LENIENT repeat evaluation: if the student says the right word(s) even with extra words, typos, or slight mistakes, count it as correct. Example: student says "one 23" when asked to repeat "One, Two, Three" — this is CORRECT (speech-to-text error). Be generous.
-- When giving an example sentence at A1/A2 level, always add the Arabic translation in brackets on the same line: "I have three books. (عندي ثلاثة كتب)"
-- Be conversational and natural — speak like an enthusiastic human teacher, not a robot listing items`;
+- STRICT FORMATTING: NO markdown. NO hashtags (#). NO hyphens (---). NO tables (|). NO blockquotes (>). NO bold (**). NO headers. Plain text ONLY.
+- STRICT LENGTH: Maximum 3 SHORT sentences per reply. Never write paragraphs. Never use bullet lists.
+- Emojis: maximum 1 per reply. No emoji spam.
+- NEVER explain what you are doing — just do it. Do NOT say "أعيد لك", "سأكرر", "لنبدأ" — just start teaching immediately.
+- NEVER teach extra vocabulary beyond the lesson word. NEVER add extra greetings, tables, or comparisons unprompted.
+- ONE word or exercise at a time. Do not combine multiple words in one message.
+- Be warm but brief: "ممتاز!", "برافو!", "Excellent!", "Well done!"
+- If student writes Arabic: reply in one Arabic sentence then continue
+- LENIENT repeat evaluation: if the student says the right word(s) even with typos or extra words, count it as correct. Be generous.
+- A1/A2 example sentences: add Arabic translation in brackets: "Hello! (مرحباً!)"
+- You are a CONVERSATIONAL teacher, not a textbook. Short. Natural. Human.`;
     }catch(e){console.error("Linda system prompt error:",e);return "You are Linda, an enthusiastic English teacher. Teach the current lesson warmly and naturally.";}
   };
 
@@ -9741,12 +9746,26 @@ ALWAYS:
 
   const speakLinda=(text)=>speakElevenLabs(text,LINDA_VOICE_ID);
 
+  const cleanLindaText=(text)=>text
+    .replace(/^#+\s*/gm,"")          // remove # headers
+    .replace(/\*\*/g,"")             // remove bold
+    .replace(/\*/g,"")               // remove italic
+    .replace(/^\s*---+\s*$/gm,"")   // remove --- dividers
+    .replace(/^\s*>\s*/gm,"")       // remove blockquotes
+    .replace(/\|[^
+]+\|/g,"")     // remove tables
+    .replace(/
+{3,}/g,"
+")        // collapse excess newlines
+    .trim();
+
   const addLindaMessage=(text)=>{
     if(!mountedRef.current)return;
-    const isSuccess=/\[REPEAT_SUCCESS\]/i.test(text);
-    const isMoveOn=/\[MOVE_ON\]/i.test(text);
-    // Strip signals and name prefix
-    let raw=text
+    const cleaned=cleanLindaText(text);
+    const isSuccess=/\[REPEAT_SUCCESS\]/i.test(cleaned);
+    const isMoveOn=/\[MOVE_ON\]/i.test(cleaned);
+    // Strip signals and name prefix (use cleaned text - markdown already removed)
+    let raw=cleaned
       .replace(/\[REPEAT_SUCCESS\]/gi,"").replace(/\[MOVE_ON\]/gi,"")
       .replace(/\[Linda\][:：]?\s*/gi,"").replace(/Linda[:：]\s*/gi,"")
       .replace(/\*\*/g,"").replace(/\*/g,"").trim();
