@@ -3163,7 +3163,7 @@ const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade, freePreview=false})
     <div>
       <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 13, color: T.textMid, fontFamily: "'Cairo','Source Sans Pro',system-ui", marginBottom: 4 }}>
-          <strong>14 categories · {totalQ} questions</strong> covering Subject-Verb Agreement, Articles, Tenses, Prepositions, Passives, Conditionals, Relative Clauses, and more.
+          <strong>{GRAMMAR_EXERCISES.length} categories · {totalQ} questions</strong> covering Subject-Verb Agreement, Articles, Tenses, Prepositions, Passives, Conditionals, Relative Clauses, and more.
         </div>
         {totalAnswered > 0 && (
           <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 14px", display: "inline-block" }}>
@@ -3180,17 +3180,17 @@ const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade, freePreview=false})
           const isOpen = openCat === catIdx;
           return (
             <div key={catIdx}>
-              <div onClick={() => setOpenCat(isOpen ? null : catIdx)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: "pointer", transition: "all 0.15s" }}>
-                <span style={{ fontSize: 20 }}>{cat.icon}</span>
-                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.category}</span>
+              <div onClick={() => (freePreview&&catIdx>=2)?onUpgrade():setOpenCat(isOpen ? null : catIdx)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: (freePreview&&catIdx>=2)?"#f8fafc":isOpen?`${cat.color}10`:T.bg, border: `1px solid ${(freePreview&&catIdx>=2)?T.border:isOpen?cat.color+"40":T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: (freePreview&&catIdx>=2)?"not-allowed":"pointer", transition: "all 0.15s", opacity:(freePreview&&catIdx>=2)?0.55:1 }}>
+                <span style={{ fontSize: 20 }}>{(freePreview&&catIdx>=2)?"🔒":cat.icon}</span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: (freePreview&&catIdx>=2)?T.textLight:isOpen?cat.color:T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.category}</span>
                 {score.attempted > 0 && (
                   <span style={{ background: score.correct === score.attempted ? T.greenBg : T.amberBg, border: `1px solid ${score.correct === score.attempted ? T.greenBorder : T.amberBorder}`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: score.correct === score.attempted ? T.green : T.amber, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>
                     {score.correct}/{score.attempted}
                   </span>
                 )}
                 <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.exercises.length}q</span>
-                <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
+                {!(freePreview&&catIdx>=2)&&<span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>}
               </div>
               {isOpen && (
                 <div style={{ border: `1px solid ${cat.color}40`, borderTop: "none", borderRadius: "0 0 10px 10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16, background: `${cat.color}05` }}>
