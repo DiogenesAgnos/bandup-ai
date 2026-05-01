@@ -4759,11 +4759,7 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
   };
 
   // ── Save current answer and advance ──
-  const saveAnswer = (partLabel, question) => {
-    const ans = transcript.trim()||finalTranscriptRef.current.trim();
-    answersRef.current.push({part:partLabel, question, answer:ans||"[No response recorded]"});
-    setTranscript(""); finalTranscriptRef.current="";
-  };
+  // saveAnswer replaced by inline pushes in advance functions
 
   // ── Examiner reads question via ElevenLabs, then sets isSpeaking=false ──
   const examinerSpeak = (text, onDone) => {
@@ -4821,7 +4817,7 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
     setSpeakLeft(120);
     speakTimerRef.current = setInterval(()=>{
       setSpeakLeft(prev=>{
-        if(prev<=1){ clearInterval(speakTimerRef.current); if(mountedRef.current) finishP2(); return 0; }
+        if(prev<=1){ clearInterval(speakTimerRef.current); if(mountedRef.current) finishP2(""); return 0; }
         return prev-1;
       });
     },1000);
@@ -4869,8 +4865,8 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
     // Resume Part 2 speak timer if it was running
     if(phase==="p2_speak" && speakPausedAt.current>0){
       setSpeakLeft(speakPausedAt.current);
-      speakTimerRef.current=setInterval(()=>setSpeakLeft(prev=>{
-        if(prev<=1){clearInterval(speakTimerRef.current);if(mountedRef.current)finishP2();return 0;}return prev-1;
+            speakTimerRef.current=setInterval(()=>setSpeakLeft(prev=>{
+        if(prev<=1){clearInterval(speakTimerRef.current);if(mountedRef.current)finishP2("");return 0;}return prev-1;
       }),1000);
     }
   };
@@ -7968,6 +7964,11 @@ const PlacementTest = ({uiLang="ar", onNavigate, isPro=false, session=null}) => 
   const saved = loadPlacementResult();
   const hasTaken = !!saved;
   const [screen, setScreen] = useState(saved?"results":"intro");
+  const [readingAnswers, setReadingAnswers] = useState(saved?.readingAnswers||{});
+  const [grammarAnswers, setGrammarAnswers] = useState(saved?.grammarAnswers||{});
+  const [readingTime, setReadingTime] = useState(600);
+  const [grammarTime, setGrammarTime] = useState(600);
+  const [results, setResults] = useState(saved||null);
   // On mount: if logged in and no local result, check Supabase
   useEffect(()=>{
     if(session?.email && !saved){
@@ -7980,11 +7981,6 @@ const PlacementTest = ({uiLang="ar", onNavigate, isPro=false, session=null}) => 
       });
     }
   },[session?.email]);
-  const [readingAnswers, setReadingAnswers] = useState(saved?.readingAnswers||{});
-  const [grammarAnswers, setGrammarAnswers] = useState(saved?.grammarAnswers||{});
-  const [readingTime, setReadingTime] = useState(600);
-  const [grammarTime, setGrammarTime] = useState(600);
-  const [results, setResults] = useState(saved||null);
   const [reviewSection, setReviewSection] = useState(null); // null | "reading" | "grammar"
   const timerRef = useRef(null);
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
@@ -11261,8 +11257,6 @@ export default function IELTSBot(){
         {/* TIER 2 — Red navbar: grouped navigation */}
         <div style={{background:T.primary}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px",position:"relative"}}>
-            {/* Scroll hint fade — mobile only */}
-            <div className="nav-scroll-hint" style={{position:"absolute",right:0,top:0,bottom:0,width:48,background:"linear-gradient(to right, transparent, rgba(180,0,0,0.85))",pointerEvents:"none",zIndex:2,borderRadius:"0 4px 4px 0"}}/>
             {/* Desktop: grouped with dividers */}
             <div style={{position:"relative"}}>
             {/* Scroll hint — white fade on trailing edge + white progress bar */}
