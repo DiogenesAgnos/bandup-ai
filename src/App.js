@@ -26,7 +26,7 @@ const fetchProStatus = async (email) => {
   } catch { return false; }
 };
 
-// ── Device session helpers (max 2 concurrent devices per Pro account) ──
+// ── Device session helpers (1 active device per Pro account — new login kicks old device) ──
 const MAX_DEVICES = 1;
 
 const generateDeviceToken = () => {
@@ -1369,20 +1369,28 @@ const PracticeMode=({isPro,onUpgrade,email})=>{
     category:e.category||"Grammar", severity:"moderate"
   }))||[];
 
+  // Fix 4: separate practice counter so it doesn't burn main essay credits
+  const PRACTICE_STORAGE_KEY = "bandup_practice_uses";
+  const getPracticeUses = useCallback(()=>{try{return parseInt(localStorage.getItem(PRACTICE_STORAGE_KEY+(email||""))||"0");}catch{return 0;}},[email]);
+  const savePracticeUses = useCallback((n)=>{try{localStorage.setItem(PRACTICE_STORAGE_KEY+(email||""),String(n));}catch{}},[email]);
+
   const fetchLiveFeedback=useCallback(async(text)=>{
     if(countWords(text)<25) return;
-    if(!isPro&&getStoredUses(email)>=FREE_USES_LIMIT){ onUpgrade(); return; }
+    if(!isPro&&getPracticeUses()>=FREE_USES_LIMIT){ onUpgrade(); return; }
     setLoadingFeedback(true);
     try{
-      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:PRACTICE_SYSTEM,messages:[{role:"user",content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive coaching feedback with spotted errors as JSON.`}]})});
+      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:800,system:PRACTICE_SYSTEM,messages:[{role:"user",content:`Question: "${question}"\n\nEssay so far:\n${text}\n\nGive coaching feedback with spotted errors as JSON.`}]})});
       const data=await res.json();
       const raw=data.content?.map(b=>b.text||"").join("")||"";
       const parsed=JSON.parse(raw.replace(/```json|```/g,"").trim());
       setLiveFeedback(parsed);
-      if(!isPro){ const n=getStoredUses(email)+1; saveUses(n,email); }
+      if(!isPro){ savePracticeUses(getPracticeUses()+1); }
     }catch(e){ console.error(e); }
     finally{ setLoadingFeedback(false); }
-  },[question,isPro,onUpgrade,email]);
+  },[question,isPro,onUpgrade,email,getPracticeUses,savePracticeUses]);
+
+  // Fix 3: clean up debounce timer on unmount to prevent state updates on unmounted component
+  useEffect(()=>{ return ()=>{ if(timerRef.current) clearTimeout(timerRef.current); }; },[]);
 
   const handleEssayChange=(e)=>{
     const val=e.target.value;
@@ -1565,7 +1573,7 @@ const GrammarChecker = ({isPro, onUpgrade=()=>{}}) => {
       const res = await fetch(API_URL, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514", max_tokens: 600,
+          model: "claude-sonnet-4-6", max_tokens: 600,
           system: GRAMMAR_SYSTEM,
           messages: [{ role: "user", content: input.trim() }]
         })
@@ -2840,7 +2848,7 @@ const SelfCorrectMode = ({isPro,onUpgrade}) => {
     setHintLoading(true);
     try{
       const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:400,
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:400,
           system:`You are an English error detector. Find errors in the text and return ONLY JSON — no markdown:
 {"count":3,"wrongPhrases":["exact phrase 1","exact phrase 2"],"categories":["grammar","word choice"]}
 wrongPhrases: the exact incorrect words/phrases from the text (no corrections, just the problematic parts).
@@ -2860,7 +2868,7 @@ If no errors: {"count":0,"wrongPhrases":[],"categories":[]}`,
     setLoading(true);
     try{
       const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:700,
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:700,
           system:`You are an English grammar checker. Analyse the provided text and return only JSON:
 {"errors":[{"wrong":"exact wrong phrase","right":"corrected version","explanation":"concise rule explanation","severity":"major|moderate|minor"}],"overall":"one sentence summary","score":0}
 score is 0-10. If no errors, return {"errors":[],"overall":"No errors found.","score":10}. Return ONLY valid JSON, no markdown.`,
@@ -4036,7 +4044,6 @@ const IELTS_TOPICS=SPEAKING_PART1.map(t=>({
 
 const ConversationPractice=({isPro,onUpgrade,session,onAuth})=>{
   const [screen,setScreen]=useState("setup");
-  const [mode,setMode]=useState("free");
   const [level,setLevel]=useState(()=>{try{return localStorage.getItem("ef_sarah_level")||"b1";}catch{return "b1";}});
   const [userName,setUserName]=useState(()=>{try{return localStorage.getItem("ef_sarah_name")||"";}catch{return "";}});
   const [ieltsTopicIdx,setIeltsTopicIdx]=useState(0);
@@ -4175,7 +4182,7 @@ RESPONSE RULES:
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const res=await fetch("/api/analyze",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:150,system,messages:msgs})
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:150,system,messages:msgs})
       });
       if(!mountedRef.current)return "";
       const data=await res.json();
@@ -4267,7 +4274,7 @@ OVERALL:
 Write 2-3 warm, honest sentences about the user's current level and one clear priority to focus on next.`;
     try{
       const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,system:sys,
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:600,system:sys,
           messages:[{role:"user",content:`Conversation:\n\n${convo}`}]})});
       if(!mountedRef.current)return;
       const data=await res.json();
@@ -4276,14 +4283,15 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
       // Generate a rich session summary for next session's greeting
       try{
         const sumRes=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:120,
+          body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:120,
             system:"You are summarising an English practice session for an AI coach's memory. Write exactly 3 sentences, plain text, no labels. Sentence 1: topics and questions covered. Sentence 2: the student's main grammar or vocabulary errors (be specific — quote the mistakes). Sentence 3: vocabulary or phrases introduced, and where the conversation ended.",
             messages:[{role:"user",content:`Summarise this session for the coach's memory:\n\n${convo}`}]})});
+        if(!mountedRef.current)return; // Fix 9: guard before any state/storage update
         const sumData=await sumRes.json();
         const summary=sumData?.content?.[0]?.text||null;
         saveSarahHistory({name:userName,level,date:new Date().toISOString(),summary});
       }catch(e){
-        saveSarahHistory({name:userName,level,date:new Date().toISOString(),summary:null});
+        if(mountedRef.current) saveSarahHistory({name:userName,level,date:new Date().toISOString(),summary:null});
       }
       setPastHistory(loadSarahHistory());
     }catch(e){setReport("Could not generate report.");}
@@ -4381,11 +4389,11 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     // Stop Web Speech fallback
     recognitionRef.current?.stop();
     setIsRecording(false);
+    // Fix: read finalTranscriptRef (updated synchronously in onend) instead of
+    // calling sendMessage inside a state-updater (wrong pattern — fires twice in StrictMode)
     setTimeout(()=>{
-      setTranscript(prev=>{
-        if(prev.trim())sendMessage(prev);
-        return prev;
-      });
+      const t=finalTranscriptRef.current.trim();
+      if(t)sendMessage(t);
     },150); // small delay to let final result land
   };
 
@@ -4891,7 +4899,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
 
     try{
       const res = await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:900,system:sys,
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:900,system:sys,
           messages:[{role:"user",content:`Score this IELTS Speaking test transcript:\n\n${fullTranscript}`}]})});
       const data = await res.json();
       const raw = data?.content?.[0]?.text||"";
@@ -6972,7 +6980,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar",onUpgrade}){
     setCorrect(ok);
     if(ok) gameAudio.correct(); else gameAudio.wrong();
     const newLives=ok?lives:lives-1;
-    if(!ok) setLives(l=>l-1);
+    setLives(newLives);
     if(ok) setScore(s=>s+1);
     const newAnswers=[...answers,{q:cq.q,opts:cq.opts,chosen:i,correct:cq.a,correctText:cq.opts[cq.a],exp:cq.exp||"",ok}];
     setAnswers(newAnswers);
@@ -6981,8 +6989,7 @@ function IELTSGame({proUser,onNavigate,uiLang="ar",onUpgrade}){
       if(qIdx+1>=25||newLives<=0){
         const finalScore=(ok?score+1:score);
         const entry={cat:cat.id,catName:uiLang==="ar"?cat.arabic:cat.english,score:finalScore,total:qIdx+1,date:new Date().toLocaleDateString(uiLang==="ar"?"ar-SA":"en-GB"),ts:Date.now()};
-        const h=getHistory(); h.unshift(entry);
-        try{localStorage.setItem("ef_game_history",JSON.stringify(h.slice(0,50)));}catch{}
+        saveHistory(entry);
         setScreen("complete");
       } else { setQIdx(j=>j+1); setGState("running"); setBlockKey(k=>k+1); setShowPrev(false); }
     },1500);
@@ -8509,7 +8516,7 @@ function ManageSubModal({onClose,email=""}){
         {/* Didn't get email? */}
         <div style={{background:"#fef9c3",border:"1px solid #fde047",borderRadius:8,padding:"10px 14px",marginBottom:20,direction:"rtl"}}>
           <div style={{fontSize:12,color:"#713f12",lineHeight:1.5}}>
-            <strong>Can't find the email?</strong> Check your Spam folder, or contact us via the <strong>Contact</strong> page and we'll helدك في الإلغاء خلال 24 ساعة.
+            <strong>Can't find the email?</strong> Check your Spam folder, or contact us via the <strong>Contact</strong> page and we'll help you cancel within 24 hours / سنساعدك في الإلغاء خلال 24 ساعة.
           </div>
         </div>
 
@@ -8540,7 +8547,6 @@ const UI = {
     heroPill:"🎓 تعلّم الإنجليزية  ·  ارفع درجتك في الآيلتس",
     heroTitle:"تعلّم الإنجليزية. ارفع درجة الآيلتس.",
     heroSub:"اختبار تحديد مستوى · تغذية راجعة حقيقية على مقالاتك · مبني للآيلتس والأهداف الأكبر",
-    heroIelts:"✅ مثالي لمن يستهدف رفع درجة الآيلتس",
     heroIelts:"✅ مثالي لمن يستهدف رفع درجة الآيلتس",
     startFree:"اكتشف مستواك — مجاناً ←",
     startFree2:"حلّل مقالتك الأولى مجاناً →",
@@ -8596,7 +8602,6 @@ const UI = {
     heroPill:"🎓 English Learning  ·  IELTS Preparation",
     heroTitle:"Learn English. Ace your IELTS.",
     heroSub:"A placement test, real writing feedback, and structured practice — built for IELTS and beyond.",
-    heroIelts:"✅ Ideal if you're also targeting a specific IELTS band",
     heroIelts:"✅ Ideal if you're also targeting a specific IELTS band",
     startFree:"Find your level — free, no sign-up",
     startFree2:"Analyse your first essay free →",
@@ -9587,7 +9592,7 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
     if(screen==="chat"&&messages.length>0){
       saveLindaSession(progress.currentLesson,currentPhase,messages);
     }
-  },[messages,currentPhase]);
+  },[messages,currentPhase,screen,progress.currentLesson]);
 
   const levelData=LINDA_CURRICULUM[progress.level];
   const lessons=levelData?.lessons||[];
@@ -9658,7 +9663,7 @@ For EACH word follow this format exactly:
 IMPORTANT: Write Arabic only inside small brackets like (يعني: مرحبا) — never write full Arabic sentences. Keep 80% of your message in English. Be warm and enthusiastic.
 Vocabulary:
 ${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
-When ALL words done: "${instr.vocabDone}" — immediately present first fill-in-the-blank.`,
+When ALL words done: say "${instr.vocabDone}" and include the exact tag [PHASE:2] anywhere in your message — then immediately present first fill-in-the-blank.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
 Present ONE exercise at a time using this format:
@@ -9667,7 +9672,7 @@ If correct: "${instr.fillCorrect}" — immediately next exercise.
 If wrong: "${instr.fillWrong}: [Arabic/English hint]" — ask again.
 Exercises:
 ${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence.replace(/___/g,instr.fillBlankWord)}" — answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
-When ALL done: "${instr.fillDone}" — immediately present first spelling word.`,
+When ALL done: say "${instr.fillDone}" and include the exact tag [PHASE:3] anywhere in your message — then immediately present first spelling word.`,
 
       2:`PHASE 3 — SPELLING:
 You MUST follow this exact format for EVERY spelling question — no exceptions:
@@ -9685,7 +9690,7 @@ If wrong: spell it out: "It's [SPELL]T-R-A-F-F-I-C[/SPELL] — try once more: [S
 
 Words to test in order: ${lesson.spelling.map((w,i)=>`${i+1}. [SPELL]${w}[/SPELL]`).join(", ")}
 
-Start immediately with word 1. When ALL words done: say "Outstanding! Let's talk now." and immediately ask the first conversation question.`,
+Start immediately with word 1. When ALL words done: say "Outstanding! Let's talk now." and include the exact tag [PHASE:4] in your message — then immediately ask the first conversation question.`,
 
       3:`PHASE 4 — CONVERSATION:
 Ask ONE question at a time:
@@ -9693,7 +9698,7 @@ ${lesson.conversation.map((c,i)=>`${i+1}. ${instr.convIntro} ${c}`).join("\n")}
 Weave in grammar naturally: ${lesson.grammar.point}
 ${lesson.grammar.levelNote?`Share this note naturally: ${lesson.grammar.levelNote}`:""}
 ${isA1A2?"اشرح أي مفهوم صعب بالعربي.":isB1?"Use Arabic to explain difficult grammar points.":""}
-When done: "${instr.lessonDone}"`,
+When ALL questions done: say "${instr.lessonDone}" and include the exact tag [LESSON_COMPLETE] in your message.`,
     };
 
     const lowLevelNote=isA1A2?`
@@ -9732,7 +9737,7 @@ ALWAYS:
       const controller=new AbortController();
       const timeout=setTimeout(()=>controller.abort(),20000); // 20s timeout
       const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},signal:controller.signal,
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,system,messages:msgs})});
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:200,system,messages:msgs})});
       clearTimeout(timeout);
       if(!mountedRef.current)return "";
       const data=await res.json();
@@ -9746,11 +9751,20 @@ ALWAYS:
     if(!mountedRef.current)return;
     const isSuccess=/\[REPEAT_SUCCESS\]/i.test(text);
     const isMoveOn=/\[MOVE_ON\]/i.test(text);
-    // Strip signals and name prefix
+
+    // Fix 4: detect structured phase signals BEFORE stripping — reliable across all phrasings
+    const sigPhase2=/\[PHASE:2\]/i.test(text);
+    const sigPhase3=/\[PHASE:3\]/i.test(text);
+    const sigPhase4=/\[PHASE:4\]/i.test(text);
+    const sigLessonDone=/\[LESSON_COMPLETE\]/i.test(text);
+
+    // Strip all control signals and name prefix — none of these are shown to the student
     let raw=text
       .replace(/\[REPEAT_SUCCESS\]/gi,"").replace(/\[MOVE_ON\]/gi,"")
+      .replace(/\[PHASE:\d\]/gi,"").replace(/\[LESSON_COMPLETE\]/gi,"")
       .replace(/\[Linda\][:：]?\s*/gi,"").replace(/Linda[:：]\s*/gi,"")
       .replace(/\*\*/g,"").replace(/\*/g,"").trim();
+
     // Extract spelling words for TTS (keep them) but mark for visual blur
     const ttsText=raw.replace(/\[SPELL\](.*?)\[\/SPELL\]/gi,"$1");
     const displayText=raw; // keep [SPELL] tags — rendered as blurred in JSX
@@ -9766,23 +9780,28 @@ ALWAYS:
                       raw.match(/once more[:\s]+[""]?([^"".\n?!]+)/i)||
                       raw.match(/try again[:\s]+[""]?([^"".\n?!]+)/i);
     if(repeatMatch)setRepeatTarget(repeatMatch[1].trim().replace(/[""]$/,"").replace(/\[SPELL\]|\[\/SPELL\]/gi,""));
-    // Phase advancement
-    if(/(أكمل الجملة|fill.in.the.blank|blank exercises)/i.test(raw)&&currentPhase===0)setCurrentPhase(1);
-    else if(/(الإملاء|now spelling|time for spell)/i.test(raw)&&currentPhase===1)setCurrentPhase(2);
-    else if(/(نتحدث|let's talk|conversation now|outstanding)/i.test(raw)&&currentPhase===2)setCurrentPhase(3);
-    else if(/(انتهى الدرس|lesson complete|amazing work)/i.test(raw)){
+
+    // Fix 4: Phase advancement — structured signals first, regex as safety-net fallback
+    // Lesson complete: signal-driven only (removed "amazing work" — too broad, fires mid-lesson)
+    if(sigLessonDone||(/(انتهى الدرس|lesson complete)/i.test(raw)&&currentPhase===3)){
       if(currentLesson&&!completedSet.has(currentLesson.id)){
         const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
         const next=lessons[nextIdx];
         saveProgress({completed:[...progress.completed,currentLesson.id],currentLesson:next?.id||currentLesson.id});
       }
       clearLindaSession();
+    } else if((sigPhase2||(/(أكمل الجملة|fill.in.the.blank|blank exercises)/i.test(raw)))&&currentPhase===0){
+      setCurrentPhase(1);
+    } else if((sigPhase3||(/(الإملاء|now spelling|time for spell)/i.test(raw)))&&currentPhase===1){
+      setCurrentPhase(2);
+    } else if((sigPhase4||(/(نتحدث|let's talk|conversation now|outstanding.*let.*talk)/i.test(raw)))&&currentPhase===2){
+      setCurrentPhase(3);
     }
   };
 
   const getHistory=()=>messages.map(m=>({
     role:m.role==="user"?"user":"assistant",
-    content:m.role==="user"?m.text:m.text,
+    content:m.text,
   }));
 
   const sendMessage=async(text)=>{
@@ -9827,7 +9846,9 @@ ALWAYS:
     }
     recognitionRef.current?.stop();
     setIsRecording(false);
-    setTimeout(()=>{setTranscript(prev=>{if(prev.trim())sendMessage(prev);return prev;});},150);
+    // Fix: read finalTranscriptRef (updated synchronously in onend) instead of
+    // calling sendMessage inside a state-updater (wrong pattern — fires twice in StrictMode)
+    setTimeout(()=>{const t=finalTranscriptRef.current.trim();if(t)sendMessage(t);},150);
   };
 
   const startRecording=async()=>{
@@ -9892,12 +9913,14 @@ ALWAYS:
     <div style={{width:size,height:size,borderRadius:"50%",overflow:"hidden",flexShrink:0,border:"2px solid #a78bfa"}} dangerouslySetInnerHTML={{__html:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="38" fill="#f5f3ff" stroke="#a78bfa" strokeWidth="2"/><circle cx="40" cy="30" r="14" fill="#c4b5fd"/><ellipse cx="40" cy="62" rx="18" ry="12" fill="#7c3aed"/><circle cx="40" cy="30" r="11" fill="#ede9fe"/><ellipse cx="35" cy="28" rx="2" ry="2.5" fill="#4c1d95"/><ellipse cx="45" cy="28" rx="2" ry="2.5" fill="#4c1d95"/><path d="M34 35 Q40 40 46 35" stroke="#7c3aed" strokeWidth="1.5" fill="none" strokeLinecap="round"/><rect x="22" y="44" width="36" height="5" rx="2" fill="#6d28d9"/><path d="M27 50 Q40 59 53 50" fill="#7c3aed"/></svg>`}}/>
   );
 
+  // Fix 2: show actual user initial instead of hardcoded "S"
+  const userInitial=(session?.name||session?.email?.split("@")[0]||"U").charAt(0).toUpperCase();
   const UserAvatar=()=>(
-    <div style={{width:38,height:38,borderRadius:"50%",background:"#ede9fe",border:"2px solid #a78bfa",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:14,color:"#7c3aed",flexShrink:0,...sty}}>S</div>
+    <div style={{width:38,height:38,borderRadius:"50%",background:"#ede9fe",border:"2px solid #a78bfa",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:14,color:"#7c3aed",flexShrink:0,...sty}}>{userInitial}</div>
   );
 
-  // Check if there's a saved session to resume
-  const savedSession=loadLindaSession();
+  // Fix 6: memoize so localStorage is not hit on every render — refresh when lesson or messages change
+  const savedSession=useMemo(()=>loadLindaSession(),[progress.currentLesson,messages.length]);
   const canResume=savedSession&&savedSession.lessonId===progress.currentLesson;
 
   // SETUP SCREEN
@@ -10763,6 +10786,8 @@ export default function IELTSBot(){
   const [navVisible,setNavVisible]=useState(true);
   const lastScrollY=useRef(0);
   const analyzeRef=useRef(null);
+  // Fix 1: sessionRef always reflects current session — used inside Paddle eventCallback closure
+  const sessionRef=useRef(null);
   const [proUser, setProUser] = useState(false);
   const [heroTab, setHeroTab] = useState(0);
   const usesLeft = FREE_USES_LIMIT - uses;
@@ -10793,6 +10818,9 @@ export default function IELTSBot(){
     });
     return ()=> subscription.unsubscribe();
   },[]);
+
+  // Fix 1: keep sessionRef always current so Paddle eventCallback (a stale closure) can read latest session
+  useEffect(()=>{ sessionRef.current = session; },[session]);
 
   // ── Smart nav hide on scroll (mobile) ──
   useEffect(()=>{
@@ -10827,18 +10855,22 @@ export default function IELTSBot(){
           token: PADDLE_TOKEN,
           eventCallback: (ev) => {
             if(ev.name === "checkout.completed"){
-              // Checkout succeeded — Pro will be activated by webhook
-              // But also try to activate immediately via client-side
-              const email = ev.data?.customer?.email || session?.email;
+              // Fix 1: use sessionRef (always current) instead of stale closure over session
+              const email = ev.data?.customer?.email || sessionRef.current?.email;
               if(email){
                 fetch("/api/paddle/activate", {
                   method:"POST",
                   headers:{"Content-Type":"application/json"},
                   body: JSON.stringify({email})
-                }).then(()=>{
+                }).then(async(res)=>{
+                  if(!res.ok) throw new Error("Activation failed");
                   fetchProStatus(email).then(setProUser);
                   setShowPaywall(false);
-                }).catch(console.error);
+                }).catch(()=>{
+                  // Fix 14: show user-facing message instead of silently failing
+                  setError("Payment confirmed! If Pro hasn't activated, please refresh the page or contact us — your payment is safe.");
+                  setShowPaywall(false);
+                });
               } else {
                 setProUser(true);
                 setShowPaywall(false);
@@ -10849,7 +10881,8 @@ export default function IELTSBot(){
       }
     };
     document.head.appendChild(script);
-  },[session]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);  // run once only — sessionRef handles live session access inside the callback
 
   const handleAuthSuccess=(sess)=>{
     setSession(sess);
@@ -10866,6 +10899,8 @@ export default function IELTSBot(){
   };
 
   const handleSignOut=async()=>{
+    // Fix 2: clear device slot in DB so the user's next login isn't blocked
+    if(session?.email) await unregisterDevice(session.email);
     await supabase.auth.signOut();
     setSession(null);
     setUses(0);
@@ -10875,9 +10910,10 @@ export default function IELTSBot(){
     switchView("analyze");
   };
 
-  const [isSampleEssay, setIsSampleEssay] = useState(false);
+  // Fix 11 + 12: removed unused isSampleEssay state; trigger analyze directly via analyzeCallbackRef
+  // instead of the fragile setTimeout + .click() pattern
+  const analyzeCallbackRef = useRef(null);
   const trySampleEssay=()=>{
-    setIsSampleEssay(true);
     setTaskType("task2");
     setTopic(SAMPLE_ESSAY_TOPIC);
     setEssay(SAMPLE_ESSAY_TEXT);
@@ -10885,16 +10921,20 @@ export default function IELTSBot(){
     clearLastResult();
     setError("");
     switchView("analyze");
-    // Auto-click analyze after a brief delay to let state update
-    setTimeout(()=>{
-      if(analyzeRef.current){
-        analyzeRef.current.scrollIntoView({behavior:"smooth",block:"center"});
-        setTimeout(()=>{ if(analyzeRef.current) analyzeRef.current.click(); },400);
-      }
-    },300);
+    // Schedule analyze to run after React re-renders with the new state
+    analyzeCallbackRef.current = "pending";
   };
 
   const switchLang=(newLang)=>{ setLang(newLang); if(result){ setError(newLang==="ar"?"تم تغيير اللغة. اضغط 'Analyze' مجدداً لرؤية التعليقات بالعربية.":"Language changed. Click 'Analyze' again to see feedback in English."); } };
+
+  // Fix 11: runs analyze once after trySampleEssay has updated state — no fake .click() needed
+  useEffect(()=>{
+    if(analyzeCallbackRef.current==="pending"&&topic===SAMPLE_ESSAY_TOPIC&&essay===SAMPLE_ESSAY_TEXT){
+      analyzeCallbackRef.current=null;
+      analyze();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[topic,essay]);
 
   // Fix black screen: reload app if React crashes when returning from background
   useEffect(()=>{
@@ -11084,7 +11124,7 @@ export default function IELTSBot(){
     try {
       const base64 = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=(e)=>res(e.target.result.split(",")[1]); r.onerror=rej; r.readAsDataURL(file); });
       const resp = await fetch(API_URL, { method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:2000,
+        body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:2000,
           messages:[{ role:"user", content:[
             { type:"image", source:{ type:"base64", media_type:file.type||"image/jpeg", data:base64 }},
             { type:"text", text: target==="topic"
@@ -11115,9 +11155,14 @@ export default function IELTSBot(){
         ?[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:image}},{type:"text",text:`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`}]
         :`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`;
       const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:4000,system:getSystemPrompt(taskType,lang),messages:[{role:"user",content:messageContent}]})});
+      // Fix 13: handle non-200 HTTP responses before attempting JSON parse
+      if(!res.ok){ throw new Error(`API error ${res.status}`); }
       const data=await res.json();
       const text=data.content.map(b=>b.text||"").join("");
-      const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
+      const cleanText=text.replace(/```json|```/g,"").trim();
+      // Fix 13: validate response looks like JSON before parsing to get a meaningful error
+      if(!cleanText.startsWith("{")&&!cleanText.startsWith("[")){ throw new Error("Unexpected response format"); }
+      const parsed=JSON.parse(cleanText);
       if(parsed.error==="non_english"){
         setLoading(false);
         setError(lang==="ar"?"يرجى كتابة مقالتك باللغة الإنجليزية. هذه الأداة تقيّم الكتابة الإنجليزية فقط.":"Please submit your essay in English. This tool evaluates English writing only.");
