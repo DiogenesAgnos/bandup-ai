@@ -9647,11 +9647,20 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
     // Only build the CURRENT phase instruction — saves ~70% of prompt tokens
     const phaseInstructions={
       0:`PHASE 1 — VOCABULARY:
-You are an enthusiastic English teacher. Teach in English — Arabic appears only as a tiny translation hint in brackets.
-For EACH word: 1) Introduce with meaning + example. 2) Ask student to repeat. 3) After correct repeat say "Once more:" 4) After second correct repeat move to next word immediately. 5) If wrong: "Almost! Try again: [WORD]"
-Arabic only inside brackets like (يعني: مرحبا). Keep 80% English. Be warm and enthusiastic.
+${isA1A2?`You are a warm Arabic-speaking teacher helping absolute beginners. ALL instructions and feedback are in Arabic. Only the English word itself is in English.
+For EACH word:
+1) Introduce: say the word in English, then explain its meaning in Arabic using "${instr.vocabMeaning}".
+2) Give the Arabic example: ${v.exAr} (use the actual example from the word data).
+3) Say "${instr.vocabRepeat}: [WORD]" to ask them to repeat.
+4) After correct repeat: "${instr.vocabAgain}: [WORD]" — ask once more.
+5) After second correct repeat: "${instr.vocabNext}" — move immediately to next word.
+6) If wrong: "تقريباً! حاول مرة أخرى: [WORD]"
+NEVER use English instructions. All explanations are in Arabic.`:
+`You are an enthusiastic English teacher. Teach in English — Arabic appears only as a tiny translation hint in brackets.
+For EACH word: 1) Introduce with meaning + example. 2) Ask student to repeat. 3) After correct repeat say "${instr.vocabAgain} [WORD]" 4) After second correct repeat move to next word immediately. 5) If wrong: "Almost! Try again: [WORD]"
+Arabic only inside brackets like (يعني: مرحبا). Keep 80% English. Be warm and enthusiastic.`}
 Vocabulary:
-${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
+${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${isA1A2?v.exAr:v.ex}`).join("\n")}
 When ALL words done: "${instr.vocabDone}" — immediately present first fill-in-the-blank.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
@@ -9779,7 +9788,6 @@ ALWAYS:
   };
 
   const startLesson=async(lesson,resumeSession=false)=>{
-    if(!session){if(onAuth)onAuth();return;}
     if(!lesson)return;
     if(!resumeSession){
       clearLindaSession();
