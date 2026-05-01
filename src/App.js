@@ -624,7 +624,7 @@ const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
     },
     {
       id:"practise",
-      label:isAr?"✏️ تدرّب ▾":"✏️ Practise ▾",
+      label:isAr?"✏️ تمرّن ▾":"✏️ Practice ▾",
       active: ["analyze","practice","grammar","reading","exercises","game"].includes(mainView),
       items:[
         {label:isAr?"🎓 تحليل المقال":"🎓 Analyze Essay", view:"analyze", icon:"🎓"},
@@ -11261,6 +11261,30 @@ export default function IELTSBot(){
       )}
 
       {/* ── HERO — ieltsanswers style: big + clean + minimal ─── */}
+      {/* ── LAUNCH OFFER BANNER ── */}
+      {mainView==="home"&&!proUser&&(
+        <div style={{background:"linear-gradient(90deg,#7f1d1d 0%,#dc2626 50%,#7f1d1d 100%)",padding:"11px 16px",textAlign:"center",position:"relative"}}>
+          <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:10,flexWrap:"wrap",maxWidth:700,margin:"0 auto"}}>
+            <span style={{fontSize:16}}>🔥</span>
+            <span style={{fontFamily:"'Cairo',system-ui",fontWeight:800,fontSize:"clamp(13px,2vw,15px)",color:"white",letterSpacing:"0.02em"}}>
+              {uiLang==="ar"?"عرض الإطلاق — وقت محدود":"Launch Offer — Limited Time"}
+            </span>
+            <span style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(0,0,0,0.25)",borderRadius:20,padding:"4px 14px"}}>
+              <span style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(12px,1.8vw,14px)",color:"rgba(255,255,255,0.55)",textDecoration:"line-through",fontWeight:500}}>
+                {uiLang==="ar"?"50 دينار / 75$":"$75 / 50 JOD"}
+              </span>
+              <span style={{fontFamily:"'Cairo',system-ui",fontSize:"clamp(13px,2vw,15px)",color:"#fde68a",fontWeight:900}}>
+                {uiLang==="ar"?"الآن 25 دينار / 35$":"Now $35 / 25 JOD"}
+              </span>
+            </span>
+            <button onClick={()=>setShowPaywall(true)} style={{background:"#fde68a",color:"#7f1200",border:"none",borderRadius:20,padding:"5px 16px",fontSize:"clamp(11px,1.5vw,13px)",fontWeight:800,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0}}>
+              {uiLang==="ar"?"اشترك الآن ←":"Subscribe Now →"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── HERO ── */}
       {mainView==="home"&&(
         <div style={{background:T.primary,padding:"80px 32px 90px",textAlign:"center",position:"relative",overflow:"hidden"}}>
           {/* Subtle pattern overlay */}
