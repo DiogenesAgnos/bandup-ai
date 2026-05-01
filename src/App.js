@@ -9797,8 +9797,8 @@ ALWAYS:
   };
 
   const startLesson=async(lesson,resumeSession=false)=>{
-    if(!session){if(onAuth)onAuth();return;}
     if(!lesson)return;
+    cancelElevenLabs();
     if(!resumeSession){
       clearLindaSession();
       saveProgress({...progress,currentLesson:lesson.id});
@@ -11205,27 +11205,8 @@ export default function IELTSBot(){
           </div>
         </div>
 
-        {/* TIER 2 — Red navbar: navigation links */}
-        <div style={{background:T.primary}}>
-          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px"}}>
-            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"wrap"}}>
-              <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
-              <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
-              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
-              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
-              <MainTab label={UI[uiLang].teacher} active={mainView==="teacher"} onClick={()=>{switchView("teacher");trackEvent("nav_click",{page:"teacher"});}}/>
-              <MainTab label={UI[uiLang].exercises} active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
-              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
-              <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
-              <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
-              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
-              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
-              <MainTab label={UI[uiLang].studyplan} active={mainView==="studyplan"} onClick={()=>{switchView("studyplan");trackEvent("nav_click",{page:"studyplan"});}}/>
-              <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
-              <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
-            </div>
-          </div>
-        </div>
+        {/* TIER 2 — Red navbar: dropdown groups */}
+        <NavDropdownBar mainView={mainView} switchView={switchView} trackEvent={trackEvent} uiLang={uiLang} UI={UI} T={T}/>
       </div>
 
       {/* Writing sub-nav */}
