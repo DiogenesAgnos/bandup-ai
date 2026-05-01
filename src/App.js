@@ -593,6 +593,7 @@ const TabBtn=({label,active,onClick,badge})=>(
 // ── Dropdown Nav Bar ─────────────────────────────────────────────────────────
 const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
   const [openGroup, setOpenGroup] = React.useState(null);
+  const [alignRight, setAlignRight] = React.useState({}); // per-group: true = anchor dropdown to right of button
   const isAr = uiLang === "ar";
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
@@ -687,12 +688,21 @@ const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
               ) : (
                 <>
                   <button
-                    onClick={()=>setOpenGroup(openGroup===group.id?null:group.id)}
+                    onClick={(e)=>{
+                      if(openGroup===group.id){ setOpenGroup(null); return; }
+                      // Measure button position — if dropdown would overflow right side, anchor to right instead
+                      const rect=e.currentTarget.getBoundingClientRect();
+                      const wouldOverflow=(rect.left+220)>window.innerWidth;
+                      setAlignRight(prev=>({...prev,[group.id]:isAr?!wouldOverflow:wouldOverflow}));
+                      setOpenGroup(group.id);
+                    }}
                     style={{height:52,padding:"0 16px",background:openGroup===group.id?"rgba(0,0,0,0.15)":"transparent",border:"none",borderBottom:group.active?`3px solid ${T.accent}`:"3px solid transparent",borderTop:"3px solid transparent",color:group.active?T.accent:openGroup===group.id?"white":"rgba(255,255,255,0.88)",fontSize:14,fontWeight:group.active?700:500,cursor:"pointer",whiteSpace:"nowrap",...sty,transition:"all 0.15s",display:"flex",alignItems:"center",gap:4}}>
                     {group.label}
                   </button>
                   {openGroup===group.id&&(
-                    <div style={{position:"absolute",top:"100%",[isAr?"right":"left"]:0,background:"white",borderRadius:"0 0 12px 12px",boxShadow:"0 8px 24px rgba(0,0,0,0.18)",minWidth:220,zIndex:300,overflow:"hidden",border:`1px solid ${T.border}`,borderTop:"none"}}>
+                    <div style={{position:"absolute",top:"100%",
+                      ...(alignRight[group.id]?{right:0,left:"auto"}:{left:0,right:"auto"}),
+                      background:"white",borderRadius:"0 0 12px 12px",boxShadow:"0 8px 24px rgba(0,0,0,0.18)",minWidth:220,maxWidth:"calc(100vw - 16px)",zIndex:300,overflow:"hidden",border:`1px solid ${T.border}`,borderTop:"none"}}>
                       {group.items.map((item,i)=>(
                         <button key={item.view} onClick={()=>handleNav(item.view)}
                           style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"12px 18px",background:mainView===item.view?"#fef2f2":"white",border:"none",borderBottom:i<group.items.length-1?`1px solid ${T.border}`:"none",cursor:"pointer",textAlign:isAr?"right":"left",...sty,fontSize:14,fontWeight:mainView===item.view?700:500,color:mainView===item.view?T.primary:T.text,transition:"background 0.1s"}}>
