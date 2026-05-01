@@ -9752,11 +9752,8 @@ ALWAYS:
     .replace(/\*/g,"")               // remove italic
     .replace(/^\s*---+\s*$/gm,"")   // remove --- dividers
     .replace(/^\s*>\s*/gm,"")       // remove blockquotes
-    .replace(/\|[^
-]+\|/g,"")     // remove tables
-    .replace(/
-{3,}/g,"
-")        // collapse excess newlines
+    .replace(/\|[^|]+\|/g,"")
+    .replace(/\n{3,}/g,"\n")
     .trim();
 
   const addLindaMessage=(text)=>{
