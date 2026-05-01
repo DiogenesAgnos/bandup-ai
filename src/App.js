@@ -2526,39 +2526,7 @@ const BAND_QUIZ = [
 
 // ── ExercisesHub ──────────────────────────────
 const ExercisesHub = ({isPro, onUpgrade}) => {
-  if(!isPro) return (
-    <div style={{maxWidth:560,margin:"40px auto",padding:"0 24px"}}>
-      <div style={{textAlign:"center",marginBottom:24}}>
-        <div style={{fontSize:52,marginBottom:12}}>🏋️</div>
-        <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,marginBottom:8}}>Practice Exercises</h2>
-        <p style={{color:T.textMid,fontSize:14,fontFamily:"'Cairo','Source Sans Pro',system-ui",lineHeight:1.7}}>230+ exercises across 8 categories — all with instant feedback and detailed explanations.</p>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
-        {[
-          {icon:"📐",title:"Grammar",count:"130+ questions",desc:"Articles, tenses, conditionals, subject-verb agreement"},
-          {icon:"🎧",title:"Dictation",count:"25 sentences",desc:"Listen and type — B1, B2, and C1 levels"},
-          {icon:"🔤",title:"Sentence Builder",count:"13 sentences",desc:"Arrange words into the correct sentence"},
-          {icon:"📚",title:"Vocabulary",count:"33 questions",desc:"Academic word list, collocations, word formation"},
-          {icon:"✏️",title:"Paraphrasing",count:"18 questions",desc:"Rewrite sentences using Band 7+ academic language"},
-          {icon:"🔍",title:"Error Correction",count:"25+ questions",desc:"Spot and fix real IELTS-style mistakes"},
-          {icon:"📊",title:"Band Quiz",count:"10 questions",desc:"Self-assess your current writing level by criterion"},
-        ].map((c,i)=>(
-          <div key={i} style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 14px"}}>
-            <div style={{fontSize:22,marginBottom:4}}>{c.icon}</div>
-            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontWeight:700,fontSize:13,color:T.text}}>{c.title}</div>
-            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:T.primary,fontWeight:600,marginBottom:4}}>{c.count}</div>
-            <div style={{fontFamily:"'Cairo','Source Sans Pro',system-ui",fontSize:11,color:T.textMuted,lineHeight:1.4}}>{c.desc}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{textAlign:"center"}}>
-        <button onClick={onUpgrade} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 32px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Cairo','Source Sans Pro',system-ui",boxShadow:`0 4px 16px ${T.primary}44`}}>
-          🔓 Upgrade to Pro — $35 / 25 JOD
-        </button>
-        <div style={{marginTop:12,fontSize:12,color:T.textMuted,fontFamily:"'Cairo','Source Sans Pro',system-ui"}}>3-month subscription · Cancel anytime</div>
-      </div>
-    </div>
-  );
+  // Free users can access Grammar (cat 1) and Dictation freely — no teaser gate
   const [activeExTab, setActiveExTab] = useState("grammar");
   const [timeLeft, setTimeLeft] = useState(Infinity);
   const [paused, setPaused] = useState(true);
@@ -2670,12 +2638,16 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
 
       {/* Exercise type tabs */}
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
-        {TABS.map(t => (
-          <button key={t.key} onClick={() => setActiveExTab(t.key)}
-            style={{ background: activeExTab === t.key ? T.primaryLight : T.bgGray, border: `1px solid ${activeExTab === t.key ? T.primaryBorder : T.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: activeExTab === t.key ? 700 : 400, color: activeExTab === t.key ? T.primary : T.textMid, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", display: "flex", alignItems: "center", gap: 5 }}>
-            <span>{t.icon}</span>{t.label}
+        {TABS.map(t => {
+          const tabLocked = !isPro && !t.freePreview;
+          return(
+          <button key={t.key} onClick={() => tabLocked?onUpgrade():setActiveExTab(t.key)}
+            style={{ background: activeExTab === t.key ? T.primaryLight : T.bgGray, border: `1px solid ${activeExTab === t.key ? T.primaryBorder : T.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: activeExTab === t.key ? 700 : 400, color: activeExTab === t.key ? T.primary : tabLocked?T.textLight:T.textMid, cursor: "pointer", fontFamily: "'Cairo','Source Sans Pro',system-ui", display: "flex", alignItems: "center", gap: 5, opacity:tabLocked?0.65:1 }}>
+            <span>{tabLocked?"🔒":t.icon}</span>{t.label}
+            {t.freePreview&&!isPro&&<span style={{fontSize:9,background:"#dcfce7",color:"#16a34a",borderRadius:4,padding:"1px 5px",fontWeight:700,marginLeft:2}}>FREE</span>}
           </button>
-        ))}
+          );
+        })}
       </div>
 
       {/* Expired overlay message */}
@@ -2689,7 +2661,8 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
       )}
 
       {/* Content area */}
-      <div style={{ opacity: timeExpired && !isPro ? 0.4 : 1, pointerEvents: timeExpired && !isPro ? "none" : "auto", filter: !isPro && paused && !timeExpired ? "blur(4px)" : "none", transition: "filter 0.3s ease", userSelect: !isPro && paused && !timeExpired ? "none" : "auto", position: "relative" }}>
+      {/* Free tabs (grammar/dictation) never blur or get blocked */}
+      <div style={{ opacity: (timeExpired && !isPro && !["grammar","dictation"].includes(activeExTab)) ? 0.4 : 1, pointerEvents: (timeExpired && !isPro && !["grammar","dictation"].includes(activeExTab)) ? "none" : "auto", filter: (!isPro && paused && !timeExpired && !["grammar","dictation"].includes(activeExTab)) ? "blur(4px)" : "none", transition: "filter 0.3s ease", userSelect: (!isPro && paused && !timeExpired && !["grammar","dictation"].includes(activeExTab)) ? "none" : "auto", position: "relative" }}>
         {!isPro && paused && !timeExpired && (
           <div style={{ position: "absolute", inset: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
             <div style={{ background: "rgba(255,255,255,0.85)", borderRadius: 12, padding: "16px 28px", textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.12)", backdropFilter: "blur(2px)" }}>
