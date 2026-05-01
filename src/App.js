@@ -9601,15 +9601,11 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
     saveLindaProgress(next);
   };
 
-  const buildSystemPromptWithLevel=(lesson,phase,prog)=>buildSystemPromptInner(lesson,phase,prog||progress);
-  const buildSystemPrompt=(lesson,phase)=>buildSystemPromptInner(lesson,phase,progress);
-  const buildSystemPromptInner=(lesson,phase,prog)=>{
+  const buildSystemPrompt=(lesson,phase)=>{
     if(!lesson)return "";
-    try{
-    const isA1A2=["a1","a2"].includes(prog.level);
-    const isB1=prog.level==="b1";
+    const isA1A2=["a1","a2"].includes(progress.level);
+    const isB1=progress.level==="b1";
     const isLowLevel=isA1A2||isB1;
-    const levelData=LINDA_CURRICULUM[prog.level]||LINDA_CURRICULUM["a1"];
 
     // A1/A2: ALL instructional language in Arabic. English only for the actual words/sentences being taught.
     const instr=isA1A2?{
@@ -9648,49 +9644,55 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
       convIntro:"Question:",lessonDone:"Lesson complete! Amazing work! Shall we move to the next lesson?",
     };
 
-    // Only build the CURRENT phase instruction — saves ~70% of prompt tokens
     const phaseInstructions={
       0:`PHASE 1 — VOCABULARY:
-${isA1A2?`You are a warm Arabic-speaking teacher helping absolute beginners. ALL instructions and feedback are in Arabic. Only the English word itself is in English.
-For EACH word:
-1) Introduce: say the word in English, then explain its meaning in Arabic using "${instr.vocabMeaning}".
-2) Give the Arabic example: ${v.exAr} (use the actual example from the word data).
-3) Say "${instr.vocabRepeat}: [WORD]" to ask them to repeat.
-4) After correct repeat: "${instr.vocabAgain}: [WORD]" — ask once more.
-5) After second correct repeat: "${instr.vocabNext}" — move immediately to next word.
-6) If wrong: "تقريباً! حاول مرة أخرى: [WORD]"
-NEVER use English instructions. All explanations are in Arabic.`:
-`You are an enthusiastic English teacher. Teach in English — Arabic appears only as a tiny translation hint in brackets.
-For EACH word: 1) Introduce with meaning + example. 2) Ask student to repeat. 3) After correct repeat say "${instr.vocabAgain} [WORD]" 4) After second correct repeat move to next word immediately. 5) If wrong: "Almost! Try again: [WORD]"
-Arabic only inside brackets like (يعني: مرحبا). Keep 80% English. Be warm and enthusiastic.`}
+You are an enthusiastic English teacher. Teach in English — Arabic appears only as a tiny translation hint in brackets.
+
+For EACH word follow this format exactly:
+1. Warm greeting + introduce the lesson topic in ONE sentence (first word only). Example: "Welcome! Today we're learning about greetings and introductions. Let's start!"
+2. Introduce word: "Our first word is [WORD] — it means (${isLowLevel?"[Arabic translation]":"[meaning]"}). For example: [example sentence]. Now repeat after me: [WORD]"
+3. After correct repeat: "Excellent! One more time: [WORD]"
+4. After second correct repeat: "Perfect! Next word:" — move immediately.
+5. If wrong: "Almost! Try again: [WORD]"
+
+IMPORTANT: Write Arabic only inside small brackets like (يعني: مرحبا) — never write full Arabic sentences. Keep 80% of your message in English. Be warm and enthusiastic.
 Vocabulary:
-${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${isA1A2?v.exAr:v.ex}`).join("\n")}
+${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
 When ALL words done: "${instr.vocabDone}" — immediately present first fill-in-the-blank.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
-Present ONE exercise at a time: "${instr.fillIntro}: [sentence with '${instr.fillBlankWord}' for the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
-If correct: "${instr.fillCorrect}" — next exercise immediately.
-If wrong FIRST time: "${instr.fillWrong}: [hint]" — give ONE more chance only.
-If wrong SECOND time: reveal answer, move on immediately.
-NEVER correct on first attempt — always give one second chance first.
+Present ONE exercise at a time using this format:
+"${instr.fillIntro}: [sentence with the word '${instr.fillBlankWord}' replacing the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
+If correct: "${instr.fillCorrect}" — immediately next exercise.
+If wrong: "${instr.fillWrong}: [Arabic/English hint]" — ask again.
 Exercises:
 ${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence.replace(/___/g,instr.fillBlankWord)}" — answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
-When ALL done: "${instr.fillDone}" — present first spelling word immediately.`,
+When ALL done: "${instr.fillDone}" — immediately present first spelling word.`,
 
       2:`PHASE 3 — SPELLING:
-ALWAYS use this exact format: "Spell this word: [SPELL]WORD[/SPELL]"
-[SPELL] tags hide the word visually but it is spoken aloud. NEVER describe or hint the word — just say it.
-If correct: praise + next word: "Well done! Next: [SPELL]NEXTWORD[/SPELL]"
-If wrong: "It's [SPELL]W-O-R-D[/SPELL] — try once more: [SPELL]Word[/SPELL]"
-Words: ${lesson.spelling.map((w,i)=>`${i+1}. [SPELL]${w}[/SPELL]`).join(", ")}
-Start with word 1 immediately. When ALL done: "Outstanding! Let's talk now." then ask first conversation question.`,
+You MUST follow this exact format for EVERY spelling question — no exceptions:
+"Spell this word: [SPELL]WORD[/SPELL]"
+
+The [SPELL] tags make the word hidden visually but spoken aloud. The student hears it but cannot read it.
+
+MANDATORY: You MUST include [SPELL]WORD[/SPELL] in EVERY message where you ask for spelling. Never give hints, meanings, or descriptions instead of the word itself. Never say "the word means..." — just say the word.
+
+Example of CORRECT format: "Spell this word: [SPELL]Traffic[/SPELL]"
+Example of WRONG format: "The word means 'مرور' — spell it!" ← THIS IS WRONG, never do this.
+
+If correct: praise briefly + immediately give next word: "Well done! Next: [SPELL]NEXTWORD[/SPELL]"
+If wrong: spell it out: "It's [SPELL]T-R-A-F-F-I-C[/SPELL] — try once more: [SPELL]Traffic[/SPELL]"
+
+Words to test in order: ${lesson.spelling.map((w,i)=>`${i+1}. [SPELL]${w}[/SPELL]`).join(", ")}
+
+Start immediately with word 1. When ALL words done: say "Outstanding! Let's talk now." and immediately ask the first conversation question.`,
 
       3:`PHASE 4 — CONVERSATION:
 Ask ONE question at a time:
 ${lesson.conversation.map((c,i)=>`${i+1}. ${instr.convIntro} ${c}`).join("\n")}
 Weave in grammar naturally: ${lesson.grammar.point}
-${lesson.grammar.levelNote?`Note: ${lesson.grammar.levelNote}`:""}
-${isA1A2?"اشرح أي مفهوم صعب بالعربي.":isB1?"Use Arabic for difficult grammar points.":""}
+${lesson.grammar.levelNote?`Share this note naturally: ${lesson.grammar.levelNote}`:""}
+${isA1A2?"اشرح أي مفهوم صعب بالعربي.":isB1?"Use Arabic to explain difficult grammar points.":""}
 When done: "${instr.lessonDone}"`,
     };
 
@@ -9705,7 +9707,7 @@ CRITICAL — YOU ARE TEACHING A1/A2 BEGINNERS:
 FOR B1: Give Arabic meaning for all new vocabulary. Keep grammar explanations bilingual.`:"";
 
     return `You are Linda, an enthusiastic English teacher for Arabic-speaking students.
-Level: ${prog.level.toUpperCase()} — ${levelData.name}
+Level: ${progress.level.toUpperCase()} — ${levelData.name}
 Lesson: ${lesson.title} (${lesson.titleAr})
 ${lowLevelNote}
 
@@ -9715,18 +9717,12 @@ ALWAYS:
 - NEVER say your name
 - NEVER wait for permission to advance — move automatically after correct answers
 - NEVER say "underscore" — use "${instr.fillBlankWord}" for gaps
-- STRICT FORMATTING: NO markdown. NO hashtags (#). NO hyphens (---). NO tables (|). NO blockquotes (>). NO bold (**). NO headers. Plain text ONLY.
-- STRICT LENGTH: Maximum 3 SHORT sentences per reply. Never write paragraphs. Never use bullet lists.
-- Emojis: maximum 1 per reply. No emoji spam.
-- NEVER explain what you are doing — just do it. Do NOT say "أعيد لك", "سأكرر", "لنبدأ" — just start teaching immediately.
-- NEVER teach extra vocabulary beyond the lesson word. NEVER add extra greetings, tables, or comparisons unprompted.
-- ONE word or exercise at a time. Do not combine multiple words in one message.
-- Be warm but brief: "ممتاز!", "برافو!", "Excellent!", "Well done!"
-- If student writes Arabic: reply in one Arabic sentence then continue
-- LENIENT repeat evaluation: if the student says the right word(s) even with typos or extra words, count it as correct. Be generous.
-- A1/A2 example sentences: add Arabic translation in brackets: "Hello! (مرحباً!)"
-- You are a CONVERSATIONAL teacher, not a textbook. Short. Natural. Human.`;
-    }catch(e){console.error("Linda system prompt error:",e);return "You are Linda, an enthusiastic English teacher. Teach the current lesson warmly and naturally.";}
+- 2-3 sentences max per response
+- Be warm and enthusiastic: "Excellent! 🌟", "Well done!", "One more time!", "Perfect! 🎉", "Brilliant! 💫", "ممتاز!", "برافو!"
+- If student writes Arabic: respond briefly in Arabic then continue
+- LENIENT repeat evaluation: if the student says the right word(s) even with extra words, typos, or slight mistakes, count it as correct. Example: student says "one 23" when asked to repeat "One, Two, Three" — this is CORRECT (speech-to-text error). Be generous.
+- When giving an example sentence at A1/A2 level, always add the Arabic translation in brackets on the same line: "I have three books. (عندي ثلاثة كتب)"
+- Be conversational and natural — speak like an enthusiastic human teacher, not a robot listing items`;
   };
 
   const callClaude=async(system,history,userMsg)=>{
@@ -9746,23 +9742,12 @@ ALWAYS:
 
   const speakLinda=(text)=>speakElevenLabs(text,LINDA_VOICE_ID);
 
-  const cleanLindaText=(text)=>text
-    .replace(/^#+\s*/gm,"")          // remove # headers
-    .replace(/\*\*/g,"")             // remove bold
-    .replace(/\*/g,"")               // remove italic
-    .replace(/^\s*---+\s*$/gm,"")   // remove --- dividers
-    .replace(/^\s*>\s*/gm,"")       // remove blockquotes
-    .replace(/\|[^|]+\|/g,"")
-    .replace(/\n{3,}/g,"\n")
-    .trim();
-
   const addLindaMessage=(text)=>{
     if(!mountedRef.current)return;
-    const cleaned=cleanLindaText(text);
-    const isSuccess=/\[REPEAT_SUCCESS\]/i.test(cleaned);
-    const isMoveOn=/\[MOVE_ON\]/i.test(cleaned);
-    // Strip signals and name prefix (use cleaned text - markdown already removed)
-    let raw=cleaned
+    const isSuccess=/\[REPEAT_SUCCESS\]/i.test(text);
+    const isMoveOn=/\[MOVE_ON\]/i.test(text);
+    // Strip signals and name prefix
+    let raw=text
       .replace(/\[REPEAT_SUCCESS\]/gi,"").replace(/\[MOVE_ON\]/gi,"")
       .replace(/\[Linda\][:：]?\s*/gi,"").replace(/Linda[:：]\s*/gi,"")
       .replace(/\*\*/g,"").replace(/\*/g,"").trim();
@@ -9812,11 +9797,11 @@ ALWAYS:
   };
 
   const startLesson=async(lesson,resumeSession=false)=>{
+    if(!session){if(onAuth)onAuth();return;}
     if(!lesson)return;
-    const lessonLevel=lesson.id.split("_")[0]; // derive level from lesson ID directly
     if(!resumeSession){
       clearLindaSession();
-      saveProgress({...progress,level:lessonLevel,currentLesson:lesson.id});
+      saveProgress({...progress,currentLesson:lesson.id});
       setMessages([]);
       setCurrentPhase(0);
       setRepeatTarget(null);setRepeatSuccess(0);
@@ -9825,19 +9810,9 @@ ALWAYS:
     setMobileTab("chat");
     if(resumeSession&&messages.length>0)return;
     setIsThinking(true);
-    const isA1A2Open=["a1","a2"].includes(lessonLevel); // use lessonLevel, not stale progress.level
-    const opening=isA1A2Open
-      ?`ابدأ الدرس الآن. رحّب بالطالب بجملة واحدة بالعربي. ثم علّمه الكلمة الأولى: "${lesson.vocab[0].w}" — تعني "${lesson.vocab[0].ar}". مثال بالعربي: "${lesson.vocab[0].exAr}". اطلب منه أن يكرر الكلمة.`
-      :`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}" with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
-    // Build system prompt with correct level
-    const leveledProgress={...progress,level:lessonLevel};
-    const sys=buildSystemPromptWithLevel(lesson,0,leveledProgress);
-    const reply=await callClaude(sys,[],opening);
-    if(mountedRef.current){
-      setIsThinking(false);
-      if(reply) addLindaMessage(reply);
-      else addLindaMessage(isA1A2Open?"عذراً، حدث خطأ. اضغط على الدرس مرة أخرى للمحاولة.":"Sorry, something went wrong. Please tap the lesson again to retry.");
-    }
+    const opening=`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}"${["a1","a2"].includes(progress.level)?` — give its Arabic meaning [${lesson.vocab[0].ar}]`:""} with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
+    const reply=await callClaude(buildSystemPrompt(lesson,0),[],opening);
+    if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
   };
 
   const mediaRecorderRef=useRef(null);
@@ -9998,10 +9973,9 @@ ALWAYS:
           {lessons.map((lesson,idx)=>{
             const done=completedSet.has(lesson.id);
             const isCurrent=lesson.id===progress.currentLesson;
-            const b2Locked=progress.level==="b2"&&!isPro&&idx>=FREE_B2_LESSONS;
             return(
-              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:b2Locked?"#fafafa":isCurrent?"#faf5ff":"white",cursor:b2Locked?"not-allowed":"pointer",opacity:b2Locked?0.6:1}}
-                onClick={()=>b2Locked?onUpgrade():startLesson(lesson)}>
+              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer"}}
+                onClick={()=>startLesson(lesson)}>
                 <div style={{width:28,height:28,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,flexShrink:0}}>
                   {done?"✓":idx+1}
                 </div>
@@ -10013,7 +9987,6 @@ ALWAYS:
                 </div>
                 {isCurrent&&<div style={{fontSize:11,fontWeight:700,color:"#7c3aed",background:"#ede9fe",padding:"2px 8px",borderRadius:20,...sty}}>{isAr?"الدرس الحالي":"Current"}</div>}
                 {done&&<span style={{fontSize:16}}>✅</span>}
-                {b2Locked&&<span style={{fontSize:12}}>🔒</span>}
               </div>
             );
           })}
@@ -10153,7 +10126,7 @@ ALWAYS:
                   {isUser?<UserAvatar/>:<LindaAvatar size={32}/>}
                   <div style={{maxWidth:"80%",display:"flex",flexDirection:"column",alignItems:isUser?"flex-end":"flex-start"}}>
                     {!isUser&&<div style={{fontSize:10,fontWeight:700,color:"#7c3aed",marginBottom:2,...sty}}>Linda</div>}
-                    <div style={{background:isUser?T.primaryLight:"#f5f3ff",border:`1px solid ${isUser?T.primaryBorder:"#e9d5ff"}`,borderRadius:isUser?"14px 14px 4px 14px":"14px 14px 14px 4px",padding:"10px 14px",fontSize:14,color:T.text,lineHeight:1.65,...sty,direction:"auto",unicodeBidi:"plaintext"}}>
+                    <div style={{background:isUser?T.primaryLight:"#f5f3ff",border:`1px solid ${isUser?T.primaryBorder:"#e9d5ff"}`,borderRadius:isUser?"14px 14px 4px 14px":"14px 14px 14px 4px",padding:"10px 14px",fontSize:14,color:T.text,lineHeight:1.65,...sty}}>
                       {!isUser?msg.text.split(/(\[SPELL\].*?\[\/SPELL\])/gi).map((part,i)=>{
                         const m=part.match(/\[SPELL\](.*?)\[\/SPELL\]/i);
                         if(m)return <span key={i} style={{filter:"blur(4px)",userSelect:"none",cursor:"default",background:"#e9d5ff",borderRadius:4,padding:"0 4px"}}>{m[1]}</span>;
@@ -10186,24 +10159,10 @@ ALWAYS:
                 placeholder={isAr?(isRecording?"جارٍ التسجيل — اضغط ⏹ للإرسال":"اضغط الميكروفون أو اكتب هنا..."):(isRecording?"Listening... tap ⏹ to stop and send":"Tap mic or type here...")}
                 rows={2}
                 style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?"#a78bfa":T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
-              {transcript.trim()&&!isRecording&&(
-                <button onClick={()=>sendMessage(transcript)}
-                  style={{width:52,height:52,borderRadius:"50%",border:"none",background:"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
-                  ➤
-                </button>
-              )}
-              {!transcript.trim()&&(
-                <button onClick={isRecording?stopRecording:startRecording}
-                  style={{width:52,height:52,borderRadius:"50%",border:"none",background:"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
-                  {isRecording?"⏹":"🎤"}
-                </button>
-              )}
-              {transcript.trim()&&isRecording&&(
-                <button onClick={stopRecording}
-                  style={{width:52,height:52,borderRadius:"50%",border:"none",background:"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 0 0 4px #a78bfa",transition:"all 0.2s"}}>
-                  ⏹
-                </button>
-              )}
+              <button onClick={isRecording?stopRecording:startRecording}
+                style={{width:52,height:52,borderRadius:"50%",border:"none",background:isRecording?"#7c3aed":"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
+                {isRecording?"⏹":"🎤"}
+              </button>
             </div>
             {isRecording&&(
               <div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",fontSize:12,color:"#7c3aed",...sty}}>
@@ -10638,16 +10597,41 @@ const PronunciationPage=({uiLang="ar",isPro=false,onUpgrade})=>{
   const playWord=async(word)=>{
     if(speaking===word)return;
     setSpeaking(word);
-    await speakElevenLabs(word,SARAH_VOICE_ID,()=>setSpeaking(""));
+    // Try cached URL first
+    let url=audioCache[word];
+    if(!url){
+      try{
+        const res=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+        if(res.ok){
+          const data=await res.json();
+          const phonetics=(data[0]?.phonetics||[]);
+          const found=phonetics.find(p=>p.audio&&p.audio.includes("uk"))||
+                       phonetics.find(p=>p.audio&&p.audio.includes("us"))||
+                       phonetics.find(p=>p.audio&&p.audio.length>0);
+          if(found?.audio){
+            url=found.audio.startsWith("http")?found.audio:"https:"+found.audio;
+            setAudioCache(prev=>({...prev,[word]:url}));
+          }
+        }
+      }catch(e){}
+    }
+    if(url){
+      try{
+        if(audioRef.current){audioRef.current.pause();audioRef.current=null;}
+        const audio=new Audio(url);
+        audioRef.current=audio;
+        audio.onended=()=>setSpeaking("");
+        audio.onerror=()=>{
+          fallbackSpeak(word);
+        };
+        await audio.play();
+        return;
+      }catch(e){}
+    }
+    fallbackSpeak(word);
   };
 
-  const fallbackSpeak=async(word)=>{
-    // Try ElevenLabs (Sarah's voice) first
-    try{
-      await speakElevenLabs(word,SARAH_VOICE_ID,()=>setSpeaking(""));
-      return;
-    }catch(e){}
-    // Final fallback: browser TTS
+  const fallbackSpeak=(word)=>{
     if(!window.speechSynthesis){setSpeaking("");return;}
     cancelElevenLabs();
     const utt=new SpeechSynthesisUtterance(word);
@@ -10774,13 +10758,12 @@ export default function IELTSBot(){
   const [session,setSession]=useState(null);
   const [uses,setUses]=useState(0);
   const [lang,setLang]=useState("en");
-  const [uiLang,setUiLang]=useState(()=>{try{return localStorage.getItem("ef_ui_lang")||"ar";}catch{return "ar";}}); // Website UI language
+  const [uiLang,setUiLang]=useState(()=>{try{return localStorage.getItem("ef_ui_lang")||"en";}catch{return "en";}}); // Website UI language
   const [menuOpen,setMenuOpen]=useState(false);
   const [navVisible,setNavVisible]=useState(true);
   const lastScrollY=useRef(0);
   const analyzeRef=useRef(null);
   const [proUser, setProUser] = useState(false);
-  const [deviceWarning, setDeviceWarning] = useState(false);
   const [heroTab, setHeroTab] = useState(0);
   const usesLeft = FREE_USES_LIMIT - uses;
 
@@ -10792,10 +10775,7 @@ export default function IELTSBot(){
         const sess = toSession(sbSess.user);
         setSession(sess);
         setUses(getStoredUses(sess.email));
-        fetchProStatus(sess.email).then(isPro => {
-          setProUser(isPro);
-          if(isPro) checkDeviceSession(sess.email).then(valid => { if(!valid) setDeviceWarning(true); });
-        });
+        fetchProStatus(sess.email).then(setProUser);
       }
     });
     // Listen for login/logout events
@@ -10804,10 +10784,7 @@ export default function IELTSBot(){
         const sess = toSession(sbSess.user);
         setSession(sess);
         setUses(getStoredUses(sess.email));
-        fetchProStatus(sess.email).then(isPro => {
-          setProUser(isPro);
-          if(isPro) checkDeviceSession(sess.email).then(valid => { if(!valid) setDeviceWarning(true); });
-        });
+        fetchProStatus(sess.email).then(setProUser);
       } else {
         setSession(null);
         setProUser(false);
@@ -10837,8 +10814,6 @@ export default function IELTSBot(){
     window.addEventListener("scroll",onScroll,{passive:true});
     return()=>window.removeEventListener("scroll",onScroll);
   },[]);
-
-  // Nav scroll hint removed — replaced with dropdown nav
 
   // ── Initialize Paddle.js ──
   useEffect(()=>{
@@ -10890,25 +10865,7 @@ export default function IELTSBot(){
     setShowPaywall(false);
   };
 
-  // ── Poll every 60s — force logout if another device took over ──
-  useEffect(()=>{
-    if(!session?.email||!proUser) return;
-    const interval = setInterval(async()=>{
-      const valid = await checkDeviceSession(session.email);
-      if(!valid){
-        clearInterval(interval);
-        // Force sign out
-        await supabase.auth.signOut();
-        setSession(null); setProUser(false); setMenuOpen(false);
-        setDeviceWarning(true); // repurpose to show kicked message
-        switchView("home");
-      }
-    }, 60000); // check every 60 seconds
-    return ()=>clearInterval(interval);
-  },[session?.email, proUser]);
-
   const handleSignOut=async()=>{
-    if(session?.email) await unregisterDevice(session.email);
     await supabase.auth.signOut();
     setSession(null);
     setUses(0);
@@ -11248,28 +11205,39 @@ export default function IELTSBot(){
           </div>
         </div>
 
-        {/* TIER 2 — Red navbar: dropdown groups */}
-        <NavDropdownBar mainView={mainView} switchView={switchView} trackEvent={trackEvent} uiLang={uiLang} UI={UI} T={T}/>
+        {/* TIER 2 — Red navbar: navigation links */}
+        <div style={{background:T.primary}}>
+          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 8px"}}>
+            <div className="nav-tabs" style={{display:"flex",gap:0,alignItems:"center",direction:uiLang==="ar"?"rtl":"ltr",flexWrap:"wrap"}}>
+              <MainTab label={UI[uiLang].home} active={mainView==="home"} onClick={()=>{switchView("home");trackEvent("nav_click",{page:"home"});}}/>
+              <MainTab label={UI[uiLang].placement} active={mainView==="placement"} onClick={()=>{switchView("placement");trackEvent("nav_click",{page:"placement"});}}/>
+              <MainTab label={UI[uiLang].writing} active={["analyze","practice","grammar"].includes(mainView)} onClick={()=>{switchView("analyze");trackEvent("nav_click",{page:"analyze"});}}/>
+              <MainTab label={UI[uiLang].speaking} active={mainView==="speaking"} onClick={()=>{switchView("speaking");trackEvent("nav_click",{page:"speaking"});}}/>
+              <MainTab label={UI[uiLang].teacher} active={mainView==="teacher"} onClick={()=>{switchView("teacher");trackEvent("nav_click",{page:"teacher"});}}/>
+              <MainTab label={UI[uiLang].exercises} active={mainView==="exercises"} onClick={()=>{switchView("exercises");trackEvent("nav_click",{page:"exercises"});}}/>
+              <MainTab label={UI[uiLang].reading} active={mainView==="reading"} onClick={()=>{switchView("reading");trackEvent("nav_click",{page:"reading"});}}/>
+              <MainTab label={UI[uiLang].game} active={mainView==="game"} onClick={()=>{switchView("game");trackEvent("nav_click",{page:"game"});}}/>
+              <MainTab label={UI[uiLang].vocab} active={mainView==="vocabulary"} onClick={()=>{switchView("vocabulary");trackEvent("nav_click",{page:"vocabulary"});}}/>
+              <MainTab label={UI[uiLang].toolkit} active={mainView==="toolkit"} onClick={()=>{switchView("toolkit");trackEvent("nav_click",{page:"toolkit"});}}/>
+              <MainTab label={UI[uiLang].progress} active={mainView==="progress"} onClick={()=>{switchView("progress");trackEvent("nav_click",{page:"progress"});}}/>
+              <MainTab label={UI[uiLang].studyplan} active={mainView==="studyplan"} onClick={()=>{switchView("studyplan");trackEvent("nav_click",{page:"studyplan"});}}/>
+              <MainTab label={UI[uiLang].pronunciation} active={mainView==="pronunciation"} onClick={()=>{switchView("pronunciation");trackEvent("nav_click",{page:"pronunciation"});}}/>
+              <MainTab label={UI[uiLang].contact} active={mainView==="contact"} onClick={()=>{switchView("contact");trackEvent("nav_click",{page:"contact"});}}/>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ── Device session warning banner ── */}
-      {deviceWarning&&proUser&&(
-        <div style={{background:"#fef3c7",borderBottom:"1px solid #fcd34d",padding:"10px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,direction:uiLang==="ar"?"rtl":"ltr"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <span style={{fontSize:18}}>⚠️</span>
-            <span style={{fontFamily:"'Cairo',system-ui",fontSize:13,color:"#92400e",fontWeight:600}}>
-              {uiLang==="ar"
-                ?"تم تسجيل دخول حسابك من جهاز آخر. تم تسجيل خروجك تلقائياً. إذا لم تكن أنت، يرجى تغيير كلمة المرور فوراً."
-                :"Your account was accessed from another device and you have been signed out. If this wasn't you, change your password immediately."}
-            </span>
+      {/* Writing sub-nav */}
+      {["analyze","practice","grammar"].includes(mainView)&&(
+        <div className="writing-subnav" style={{background:"#f9fafb",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
+          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
+            {[{v:"analyze",l:UI[uiLang].wAnalyze},{v:"practice",l:UI[uiLang].wPractice},{v:"grammar",l:UI[uiLang].wGrammar}].map(t=>(
+              <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"7px 16px",fontSize:13,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
+            ))}
           </div>
-          <button onClick={()=>setDeviceWarning(false)} style={{background:"transparent",border:"1px solid #f59e0b",borderRadius:6,padding:"4px 12px",fontSize:12,fontWeight:600,color:"#92400e",cursor:"pointer",fontFamily:"'Cairo',system-ui",flexShrink:0}}>
-            {uiLang==="ar"?"تجاهل":"Dismiss"}
-          </button>
         </div>
       )}
-
-
 
       {/* ── HERO — ieltsanswers style: big + clean + minimal ─── */}
       {mainView==="home"&&(
@@ -11277,30 +11245,6 @@ export default function IELTSBot(){
           {/* Subtle pattern overlay */}
           <div style={{position:"absolute",inset:0,opacity:0.05,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
           <div style={{maxWidth:760,margin:"0 auto",position:"relative",zIndex:2,direction:uiLang==="ar"?"rtl":"ltr",textAlign:"center"}}>
-
-            {/* ── Launch Offer Sticker ── */}
-            <div style={{display:"flex",flexDirection:"column",alignItems:"center",background:"linear-gradient(135deg,#fbbf24,#f59e0b)",borderRadius:16,padding:"10px 24px 12px",marginBottom:28,boxShadow:"0 6px 24px rgba(0,0,0,0.25), 0 0 0 3px rgba(255,255,255,0.25)",position:"relative",border:"2px solid rgba(255,255,255,0.5)",maxWidth:420,margin:"0 auto 28px"}}>
-              {/* Ribbon label */}
-              <span style={{fontFamily:"'Cairo',system-ui",fontWeight:900,fontSize:13,color:"#7f1200",letterSpacing:"0.5px",textTransform:"uppercase",marginBottom:4}}>
-                {uiLang==="ar"?"🔥 عرض الإطلاق — وقت محدود":"🔥 Launch Offer — Limited Time"}
-              </span>
-              <div style={{display:"flex",alignItems:"center",gap:10}}>
-                {/* Struck-through original price */}
-                <span style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700,color:"rgba(127,18,0,0.6)",textDecoration:"line-through"}}>
-                  "50 JOD / $75"
-                </span>
-                {/* Arrow */}
-                <span style={{fontSize:14,color:"#7f1200",fontWeight:900}}>→</span>
-                {/* Current price */}
-                <span style={{fontFamily:"Georgia,serif",fontSize:26,fontWeight:900,color:"#7f1200"}}>
-                  "25 JOD / $35"
-                </span>
-              </div>
-              <span style={{fontFamily:"'Cairo',system-ui",fontSize:11,color:"rgba(127,18,0,0.75)",fontWeight:600,marginTop:2}}>
-                {uiLang==="ar"?"لكل 3 أشهر · سعر الإطلاق":"per 3 months · introductory price"}
-              </span>
-            </div>
-
             <div style={{display:"inline-block",background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:20,padding:"5px 18px",fontSize:13,color:"rgba(255,255,255,0.9)",fontFamily:"'Cairo',system-ui",fontWeight:600,marginBottom:24}}>
               {uiLang==="ar"?"🎓 تعلّم الإنجليزية  ·  ارفع درجتك في الآيلتس":"🎓 English Learning  ·  IELTS Preparation"}
             </div>
@@ -11832,7 +11776,7 @@ export default function IELTSBot(){
         {mainView==="teacher"&&<LindaPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} uiLang={uiLang} session={session} onAuth={()=>setShowAuth(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView} isPro={proUser} session={session}/>}
+        {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView} isPro={proUser}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="pronunciation"&&<PronunciationPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
@@ -12027,27 +11971,13 @@ export default function IELTSBot(){
           .mobile-top-controls { display: flex !important; }
           .sticky-nav div[style*="height:56"] { padding: 0 12px !important; }
 
-          /* NAV TIER 2 — grouped nav, no hamburger */
+          /* NAV TIER 2 — show all tabs as wrapping rows, no hamburger */
           .hamburger-btn { display: none !important; }
           .mobile-lang-toggle { display: none !important; }
           .mobile-consult-btn { display: none !important; }
+          .nav-tabs { display: flex !important; flex-wrap: wrap !important; width: 100% !important; }
+          .nav-tabs button { font-size: 11px !important; padding: 8px 7px !important; white-space: nowrap !important; min-height: 36px !important; }
           .sticky-nav { position: sticky !important; top: 0 !important; }
-          /* Grouped nav: scrollable single row on mobile */
-          .nav-grouped {
-            overflow-x: auto !important;
-            flex-wrap: nowrap !important;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none !important;
-            padding-bottom: 2px !important;
-          }
-          .nav-grouped::-webkit-scrollbar { display: none !important; }
-          .nav-grouped button { font-size: 13px !important; padding: 6px 10px !important; white-space: nowrap !important; min-height: 40px !important; height: 40px !important; }
-          /* Group labels smaller on mobile */
-          .nav-grouped span { font-size: 9px !important; padding: 0 3px !important; }
-          /* Dividers slimmer */
-          .nav-grouped > div[style*="width:1"] { margin: 0 2px !important; }
-          /* Scroll hint — visible on all screen sizes */
-          .nav-scroll-hint { display: block; }
 
           /* HERO */
           .hero-inner { flex-direction: column-reverse !important; min-height: auto !important; padding: 20px 16px 24px !important; }
@@ -12095,9 +12025,6 @@ export default function IELTSBot(){
 
         @media (max-width: 480px) {
           .features-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-        }
-        @media (max-width: 768px) {
-          .nav-scroll-hint.hidden { opacity: 0 !important; }
         }
 
         @media (max-width: 380px) {
