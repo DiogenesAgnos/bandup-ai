@@ -7944,10 +7944,42 @@ const savePlacementResult = (data) => { try { localStorage.setItem(PLACEMENT_STO
 const loadPlacementResult = () => { try { const d=localStorage.getItem(PLACEMENT_STORAGE_KEY); return d?JSON.parse(d):null; } catch { return null; } };
 const clearPlacementResult = () => { try { localStorage.removeItem(PLACEMENT_STORAGE_KEY); } catch {} };
 
-const PlacementTest = ({uiLang="ar", onNavigate, isPro=false}) => {
+const savePlacementToSupabase = async (email, data) => {
+  if(!email) return;
+  try {
+    await supabase.from("profiles").update({
+      placement_result: JSON.stringify({...data, date: new Date().toISOString()})
+    }).eq("email", email.toLowerCase().trim());
+  } catch(e) { console.warn("Placement save failed", e); }
+};
+
+const loadPlacementFromSupabase = async (email) => {
+  if(!email) return null;
+  try {
+    const { data } = await supabase.from("profiles")
+      .select("placement_result")
+      .eq("email", email.toLowerCase().trim())
+      .single();
+    return data?.placement_result ? JSON.parse(data.placement_result) : null;
+  } catch { return null; }
+};
+
+const PlacementTest = ({uiLang="ar", onNavigate, isPro=false, session=null}) => {
   const saved = loadPlacementResult();
   const hasTaken = !!saved;
   const [screen, setScreen] = useState(saved?"results":"intro");
+  // On mount: if logged in and no local result, check Supabase
+  useEffect(()=>{
+    if(session?.email && !saved){
+      loadPlacementFromSupabase(session.email).then(remote=>{
+        if(remote){
+          savePlacementResult(remote); // cache locally
+          setResults(remote);
+          setScreen("results");
+        }
+      });
+    }
+  },[session?.email]);
   const [readingAnswers, setReadingAnswers] = useState(saved?.readingAnswers||{});
   const [grammarAnswers, setGrammarAnswers] = useState(saved?.grammarAnswers||{});
   const [readingTime, setReadingTime] = useState(600);
@@ -7983,6 +8015,7 @@ const PlacementTest = ({uiLang="ar", onNavigate, isPro=false}) => {
     const level = CEFR_LEVELS.find(l=>pct>=l.min&&pct<=l.max)||CEFR_LEVELS[0];
     const data = {rScore,gScore,total,pct,level,readingAnswers:rAns,grammarAnswers:gAns};
     savePlacementResult(data);
+    if(session?.email) savePlacementToSupabase(session.email, data);
     setResults(data);
     setScreen("results");
     setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),50);
@@ -11872,7 +11905,7 @@ export default function IELTSBot(){
         {mainView==="teacher"&&<LindaPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} uiLang={uiLang} session={session} onAuth={()=>setShowAuth(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
-        {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView} isPro={proUser}/>}
+        {mainView==="placement"&&<PlacementTest uiLang={uiLang} onNavigate={switchView} isPro={proUser} session={session}/>}
         {mainView==="contact"&&<ContactPage/>}
         {mainView==="game"&&<IELTSGame proUser={proUser} onNavigate={switchView} uiLang={uiLang} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="pronunciation"&&<PronunciationPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
