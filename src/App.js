@@ -605,6 +605,13 @@ const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
       active: mainView==="home"
     },
     {
+      id:"mocktest",
+      label:isAr?"🎓 اختبار المحادثة":"🎓 IELTS Mock Test",
+      single:true,
+      view:"mocktest",
+      active: mainView==="mocktest"
+    },
+    {
       id:"learn",
       label:isAr?"📚 تعلّم ▾":"📚 Learn ▾",
       active: ["teacher","speaking"].includes(mainView),
@@ -4643,7 +4650,13 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
 };
 
 // ── IELTS MOCK SPEAKING TEST ─────────────────────────────────────────────────
+const MOCK_USED_KEY = "ef_mock_used";
+const getMockUsed = () => { try{ return !!localStorage.getItem(MOCK_USED_KEY); }catch{ return false; } };
+const setMockUsed = () => { try{ localStorage.setItem(MOCK_USED_KEY,"1"); }catch{} };
+
 const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
+  // Fix 4: gate — free users get 1 attempt; after that Pro only
+  const [mockUsed] = useState(()=>getMockUsed());
   const [phase, setPhase] = useState("intro");
   // Part 1: cycle through 3 topics × 3 questions each
   const [p1TopicIdx, setP1TopicIdx] = useState(0);
@@ -4794,10 +4807,11 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
 
   // ── Part 2 prep timer ──
   const startPrepTimer = () => {
+    if(prepTimerRef.current) return; // already running — prevent double-invocation
     setPrepLeft(60); setPrepDone(false);
     prepTimerRef.current = setInterval(()=>{
       setPrepLeft(prev=>{
-        if(prev<=1){ clearInterval(prepTimerRef.current); setPrepDone(true); return 0; }
+        if(prev<=1){ clearInterval(prepTimerRef.current); prepTimerRef.current=null; setPrepDone(true); return 0; }
         return prev-1;
       });
     },1000);
@@ -4805,10 +4819,11 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
 
   // ── Part 2 speak timer ──
   const startSpeakTimer = () => {
+    if(speakTimerRef.current) return; // already running — prevent double-invocation and double-speed
     setSpeakLeft(120);
     speakTimerRef.current = setInterval(()=>{
       setSpeakLeft(prev=>{
-        if(prev<=1){ clearInterval(speakTimerRef.current); if(mountedRef.current) finishP2(""); return 0; }
+        if(prev<=1){ clearInterval(speakTimerRef.current); speakTimerRef.current=null; if(mountedRef.current) finishP2(""); return 0; }
         return prev-1;
       });
     },1000);
@@ -4840,8 +4855,8 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
   const pauseTest = () => {
     cancelElevenLabs();
     if(isRecordingRef.current) stopRecording();
-    if(prepTimerRef.current){ clearInterval(prepTimerRef.current); prepPausedAt.current=prepLeft; }
-    if(speakTimerRef.current){ clearInterval(speakTimerRef.current); speakPausedAt.current=speakLeft; }
+    if(prepTimerRef.current){ clearInterval(prepTimerRef.current); prepTimerRef.current=null; prepPausedAt.current=prepLeft; }
+    if(speakTimerRef.current){ clearInterval(speakTimerRef.current); speakTimerRef.current=null; speakPausedAt.current=speakLeft; }
     setIsPaused(true); setIsSpeaking(false);
   };
   const resumeTest = () => {
@@ -4850,14 +4865,14 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
     if(phase==="p2_prep" && prepPausedAt.current>0){
       setPrepLeft(prepPausedAt.current);
       prepTimerRef.current=setInterval(()=>setPrepLeft(prev=>{
-        if(prev<=1){clearInterval(prepTimerRef.current);setPrepDone(true);return 0;}return prev-1;
+        if(prev<=1){clearInterval(prepTimerRef.current);prepTimerRef.current=null;setPrepDone(true);return 0;}return prev-1;
       }),1000);
     }
     // Resume Part 2 speak timer if it was running
     if(phase==="p2_speak" && speakPausedAt.current>0){
       setSpeakLeft(speakPausedAt.current);
-            speakTimerRef.current=setInterval(()=>setSpeakLeft(prev=>{
-        if(prev<=1){clearInterval(speakTimerRef.current);if(mountedRef.current)finishP2("");return 0;}return prev-1;
+      speakTimerRef.current=setInterval(()=>setSpeakLeft(prev=>{
+        if(prev<=1){clearInterval(speakTimerRef.current);speakTimerRef.current=null;if(mountedRef.current)finishP2("");return 0;}return prev-1;
       }),1000);
     }
   };
@@ -4905,7 +4920,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
       const raw = data?.content?.[0]?.text||"";
       const clean = raw.replace(/```json|```/g,"").trim();
       const parsed = JSON.parse(clean);
-      if(mountedRef.current){setReport(parsed); setPhase("results");}
+      if(mountedRef.current){setReport(parsed); setPhase("results"); setMockUsed();}  // Fix 4: mark used on completion
     }catch(e){
       if(mountedRef.current){setReport({error:true}); setPhase("results");}
     }
@@ -5009,6 +5024,23 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
 
   // ────────── RENDER ──────────
   if(!testPair) return <div style={{textAlign:"center",padding:40,...sty,color:T2.textMuted}}>Preparing your test...</div>;
+
+  // Fix 4: free users who've already used their one attempt see an upgrade prompt
+  if(!isPro && mockUsed && phase==="intro") return (
+    <div style={{maxWidth:520,margin:"0 auto",padding:"40px 24px",textAlign:"center"}}>
+      <div style={{fontSize:48,marginBottom:16}}>🎓</div>
+      <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T2.text,margin:"0 0 10px"}}>IELTS Speaking Mock Test</h2>
+      <p style={{...sty,fontSize:14,color:T2.textMuted,lineHeight:1.7,margin:"0 0 24px"}}>You've used your one free mock test. Upgrade to Pro to take unlimited mock tests anytime.</p>
+      <div style={{background:"#fef9c3",border:"1px solid #fcd34d",borderRadius:10,padding:"12px 16px",marginBottom:24,...sty,fontSize:13,color:"#92400e"}}>
+        ✅ Your free test is complete — the results were saved above if you'd like to review them.
+      </div>
+      <button onClick={onUpgrade}
+        style={{width:"100%",background:"#dc2626",color:"white",border:"none",borderRadius:12,padding:"18px",fontSize:16,fontWeight:800,cursor:"pointer",...sty,boxShadow:"0 6px 20px rgba(220,38,38,0.3)",marginBottom:12}}>
+        🔓 Upgrade to Pro — Unlimited Mock Tests
+      </button>
+      <p style={{...sty,fontSize:12,color:T2.textMuted}}>Pro also unlocks unlimited conversation practice, all reading tests, and more.</p>
+    </div>
+  );
 
   // INTRO
   if(phase==="intro") return (
@@ -5228,10 +5260,21 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
           </details>
         </>
       )}
-      <button onClick={()=>{ answersRef.current=[]; setPhase("intro"); setP1TopicIdx(0); setP1QuestionIdx(0); setP3QuestionIdx(0); setReport(null); setTranscript(""); const shuffled=[...SPEAKING_PART1].sort(()=>0.5-Math.random()).slice(0,3); const pairIdx=Math.floor(Math.random()*Math.min(SPEAKING_PART2.length,SPEAKING_PART3.length)); setTestPair({p1topics:shuffled,p2:SPEAKING_PART2[pairIdx],p3:SPEAKING_PART3[pairIdx]}); }}
-        style={{width:"100%",background:"#f1f5f9",color:T2.textMid,border:`1px solid ${T2.border}`,borderRadius:10,padding:14,fontSize:14,fontWeight:600,cursor:"pointer",...sty}}>
-        🔄 Take Another Test
-      </button>
+      {/* Fix 4: Pro-only repeat — free users see upgrade prompt */}
+      {isPro ? (
+        <button onClick={()=>{ answersRef.current=[]; setPhase("intro"); setP1TopicIdx(0); setP1QuestionIdx(0); setP3QuestionIdx(0); setReport(null); setTranscript(""); const shuffled=[...SPEAKING_PART1].sort(()=>0.5-Math.random()).slice(0,3); const pairIdx=Math.floor(Math.random()*Math.min(SPEAKING_PART2.length,SPEAKING_PART3.length)); setTestPair({p1topics:shuffled,p2:SPEAKING_PART2[pairIdx],p3:SPEAKING_PART3[pairIdx]}); }}
+          style={{width:"100%",background:"#f1f5f9",color:T2.textMid,border:`1px solid ${T2.border}`,borderRadius:10,padding:14,fontSize:14,fontWeight:600,cursor:"pointer",...sty}}>
+          🔄 Take Another Test
+        </button>
+      ) : (
+        <div style={{background:"#fef9c3",border:"1px solid #fcd34d",borderRadius:10,padding:"14px 16px",textAlign:"center",...sty}}>
+          <div style={{fontSize:13,fontWeight:700,color:"#92400e",marginBottom:6}}>Want to take another test?</div>
+          <div style={{fontSize:12,color:"#78350f",marginBottom:12}}>Unlimited mock tests are a Pro feature.</div>
+          <button onClick={onUpgrade} style={{background:"#dc2626",color:"white",border:"none",borderRadius:8,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",...sty}}>
+            🔓 Upgrade to Pro
+          </button>
+        </div>
+      )}
     </div>
   );
 
@@ -8529,7 +8572,7 @@ function ManageSubModal({onClose,email=""}){
 }
 
 // ── URL Routing ──────────────────────────────
-const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary","/placement":"placement","/pronunciation":"pronunciation","/studyplan":"studyplan","/teacher":"teacher"};
+const ROUTE_MAP = {"/":"home","/analyze":"analyze","/terms":"terms","/privacy":"privacy","/refund":"refund","/pricing":"pricing","/practice":"practice","/progress":"progress","/toolkit":"toolkit","/contact":"contact","/grammar":"grammar","/exercises":"exercises","/admin":"admin","/speaking":"speaking","/reading":"reading","/game":"game","/vocabulary":"vocabulary","/placement":"placement","/pronunciation":"pronunciation","/studyplan":"studyplan","/teacher":"teacher","/mocktest":"mocktest"};
 const VIEW_TO_PATH = Object.fromEntries(Object.entries(ROUTE_MAP).map(([k,v])=>[v,k]));
 const getViewFromPath = () => { const p = window.location.pathname.replace(/\/+$/,"") || "/"; return ROUTE_MAP[p] || "home"; };
 
@@ -10898,15 +10941,19 @@ export default function IELTSBot(){
   };
 
   const handleSignOut=async()=>{
-    // Fix 2: clear device slot in DB so the user's next login isn't blocked
-    if(session?.email) await unregisterDevice(session.email);
-    await supabase.auth.signOut();
-    setSession(null);
-    setUses(0);
-    setResult(null);
-    setProUser(false);
-    setMenuOpen(false);
-    switchView("analyze");
+    try{
+      // Fire non-blocking — never let this crash the sign-out flow
+      if(session?.email) unregisterDevice(session.email).catch(()=>{});
+      await supabase.auth.signOut();
+    }catch(e){ console.warn("Sign-out error:", e); }
+    finally{
+      setSession(null);
+      setUses(0);
+      setResult(null);
+      setProUser(false);
+      setMenuOpen(false);
+      switchView("analyze");
+    }
   };
 
   // Fix 11 + 12: removed unused isSampleEssay state; trigger analyze directly via analyzeCallbackRef
@@ -11797,6 +11844,13 @@ export default function IELTSBot(){
         {mainView==="grammar"&&<GrammarChecker isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="exercises"&&<ExercisesHub isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="speaking"&&<SpeakingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} session={session} onAuth={()=>setShowAuth(true)}/>}
+        {mainView==="mocktest"&&(
+          <div style={{maxWidth:900,margin:"0 auto",padding:"24px 24px 80px"}}>
+            <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 4px",direction:"ltr",textAlign:"left"}}>🎓 IELTS Speaking Mock Test</h1>
+            <p style={{fontSize:14,color:T.textMuted,margin:"0 0 24px",lineHeight:1.5,fontFamily:"'Cairo',system-ui"}}>A full simulated IELTS Speaking test — all three parts, timed, and scored on all four official criteria.</p>
+            <MockSpeakingTest isPro={proUser} onUpgrade={()=>setShowPaywall(true)} session={session} onAuth={()=>setShowAuth(true)}/>
+          </div>
+        )}
         {mainView==="teacher"&&<LindaPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)} uiLang={uiLang} session={session} onAuth={()=>setShowAuth(true)}/>}
         {mainView==="reading"&&<ReadingPage isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
         {mainView==="vocabulary"&&<VocabularyPage uiLang={uiLang} isPro={proUser} onUpgrade={()=>setShowPaywall(true)}/>}
