@@ -619,7 +619,9 @@ const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
       label:isAr?"✏️ تدرّب ▾":"✏️ Practise ▾",
       active: ["analyze","practice","grammar","reading","exercises","game"].includes(mainView),
       items:[
-        {label:isAr?"✍️ الكتابة والتحليل":"✍️ Writing & Analysis", view:"analyze", icon:"✍️"},
+        {label:isAr?"🎓 تحليل المقال":"🎓 Analyze Essay", view:"analyze", icon:"🎓"},
+        {label:isAr?"✍️ تدريب الكتابة":"✍️ Writing Practice", view:"practice", icon:"✍️"},
+        {label:isAr?"📐 قواعد اللغة":"📐 Grammar", view:"grammar", icon:"📐"},
         {label:isAr?"📖 اختبارات القراءة":"📖 Reading Tests", view:"reading", icon:"📖"},
         {label:isAr?"💪 تمارين":"💪 Exercises", view:"exercises", icon:"💪"},
         {label:isAr?"🎮 ألعاب تعليمية":"🎮 Games", view:"game", icon:"🎮"},
@@ -2328,8 +2330,8 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
           const isOpen = openCat === catIdx;
           return (
             <div key={catIdx}>
-              <div onClick={() => setOpenCat(isOpen ? null : catIdx)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: "pointer", transition: "all 0.15s" }}>
+              <div onClick={() => (freePreview&&catIdx>0)?onUpgrade():setOpenCat(isOpen ? null : catIdx)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: (freePreview&&catIdx>0)?"#fafafa":isOpen ? `${cat.color}10` : T.bg, border: `1px solid ${(freePreview&&catIdx>0)?T.border:isOpen ? cat.color + "40" : T.border}`, borderRadius: isOpen ? "10px 10px 0 0" : 10, cursor: (freePreview&&catIdx>0)?"not-allowed":"pointer", transition: "all 0.15s", opacity:(freePreview&&catIdx>0)?0.6:1 }}>
                 <span style={{ fontSize: 20 }}>{cat.icon}</span>
                 <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: isOpen ? cat.color : T.text, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.category}</span>
                 {score.attempted > 0 && (
@@ -2338,6 +2340,7 @@ const GrammarExercises = ({isPro, onUpgrade}) => {
                   </span>
                 )}
                 <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "'Cairo','Source Sans Pro',system-ui" }}>{cat.exercises.length}q</span>
+                {freePreview&&catIdx>0&&<span style={{fontSize:11}}>🔒</span>}
                 <span style={{ fontSize: 16, color: T.textMuted, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>▼</span>
               </div>
               {isOpen && (
@@ -2595,13 +2598,13 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
   const timeExpired = !isPro && timeLeft <= 0;
 
   const TABS = [
-    { key:"grammar", icon:"📐", label:"Grammar Drills" },
+    { key:"grammar", icon:"📐", label:"Grammar Drills", freePreview:true },
     { key:"paraphrase", icon:"🔄", label:"Paraphrasing" },
     { key:"linking", icon:"🔗", label:"Linking Words" },
     { key:"vocab", icon:"📖", label:"Vocabulary Upgrade" },
     { key:"errors", icon:"🔍", label:"Error Correction" },
     { key:"bandcheck", icon:"🎯", label:"Band Self-Check" },
-    { key:"dictation", icon:"🎧", label:"Dictation" },
+    { key:"dictation", icon:"🎧", label:"Dictation", freePreview:true },
     { key:"builder", icon:"🔤", label:"Sentence Builder" },
   ];
 
@@ -2696,13 +2699,13 @@ const ExercisesHub = ({isPro, onUpgrade}) => {
             </div>
           </div>
         )}
-        {activeExTab === "grammar" && <GrammarExercisesInner isPro={isPro} canAnswer={canAnswer} onUpgrade={onUpgrade} />}
+        {activeExTab === "grammar" && <GrammarExercisesInner isPro={isPro} canAnswer={isPro||true} onUpgrade={onUpgrade} freePreview={!isPro} />}
         {activeExTab === "paraphrase" && <ParaphraseExercises canAnswer={canAnswer} />}
         {activeExTab === "linking" && <LinkingWordsQuiz canAnswer={canAnswer} />}
         {activeExTab === "vocab" && <VocabUpgradeExercises canAnswer={canAnswer} />}
         {activeExTab === "errors" && <ErrorCorrectionExercises canAnswer={canAnswer} />}
         {activeExTab === "bandcheck" && <BandSelfCheck />}
-        {activeExTab === "dictation" && <DictationExercises canAnswer={canAnswer} />}
+        {activeExTab === "dictation" && <DictationExercises canAnswer={true} freePreview={!isPro} />}
         {activeExTab === "builder" && <SentenceBuilder canAnswer={canAnswer} />}
       </div>
     </div>
@@ -3257,7 +3260,7 @@ const DailyChallengeWidget = ({uiLang="en"}) => {
 };
 
 // ── GrammarExercisesInner (shared logic, used in ExercisesHub) ──
-const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade}) => {
+const GrammarExercisesInner = ({isPro, canAnswer, onUpgrade, freePreview=false}) => {
   const [openCat, setOpenCat] = useState(null);
   const [answers, setAnswers] = useState({});
   const [showExplanation, setShowExplanation] = useState({});
@@ -11344,16 +11347,7 @@ export default function IELTSBot(){
         </div>
       )}
 
-      {/* Writing sub-nav */}
-      {["analyze","practice","grammar"].includes(mainView)&&(
-        <div className="writing-subnav" style={{background:"#f9fafb",borderBottom:`1px solid ${T.border}`,padding:"0 32px"}}>
-          <div style={{maxWidth:1200,margin:"0 auto",display:"flex",gap:4,overflowX:"auto",padding:"8px 0"}} className="tab-row">
-            {[{v:"analyze",l:UI[uiLang].wAnalyze},{v:"practice",l:UI[uiLang].wPractice},{v:"grammar",l:UI[uiLang].wGrammar}].map(t=>(
-              <button key={t.v} onClick={()=>switchView(t.v)} style={{background:mainView===t.v?T.primaryLight:"white",border:`1px solid ${mainView===t.v?T.primaryBorder:T.border}`,borderRadius:6,padding:"7px 16px",fontSize:13,fontWeight:mainView===t.v?700:500,color:mainView===t.v?T.primary:T.textMid,cursor:"pointer",fontFamily:"'Cairo',system-ui",whiteSpace:"nowrap",flexShrink:0}}>{t.l}</button>
-            ))}
-          </div>
-        </div>
-      )}
+
 
       {/* ── HERO — ieltsanswers style: big + clean + minimal ─── */}
       {mainView==="home"&&(
