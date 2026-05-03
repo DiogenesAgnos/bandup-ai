@@ -10815,16 +10815,16 @@ const HomeDemoSection=({uiLang="en",switchView})=>{
 
   // ── Grammar drill script ──
   const GRAMMAR_SCRIPT_EN=[
-    {role:"bot",  text:"Grammar Drill ✏️ — Choose the correct word:\n\n\"She ___ to the gym every morning.\"\n\n🅐 go &nbsp; 🅑 goes &nbsp; 🅒 going"},
+    {role:"bot",  text:"Grammar Drill ✏️ — Choose the correct word:\n\n\"She ___ to the gym every morning.\"\n\n🅐 go   🅑 goes   🅒 going"},
     {role:"user", text:"🅑 goes"},
-    {role:"bot",  text:"✅ Correct! With third-person singular (she/he/it) we add **-s** or **-es**.\n\n\"She **goes** to the gym every morning.\" 💪\n\nNext question:\n\n\"They ___ watching TV when I called.\"\n\n🅐 was &nbsp; 🅑 is &nbsp; 🅒 were"},
+    {role:"bot",  text:"✅ Correct! With third-person singular (she/he/it) we add **-s** or **-es**.\n\n\"She **goes** to the gym every morning.\" 💪\n\nNext question:\n\n\"They ___ watching TV when I called.\"\n\n🅐 was   🅑 is   🅒 were"},
     {role:"user", text:"🅒 were"},
     {role:"bot",  text:"✅ Exactly right! **Were** is used with plural subjects (they/we/you) in the past continuous.\n\n\"They **were** watching TV when I called.\" 🎯\n\nYou're on a roll! Ready for the next one? 💬"},
   ];
   const GRAMMAR_SCRIPT_AR=[
-    {role:"bot",  text:"تمرين قواعد ✏️ — اختر الكلمة الصحيحة:\n\n\"She ___ to the gym every morning.\"\n\n🅐 go &nbsp; 🅑 goes &nbsp; 🅒 going"},
+    {role:"bot",  text:"تمرين قواعد ✏️ — اختر الكلمة الصحيحة:\n\n\"She ___ to the gym every morning.\"\n\n🅐 go   🅑 goes   🅒 going"},
     {role:"user", text:"🅑 goes"},
-    {role:"bot",  text:"✅ صحيح! مع ضمائر المفرد الغائب (she/he/it) نضيف **-s** أو **-es**.\n\n\"She **goes** to the gym every morning.\" 💪\n\nالسؤال التالي:\n\n\"They ___ watching TV when I called.\"\n\n🅐 was &nbsp; 🅑 is &nbsp; 🅒 were"},
+    {role:"bot",  text:"✅ صحيح! مع ضمائر المفرد الغائب (she/he/it) نضيف **-s** أو **-es**.\n\n\"She **goes** to the gym every morning.\" 💪\n\nالسؤال التالي:\n\n\"They ___ watching TV when I called.\"\n\n🅐 was   🅑 is   🅒 were"},
     {role:"user", text:"🅒 were"},
     {role:"bot",  text:"✅ صحيح تماماً! **Were** تُستخدم مع الجمع (they/we/you) في الماضي المستمر.\n\n\"They **were** watching TV when I called.\" 🎯\n\nأنت في تقدم رائع! هل أنت مستعد للسؤال التالي؟ 💬"},
   ];
@@ -10948,10 +10948,10 @@ const HomeDemoSection=({uiLang="en",switchView})=>{
           {isAr?"✨ جرّب قبل ما تسجّل":"✨ See it in action — no sign-up needed"}
         </div>
         <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(22px,3vw,30px)",color:"#1e293b",margin:"0 0 10px",lineHeight:1.3}}>
-          {isAr?"تعلّم وتحدّث — بالذكاء الاصطناعي":"Learn and speak — powered by AI"}
+          {isAr?"تحدّث وتعلّم":"Speak and Learn"}
         </h2>
-        <p style={{fontSize:"clamp(13px,1.8vw,15px)",color:"#64748b",...sty,margin:0,lineHeight:1.6,maxWidth:560,marginLeft:"auto",marginRight:"auto"}}>
-          {isAr?"لايف للتعليم مع ليندا · شريكك في المحادثة الإنجليزية مع سارة":"Structured speaking lessons with Linda · Conversation practice with Sarah"}
+        <p style={{fontSize:"clamp(13px,1.8vw,15px)",color:"#64748b",...sty,margin:0,lineHeight:1.6,maxWidth:580,marginLeft:"auto",marginRight:"auto"}}>
+          {isAr?"تعلّم الإنجليزية مع ليندا، وتدرّب على محادثة الآيلتس مع سارة":"Learn English with Linda, and practise your IELTS speaking with Sarah"}
         </p>
       </div>
 
