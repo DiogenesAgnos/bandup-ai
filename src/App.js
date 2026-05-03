@@ -10767,6 +10767,277 @@ class ErrorBoundary extends React.Component{
 }
 
 // ── MAIN APP ──────────────────────────────────
+// ── Homepage Live Demo Section ──────────────────────────────────────────────
+const HomeDemoSection=({uiLang="en",switchView})=>{
+  const isAr=uiLang==="ar";
+  const dir=isAr?"rtl":"ltr";
+  const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+
+  // ── Linda script ──
+  const LINDA_SCRIPT_EN=[
+    {role:"bot",  text:"Welcome! 🎙️ Today we're learning words about daily life. Listen and repeat after me!\n\nOur first word is **busy** — (مشغول). For example: \"I'm very busy today.\"\n\nNow repeat after me: *busy* 🎤"},
+    {role:"user", text:"busy"},
+    {role:"bot",  text:"Excellent! 🌟 One more time: *busy* 🎤"},
+    {role:"user", text:"busy!"},
+    {role:"bot",  text:"Perfect! ✅ Next word: **schedule** — (جدول / برنامج). For example: \"My schedule is full this week.\"\n\nRepeat: *schedule* 🎤"},
+    {role:"user", text:"schedule"},
+    {role:"bot",  text:"Amazing! 🎉 You're doing great. Let's try a sentence now — fill in the blank:\n\n\"I have a very busy ___ this week.\" 💬"},
+  ];
+  const LINDA_SCRIPT_AR=[
+    {role:"bot",  text:"أهلاً! 🎙️ اليوم نتعلم كلمات عن الحياة اليومية. استمع وكرر بعدي!\n\nكلمتنا الأولى هي **busy** — (مشغول). مثال: \"I'm very busy today.\"\n\nكرر بعدي: *busy* 🎤"},
+    {role:"user", text:"busy"},
+    {role:"bot",  text:"ممتاز! 🌟 مرة أخرى: *busy* 🎤"},
+    {role:"user", text:"busy!"},
+    {role:"bot",  text:"رائع! ✅ الكلمة التالية: **schedule** — (جدول). مثال: \"My schedule is full this week.\"\n\nكرر: *schedule* 🎤"},
+    {role:"user", text:"schedule"},
+    {role:"bot",  text:"أحسنت! 🎉 الآن أكمل الجملة:\n\n\"I have a very busy ___ this week.\" 💬"},
+  ];
+
+  // ── Sarah script ──
+  const SARAH_SCRIPT_EN=[
+    {role:"bot",  text:"Hey! 😊 Let's warm up. Tell me — what do you usually do on weekends?"},
+    {role:"user", text:"I usually stays home and watch movies."},
+    {role:"bot",  text:"Nice! 🎬 Small correction — say \"I usually **stay** home\" (not *stays* — with 'I' we don't add 's').\n\nTry again: \"I usually ___ home and watch movies.\" 💬"},
+    {role:"user", text:"I usually stay home and watch movies."},
+    {role:"bot",  text:"Perfect! ✅ Great correction.\n\nNow for an IELTS-style question 🎯 — **Do you prefer spending time alone or with others? Why?**"},
+    {role:"user", text:"I prefer with friends because its more fun."},
+    {role:"bot",  text:"Good idea! 💡 Try: \"I prefer **spending time** with friends because it's more fun.\" — Adding 'spending time' makes it a complete structure.\n\nCan you say the full sentence? 🎤"},
+  ];
+  const SARAH_SCRIPT_AR=[
+    {role:"bot",  text:"أهلاً! 😊 سؤال للإحماء — ماذا تفعل عادةً في عطلة نهاية الأسبوع؟"},
+    {role:"user", text:"I usually stays home and watch movies."},
+    {role:"bot",  text:"جيد! 🎬 تصحيح صغير — قل \"I usually **stay** home\" (مع 'I' لا نضيف 's').\n\nحاول مرة ثانية: \"I usually ___ home and watch movies.\" 💬"},
+    {role:"user", text:"I usually stay home and watch movies."},
+    {role:"bot",  text:"ممتاز! ✅ أحسنت التصحيح.\n\nسؤال على نمط الآيلتس 🎯 — **هل تفضّل الوقت وحدك أم مع الآخرين؟ ولماذا؟**"},
+    {role:"user", text:"I prefer with friends because its more fun."},
+    {role:"bot",  text:"فكرة جيدة! 💡 قل: \"I prefer **spending time** with friends because it's more fun.\" — إضافة 'spending time' تجعل الجملة مكتملة.\n\nهل تستطيع قول الجملة كاملة؟ 🎤"},
+  ];
+
+  // ── Grammar drill script ──
+  const GRAMMAR_SCRIPT_EN=[
+    {role:"bot",  text:"Grammar Drill ✏️ — Choose the correct word:\n\n\"She ___ to the gym every morning.\"\n\n🅐 go &nbsp; 🅑 goes &nbsp; 🅒 going"},
+    {role:"user", text:"🅑 goes"},
+    {role:"bot",  text:"✅ Correct! With third-person singular (she/he/it) we add **-s** or **-es**.\n\n\"She **goes** to the gym every morning.\" 💪\n\nNext question:\n\n\"They ___ watching TV when I called.\"\n\n🅐 was &nbsp; 🅑 is &nbsp; 🅒 were"},
+    {role:"user", text:"🅒 were"},
+    {role:"bot",  text:"✅ Exactly right! **Were** is used with plural subjects (they/we/you) in the past continuous.\n\n\"They **were** watching TV when I called.\" 🎯\n\nYou're on a roll! Ready for the next one? 💬"},
+  ];
+  const GRAMMAR_SCRIPT_AR=[
+    {role:"bot",  text:"تمرين قواعد ✏️ — اختر الكلمة الصحيحة:\n\n\"She ___ to the gym every morning.\"\n\n🅐 go &nbsp; 🅑 goes &nbsp; 🅒 going"},
+    {role:"user", text:"🅑 goes"},
+    {role:"bot",  text:"✅ صحيح! مع ضمائر المفرد الغائب (she/he/it) نضيف **-s** أو **-es**.\n\n\"She **goes** to the gym every morning.\" 💪\n\nالسؤال التالي:\n\n\"They ___ watching TV when I called.\"\n\n🅐 was &nbsp; 🅑 is &nbsp; 🅒 were"},
+    {role:"user", text:"🅒 were"},
+    {role:"bot",  text:"✅ صحيح تماماً! **Were** تُستخدم مع الجمع (they/we/you) في الماضي المستمر.\n\n\"They **were** watching TV when I called.\" 🎯\n\nأنت في تقدم رائع! هل أنت مستعد للسؤال التالي؟ 💬"},
+  ];
+
+  const lindaScript=isAr?LINDA_SCRIPT_AR:LINDA_SCRIPT_EN;
+  const sarahScript=isAr?SARAH_SCRIPT_AR:SARAH_SCRIPT_EN;
+  const grammarScript=isAr?GRAMMAR_SCRIPT_AR:GRAMMAR_SCRIPT_EN;
+
+  // ── Animated chat hook ──
+  const useAnimatedChat=(script,loopDelay=3000)=>{
+    const [messages,setMessages]=useState([]);
+    const [typing,setTyping]=useState(false);
+    const idxRef=useRef(0);
+    const timerRef=useRef(null);
+    useEffect(()=>{
+      const run=()=>{
+        const idx=idxRef.current;
+        if(idx>=script.length){
+          timerRef.current=setTimeout(()=>{
+            setMessages([]);
+            idxRef.current=0;
+            timerRef.current=setTimeout(run,600);
+          },loopDelay);
+          return;
+        }
+        const msg=script[idx];
+        if(msg.role==="bot"){
+          setTyping(true);
+          timerRef.current=setTimeout(()=>{
+            setTyping(false);
+            setMessages(prev=>[...prev,msg]);
+            idxRef.current=idx+1;
+            timerRef.current=setTimeout(run,msg.text.length>120?2200:1600);
+          },900);
+        } else {
+          timerRef.current=setTimeout(()=>{
+            setMessages(prev=>[...prev,msg]);
+            idxRef.current=idx+1;
+            timerRef.current=setTimeout(run,800);
+          },500);
+        }
+      };
+      timerRef.current=setTimeout(run,600);
+      return()=>{if(timerRef.current)clearTimeout(timerRef.current);};
+    // eslint-disable-next-line
+    },[uiLang]);
+    return{messages,typing};
+  };
+
+  const linda=useAnimatedChat(lindaScript,4000);
+  const sarah=useAnimatedChat(sarahScript,4000);
+  const grammar=useAnimatedChat(grammarScript,4000);
+
+  // ── Render bold and italic from **text** and *text*
+  const renderText=(text)=>{
+    const parts=text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+    return parts.map((p,i)=>{
+      if(p.startsWith("**")&&p.endsWith("**")) return <strong key={i}>{p.slice(2,-2)}</strong>;
+      if(p.startsWith("*")&&p.endsWith("*")) return <em key={i}>{p.slice(1,-1)}</em>;
+      return p.split("\n").map((line,j,arr)=><span key={j}>{line}{j<arr.length-1&&<br/>}</span>);
+    });
+  };
+
+  // ── Chat card component ──
+  const ChatCard=({title,subtitle,badge,badgeColor,headerBg,botBg,botColor,botBorder,avatarSvg,messages,typing,onTry,tryLabel})=>(
+    <div style={{background:"white",borderRadius:20,boxShadow:"0 4px 32px rgba(0,0,0,0.10)",overflow:"hidden",border:"1px solid #e2e8f0",display:"flex",flexDirection:"column",minHeight:380}}>
+      {/* Header */}
+      <div style={{background:headerBg,padding:"14px 18px",direction:dir}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,flexDirection:isAr?"row-reverse":"row"}}>
+          <div style={{width:38,height:38,borderRadius:"50%",overflow:"hidden",flexShrink:0,border:`2px solid ${botBorder}`}} dangerouslySetInnerHTML={{__html:avatarSvg}}/>
+          <div style={{flex:1,textAlign:isAr?"right":"left"}}>
+            <div style={{fontWeight:800,fontSize:15,color:"white",...sty}}>{title}</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.8)",...sty}}>{subtitle}</div>
+          </div>
+          <span style={{background:badgeColor,color:"white",fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:10,...sty,flexShrink:0,whiteSpace:"nowrap"}}>{badge}</span>
+        </div>
+      </div>
+      {/* Messages */}
+      <div style={{flex:1,padding:"14px 12px",display:"flex",flexDirection:"column",gap:8,minHeight:260,overflowY:"hidden",direction:dir}}>
+        {messages.map((m,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:m.role==="user"?(isAr?"flex-start":"flex-end"):(isAr?"flex-end":"flex-start"),gap:6,alignItems:"flex-end"}}>
+            {m.role==="bot"&&!isAr&&<div style={{width:26,height:26,borderRadius:"50%",overflow:"hidden",flexShrink:0}} dangerouslySetInnerHTML={{__html:avatarSvg}}/>}
+            {m.role==="bot"&&isAr&&<div style={{width:26,height:26,borderRadius:"50%",overflow:"hidden",flexShrink:0,order:2}} dangerouslySetInnerHTML={{__html:avatarSvg}}/>}
+            <div style={{maxWidth:"78%",padding:"9px 12px",borderRadius:m.role==="bot"?`4px 14px 14px 14px`:`14px 14px ${m.role==="user"&&!isAr?"4px":"14px"} ${m.role==="user"&&isAr?"4px":"14px"}`,background:m.role==="bot"?botBg:"#f1f5f9",fontSize:12.5,lineHeight:1.6,color:m.role==="bot"?botColor:"#334155",...sty,wordBreak:"break-word",textAlign:isAr?"right":"left"}}>
+              {renderText(m.text)}
+            </div>
+          </div>
+        ))}
+        {typing&&(
+          <div style={{display:"flex",justifyContent:isAr?"flex-end":"flex-start",gap:6,alignItems:"flex-end"}}>
+            {!isAr&&<div style={{width:26,height:26,borderRadius:"50%",overflow:"hidden",flexShrink:0}} dangerouslySetInnerHTML={{__html:avatarSvg}}/>}
+            {isAr&&<div style={{width:26,height:26,borderRadius:"50%",overflow:"hidden",flexShrink:0,order:2}} dangerouslySetInnerHTML={{__html:avatarSvg}}/>}
+            <div style={{padding:"10px 14px",borderRadius:"4px 14px 14px 14px",background:botBg,display:"flex",gap:4,alignItems:"center"}}>
+              {[0,1,2].map(d=>(
+                <div key={d} style={{width:6,height:6,borderRadius:"50%",background:botColor,opacity:0.7,animation:`bounce 1s ease-in-out ${d*0.15}s infinite`}}/>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      {/* CTA */}
+      <div style={{padding:"12px 14px",borderTop:"1px solid #f1f5f9",textAlign:"center"}}>
+        <button onClick={onTry} style={{background:headerBg,color:"white",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:700,cursor:"pointer",...sty,width:"100%",transition:"opacity 0.15s"}}
+          onMouseOver={e=>e.currentTarget.style.opacity="0.88"}
+          onMouseOut={e=>e.currentTarget.style.opacity="1"}>
+          {tryLabel}
+        </button>
+      </div>
+    </div>
+  );
+
+  const LINDA_SVG=`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="38" fill="#f5f3ff" stroke="#a78bfa" strokeWidth="2"/><circle cx="40" cy="30" r="14" fill="#c4b5fd"/><ellipse cx="40" cy="62" rx="18" ry="12" fill="#7c3aed"/><circle cx="40" cy="30" r="11" fill="#ede9fe"/><ellipse cx="35" cy="28" rx="2" ry="2.5" fill="#4c1d95"/><ellipse cx="45" cy="28" rx="2" ry="2.5" fill="#4c1d95"/><path d="M34 35 Q40 40 46 35" stroke="#7c3aed" strokeWidth="1.5" fill="none" strokeLinecap="round"/><rect x="22" y="44" width="36" height="5" rx="2" fill="#6d28d9"/><path d="M27 50 Q40 59 53 50" fill="#7c3aed"/></svg>`;
+  const SARAH_SVG=`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="38" fill="#fef2f2" stroke="#fecaca" strokeWidth="2"/><circle cx="40" cy="30" r="14" fill="#f9a8a8"/><ellipse cx="40" cy="62" rx="18" ry="12" fill="#b91c1c"/><circle cx="40" cy="30" r="11" fill="#fddcdc"/><ellipse cx="35" cy="28" rx="2" ry="2.5" fill="#7f1d1d"/><ellipse cx="45" cy="28" rx="2" ry="2.5" fill="#7f1d1d"/><path d="M35 35 Q40 39 45 35" stroke="#c05050" strokeWidth="1.5" fill="none" strokeLinecap="round"/><rect x="22" y="44" width="36" height="5" rx="2" fill="#991b1b"/><path d="M28 50 Q40 58 52 50" fill="#b91c1c"/></svg>`;
+
+  return(
+    <div style={{background:"#f8f9fb",padding:"52px 20px 60px",direction:dir}}>
+      <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}`}</style>
+      {/* Section header */}
+      <div style={{textAlign:"center",marginBottom:36}}>
+        <div style={{display:"inline-block",background:"#fef2f2",border:"1px solid #fecaca",borderRadius:20,padding:"4px 16px",fontSize:12,fontWeight:700,color:"#b91c1c",...sty,marginBottom:12}}>
+          {isAr?"✨ جرّب قبل ما تسجّل":"✨ See it in action — no sign-up needed"}
+        </div>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(22px,3vw,30px)",color:"#1e293b",margin:"0 0 10px",lineHeight:1.3}}>
+          {isAr?"تعلّم وتحدّث — بالذكاء الاصطناعي":"Learn and speak — powered by AI"}
+        </h2>
+        <p style={{fontSize:"clamp(13px,1.8vw,15px)",color:"#64748b",...sty,margin:0,lineHeight:1.6,maxWidth:560,marginLeft:"auto",marginRight:"auto"}}>
+          {isAr?"لايف للتعليم مع ليندا · شريكك في المحادثة الإنجليزية مع سارة":"Structured speaking lessons with Linda · Conversation practice with Sarah"}
+        </p>
+      </div>
+
+      {/* Linda + Sarah cards — side by side desktop, stacked mobile */}
+      <div style={{maxWidth:980,margin:"0 auto 36px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20}}>
+        <ChatCard
+          title={isAr?"ليندا — المعلمة الناطقة":"Linda — Your Speaking Teacher"}
+          subtitle={isAr?"تعلّم بالصوت · تكرار · نطق صحيح":"Voice lessons · Repeat & learn · Real pronunciation"}
+          badge={isAr?"🎙️ يدرّس بالكلام":"🎙️ Teaches by Speaking"}
+          badgeColor="#5b21b6"
+          headerBg="#7c3aed"
+          botBg="#f5f3ff"
+          botColor="#4c1d95"
+          botBorder="#a78bfa"
+          avatarSvg={LINDA_SVG}
+          messages={linda.messages}
+          typing={linda.typing}
+          onTry={()=>switchView("teacher")}
+          tryLabel={isAr?"ابدأ مع ليندا ←":"Start Learning with Linda →"}
+        />
+        <ChatCard
+          title={isAr?"سارة — شريكة المحادثة":"Sarah — Your Conversation Partner"}
+          subtitle={isAr?"آيلتس · محادثة عامة · تصحيح أخطاء فوري":"IELTS speaking · Casual chat · Instant corrections"}
+          badge={isAr?"🗣️ شريكة آيلتس":"🗣️ IELTS Partner"}
+          badgeColor="#991b1b"
+          headerBg="#b91c1c"
+          botBg="#fef2f2"
+          botColor="#7f1d1d"
+          botBorder="#fecaca"
+          avatarSvg={SARAH_SVG}
+          messages={sarah.messages}
+          typing={sarah.typing}
+          onTry={()=>switchView("speaking")}
+          tryLabel={isAr?"تحدّث مع سارة ←":"Start Speaking with Sarah →"}
+        />
+      </div>
+
+      {/* Grammar Drill demo — full width below */}
+      <div style={{maxWidth:980,margin:"0 auto"}}>
+        <div style={{background:"white",borderRadius:20,boxShadow:"0 4px 32px rgba(0,0,0,0.08)",overflow:"hidden",border:"1px solid #e2e8f0"}}>
+          {/* Header */}
+          <div style={{background:"linear-gradient(90deg,#0f766e,#0d9488)",padding:"14px 18px",direction:dir}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,flexDirection:isAr?"row-reverse":"row",justifyContent:"space-between"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,flexDirection:isAr?"row-reverse":"row"}}>
+                <span style={{fontSize:28}}>✏️</span>
+                <div style={{textAlign:isAr?"right":"left"}}>
+                  <div style={{fontWeight:800,fontSize:15,color:"white",...sty}}>{isAr?"تمارين قواعد تفاعلية":"Interactive Grammar Drills"}</div>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,0.8)",...sty}}>{isAr?"100+ سؤال · تصحيح فوري · شرح كل إجابة":"100+ questions · Instant feedback · Explained answers"}</div>
+                </div>
+              </div>
+              <span style={{background:"rgba(255,255,255,0.2)",color:"white",fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:10,...sty,whiteSpace:"nowrap"}}>
+                {isAr?"🆓 مجاني جزئياً":"🆓 Partly Free"}
+              </span>
+            </div>
+          </div>
+          {/* Messages — horizontal on desktop, same flow on mobile */}
+          <div style={{padding:"16px 16px",display:"flex",flexDirection:"column",gap:8,minHeight:160,direction:dir}}>
+            {grammar.messages.map((m,i)=>(
+              <div key={i} style={{display:"flex",justifyContent:m.role==="user"?(isAr?"flex-start":"flex-end"):(isAr?"flex-end":"flex-start")}}>
+                <div style={{maxWidth:"82%",padding:"9px 13px",borderRadius:12,background:m.role==="bot"?"#f0fdfa":"#f1f5f9",fontSize:12.5,lineHeight:1.65,color:m.role==="bot"?"#134e4a":"#334155",...sty,wordBreak:"break-word",textAlign:isAr?"right":"left",border:m.role==="bot"?"1px solid #99f6e4":"1px solid #e2e8f0"}}>
+                  {renderText(m.text)}
+                </div>
+              </div>
+            ))}
+            {grammar.typing&&(
+              <div style={{display:"flex",justifyContent:isAr?"flex-end":"flex-start"}}>
+                <div style={{padding:"10px 14px",borderRadius:12,background:"#f0fdfa",display:"flex",gap:4,alignItems:"center",border:"1px solid #99f6e4"}}>
+                  {[0,1,2].map(d=><div key={d} style={{width:6,height:6,borderRadius:"50%",background:"#0f766e",opacity:0.7,animation:`bounce 1s ease-in-out ${d*0.15}s infinite`}}/>)}
+                </div>
+              </div>
+            )}
+          </div>
+          {/* CTA */}
+          <div style={{padding:"12px 16px",borderTop:"1px solid #f0fdfa",textAlign:"center"}}>
+            <button onClick={()=>switchView("exercises")} style={{background:"linear-gradient(90deg,#0f766e,#0d9488)",color:"white",border:"none",borderRadius:10,padding:"10px 32px",fontSize:13,fontWeight:700,cursor:"pointer",...sty,transition:"opacity 0.15s"}}
+              onMouseOver={e=>e.currentTarget.style.opacity="0.88"}
+              onMouseOut={e=>e.currentTarget.style.opacity="1"}>
+              {isAr?"جرّب تمارين القواعد ←":"Try the Grammar Drills →"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function IELTSBot(){
   const [mainView,setMainView]=useState(()=>getViewFromPath());
   const [taskType,setTaskType]=useState(()=>getLastResult()?.taskType||"task2");
@@ -11326,6 +11597,9 @@ export default function IELTSBot(){
         </div>
       )}
 
+
+      {/* ── SPEAKING & GRAMMAR LIVE DEMOS ── */}
+      {mainView==="home"&&<HomeDemoSection uiLang={uiLang} switchView={switchView}/>}
 
       {/* VALUE PROPOSITION STRIP — 4 bullets */}
       {mainView==="home"&&(
