@@ -4081,7 +4081,14 @@ const primeAudioForAndroid=()=>{
   }catch(e){}
 };
 
+// ── TTS cancel generation — incremented on every cancelElevenLabs() call.
+// speakElevenLabs captures the gen at call time; if gen has advanced by the
+// time the fetch resolves, the result is silently discarded. This prevents
+// Sarah/Linda from "repeating" when the user clicks the mic mid-fetch.
+let _elCancelGen=0;
+
 const speakElevenLabs=async(text,voiceId,onEnd)=>{
+  const gen=++_elCancelGen;
   const clean=stripForEL(text);
   if(!clean){if(onEnd)onEnd();return;}
   try{
@@ -4090,8 +4097,12 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({text:clean,voiceId}),
     });
+    // If cancelled while fetching — discard result, don't play anything
+    if(gen!==_elCancelGen){if(onEnd)onEnd();return;}
     if(!res.ok)throw new Error("TTS API failed "+res.status);
     const arrayBuffer=await res.arrayBuffer();
+    // Second check: cancelled while reading response body
+    if(gen!==_elCancelGen){if(onEnd)onEnd();return;}
     const blob=new Blob([arrayBuffer],{type:"audio/mpeg"});
     const url=URL.createObjectURL(blob);
 
@@ -4149,6 +4160,9 @@ const _tryAudioContext=async(arrayBuffer,url,onEnd)=>{
 };
 
 const cancelElevenLabs=()=>{
+  // Advance generation — any speakElevenLabs currently awaiting fetch will see
+  // the mismatch and discard its result without playing anything.
+  _elCancelGen++;
   if(window._currentELSource){
     try{window._currentELSource.stop();}catch(e){}
     window._currentELSource=null;
