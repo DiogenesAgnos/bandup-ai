@@ -4024,10 +4024,12 @@ const unlockAudioCtx=()=>{
 // fetch() completes. A global touchstart listener keeps it permanently running
 // so TTS audio plays correctly after the ElevenLabs API call returns.
 const _unlockOnTouch=()=>{
+  // Create the persistent DOM audio element during a user gesture
+  // so Android Chrome grants it autoplay permission
+  getDomAudio();
   const ctx=getAudioCtx();
   if(ctx&&ctx.state==="suspended"){
     ctx.resume().then(()=>{
-      // Play and immediately stop a silent buffer to fully unlock the context
       try{
         const buf=ctx.createBuffer(1,1,22050);
         const src=ctx.createBufferSource();
@@ -4037,7 +4039,6 @@ const _unlockOnTouch=()=>{
       }catch(e){}
     }).catch(()=>{});
   }
-  // Remove listeners once unlocked — only need to do this once
   document.removeEventListener("touchstart",_unlockOnTouch,true);
   document.removeEventListener("touchend",_unlockOnTouch,true);
   document.removeEventListener("click",_unlockOnTouch,true);
@@ -4046,64 +4047,100 @@ document.addEventListener("touchstart",_unlockOnTouch,{capture:true,passive:true
 document.addEventListener("touchend",_unlockOnTouch,{capture:true,passive:true});
 document.addEventListener("click",_unlockOnTouch,{capture:true,passive:true});
 
+// ── Persistent DOM audio element — created on first touch (Android Chrome fix) ──
+// Android Chrome gives autoplay permission to DOM-attached elements created during
+// a user gesture. We create it once on first touch and reuse it forever.
+let _domAudio=null;
+const getDomAudio=()=>{
+  if(!_domAudio){
+    try{
+      _domAudio=document.createElement("audio");
+      _domAudio.setAttribute("playsinline","");
+      _domAudio.setAttribute("webkit-playsinline","");
+      _domAudio.preload="auto";
+      document.body.appendChild(_domAudio);
+    }catch(e){}
+  }
+  return _domAudio;
+};
+
 const speakElevenLabs=async(text,voiceId,onEnd)=>{
   const clean=stripForEL(text);
-  if(!clean)return;
+  if(!clean){if(onEnd)onEnd();return;}
   try{
     const res=await fetch("/api/tts",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({text:clean,voiceId}),
     });
-    if(!res.ok)throw new Error("TTS API failed");
+    if(!res.ok)throw new Error("TTS API failed "+res.status);
     const arrayBuffer=await res.arrayBuffer();
-
-    // ── Try AudioContext path first (works on iOS/Android after unlock) ──
-    const ctx=getAudioCtx();
-    if(ctx){
-      try{
-        // Always resume before playing — critical on Android Chrome where
-        // AudioContext can silently suspend after async fetch() completes
-        if(ctx.state!=="running") await ctx.resume();
-        const audioBuffer=await ctx.decodeAudioData(arrayBuffer.slice(0));
-        // Stop any currently playing source
-        if(window._currentELSource){
-          try{window._currentELSource.stop();}catch(e){}
-          window._currentELSource=null;
-        }
-        const source=ctx.createBufferSource();
-        source.buffer=audioBuffer;
-        source.connect(ctx.destination);
-        source.onended=()=>{if(onEnd)onEnd();};
-        window._currentELSource=source;
-        source.start(0);
-        return;
-      }catch(e){
-        // AudioContext path failed — fall through to Audio element
-      }
-    }
-
-    // ── Fallback: Audio element (desktop / non-iOS) ──
     const blob=new Blob([arrayBuffer],{type:"audio/mpeg"});
     const url=URL.createObjectURL(blob);
-    const audio=new Audio(url);
-    audio.onended=()=>{URL.revokeObjectURL(url);if(onEnd)onEnd();};
-    audio.onerror=()=>{URL.revokeObjectURL(url);if(onEnd)onEnd();};
-    window._currentELAudio=audio;
-    await audio.play();
+
+    // ── Primary: persistent DOM audio element (works on Android Chrome) ──
+    const audio=getDomAudio();
+    if(audio){
+      // Clean up previous object URL
+      if(audio._blobUrl){try{URL.revokeObjectURL(audio._blobUrl);}catch(e){}}
+      audio._blobUrl=url;
+      audio.onended=()=>{if(onEnd)onEnd();};
+      audio.onerror=()=>{
+        // DOM audio failed — try AudioContext as secondary fallback
+        _tryAudioContext(arrayBuffer.slice(0),url,onEnd);
+      };
+      audio.src=url;
+      const playPromise=audio.play();
+      if(playPromise!==undefined){
+        playPromise.catch(()=>{
+          // play() rejected (Android policy) — try AudioContext
+          _tryAudioContext(arrayBuffer.slice(0),url,onEnd);
+        });
+      }
+      window._currentELAudio=audio;
+      return;
+    }
+
+    // ── Fallback: AudioContext ──
+    _tryAudioContext(arrayBuffer,url,onEnd);
+
   }catch(e){
+    if(onEnd)onEnd();
     speakTextFallback(text,onEnd);
   }
 };
 
+const _tryAudioContext=async(arrayBuffer,url,onEnd)=>{
+  const ctx=getAudioCtx();
+  if(ctx){
+    try{
+      if(ctx.state!=="running") await ctx.resume();
+      const audioBuffer=await ctx.decodeAudioData(arrayBuffer instanceof ArrayBuffer?arrayBuffer:await arrayBuffer);
+      if(window._currentELSource){try{window._currentELSource.stop();}catch(e){}}
+      const source=ctx.createBufferSource();
+      source.buffer=audioBuffer;
+      source.connect(ctx.destination);
+      source.onended=()=>{if(url)try{URL.revokeObjectURL(url);}catch(e){} if(onEnd)onEnd();};
+      window._currentELSource=source;
+      source.start(0);
+      return;
+    }catch(e){}
+  }
+  // Last resort: browser TTS
+  if(url)try{URL.revokeObjectURL(url);}catch(e){}
+  speakTextFallback(text,onEnd);
+};
+
 const cancelElevenLabs=()=>{
-  // Stop AudioContext source if playing
   if(window._currentELSource){
     try{window._currentELSource.stop();}catch(e){}
     window._currentELSource=null;
   }
-  // Stop Audio element if playing
-  if(window._currentELAudio){
+  // Pause the persistent DOM audio element
+  if(_domAudio){
+    try{_domAudio.pause(); _domAudio.currentTime=0;}catch(e){}
+  }
+  if(window._currentELAudio&&window._currentELAudio!==_domAudio){
     try{window._currentELAudio.pause();window._currentELAudio.src="";}catch(e){}
     window._currentELAudio=null;
   }
