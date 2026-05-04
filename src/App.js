@@ -4366,10 +4366,7 @@ RESPONSE RULES:
   const callClaude=async(system,history,userMsg)=>{
     try{
       let msgs=history.slice(-14);
-      // ── Gemini requires the first message to be role "user". ──────────────
-      // After Sarah greets, history starts with {role:"assistant",...} which
-      // maps to Gemini "model" role → HTTP 400 on every conversation turn.
-      // Strip any leading assistant messages so the array always starts with user.
+      // Gemini requires first message to be "user" role
       while(msgs.length>0&&msgs[0].role!=="user") msgs.shift();
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const controller=new AbortController();
@@ -4380,6 +4377,20 @@ RESPONSE RULES:
       });
       clearTimeout(timeout);
       if(!mountedRef.current)return "";
+      if(res.status===429){
+        // Rate limited — wait 4 seconds and retry once
+        await new Promise(r=>setTimeout(r,4000));
+        if(!mountedRef.current)return "";
+        const retry=await fetch("/api/analyze",{
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:150,system,messages:msgs})
+        });
+        if(!mountedRef.current)return "";
+        if(retry.status===429) return "I need just a moment — please try again in a few seconds.";
+        if(!retry.ok){console.error("Sarah retry error",retry.status);return "";}
+        const d=await retry.json();
+        return d?.content?.[0]?.text||"";
+      }
       if(!res.ok){
         const errData=await res.json().catch(()=>({}));
         console.error("Sarah API error",res.status,errData);
@@ -5119,11 +5130,20 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
       const res = await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:900,system:sys,
           messages:[{role:"user",content:`Score this IELTS Speaking test transcript:\n\n${fullTranscript}`}]})});
+      // Handle rate limit with one retry
+      if(res.status===429){
+        if(mountedRef.current) setReport({error:true,rateLimited:true});
+        setPhase("results");setScoring(false);return;
+      }
+      if(!res.ok){
+        if(mountedRef.current){setReport({error:true}); setPhase("results");}
+        setScoring(false);return;
+      }
       const data = await res.json();
       const raw = data?.content?.[0]?.text||"";
       const clean = raw.replace(/```json|```/g,"").trim();
       const parsed = JSON.parse(clean);
-      if(mountedRef.current){setReport(parsed); setPhase("results"); setMockUsed();}  // Fix 4: mark used on completion
+      if(mountedRef.current){setReport(parsed); setPhase("results"); setMockUsed();}
     }catch(e){
       if(mountedRef.current){setReport({error:true}); setPhase("results");}
     }
@@ -5412,7 +5432,11 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
         {report&&!report.error&&<div style={{display:"inline-block",background:"#dc2626",color:"white",borderRadius:20,padding:"6px 20px",fontSize:18,fontWeight:900,fontFamily:"Georgia,serif",boxShadow:"0 4px 14px rgba(220,38,38,0.3)"}}>Overall Band {report.overall}</div>}
       </div>
       {report?.error ? (
-        <div style={{textAlign:"center",padding:24,...sty,color:T2.textMuted}}>Could not generate report. Please try again.</div>
+        <div style={{textAlign:"center",padding:24,...sty,color:T2.textMuted}}>
+          {report.rateLimited
+            ? "⏳ AI is busy right now (rate limit reached). Please wait 1 minute and try the test again."
+            : "Could not generate report. Please try again."}
+        </div>
       ) : report && (
         <>
           {/* 4 Criteria */}
@@ -9979,10 +10003,7 @@ ALWAYS:
   const callClaude=async(system,history,userMsg)=>{
     try{
       let msgs=history.slice(-12);
-      // ── Gemini requires the first message to be role "user". ──────────────
-      // After Linda greets, history starts with {role:"assistant",...} which
-      // maps to Gemini "model" role → HTTP 400 on every conversation turn.
-      // Strip any leading assistant messages so the array always starts with user.
+      // Gemini requires first message to be "user" role
       while(msgs.length>0&&msgs[0].role!=="user") msgs.shift();
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const controller=new AbortController();
@@ -9991,6 +10012,20 @@ ALWAYS:
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:200,system,messages:msgs})});
       clearTimeout(timeout);
       if(!mountedRef.current)return "";
+      if(res.status===429){
+        // Rate limited — wait 4 seconds and retry once
+        await new Promise(r=>setTimeout(r,4000));
+        if(!mountedRef.current)return "";
+        const retry=await fetch("/api/analyze",{
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:200,system,messages:msgs})
+        });
+        if(!mountedRef.current)return "";
+        if(retry.status===429) return "Just a moment — I'll be right with you, please try again.";
+        if(!retry.ok){console.error("Linda retry error",retry.status);return "";}
+        const d=await retry.json();
+        return d?.content?.[0]?.text||"";
+      }
       if(!res.ok){
         const errData=await res.json().catch(()=>({}));
         console.error("Linda API error",res.status,errData);
