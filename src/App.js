@@ -4081,14 +4081,21 @@ const primeAudioForAndroid=()=>{
   }catch(e){}
 };
 
-// ── TTS cancel generation — incremented on every cancelElevenLabs() call.
-// speakElevenLabs captures the gen at call time; if gen has advanced by the
-// time the fetch resolves, the result is silently discarded. This prevents
-// Sarah/Linda from "repeating" when the user clicks the mic mid-fetch.
-let _elCancelGen=0;
+// ── TTS cancel system ────────────────────────────────────────────────────────
+// _elCancelId: incremented ONLY by cancelElevenLabs — never by speakElevenLabs.
+// speakElevenLabs snapshots it at call time; if it has advanced when the fetch
+// resolves, the result is silently discarded.
+//
+// _ttsPendingTimer: holds the global setTimeout ID for the 80ms TTS delay.
+// cancelElevenLabs clears it so that even a not-yet-started TTS is killed.
+// This is the key fix for the "broken record" and cross-section audio bleed:
+//   1. User clicks mic → cancelElevenLabs → clears timer → speakElevenLabs never fires
+//   2. If fetch already in-flight → snapshot mismatch → discarded silently
+let _elCancelId=0;
+let _ttsPendingTimer=null;
 
 const speakElevenLabs=async(text,voiceId,onEnd)=>{
-  const gen=++_elCancelGen;
+  const snapshot=_elCancelId;          // READ only — never increment here
   const clean=stripForEL(text);
   if(!clean){if(onEnd)onEnd();return;}
   try{
@@ -4097,12 +4104,10 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({text:clean,voiceId}),
     });
-    // If cancelled while fetching — discard result, don't play anything
-    if(gen!==_elCancelGen){if(onEnd)onEnd();return;}
+    if(_elCancelId!==snapshot){if(onEnd)onEnd();return;} // cancelled mid-fetch
     if(!res.ok)throw new Error("TTS API failed "+res.status);
     const arrayBuffer=await res.arrayBuffer();
-    // Second check: cancelled while reading response body
-    if(gen!==_elCancelGen){if(onEnd)onEnd();return;}
+    if(_elCancelId!==snapshot){if(onEnd)onEnd();return;} // cancelled mid-body-read
     const blob=new Blob([arrayBuffer],{type:"audio/mpeg"});
     const url=URL.createObjectURL(blob);
 
@@ -4160,9 +4165,9 @@ const _tryAudioContext=async(arrayBuffer,url,onEnd)=>{
 };
 
 const cancelElevenLabs=()=>{
-  // Advance generation — any speakElevenLabs currently awaiting fetch will see
-  // the mismatch and discard its result without playing anything.
-  _elCancelGen++;
+  _elCancelId++;                        // invalidate any in-flight speakElevenLabs
+  clearTimeout(_ttsPendingTimer);       // kill any queued 80ms TTS timer
+  _ttsPendingTimer=null;
   if(window._currentELSource){
     try{window._currentELSource.stop();}catch(e){}
     window._currentELSource=null;
@@ -4375,7 +4380,10 @@ RESPONSE RULES:
     if(!mountedRef.current)return;
     const clean=text.replace(/^\[Sarah\]\s*/i,"").replace(/\*\*/g,"").replace(/\*/g,"").trim();
     setMessages(prev=>[...prev,{role:"bot",text:clean,id:Date.now()+Math.random()}]);
-    if(ttsEnabled)setTimeout(()=>speakText(stripForTTS(clean)),80);
+    if(ttsEnabled){
+      clearTimeout(_ttsPendingTimer);
+      _ttsPendingTimer=setTimeout(()=>speakText(stripForTTS(clean)),80);
+    }
   };
 
   const getHistory=()=>messages.map(m=>({
@@ -9998,7 +10006,10 @@ ALWAYS:
     const ttsText=raw.replace(/\[SPELL\](.*?)\[\/SPELL\]/gi,"$1");
     const displayText=raw; // keep [SPELL] tags — rendered as blurred in JSX
     setMessages(prev=>[...prev,{role:"bot",text:displayText,id:Date.now()+Math.random()}]);
-    if(ttsEnabled)setTimeout(()=>speakLinda(stripForTTSLinda(ttsText)),80);
+    if(ttsEnabled){
+      clearTimeout(_ttsPendingTimer);
+      _ttsPendingTimer=setTimeout(()=>speakLinda(stripForTTSLinda(ttsText)),80);
+    }
     // Repeat tracking
     if(isSuccess){setRepeatSuccess(prev=>{const n=prev+1;if(n>=2)setRepeatTarget(null);return n>=2?0:n;});}
     if(isMoveOn){setRepeatTarget(null);setRepeatSuccess(0);}
