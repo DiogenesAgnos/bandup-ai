@@ -17,10 +17,9 @@ export default async function handler(req, res) {
     const { model, max_tokens, system, messages } = req.body;
 
     // ── Model mapping ──────────────────────────────────────────────────────
-    // claude-opus-4-6   → gemini-1.5-pro   (essay analysis — highest quality)
-    // claude-sonnet-4-6 → gemini-1.5-flash (conversation, Linda, practice — fast + free)
-    const geminiModel =
-      model === "claude-opus-4-6" ? "gemini-1.5-pro" : "gemini-1.5-flash";
+    // Only gemini-2.5-flash has free quota on this account (5 RPM, 250K TPM)
+    // Use it for everything — it's Google's latest and most capable flash model
+    const geminiModel = "gemini-2.5-flash-preview-05-20";
 
     // ── Translate messages from Anthropic → Gemini format ─────────────────
     // Anthropic: [{role:"user"|"assistant", content:"..."}]
