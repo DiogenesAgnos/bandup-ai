@@ -3,9 +3,9 @@
 // Groq response format matches Anthropic's shape so App.js needs zero changes.
 
 // Model routing:
-// - Short turns (Sarah/Linda chat): llama-3.1-8b-instant — extremely fast
-// - Long tasks (mock test scoring): llama-3.3-70b-versatile — better reasoning
-const SHORT_MODEL  = "llama-3.1-8b-instant";
+// - All turns: llama-3.3-70b-versatile — follows complex system prompts reliably.
+// - The 8B model was too small to follow Sarah/Linda's strict formatting rules.
+const SHORT_MODEL  = "llama-3.3-70b-versatile";
 const LONG_MODEL   = "llama-3.3-70b-versatile";
 
 export default async function handler(req, res) {
