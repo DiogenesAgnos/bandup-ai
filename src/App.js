@@ -4114,28 +4114,29 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
     // ── Primary: persistent DOM audio element (works on Android Chrome) ──
     const audio=getDomAudio();
     if(audio){
-      // Clean up previous object URL
       if(audio._blobUrl){try{URL.revokeObjectURL(audio._blobUrl);}catch(e){}}
       audio._blobUrl=url;
       audio.onended=()=>{if(onEnd)onEnd();};
-      audio.onerror=()=>{
-        // DOM audio failed — try AudioContext as secondary fallback
-        _tryAudioContext(arrayBuffer.slice(0),url,onEnd);
+      // Bug fix: onerror AND play().catch() both fire on mobile when autoplay is
+      // blocked — causes DOUBLE AudioContext playback (the broken record bug).
+      // Shared flag ensures only ONE fallback path fires per TTS call.
+      // Also re-checks snapshot before launching AudioContext to prevent
+      // cross-section audio bleed when navigating away mid-fetch.
+      let _fallbackUsed=false;
+      const _tryFallback=()=>{
+        if(_fallbackUsed)return;
+        _fallbackUsed=true;
+        if(_elCancelId!==snapshot){if(onEnd)onEnd();return;}
+        _tryAudioContext(arrayBuffer.slice(0),url,onEnd,snapshot);
       };
+      audio.onerror=_tryFallback;
       audio.src=url;
       const playPromise=audio.play();
-      if(playPromise!==undefined){
-        playPromise.catch(()=>{
-          // play() rejected (Android policy) — try AudioContext
-          _tryAudioContext(arrayBuffer.slice(0),url,onEnd);
-        });
-      }
+      if(playPromise!==undefined) playPromise.catch(_tryFallback);
       window._currentELAudio=audio;
       return;
     }
-
-    // ── Fallback: AudioContext ──
-    _tryAudioContext(arrayBuffer,url,onEnd);
+    _tryAudioContext(arrayBuffer,url,onEnd,snapshot);
 
   }catch(e){
     if(onEnd)onEnd();
@@ -4143,12 +4144,18 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
   }
 };
 
-const _tryAudioContext=async(arrayBuffer,url,onEnd)=>{
+const _tryAudioContext=async(arrayBuffer,url,onEnd,snapshot)=>{
+  // Cancel check: if navigated away between speakElevenLabs and here, discard.
+  if(snapshot!==undefined&&_elCancelId!==snapshot){if(onEnd)onEnd();if(url)try{URL.revokeObjectURL(url);}catch(e){}return;}
   const ctx=getAudioCtx();
   if(ctx){
     try{
       if(ctx.state!=="running") await ctx.resume();
+      // Second cancel check after async resume
+      if(snapshot!==undefined&&_elCancelId!==snapshot){if(onEnd)onEnd();if(url)try{URL.revokeObjectURL(url);}catch(e){}return;}
       const audioBuffer=await ctx.decodeAudioData(arrayBuffer instanceof ArrayBuffer?arrayBuffer:await arrayBuffer);
+      // Third cancel check after async decode
+      if(snapshot!==undefined&&_elCancelId!==snapshot){if(onEnd)onEnd();if(url)try{URL.revokeObjectURL(url);}catch(e){}return;}
       if(window._currentELSource){try{window._currentELSource.stop();}catch(e){}}
       const source=ctx.createBufferSource();
       source.buffer=audioBuffer;
@@ -4159,7 +4166,6 @@ const _tryAudioContext=async(arrayBuffer,url,onEnd)=>{
       return;
     }catch(e){}
   }
-  // Last resort: browser TTS
   if(url)try{URL.revokeObjectURL(url);}catch(e){}
   speakTextFallback(text,onEnd);
 };
@@ -4172,9 +4178,14 @@ const cancelElevenLabs=()=>{
     try{window._currentELSource.stop();}catch(e){}
     window._currentELSource=null;
   }
-  // Pause the persistent DOM audio element
+  // Pause the persistent DOM audio element and clear stale event handlers
   if(_domAudio){
-    try{_domAudio.pause(); _domAudio.currentTime=0;}catch(e){}
+    try{
+      _domAudio.onended=null;
+      _domAudio.onerror=null;
+      _domAudio.pause();
+      _domAudio.currentTime=0;
+    }catch(e){}
   }
   if(window._currentELAudio&&window._currentELAudio!==_domAudio){
     try{window._currentELAudio.pause();window._currentELAudio.src="";}catch(e){}
@@ -4505,7 +4516,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
     // Try MediaRecorder first (works on Safari/Chrome/Firefox)
     if(navigator.mediaDevices?.getUserMedia){
       try{
-        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
         audioChunksRef.current=[];
         const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
           ?"audio/webm;codecs=opus"
@@ -4807,7 +4818,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
             rows={2}
             style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?T.red:T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
           <button
-            onClick={()=>{ unlockAudioCtx(); primeAudioForAndroid(); isRecording?stopRecording():startRecording(); }}
+            onClick={()=>{ unlockAudioCtx(); if(isRecording){primeAudioForAndroid();stopRecording();}else{startRecording();} }}
             disabled={isPaused}
             aria-label={isRecording?"Stop and send":"Start recording"}
             style={{width:54,height:54,borderRadius:"50%",border:"none",
@@ -4898,7 +4909,7 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
     setError(""); setTranscript(""); finalTranscriptRef.current="";
     if(navigator.mediaDevices?.getUserMedia){
       try{
-        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
         audioChunksRef.current = [];
         const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":MediaRecorder.isTypeSupported("audio/mp4")?"audio/mp4":"audio/webm";
         const mr = new MediaRecorder(stream,{mimeType});
@@ -10104,7 +10115,7 @@ ALWAYS:
 
     if(navigator.mediaDevices?.getUserMedia){
       try{
-        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
         audioChunksRef.current=[];
         const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":MediaRecorder.isTypeSupported("audio/mp4")?"audio/mp4":"audio/webm";
         const mr=new MediaRecorder(stream,{mimeType});
@@ -10427,7 +10438,7 @@ ALWAYS:
                 placeholder={isAr?(isRecording?"جارٍ التسجيل — اضغط ⏹ للإرسال":"اضغط الميكروفون أو اكتب هنا..."):(isRecording?"Listening... tap ⏹ to stop and send":"Tap mic or type here...")}
                 rows={2}
                 style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?"#a78bfa":T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
-              <button onClick={()=>{ unlockAudioCtx(); primeAudioForAndroid(); isRecording?stopRecording():startRecording(); }}
+              <button onClick={()=>{ unlockAudioCtx(); if(isRecording){primeAudioForAndroid();stopRecording();}else{startRecording();} }}
                 style={{width:52,height:52,borderRadius:"50%",border:"none",background:isRecording?"#7c3aed":"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
                 {isRecording?"⏹":"🎤"}
               </button>
