@@ -4345,9 +4345,16 @@ RESPONSE RULES:
       });
       clearTimeout(timeout);
       if(!mountedRef.current)return "";
+      if(!res.ok){
+        const errData=await res.json().catch(()=>({}));
+        console.error("Sarah API error",res.status,errData);
+        return "";
+      }
       const data=await res.json();
-      return data?.content?.[0]?.text||"";
-    }catch(e){return "";}
+      const text=data?.content?.[0]?.text||"";
+      if(!text)console.warn("Sarah: API returned empty text. Full response:",JSON.stringify(data));
+      return text;
+    }catch(e){console.error("Sarah callClaude error:",e);return "";}
   };
 
   const addSarahMessage=(text)=>{
@@ -4373,7 +4380,7 @@ RESPONSE RULES:
     setIsThinking(true);
     const history=getHistory();
     const reply=await callClaude(buildSystemPrompt(),history,`[${userName}]: ${text.trim()}`);
-    if(mountedRef.current){setIsThinking(false);if(reply)addSarahMessage(reply);}
+    if(mountedRef.current){setIsThinking(false);if(reply)addSarahMessage(reply);else addSarahMessage("Sorry, I didn't catch that — could you try again?");}
   };
 
   const startConversation=async()=>{
@@ -4402,7 +4409,10 @@ RESPONSE RULES:
       ?`Welcome ${userName} back. You have a session summary about them in your system prompt. Open with ONE specific reference from it (a topic, a mistake, or a word). Then ask if they want to continue from where they left off or try something new. Keep it to 2 sentences.`
       :`Greet ${userName} warmly as Sarah. Say you are here to practise English together. Ask what they would like to talk about, or offer to ask IELTS-style questions if they want to practise for the exam.`;
     const reply=await callClaude(buildSystemPrompt(),[],opening);
-    if(mountedRef.current){setIsThinking(false);if(reply)addSarahMessage(reply);}
+    if(mountedRef.current){
+      setIsThinking(false);
+      addSarahMessage(reply||`Hi ${userName}! I'm Sarah, your speaking practice partner. What would you like to talk about today — free conversation, or shall I give you some IELTS-style questions?`);
+    }
   };
 
   const generateReport=async()=>{
@@ -9938,8 +9948,15 @@ ALWAYS:
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:200,system,messages:msgs})});
       clearTimeout(timeout);
       if(!mountedRef.current)return "";
+      if(!res.ok){
+        const errData=await res.json().catch(()=>({}));
+        console.error("Linda API error",res.status,errData);
+        return "";
+      }
       const data=await res.json();
-      return data?.content?.[0]?.text||"";
+      const text=data?.content?.[0]?.text||"";
+      if(!text)console.warn("Linda: API returned empty text. Full response:",JSON.stringify(data));
+      return text;
     }catch(e){console.error("Linda API error:",e);return "";}
   };
 
@@ -10011,7 +10028,7 @@ ALWAYS:
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
     setIsThinking(true);
     const reply=await callClaude(buildSystemPrompt(currentLesson,currentPhase),getHistory(),text.trim());
-    if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
+    if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);else addLindaMessage("Sorry, let me try that again — please repeat your answer.");}
   };
 
   const startLesson=async(lesson,resumeSession=false)=>{
@@ -10031,7 +10048,10 @@ ALWAYS:
     primeAudioForAndroid(); // prime during gesture before async API call
     const opening=`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}"${["a1","a2"].includes(progress.level)?` — give its Arabic meaning [${lesson.vocab[0].ar}]`:""} with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
     const reply=await callClaude(buildSystemPrompt(lesson,0),[],opening);
-    if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
+    if(mountedRef.current){
+      setIsThinking(false);
+      addLindaMessage(reply||`Welcome! 🌟 Let's start our lesson. Today's first word is "${lesson.vocab[0].w}"${lesson.vocab[0].ar?" ("+lesson.vocab[0].ar+")":""} — can you try saying it?`);
+    }
   };
 
   const mediaRecorderRef=useRef(null);
