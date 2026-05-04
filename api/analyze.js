@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const { model, max_tokens, system, messages } = req.body;
 
     // ── Model ──────────────────────────────────────────────────────────────
-    const geminiModel = "gemini-2.5-flash";
+    const geminiModel = "gemini-2.5-flash-preview-05-20";
 
     // ── Translate messages Anthropic → Gemini format ───────────────────────
     const contents = messages.map((m) => ({
