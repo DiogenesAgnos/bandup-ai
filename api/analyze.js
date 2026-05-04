@@ -1,7 +1,48 @@
 // /api/analyze.js
 // Accepts requests in Anthropic format from App.js
-// Translates to Gemini 2.5 Flash format and returns Anthropic-shaped response
+// Translates to Gemini format and returns Anthropic-shaped response
 // App.js requires zero changes
+
+// Model priority list — tried in order until one succeeds.
+// gemini-2.0-flash: stable GA, no thinking tokens, fast.
+// gemini-1.5-flash: ultra-stable fallback, always available.
+const MODEL_PRIORITY = [
+  "gemini-2.0-flash",
+  "gemini-1.5-flash",
+];
+
+async function callGemini(apiKey, model, geminiBody) {
+  return await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(geminiBody),
+    }
+  );
+}
+
+function extractText(geminiData) {
+  const parts = geminiData?.candidates?.[0]?.content?.parts || [];
+  const finishReason = geminiData?.candidates?.[0]?.finishReason;
+
+  if (!parts.length) {
+    console.warn("[analyze] Gemini returned no parts. finishReason:", finishReason);
+    console.warn("[analyze] Full response:", JSON.stringify(geminiData).slice(0, 600));
+  }
+
+  // Filter thought tokens (only in 2.5 models with thinking enabled)
+  const filtered = parts.filter((p) => !p.thought).map((p) => p.text || "").join("");
+
+  // Fallback: if filter removed everything, take all text
+  const text = filtered || parts.map((p) => p.text || "").join("");
+
+  if (!text) {
+    console.warn("[analyze] Empty text after extraction. finishReason:", finishReason);
+  }
+
+  return text;
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -14,14 +55,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { model, max_tokens, system, messages } = req.body;
+    const { max_tokens, system, messages } = req.body;
 
-    // ── Model ──────────────────────────────────────────────────────────────
-    // Use stable model name — preview versions get deprecated; fall back works with both
-    const geminiModel = "gemini-2.5-flash";
-
-    // ── Translate messages Anthropic → Gemini format ───────────────────────
-    const contents = messages.map((m) => ({
+    // Translate messages Anthropic -> Gemini format
+    const rawContents = messages.map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{
         text: typeof m.content === "string"
@@ -30,16 +67,28 @@ export default async function handler(req, res) {
       }],
     }));
 
-    // ── Build request body ─────────────────────────────────────────────────
+    // Gemini requires strictly alternating user/model roles
+    // Merge consecutive same-role messages to avoid 400 errors
+    const contents = [];
+    for (const msg of rawContents) {
+      const last = contents[contents.length - 1];
+      if (last && last.role === msg.role) {
+        last.parts[0].text += "\n" + msg.parts[0].text;
+      } else {
+        contents.push({ role: msg.role, parts: [{ text: msg.parts[0].text }] });
+      }
+    }
+
+    // Must start with user role
+    if (contents.length > 0 && contents[0].role === "model") {
+      contents.unshift({ role: "user", parts: [{ text: "(start)" }] });
+    }
+
     const geminiBody = {
       contents,
       generationConfig: {
         maxOutputTokens: max_tokens || 1000,
         temperature: 0.7,
-        // thinkingConfig MUST be inside generationConfig for 2.5 Flash
-        // Setting budget to 0 disables thinking — critical for Linda/Sarah
-        // (thought tokens pollute the response text and break conversation parsing)
-        thinkingConfig: { thinkingBudget: 0 },
       },
     };
 
@@ -47,54 +96,47 @@ export default async function handler(req, res) {
       geminiBody.systemInstruction = { parts: [{ text: system }] };
     }
 
-    // ── Call Gemini ────────────────────────────────────────────────────────
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(geminiBody),
-      }
-    );
+    // Try models in priority order
+    let geminiData = null;
+    let usedModel = null;
+    let lastStatus = 500;
+    let lastErrText = "Unknown error";
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      console.error("Gemini API error:", geminiRes.status, errText);
-      if (geminiRes.status === 429) {
-        return res.status(429).json({
-          error: "quota_exceeded",
-          message: "Our AI is resting for a moment — please try again in a few hours!",
-        });
+    for (const model of MODEL_PRIORITY) {
+      const geminiRes = await callGemini(GEMINI_API_KEY, model, geminiBody);
+
+      if (!geminiRes.ok) {
+        const errText = await geminiRes.text();
+        console.error(`[analyze] ${model} failed ${geminiRes.status}:`, errText.slice(0, 300));
+        lastStatus = geminiRes.status;
+        lastErrText = errText;
+
+        if (geminiRes.status === 429) {
+          return res.status(429).json({
+            error: "quota_exceeded",
+            message: "Our AI is resting — please try again in a few minutes!",
+          });
+        }
+        if (geminiRes.status === 400) {
+          return res.status(400).json({ error: errText });
+        }
+        continue; // 404/500/503 -> try next model
       }
-      return res.status(geminiRes.status).json({ error: errText });
+
+      geminiData = await geminiRes.json();
+      usedModel = model;
+      break;
     }
 
-    const geminiData = await geminiRes.json();
-
-    // ── Extract text — filter out thought parts (p.thought === true) ───────
-    // Gemini 2.5 Flash may include thought tokens alongside the actual response.
-    // Filter them out to avoid polluting Linda/Sarah conversation responses.
-    const parts = geminiData?.candidates?.[0]?.content?.parts || [];
-    const finishReason = geminiData?.candidates?.[0]?.finishReason;
-
-    if (!parts.length) {
-      console.warn("Gemini returned no parts. finishReason:", finishReason, JSON.stringify(geminiData).slice(0, 400));
+    if (!geminiData) {
+      return res.status(lastStatus).json({ error: lastErrText });
     }
 
-    // Primary: non-thought parts only
-    const filteredText = parts
-      .filter((p) => !p.thought)
-      .map((p) => p.text || "")
-      .join("");
+    const text = extractText(geminiData);
 
-    // Fallback: if filter wiped everything (all parts had thought:true despite budget:0),
-    // take all text parts as-is — better to show thought text than nothing at all.
-    const text = filteredText || parts.map((p) => p.text || "").join("");
-
-    // ── Return in Anthropic-compatible shape ───────────────────────────────
     return res.status(200).json({
       content: [{ type: "text", text }],
-      model: geminiModel,
+      model: usedModel,
       usage: {
         input_tokens: geminiData?.usageMetadata?.promptTokenCount || 0,
         output_tokens: geminiData?.usageMetadata?.candidatesTokenCount || 0,
@@ -102,7 +144,7 @@ export default async function handler(req, res) {
     });
 
   } catch (err) {
-    console.error("analyze handler error:", err);
+    console.error("[analyze] Handler error:", err);
     return res.status(500).json({ error: err.message || "Internal server error" });
   }
 }
