@@ -17,7 +17,8 @@ export default async function handler(req, res) {
     const { model, max_tokens, system, messages } = req.body;
 
     // ── Model ──────────────────────────────────────────────────────────────
-    const geminiModel = "gemini-2.5-flash-preview-05-20";
+    // Use stable model name — preview versions get deprecated; fall back works with both
+    const geminiModel = "gemini-2.5-flash";
 
     // ── Translate messages Anthropic → Gemini format ───────────────────────
     const contents = messages.map((m) => ({
@@ -71,13 +72,24 @@ export default async function handler(req, res) {
     const geminiData = await geminiRes.json();
 
     // ── Extract text — filter out thought parts (p.thought === true) ───────
-    // Gemini 2.5 Flash includes thought tokens alongside the actual response.
-    // If not filtered, thought content garbles Linda/Sarah conversation responses.
-    const text =
-      geminiData?.candidates?.[0]?.content?.parts
-        ?.filter((p) => !p.thought)
-        ?.map((p) => p.text || "")
-        .join("") || "";
+    // Gemini 2.5 Flash may include thought tokens alongside the actual response.
+    // Filter them out to avoid polluting Linda/Sarah conversation responses.
+    const parts = geminiData?.candidates?.[0]?.content?.parts || [];
+    const finishReason = geminiData?.candidates?.[0]?.finishReason;
+
+    if (!parts.length) {
+      console.warn("Gemini returned no parts. finishReason:", finishReason, JSON.stringify(geminiData).slice(0, 400));
+    }
+
+    // Primary: non-thought parts only
+    const filteredText = parts
+      .filter((p) => !p.thought)
+      .map((p) => p.text || "")
+      .join("");
+
+    // Fallback: if filter wiped everything (all parts had thought:true despite budget:0),
+    // take all text parts as-is — better to show thought text than nothing at all.
+    const text = filteredText || parts.map((p) => p.text || "").join("");
 
     // ── Return in Anthropic-compatible shape ───────────────────────────────
     return res.status(200).json({
