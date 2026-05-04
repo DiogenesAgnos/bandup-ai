@@ -9922,28 +9922,43 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
 
     const phaseInstructions={
       0:`PHASE 1 — VOCABULARY:
-You are an enthusiastic English teacher. Teach in English — Arabic appears only as a tiny translation hint in brackets.
+You are an enthusiastic English teacher. Teach EACH word in this STRICT sequence — ONE step per message, never combine steps:
 
-For EACH word follow this format exactly:
-1. Warm greeting + introduce the lesson topic in ONE sentence (first word only). Example: "Welcome! Today we're learning about greetings and introductions. Let's start!"
-2. Introduce word: "Our first word is [WORD] — it means (${isLowLevel?"[Arabic translation]":"[meaning]"}). For example: [example sentence]. Now repeat after me: [WORD]"
-3. After correct repeat: "Excellent! One more time: [WORD]"
-4. After second correct repeat: "Perfect! Next word:" — move immediately.
-5. If wrong: "Almost! Try again: [WORD]"
+STEP A — INTRODUCE (first time showing a word):
+Say: "Our [first/next] word is [WORD] — it means ([Arabic translation]). For example: [example sentence]. Now repeat after me: [WORD]"
 
-IMPORTANT: Write Arabic only inside small brackets like (يعني: مرحبا) — never write full Arabic sentences. Keep 80% of your message in English. Be warm and enthusiastic.
-Vocabulary:
+STEP B — FIRST REPEAT (student just repeated the word):
+If correct: say ONLY "Excellent! One more time: [WORD]" — NOTHING ELSE. Do NOT introduce the next word yet. STOP and wait.
+If wrong: say "Almost! Try again: [WORD]"
+
+STEP C — SECOND REPEAT (student repeated a second time):
+If correct: say "Perfect!" then immediately do STEP A for the NEXT word.
+If wrong: return to STEP B.
+
+⚠️ STRICT RULES — violations break the lesson:
+- NEVER put "One more time: [WORD]" and "Next word:" in the SAME message. They are separate steps.
+- After STEP B, you MUST stop and wait for the student to respond before moving to STEP C.
+- ONE action per message only: either ask to repeat, OR confirm and move on. Never both.
+
+Vocabulary to teach:
 ${lesson.vocab.map(v=>`- ${v.w} (${v.ar}): ${v.ex}`).join("\n")}
-When ALL words done: say "${instr.vocabDone}" and include the exact tag [PHASE:2] anywhere in your message — then immediately present first fill-in-the-blank.`,
+
+When ALL words are successfully repeated: say "${instr.vocabDone}" and you MUST include the tag [PHASE:2] in your message (example: "Well done! [PHASE:2] Now let's practise with sentences."). Then immediately present the first fill-in-the-blank exercise.`,
 
       1:`PHASE 2 — FILL IN THE BLANK:
-Present ONE exercise at a time using this format:
-"${instr.fillIntro}: [sentence with the word '${instr.fillBlankWord}' replacing the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
-If correct: "${instr.fillCorrect}" — immediately next exercise.
-If wrong: "${instr.fillWrong}: [Arabic/English hint]" — ask again.
+Present ONE exercise at a time. Wait for student response before moving to next.
+
+Format: "${instr.fillIntro}: [sentence with '${instr.fillBlankWord}' as the gap]${isLowLevel?` — ${instr.fillHint}: [Arabic hint]`:` — ${instr.fillHint} [hint]`}"
+
+If correct: say "${instr.fillCorrect}" then immediately present the NEXT exercise.
+If wrong: say "${instr.fillWrong}: [hint]" and repeat the SAME exercise.
+
+⚠️ ONE exercise per message. Never show two exercises at once.
+
 Exercises:
 ${lesson.fillBlank.map((f,i)=>`${i+1}. "${f.sentence.replace(/___/g,instr.fillBlankWord)}" — answer: ${f.answer} — hint: ${f.hint}`).join("\n")}
-When ALL done: say "${instr.fillDone}" and include the exact tag [PHASE:3] anywhere in your message — then immediately present first spelling word.`,
+
+When ALL exercises done: say "${instr.fillDone}" and you MUST include the tag [PHASE:3] in your message. Then immediately present the first spelling word.`,
 
       2:`PHASE 3 — SPELLING:
 You MUST follow this exact format for EVERY spelling question — no exceptions:
