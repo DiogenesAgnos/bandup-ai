@@ -1,153 +1,95 @@
 // /api/analyze.js
-// Accepts requests in Anthropic format from App.js
-// Translates to Gemini format and returns Anthropic-shaped response
-// App.js requires zero changes
+// Uses Groq API — free tier, high limits, fast inference.
+// Groq response format matches Anthropic's shape so App.js needs zero changes.
 
-// Model priority list — tried in order until one succeeds.
-// gemini-2.0-flash: stable GA, no thinking tokens, fast.
-// gemini-1.5-flash: ultra-stable fallback, always available.
-const MODEL_PRIORITY = [
-  "gemini-2.0-flash",
-  "gemini-1.5-flash",
-];
-
-async function callGemini(apiKey, model, geminiBody) {
-  return await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(geminiBody),
-    }
-  );
-}
-
-function extractText(geminiData) {
-  const parts = geminiData?.candidates?.[0]?.content?.parts || [];
-  const finishReason = geminiData?.candidates?.[0]?.finishReason;
-
-  if (!parts.length) {
-    console.warn("[analyze] Gemini returned no parts. finishReason:", finishReason);
-    console.warn("[analyze] Full response:", JSON.stringify(geminiData).slice(0, 600));
-  }
-
-  // Filter thought tokens (only in 2.5 models with thinking enabled)
-  const filtered = parts.filter((p) => !p.thought).map((p) => p.text || "").join("");
-
-  // Fallback: if filter removed everything, take all text
-  const text = filtered || parts.map((p) => p.text || "").join("");
-
-  if (!text) {
-    console.warn("[analyze] Empty text after extraction. finishReason:", finishReason);
-  }
-
-  return text;
-}
+// Model routing:
+// - Short turns (Sarah/Linda chat): llama-3.1-8b-instant — extremely fast
+// - Long tasks (mock test scoring): llama-3.3-70b-versatile — better reasoning
+const SHORT_MODEL  = "llama-3.1-8b-instant";
+const LONG_MODEL   = "llama-3.3-70b-versatile";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) {
-    return res.status(500).json({ error: "GEMINI_API_KEY not configured" });
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: "GROQ_API_KEY not configured" });
   }
 
   try {
     const { max_tokens, system, messages } = req.body;
 
-    // Translate messages Anthropic -> Gemini format
-    const rawContents = messages.map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{
-        text: typeof m.content === "string"
-          ? m.content
-          : m.content.filter((b) => b.type === "text").map((b) => b.text).join("\n"),
-      }],
-    }));
+    const model = (max_tokens && max_tokens > 300) ? LONG_MODEL : SHORT_MODEL;
 
-    // Gemini requires strictly alternating user/model roles
-    // Merge consecutive same-role messages to avoid 400 errors
-    const contents = [];
-    for (const msg of rawContents) {
-      const last = contents[contents.length - 1];
-      if (last && last.role === msg.role) {
-        last.parts[0].text += "\n" + msg.parts[0].text;
-      } else {
-        contents.push({ role: msg.role, parts: [{ text: msg.parts[0].text }] });
-      }
-    }
-
-    // Must start with user role
-    if (contents.length > 0 && contents[0].role === "model") {
-      contents.unshift({ role: "user", parts: [{ text: "(start)" }] });
-    }
-
-    const geminiBody = {
-      contents,
-      generationConfig: {
-        maxOutputTokens: max_tokens || 1000,
-        temperature: 0.7,
-      },
-    };
-
+    // Build Groq messages — same format as OpenAI / Anthropic
+    const groqMessages = [];
     if (system) {
-      geminiBody.systemInstruction = { parts: [{ text: system }] };
+      groqMessages.push({ role: "system", content: system });
     }
 
-    // Try models in priority order
-    let geminiData = null;
-    let usedModel = null;
-    let lastStatus = 500;
-    let lastErrText = "Unknown error";
+    for (const m of messages) {
+      const content = typeof m.content === "string"
+        ? m.content
+        : m.content.filter(b => b.type === "text").map(b => b.text).join("\n");
+      groqMessages.push({ role: m.role === "assistant" ? "assistant" : "user", content });
+    }
 
-    for (const model of MODEL_PRIORITY) {
-      const geminiRes = await callGemini(GEMINI_API_KEY, model, geminiBody);
-
-      if (!geminiRes.ok) {
-        const errText = await geminiRes.text();
-        console.error(`[analyze] ${model} failed ${geminiRes.status}:`, errText.slice(0, 300));
-        lastStatus = geminiRes.status;
-        lastErrText = errText;
-
-        if (geminiRes.status === 429) {
-          // Try next model on rate limit — different models have separate quota buckets
-          console.warn(`[analyze] ${model} rate-limited (429), trying next model...`);
-          lastStatus = 429;
-          lastErrText = await geminiRes.text();
-          continue;
-        }
-        if (geminiRes.status === 400) {
-          return res.status(400).json({ error: errText });
-        }
-        continue; // 404/500/503 -> try next model
+    // Groq requires strictly alternating user/assistant after system.
+    // Merge consecutive same-role messages.
+    const merged = [];
+    for (const m of groqMessages) {
+      if (m.role === "system") { merged.push(m); continue; }
+      const last = merged[merged.length - 1];
+      if (last && last.role === m.role && last.role !== "system") {
+        last.content += "\n" + m.content;
+      } else {
+        merged.push({ ...m });
       }
-
-      geminiData = await geminiRes.json();
-      usedModel = model;
-      break;
     }
 
-    if (!geminiData) {
-      console.error("[analyze] All models failed. lastStatus:", lastStatus);
-      if (lastStatus === 429) {
-        return res.status(429).json({
-          error: "quota_exceeded",
-          message: "Our AI is resting — please wait a minute and try again!",
-        });
+    // Must start with user after system
+    const nonSystem = merged.filter(m => m.role !== "system");
+    if (nonSystem.length > 0 && nonSystem[0].role !== "user") {
+      const sysIdx = merged.findIndex(m => m.role === "system");
+      merged.splice(sysIdx + 1, 0, { role: "user", content: "(start)" });
+    }
+
+    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: max_tokens || 1024,
+        temperature: 0.7,
+        messages: merged,
+      }),
+    });
+
+    if (!groqRes.ok) {
+      const errText = await groqRes.text();
+      console.error("[analyze] Groq error:", groqRes.status, errText.slice(0, 400));
+      if (groqRes.status === 429) {
+        return res.status(429).json({ error: "rate_limited", message: "Please wait a moment and try again." });
       }
-      return res.status(lastStatus).json({ error: lastErrText });
+      return res.status(groqRes.status).json({ error: errText });
     }
 
-    const text = extractText(geminiData);
+    const data = await groqRes.json();
+
+    // Convert OpenAI-style response → Anthropic shape that App.js expects
+    const text = data?.choices?.[0]?.message?.content || "";
 
     return res.status(200).json({
       content: [{ type: "text", text }],
-      model: usedModel,
+      model,
       usage: {
-        input_tokens: geminiData?.usageMetadata?.promptTokenCount || 0,
-        output_tokens: geminiData?.usageMetadata?.candidatesTokenCount || 0,
+        input_tokens:  data?.usage?.prompt_tokens     || 0,
+        output_tokens: data?.usage?.completion_tokens || 0,
       },
     });
 
