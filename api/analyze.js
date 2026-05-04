@@ -1,7 +1,7 @@
 // /api/analyze.js
 // Accepts requests in Anthropic format from App.js
-// Translates to Gemini 1.5 format and returns Anthropic-shaped response
-// So App.js requires zero changes
+// Translates to Gemini 2.5 Flash format and returns Anthropic-shaped response
+// App.js requires zero changes
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -16,47 +16,37 @@ export default async function handler(req, res) {
   try {
     const { model, max_tokens, system, messages } = req.body;
 
-    // ── Model mapping ──────────────────────────────────────────────────────
-    // Only gemini-2.5-flash has free quota on this account (5 RPM, 250K TPM)
-    // Use it for everything — it's Google's latest and most capable flash model
-    const geminiModel = "gemini-2.5-flash-preview-05-20";
+    // ── Model ──────────────────────────────────────────────────────────────
+    const geminiModel = "gemini-2.5-flash";
 
-    // ── Translate messages from Anthropic → Gemini format ─────────────────
-    // Anthropic: [{role:"user"|"assistant", content:"..."}]
-    // Gemini:    [{role:"user"|"model",     parts:[{text:"..."}]}]
+    // ── Translate messages Anthropic → Gemini format ───────────────────────
     const contents = messages.map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
-      parts: [
-        {
-          text:
-            typeof m.content === "string"
-              ? m.content
-              : // Handle content arrays (e.g. image blocks — text only for now)
-                m.content
-                  .filter((b) => b.type === "text")
-                  .map((b) => b.text)
-                  .join("\n"),
-        },
-      ],
+      parts: [{
+        text: typeof m.content === "string"
+          ? m.content
+          : m.content.filter((b) => b.type === "text").map((b) => b.text).join("\n"),
+      }],
     }));
 
-    // ── Build Gemini request body ──────────────────────────────────────────
+    // ── Build request body ─────────────────────────────────────────────────
     const geminiBody = {
       contents,
       generationConfig: {
         maxOutputTokens: max_tokens || 1000,
         temperature: 0.7,
+        // thinkingConfig MUST be inside generationConfig for 2.5 Flash
+        // Setting budget to 0 disables thinking — critical for Linda/Sarah
+        // (thought tokens pollute the response text and break conversation parsing)
+        thinkingConfig: { thinkingBudget: 0 },
       },
     };
 
-    // Attach system instruction if provided
     if (system) {
-      geminiBody.systemInstruction = {
-        parts: [{ text: system }],
-      };
+      geminiBody.systemInstruction = { parts: [{ text: system }] };
     }
 
-    // ── Call Gemini API ────────────────────────────────────────────────────
+    // ── Call Gemini ────────────────────────────────────────────────────────
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -69,12 +59,10 @@ export default async function handler(req, res) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error("Gemini API error:", geminiRes.status, errText);
-
-      // Handle quota exceeded specifically so App.js can show a friendly message
       if (geminiRes.status === 429) {
         return res.status(429).json({
           error: "quota_exceeded",
-          message: "Daily AI limit reached. Please try again tomorrow.",
+          message: "Our AI is resting for a moment — please try again in a few hours!",
         });
       }
       return res.status(geminiRes.status).json({ error: errText });
@@ -82,14 +70,16 @@ export default async function handler(req, res) {
 
     const geminiData = await geminiRes.json();
 
-    // ── Extract text from Gemini response ─────────────────────────────────
+    // ── Extract text — filter out thought parts (p.thought === true) ───────
+    // Gemini 2.5 Flash includes thought tokens alongside the actual response.
+    // If not filtered, thought content garbles Linda/Sarah conversation responses.
     const text =
       geminiData?.candidates?.[0]?.content?.parts
+        ?.filter((p) => !p.thought)
         ?.map((p) => p.text || "")
         .join("") || "";
 
-    // ── Return in Anthropic-compatible shape so App.js needs no changes ───
-    // App.js reads: data.content.map(b => b.text || "").join("")
+    // ── Return in Anthropic-compatible shape ───────────────────────────────
     return res.status(200).json({
       content: [{ type: "text", text }],
       model: geminiModel,
@@ -98,6 +88,7 @@ export default async function handler(req, res) {
         output_tokens: geminiData?.usageMetadata?.candidatesTokenCount || 0,
       },
     });
+
   } catch (err) {
     console.error("analyze handler error:", err);
     return res.status(500).json({ error: err.message || "Internal server error" });
