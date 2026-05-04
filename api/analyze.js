@@ -112,10 +112,11 @@ export default async function handler(req, res) {
         lastErrText = errText;
 
         if (geminiRes.status === 429) {
-          return res.status(429).json({
-            error: "quota_exceeded",
-            message: "Our AI is resting — please try again in a few minutes!",
-          });
+          // Try next model on rate limit — different models have separate quota buckets
+          console.warn(`[analyze] ${model} rate-limited (429), trying next model...`);
+          lastStatus = 429;
+          lastErrText = await geminiRes.text();
+          continue;
         }
         if (geminiRes.status === 400) {
           return res.status(400).json({ error: errText });
@@ -129,6 +130,13 @@ export default async function handler(req, res) {
     }
 
     if (!geminiData) {
+      console.error("[analyze] All models failed. lastStatus:", lastStatus);
+      if (lastStatus === 429) {
+        return res.status(429).json({
+          error: "quota_exceeded",
+          message: "Our AI is resting — please wait a minute and try again!",
+        });
+      }
       return res.status(lastStatus).json({ error: lastErrText });
     }
 
