@@ -4080,6 +4080,8 @@ const primeAudioForAndroid=()=>{
     if(p!==undefined) p.catch(()=>{});
   }catch(e){}
 };
+
+const speakElevenLabs=async(text,voiceId,onEnd)=>{
   const clean=stripForEL(text);
   if(!clean){if(onEnd)onEnd();return;}
   try{
