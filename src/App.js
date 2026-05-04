@@ -4365,7 +4365,12 @@ RESPONSE RULES:
 
   const callClaude=async(system,history,userMsg)=>{
     try{
-      const msgs=history.slice(-14);
+      let msgs=history.slice(-14);
+      // ── Gemini requires the first message to be role "user". ──────────────
+      // After Sarah greets, history starts with {role:"assistant",...} which
+      // maps to Gemini "model" role → HTTP 400 on every conversation turn.
+      // Strip any leading assistant messages so the array always starts with user.
+      while(msgs.length>0&&msgs[0].role!=="user") msgs.shift();
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const controller=new AbortController();
       const timeout=setTimeout(()=>controller.abort(),35000);
@@ -4382,7 +4387,7 @@ RESPONSE RULES:
       }
       const data=await res.json();
       const text=data?.content?.[0]?.text||"";
-      if(!text)console.warn("Sarah: API returned empty text. Full response:",JSON.stringify(data));
+      if(!text)console.warn("Sarah: empty response:",JSON.stringify(data).slice(0,300));
       return text;
     }catch(e){console.error("Sarah callClaude error:",e);return "";}
   };
@@ -9973,10 +9978,15 @@ ALWAYS:
 
   const callClaude=async(system,history,userMsg)=>{
     try{
-      const msgs=history.slice(-12);
+      let msgs=history.slice(-12);
+      // ── Gemini requires the first message to be role "user". ──────────────
+      // After Linda greets, history starts with {role:"assistant",...} which
+      // maps to Gemini "model" role → HTTP 400 on every conversation turn.
+      // Strip any leading assistant messages so the array always starts with user.
+      while(msgs.length>0&&msgs[0].role!=="user") msgs.shift();
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const controller=new AbortController();
-      const timeout=setTimeout(()=>controller.abort(),35000); // 35s timeout (Gemini needs more time)
+      const timeout=setTimeout(()=>controller.abort(),35000);
       const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},signal:controller.signal,
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:200,system,messages:msgs})});
       clearTimeout(timeout);
@@ -9988,7 +9998,7 @@ ALWAYS:
       }
       const data=await res.json();
       const text=data?.content?.[0]?.text||"";
-      if(!text)console.warn("Linda: API returned empty text. Full response:",JSON.stringify(data));
+      if(!text)console.warn("Linda: empty response:",JSON.stringify(data).slice(0,300));
       return text;
     }catch(e){console.error("Linda API error:",e);return "";}
   };
