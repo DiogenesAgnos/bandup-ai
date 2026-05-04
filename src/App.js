@@ -4002,6 +4002,50 @@ const stripForEL=(text)=>text
   .replace(/\b(\w+)\s+\1\b/gi,"$1") // remove immediate duplicates
   .replace(/\s+/g," ").trim();
 
+// ── Audio context — unlocked on first user tap, stays unlocked for session ──
+// iOS Safari blocks audio.play() after async operations (fetch, etc.)
+// AudioContext decode+play works once the context is resumed via user gesture
+let _audioCtx=null;
+const getAudioCtx=()=>{
+  if(!_audioCtx){
+    try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
+  }
+  return _audioCtx;
+};
+// Call this synchronously inside every user interaction handler (send, record, start)
+// so the context is unlocked before the async TTS fetch completes
+const unlockAudioCtx=()=>{
+  const ctx=getAudioCtx();
+  if(ctx&&ctx.state==="suspended") ctx.resume().catch(()=>{});
+};
+
+// ── Android Chrome fix: unlock AudioContext on first touch anywhere ──────────
+// On Android (especially non-Samsung/Tecno), AudioContext suspends after async
+// fetch() completes. A global touchstart listener keeps it permanently running
+// so TTS audio plays correctly after the ElevenLabs API call returns.
+const _unlockOnTouch=()=>{
+  const ctx=getAudioCtx();
+  if(ctx&&ctx.state==="suspended"){
+    ctx.resume().then(()=>{
+      // Play and immediately stop a silent buffer to fully unlock the context
+      try{
+        const buf=ctx.createBuffer(1,1,22050);
+        const src=ctx.createBufferSource();
+        src.buffer=buf;
+        src.connect(ctx.destination);
+        src.start(0);
+      }catch(e){}
+    }).catch(()=>{});
+  }
+  // Remove listeners once unlocked — only need to do this once
+  document.removeEventListener("touchstart",_unlockOnTouch,true);
+  document.removeEventListener("touchend",_unlockOnTouch,true);
+  document.removeEventListener("click",_unlockOnTouch,true);
+};
+document.addEventListener("touchstart",_unlockOnTouch,{capture:true,passive:true});
+document.addEventListener("touchend",_unlockOnTouch,{capture:true,passive:true});
+document.addEventListener("click",_unlockOnTouch,{capture:true,passive:true});
+
 const speakElevenLabs=async(text,voiceId,onEnd)=>{
   const clean=stripForEL(text);
   if(!clean)return;
@@ -4012,7 +4056,35 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
       body:JSON.stringify({text:clean,voiceId}),
     });
     if(!res.ok)throw new Error("TTS API failed");
-    const blob=await res.blob();
+    const arrayBuffer=await res.arrayBuffer();
+
+    // ── Try AudioContext path first (works on iOS/Android after unlock) ──
+    const ctx=getAudioCtx();
+    if(ctx){
+      try{
+        // Always resume before playing — critical on Android Chrome where
+        // AudioContext can silently suspend after async fetch() completes
+        if(ctx.state!=="running") await ctx.resume();
+        const audioBuffer=await ctx.decodeAudioData(arrayBuffer.slice(0));
+        // Stop any currently playing source
+        if(window._currentELSource){
+          try{window._currentELSource.stop();}catch(e){}
+          window._currentELSource=null;
+        }
+        const source=ctx.createBufferSource();
+        source.buffer=audioBuffer;
+        source.connect(ctx.destination);
+        source.onended=()=>{if(onEnd)onEnd();};
+        window._currentELSource=source;
+        source.start(0);
+        return;
+      }catch(e){
+        // AudioContext path failed — fall through to Audio element
+      }
+    }
+
+    // ── Fallback: Audio element (desktop / non-iOS) ──
+    const blob=new Blob([arrayBuffer],{type:"audio/mpeg"});
     const url=URL.createObjectURL(blob);
     const audio=new Audio(url);
     audio.onended=()=>{URL.revokeObjectURL(url);if(onEnd)onEnd();};
@@ -4025,6 +4097,12 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
 };
 
 const cancelElevenLabs=()=>{
+  // Stop AudioContext source if playing
+  if(window._currentELSource){
+    try{window._currentELSource.stop();}catch(e){}
+    window._currentELSource=null;
+  }
+  // Stop Audio element if playing
   if(window._currentELAudio){
     try{window._currentELAudio.pause();window._currentELAudio.src="";}catch(e){}
     window._currentELAudio=null;
@@ -4205,10 +4283,13 @@ RESPONSE RULES:
     try{
       const msgs=history.slice(-14);
       if(userMsg)msgs.push({role:"user",content:userMsg});
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),35000);
       const res=await fetch("/api/analyze",{
-        method:"POST",headers:{"Content-Type":"application/json"},
+        method:"POST",headers:{"Content-Type":"application/json"},signal:controller.signal,
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:150,system,messages:msgs})
       });
+      clearTimeout(timeout);
       if(!mountedRef.current)return "";
       const data=await res.json();
       return data?.content?.[0]?.text||"";
@@ -4633,12 +4714,12 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
         {error&&<div style={{fontSize:12,color:T.red,marginBottom:5,...sty}}>{error}</div>}
         <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
           <textarea value={transcript} onChange={e=>setTranscript(e.target.value)}
-            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!isRecording&&!isPaused)sendMessage(transcript);}}}
+            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!isRecording&&!isPaused){unlockAudioCtx();sendMessage(transcript);}}}}
             placeholder={isRecording?"Listening... tap mic to stop and send":"Tap mic to speak, or type here..."}
             rows={2}
             style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?T.red:T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
           <button
-            onClick={isRecording?stopRecording:startRecording}
+            onClick={()=>{ unlockAudioCtx(); isRecording?stopRecording():startRecording(); }}
             disabled={isPaused}
             aria-label={isRecording?"Stop and send":"Start recording"}
             style={{width:54,height:54,borderRadius:"50%",border:"none",
@@ -9796,7 +9877,7 @@ ALWAYS:
       const msgs=history.slice(-12);
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const controller=new AbortController();
-      const timeout=setTimeout(()=>controller.abort(),20000); // 20s timeout
+      const timeout=setTimeout(()=>controller.abort(),35000); // 35s timeout (Gemini needs more time)
       const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},signal:controller.signal,
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:200,system,messages:msgs})});
       clearTimeout(timeout);
@@ -10179,7 +10260,7 @@ ALWAYS:
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
               {guideItems.map((g,i)=>(
-                <button key={i} onClick={()=>sendMessage(g.phrase)}
+                <button key={i} onClick={()=>{ unlockAudioCtx(); sendMessage(g.phrase); }}
                   style={{background:"white",border:"1px solid #a78bfa",borderRadius:20,padding:"4px 10px",fontSize:11,cursor:"pointer",color:"#6d28d9",...sty}}>
                   {g.phrase} <span style={{color:T.textMuted,fontSize:10}}>({g.ar})</span>
                 </button>
@@ -10239,11 +10320,11 @@ ALWAYS:
             {error&&<div style={{fontSize:12,color:T.red,marginBottom:5,...sty}}>{error}</div>}
             <div style={{display:"flex",gap:10,alignItems:"flex-end"}}>
               <textarea value={transcript} onChange={e=>setTranscript(e.target.value)}
-                onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!isRecording)sendMessage(transcript);}}}
+                onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!isRecording){unlockAudioCtx();sendMessage(transcript);}}}}
                 placeholder={isAr?(isRecording?"جارٍ التسجيل — اضغط ⏹ للإرسال":"اضغط الميكروفون أو اكتب هنا..."):(isRecording?"Listening... tap ⏹ to stop and send":"Tap mic or type here...")}
                 rows={2}
                 style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?"#a78bfa":T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
-              <button onClick={isRecording?stopRecording:startRecording}
+              <button onClick={()=>{ unlockAudioCtx(); isRecording?stopRecording():startRecording(); }}
                 style={{width:52,height:52,borderRadius:"50%",border:"none",background:isRecording?"#7c3aed":"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
                 {isRecording?"⏹":"🎤"}
               </button>
