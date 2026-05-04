@@ -9838,6 +9838,9 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
   const isRecordingRef=useRef(false);
   const finalTranscriptRef=useRef("");
   const mountedRef=useRef(true);
+  // Counts "Perfect!" confirmations in Phase 0 — when equal to vocab.length,
+  // auto-advances to Phase 1 without relying on Llama outputting [PHASE:2]
+  const vocabPerfectCountRef=useRef(0);
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const isAr=uiLang==="ar";
 
@@ -10093,8 +10096,19 @@ ALWAYS:
                       raw.match(/try again[:\s]+[""]?([^"".\n?!]+)/i);
     if(repeatMatch)setRepeatTarget(repeatMatch[1].trim().replace(/[""]$/,"").replace(/\[SPELL\]|\[\/SPELL\]/gi,""));
 
-    // Fix 4: Phase advancement — structured signals first, regex as safety-net fallback
-    // Lesson complete: signal-driven only (removed "amazing work" — too broad, fires mid-lesson)
+    // ── Phase advancement ─────────────────────────────────────────────────
+    // Primary: count-based (does not rely on Llama outputting tags)
+    // Each vocab word needs one "Perfect!" confirmation. When count >= vocab
+    // length, all words are done → advance to fill-in-the-blank automatically.
+    if(currentPhase===0&&/perfect/i.test(raw)){
+      vocabPerfectCountRef.current+=1;
+      const vocabLen=currentLesson?.vocab?.length||999;
+      if(vocabPerfectCountRef.current>=vocabLen){
+        vocabPerfectCountRef.current=0;
+        setTimeout(()=>{ if(mountedRef.current) setCurrentPhase(1); },400);
+      }
+    }
+    // Fallback text patterns + explicit tags (backup for fill→spell→conv transitions)
     if(sigLessonDone||(/(انتهى الدرس|lesson complete)/i.test(raw)&&currentPhase===3)){
       if(currentLesson&&!completedSet.has(currentLesson.id)){
         const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
@@ -10102,11 +10116,12 @@ ALWAYS:
         saveProgress({completed:[...progress.completed,currentLesson.id],currentLesson:next?.id||currentLesson.id});
       }
       clearLindaSession();
-    } else if((sigPhase2||(/(أكمل الجملة|fill.in.the.blank|blank exercises)/i.test(raw)))&&currentPhase===0){
+    } else if((sigPhase2||(/(fill.in.the.blank|fill in the blank|practise with sentences|now.*blank|let.*fill|أكمل الجملة)/i.test(raw)))&&currentPhase===0){
+      vocabPerfectCountRef.current=0;
       setCurrentPhase(1);
-    } else if((sigPhase3||(/(الإملاء|now spelling|time for spell)/i.test(raw)))&&currentPhase===1){
+    } else if((sigPhase3||(/(الإملاء|now spelling|time for spell|spell.*word|let.*spell)/i.test(raw)))&&currentPhase===1){
       setCurrentPhase(2);
-    } else if((sigPhase4||(/(نتحدث|let's talk|conversation now|outstanding.*let.*talk)/i.test(raw)))&&currentPhase===2){
+    } else if((sigPhase4||(/(نتحدث|let's talk|conversation now|outstanding.*let.*talk|now.*talk|let.*discuss|let.*chat)/i.test(raw)))&&currentPhase===2){
       setCurrentPhase(3);
     }
   };
@@ -10137,6 +10152,7 @@ ALWAYS:
       setMessages([]);
       setCurrentPhase(0);
       setRepeatTarget(null);setRepeatSuccess(0);
+      vocabPerfectCountRef.current=0; // reset vocab completion counter
     }
     setScreen("chat");
     setMobileTab("chat");
