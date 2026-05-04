@@ -4064,7 +4064,22 @@ const getDomAudio=()=>{
   return _domAudio;
 };
 
-const speakElevenLabs=async(text,voiceId,onEnd)=>{
+// Tiny silent MP3 (0.1s) — played immediately on user tap to activate the audio
+// element within the gesture window. When TTS arrives seconds later, the browser
+// considers the element already "active" and allows playback without a new gesture.
+const SILENT_MP3="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFNZSA0LjkuMiAoVURQKQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//tUxAADB8AhSmxhIAEqI5JNACAAAP///iD4IAAAhkQiAIAAxGEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
+// Call this on every user tap (send/record) to prime the audio element
+// so it can play TTS audio later even after a long async API call
+const primeAudioForAndroid=()=>{
+  const audio=getDomAudio();
+  if(!audio)return;
+  try{
+    audio.src=SILENT_MP3;
+    const p=audio.play();
+    if(p!==undefined) p.catch(()=>{});
+  }catch(e){}
+};
   const clean=stripForEL(text);
   if(!clean){if(onEnd)onEnd();return;}
   try{
@@ -4349,6 +4364,7 @@ RESPONSE RULES:
     if(!text.trim()||isThinking||sessionEnded)return;
     setShowMicHint(false);
     cancelElevenLabs();
+    primeAudioForAndroid(); // activate audio element NOW during gesture, before async API call
     setTranscript("");
     finalTranscriptRef.current="";
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
@@ -4378,6 +4394,7 @@ RESPONSE RULES:
     setSessionBlockedToday(false);
     setShowMicHint(true);
     setIsThinking(true);
+    primeAudioForAndroid(); // prime during gesture before async API call
     const isReturning=!!pastHistory;
     const opening=isReturning
       ?`Welcome ${userName} back. You have a session summary about them in your system prompt. Open with ONE specific reference from it (a topic, a mistake, or a word). Then ask if they want to continue from where they left off or try something new. Keep it to 2 sentences.`
@@ -4756,7 +4773,7 @@ Write 2-3 warm, honest sentences about the user's current level and one clear pr
             rows={2}
             style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?T.red:T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
           <button
-            onClick={()=>{ unlockAudioCtx(); isRecording?stopRecording():startRecording(); }}
+            onClick={()=>{ unlockAudioCtx(); primeAudioForAndroid(); isRecording?stopRecording():startRecording(); }}
             disabled={isPaused}
             aria-label={isRecording?"Stop and send":"Start recording"}
             style={{width:54,height:54,borderRadius:"50%",border:"none",
@@ -9986,6 +10003,7 @@ ALWAYS:
   const sendMessage=async(text)=>{
     if(!text.trim()||isThinking)return;
     cancelElevenLabs();
+    primeAudioForAndroid(); // activate audio element NOW during gesture, before async API call
     setTranscript("");
     finalTranscriptRef.current="";
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
@@ -10008,6 +10026,7 @@ ALWAYS:
     setMobileTab("chat");
     if(resumeSession&&messages.length>0)return;
     setIsThinking(true);
+    primeAudioForAndroid(); // prime during gesture before async API call
     const opening=`Start the lesson enthusiastically. Do NOT say your name. Welcome the student warmly in ONE sentence. Then immediately begin teaching the first vocabulary word: "${lesson.vocab[0].w}"${["a1","a2"].includes(progress.level)?` — give its Arabic meaning [${lesson.vocab[0].ar}]`:""} with the example: "${lesson.vocab[0].ex}". Ask them to repeat the word.`;
     const reply=await callClaude(buildSystemPrompt(lesson,0),[],opening);
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);}
@@ -10361,7 +10380,7 @@ ALWAYS:
                 placeholder={isAr?(isRecording?"جارٍ التسجيل — اضغط ⏹ للإرسال":"اضغط الميكروفون أو اكتب هنا..."):(isRecording?"Listening... tap ⏹ to stop and send":"Tap mic or type here...")}
                 rows={2}
                 style={{flex:1,padding:"10px 12px",borderRadius:10,border:`1.5px solid ${isRecording?"#a78bfa":T.borderMid}`,fontSize:14,...sty,resize:"none",lineHeight:1.5,boxSizing:"border-box",transition:"border-color 0.2s"}}/>
-              <button onClick={()=>{ unlockAudioCtx(); isRecording?stopRecording():startRecording(); }}
+              <button onClick={()=>{ unlockAudioCtx(); primeAudioForAndroid(); isRecording?stopRecording():startRecording(); }}
                 style={{width:52,height:52,borderRadius:"50%",border:"none",background:isRecording?"#7c3aed":"#7c3aed",color:"white",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:isRecording?"0 0 0 4px #a78bfa":"0 3px 10px #7c3aed55",transition:"all 0.2s"}}>
                 {isRecording?"⏹":"🎤"}
               </button>
