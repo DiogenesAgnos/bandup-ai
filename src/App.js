@@ -9838,9 +9838,10 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
   const isRecordingRef=useRef(false);
   const finalTranscriptRef=useRef("");
   const mountedRef=useRef(true);
-  // Counts "Perfect!" confirmations in Phase 0 — when equal to vocab.length,
-  // auto-advances to Phase 1 without relying on Llama outputting [PHASE:2]
   const vocabPerfectCountRef=useRef(0);
+  // Mirror currentPhase in a ref so async callbacks (sendMessage, addLindaMessage)
+  // always read the real current phase — not a stale closure value.
+  const currentPhaseRef=useRef(0);
   const sty={fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const isAr=uiLang==="ar";
 
@@ -9861,8 +9862,8 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
     return()=>clearTimeout(t);
   },[messages,isThinking]);
 
-  // Auto-save session
-  useEffect(()=>{
+  // Keep ref in sync with state — ref is readable in stale closures, state drives re-renders
+  useEffect(()=>{ currentPhaseRef.current=currentPhase; },[currentPhase]);
     if(screen==="chat"&&messages.length>0){
       saveLindaSession(progress.currentLesson,currentPhase,messages);
     }
@@ -10097,31 +10098,33 @@ ALWAYS:
     if(repeatMatch)setRepeatTarget(repeatMatch[1].trim().replace(/[""]$/,"").replace(/\[SPELL\]|\[\/SPELL\]/gi,""));
 
     // ── Phase advancement ─────────────────────────────────────────────────
-    // Primary: count-based (does not rely on Llama outputting tags)
-    // Each vocab word needs one "Perfect!" confirmation. When count >= vocab
-    // length, all words are done → advance to fill-in-the-blank automatically.
-    if(currentPhase===0&&/perfect/i.test(raw)){
+    // Uses currentPhaseRef.current (not state) — immune to stale closures.
+    const phase=currentPhaseRef.current;
+    if(phase===0&&/perfect/i.test(raw)){
       vocabPerfectCountRef.current+=1;
       const vocabLen=currentLesson?.vocab?.length||999;
       if(vocabPerfectCountRef.current>=vocabLen){
         vocabPerfectCountRef.current=0;
-        setTimeout(()=>{ if(mountedRef.current) setCurrentPhase(1); },400);
+        currentPhaseRef.current=1; // update ref immediately — don't wait for re-render
+        setCurrentPhase(1);        // trigger re-render
       }
     }
-    // Fallback text patterns + explicit tags (backup for fill→spell→conv transitions)
-    if(sigLessonDone||(/(انتهى الدرس|lesson complete)/i.test(raw)&&currentPhase===3)){
+    if(sigLessonDone||(/(انتهى الدرس|lesson complete)/i.test(raw)&&phase===3)){
       if(currentLesson&&!completedSet.has(currentLesson.id)){
         const nextIdx=lessons.findIndex(l=>l.id===currentLesson.id)+1;
         const next=lessons[nextIdx];
         saveProgress({completed:[...progress.completed,currentLesson.id],currentLesson:next?.id||currentLesson.id});
       }
       clearLindaSession();
-    } else if((sigPhase2||(/(fill.in.the.blank|fill in the blank|practise with sentences|now.*blank|let.*fill|أكمل الجملة)/i.test(raw)))&&currentPhase===0){
+    } else if((sigPhase2||(/(fill.in.the.blank|fill in the blank|practise with sentences|now.*blank|let.*fill|أكمل الجملة)/i.test(raw)))&&phase===0){
       vocabPerfectCountRef.current=0;
+      currentPhaseRef.current=1;
       setCurrentPhase(1);
-    } else if((sigPhase3||(/(الإملاء|now spelling|time for spell|spell.*word|let.*spell)/i.test(raw)))&&currentPhase===1){
+    } else if((sigPhase3||(/(الإملاء|now spelling|time for spell|spell.*word|let.*spell)/i.test(raw)))&&phase===1){
+      currentPhaseRef.current=2;
       setCurrentPhase(2);
-    } else if((sigPhase4||(/(نتحدث|let's talk|conversation now|outstanding.*let.*talk|now.*talk|let.*discuss|let.*chat)/i.test(raw)))&&currentPhase===2){
+    } else if((sigPhase4||(/(نتحدث|let's talk|conversation now|outstanding.*let.*talk|now.*talk|let.*discuss|let.*chat)/i.test(raw)))&&phase===2){
+      currentPhaseRef.current=3;
       setCurrentPhase(3);
     }
   };
@@ -10139,7 +10142,7 @@ ALWAYS:
     finalTranscriptRef.current="";
     setMessages(prev=>[...prev,{role:"user",text:text.trim(),id:Date.now()}]);
     setIsThinking(true);
-    const reply=await callClaude(buildSystemPrompt(currentLesson,currentPhase),getHistory(),text.trim());
+    const reply=await callClaude(buildSystemPrompt(currentLesson,currentPhaseRef.current),getHistory(),text.trim());
     if(mountedRef.current){setIsThinking(false);if(reply)addLindaMessage(reply);else addLindaMessage("Sorry, let me try that again — please repeat your answer.");}
   };
 
@@ -10151,6 +10154,7 @@ ALWAYS:
       saveProgress({...progress,currentLesson:lesson.id});
       setMessages([]);
       setCurrentPhase(0);
+      currentPhaseRef.current=0;
       setRepeatTarget(null);setRepeatSuccess(0);
       vocabPerfectCountRef.current=0; // reset vocab completion counter
     }
