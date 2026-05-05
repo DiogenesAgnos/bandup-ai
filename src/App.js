@@ -9864,6 +9864,9 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
 
   // Keep ref in sync with state — ref is readable in stale closures, state drives re-renders
   useEffect(()=>{ currentPhaseRef.current=currentPhase; },[currentPhase]);
+
+  // Auto-save session
+  useEffect(()=>{
     if(screen==="chat"&&messages.length>0){
       saveLindaSession(progress.currentLesson,currentPhase,messages);
     }
