@@ -611,7 +611,7 @@ const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
       active: ["placement","mocktest","reading","exercises"].includes(mainView),
       items:[
         {label:isAr?"📋 اختبار تحديد المستوى":"📋 Placement Test", view:"placement", icon:"📋"},
-        {label:isAr?"🎓 اختبار المحادثة الوهمي":"🎓 IELTS Mock Exam", view:"mocktest", icon:"🎓"},
+        {label:isAr?"🎓 اختبار تجريبي لمهارة المحادثة":"🎓 IELTS Speaking Mock Test", view:"mocktest", icon:"🎓"},
         {label:isAr?"📖 اختبارات القراءة":"📖 Reading Tests", view:"reading", icon:"📖"},
         {label:isAr?"💪 تمارين":"💪 Exercises", view:"exercises", icon:"💪"},
       ]
@@ -5293,7 +5293,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
     <div style={{maxWidth:520,margin:"0 auto",padding:"40px 24px",textAlign:"center"}}>
       <div style={{fontSize:48,marginBottom:16}}>🎓</div>
       <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T2.text,margin:"0 0 10px"}}>IELTS Speaking Mock Test</h2>
-      <p style={{...sty,fontSize:14,color:T2.textMuted,lineHeight:1.7,margin:"0 0 24px"}}>{isAr?"اختبار المحادثة الكامل متاح لأعضاء Pro فقط. سجّل الآن للحصول على اختبارات غير محدودة مع تقييم شامل على المعايير الأربعة.":"The full IELTS Speaking Mock Test is a Pro feature. Upgrade to access unlimited mock tests, scored on all four official IELTS criteria."}</p>
+      <p style={{...sty,fontSize:14,color:T2.textMuted,lineHeight:1.7,margin:"0 0 24px"}}>"The full IELTS Speaking Mock Test is a Pro feature. Upgrade to access unlimited tests, scored on all four official IELTS criteria."</p>
       <div style={{background:"#fef9c3",border:"1px solid #fcd34d",borderRadius:10,padding:"12px 16px",marginBottom:24,...sty,fontSize:13,color:"#92400e"}}>
         ✅ Your free test is complete — the results were saved above if you'd like to review them.
       </div>
@@ -5556,7 +5556,7 @@ const SpeakingPage = ({isPro, onUpgrade, session, onAuth}) => {
   const [showAnswer, setShowAnswer] = useState({});
 
   const tabs = [
-    {id:"mock",label:"🎓 Mock Test",free:false},
+    {id:"mock",label:"🎓 Speaking Mock Test",free:false},
     {id:"chat",label:"🎤 Speaking Practice",free:true},
     {id:"examples",label:"📝 Models & Tips",free:true},
     {id:"vocabulary",label:"📚 Vocabulary",free:false},
@@ -8964,7 +8964,7 @@ const STUDY_STEPS = {
     {
       num:1, free:true, view:"teacher",
       title:"معلمتك ليندا — ابدأ من هنا",
-      tag:"مجاني: المستوى A1 — Pro: جميع المستويات",
+      tag:"الدرس الأول من A1 وB2 مجاني — Pro: باقي الدروس",
       desc:"ليندا هي معلمتك الشخصية. تعلّمك الإنجليزية من الصفر حتى الإتقان — مفردات، قواعد، إملاء، ومحادثة. كل درس حوالي 30 دقيقة مع شرح بالعربي.",
       tip:"ابدأ بالمستوى A1 حتى لو كان مستواك أعلى. ليندا ستعرف مستواك الحقيقي بعد بضعة دروس وتتكيّف معه.",
       action:"ابدأ مع ليندا ←",
@@ -9035,7 +9035,7 @@ const STUDY_STEPS = {
     },
     {
       num:10, free:true, view:"speaking",
-      title:"تدريب المحادثة مع سارة",
+      title:"مدرّب المحادثة — تدرّب مع سارة",
       tag:"مجاني — 7 دقائق للمستخدمين المجانيين",
       desc:"تدرّب على المحادثة مع سارة وهي تصحح أخطاءك النحوية والمفردات في الوقت الفعلي. اختر وضع الآيلتس أو المحادثة الحرة.",
       tip:"هذه الميزة تعمل على Google Chrome فقط. استخدم الميكروفون للتحدث وانتظر ردّ سارة — الهدف هو الطلاقة والدقة معاً، وليس الكمال.",
@@ -9069,8 +9069,8 @@ const STUDY_STEPS = {
   en: [
     {
       num:1, free:true, view:"teacher",
-      title:"Learn with Linda",
-      tag:"Free: A1 level · Pro: all levels",
+      title:"English Lessons with Linda",
+      tag:"Free: first lesson of A1 & B2 · Pro: all others",
       desc:"Linda is your personal English teacher. She teaches vocabulary, grammar, spelling, and conversation — one structured lesson at a time with Arabic explanations. Each lesson takes about 30 minutes.",
       tip:"Start with A1 even if you think your level is higher. Linda adapts to your real level after a few lessons and will push you forward.",
       action:"Start with Linda →",
@@ -9141,7 +9141,7 @@ const STUDY_STEPS = {
     },
     {
       num:10, free:true, view:"speaking",
-      title:"Speaking Practice with Sarah",
+      title:"Speaking Coach — Practice with Sarah",
       tag:"Free — 7 minutes per session",
       desc:"Have a real conversation with Sarah and get live grammar and vocabulary corrections. Choose IELTS mode or free conversation on any topic.",
       tip:"Use Google Chrome for voice input. Speak naturally, wait for Sarah's response, and pay attention to every correction — those are your most valuable learning moments.",
