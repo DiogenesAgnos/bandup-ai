@@ -26,7 +26,7 @@ const ALLOWED_MODELS = new Set([
   "claude-haiku-4-5-20251001",
 ]);
 const FALLBACK_MODEL = "claude-sonnet-4-6";
-const MAX_OUTPUT_TOKENS = 2000; // 2000 tokens keeps Sonnet response ~22s vs ~50s at 4000
+const MAX_OUTPUT_TOKENS = 3000; // 3000 tokens = ~37s on Sonnet, enough for full JSON + sample essay
 const REQUEST_TIMEOUT_MS = 70000; // 70s abort, safely under 90s maxDuration
 
 export default async function handler(req, res) {
