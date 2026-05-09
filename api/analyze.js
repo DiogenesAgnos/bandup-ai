@@ -1,100 +1,163 @@
 // /api/analyze.js
-// Uses Groq API — free tier, high limits, fast inference.
-// Groq response format matches Anthropic's shape so App.js needs zero changes.
+// Anthropic Claude API proxy.
+//
+// Frontend already sends payloads in Anthropic shape:
+//   { model, max_tokens, system, messages: [{role, content}] }
+// and expects Anthropic-shape responses:
+//   { content: [{type:"text", text:"..."}], usage: {...} }
+//
+// This file is a thin proxy with safety guards:
+//   - Model whitelist (rejects anything else — protects cost)
+//   - max_tokens hard cap (4000 — covers writing analysis, blocks runaway)
+//   - Message normalisation (merge consecutive same-role, drop leading non-user)
+//   - 45s timeout
+//   - Proper 429 (rate limit) and 529 (overloaded) signalling so the frontend's
+//     existing retry logic in Sarah/Linda/Mock kicks in correctly.
 
-// Model routing:
-// - All turns: llama-3.3-70b-versatile — follows complex system prompts reliably.
-// - The 8B model was too small to follow Sarah/Linda's strict formatting rules.
-const SHORT_MODEL  = "llama-3.3-70b-versatile";
-const LONG_MODEL   = "llama-3.3-70b-versatile";
+// Models the frontend uses today + the latest Opus for future writing-analysis upgrade.
+const ALLOWED_MODELS = new Set([
+  "claude-sonnet-4-6",
+  "claude-opus-4-6",
+  "claude-opus-4-7",
+  "claude-haiku-4-5-20251001",
+]);
+const FALLBACK_MODEL = "claude-sonnet-4-6";
+const MAX_OUTPUT_TOKENS = 4000;
+const REQUEST_TIMEOUT_MS = 45000;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: "GROQ_API_KEY not configured" });
+    console.error("[analyze] ANTHROPIC_API_KEY not configured");
+    return res.status(500).json({ error: "ANTHROPIC_API_KEY not configured" });
   }
 
   try {
-    const { max_tokens, system, messages } = req.body;
+    const { model, max_tokens, system, messages } = req.body || {};
 
-    const model = (max_tokens && max_tokens > 300) ? LONG_MODEL : SHORT_MODEL;
-
-    // Build Groq messages — same format as OpenAI / Anthropic
-    const groqMessages = [];
-    if (system) {
-      groqMessages.push({ role: "system", content: system });
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: "messages array required" });
     }
 
+    // Whitelist model — any unknown string falls back to Sonnet (cost guard).
+    const useModel = ALLOWED_MODELS.has(model) ? model : FALLBACK_MODEL;
+
+    // Cap max_tokens. Frontend asks for up to 4000 (writing analysis).
+    const requested = parseInt(max_tokens, 10);
+    const useMax = Math.min(
+      Math.max(Number.isFinite(requested) ? requested : 1024, 1),
+      MAX_OUTPUT_TOKENS
+    );
+
+    // Normalise messages so Claude API accepts them.
+    // Rules: messages must alternate user/assistant. First message must be "user".
+    // Frontend already tries to enforce this, but defend in depth.
+    const cleanMsgs = [];
     for (const m of messages) {
-      const content = typeof m.content === "string"
-        ? m.content
-        : m.content.filter(b => b.type === "text").map(b => b.text).join("\n");
-      groqMessages.push({ role: m.role === "assistant" ? "assistant" : "user", content });
-    }
+      if (!m || !m.role) continue;
+      const role = m.role === "assistant" ? "assistant" : "user";
+      // content may be a string OR an array of blocks (image+text for OCR / Task 1).
+      // Pass arrays through as-is so multimodal still works.
+      const content = m.content;
+      if (content == null) continue;
 
-    // Groq requires strictly alternating user/assistant after system.
-    // Merge consecutive same-role messages.
-    const merged = [];
-    for (const m of groqMessages) {
-      if (m.role === "system") { merged.push(m); continue; }
-      const last = merged[merged.length - 1];
-      if (last && last.role === m.role && last.role !== "system") {
-        last.content += "\n" + m.content;
+      const last = cleanMsgs[cleanMsgs.length - 1];
+      if (last && last.role === role) {
+        // Merge consecutive same-role messages.
+        // For string-on-string just concatenate. If either side is an array
+        // (multimodal), normalise to an array of blocks.
+        if (typeof last.content === "string" && typeof content === "string") {
+          last.content = last.content + "\n" + content;
+        } else {
+          const lastBlocks = Array.isArray(last.content)
+            ? last.content
+            : [{ type: "text", text: String(last.content) }];
+          const newBlocks = Array.isArray(content)
+            ? content
+            : [{ type: "text", text: String(content) }];
+          last.content = lastBlocks.concat(newBlocks);
+        }
       } else {
-        merged.push({ ...m });
+        cleanMsgs.push({ role, content });
       }
     }
 
-    // Must start with user after system
-    const nonSystem = merged.filter(m => m.role !== "system");
-    if (nonSystem.length > 0 && nonSystem[0].role !== "user") {
-      const sysIdx = merged.findIndex(m => m.role === "system");
-      merged.splice(sysIdx + 1, 0, { role: "user", content: "(start)" });
+    // Drop leading non-user messages (Claude requires first to be user)
+    while (cleanMsgs.length && cleanMsgs[0].role !== "user") cleanMsgs.shift();
+    if (cleanMsgs.length === 0) {
+      return res.status(400).json({ error: "no valid user message in conversation" });
     }
 
-    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: max_tokens || 1024,
-        temperature: 0.7,
-        messages: merged,
-      }),
-    });
+    const body = {
+      model: useModel,
+      max_tokens: useMax,
+      messages: cleanMsgs,
+    };
+    if (typeof system === "string" && system.trim()) {
+      body.system = system;
+    }
 
-    if (!groqRes.ok) {
-      const errText = await groqRes.text();
-      console.error("[analyze] Groq error:", groqRes.status, errText.slice(0, 400));
-      if (groqRes.status === 429) {
-        return res.status(429).json({ error: "rate_limited", message: "Please wait a moment and try again." });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+    let claudeRes;
+    try {
+      claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    if (!claudeRes.ok) {
+      const errText = await claudeRes.text().catch(() => "");
+      console.error("[analyze] Claude error", claudeRes.status, errText.slice(0, 400));
+
+      // Pass through 429 so frontend retry logic kicks in (Sarah/Linda/Mock all handle 429).
+      if (claudeRes.status === 429) {
+        return res.status(429).json({
+          error: "rate_limited",
+          message: "Please wait a moment and try again.",
+        });
       }
-      return res.status(groqRes.status).json({ error: errText });
+      // 529 = Anthropic overloaded. Translate to 503 so it's clearly transient.
+      if (claudeRes.status === 529) {
+        return res.status(503).json({
+          error: "overloaded",
+          message: "Claude is busy — try again in a moment.",
+        });
+      }
+      // 401/403 = our key is bad. Don't leak the message body to client.
+      if (claudeRes.status === 401 || claudeRes.status === 403) {
+        return res.status(500).json({ error: "auth_error" });
+      }
+
+      return res.status(claudeRes.status).json({
+        error: errText.slice(0, 400) || `claude_error_${claudeRes.status}`,
+      });
     }
 
-    const data = await groqRes.json();
-
-    // Convert OpenAI-style response → Anthropic shape that App.js expects
-    const text = data?.choices?.[0]?.message?.content || "";
-
-    return res.status(200).json({
-      content: [{ type: "text", text }],
-      model,
-      usage: {
-        input_tokens:  data?.usage?.prompt_tokens     || 0,
-        output_tokens: data?.usage?.completion_tokens || 0,
-      },
-    });
+    const data = await claudeRes.json();
+    // Pass-through. Anthropic shape is what App.js expects.
+    return res.status(200).json(data);
 
   } catch (err) {
+    if (err && err.name === "AbortError") {
+      console.error("[analyze] Timeout after", REQUEST_TIMEOUT_MS, "ms");
+      return res.status(504).json({ error: "timeout" });
+    }
     console.error("[analyze] Handler error:", err);
-    return res.status(500).json({ error: err.message || "Internal server error" });
+    return res.status(500).json({ error: err?.message || "Internal server error" });
   }
 }
