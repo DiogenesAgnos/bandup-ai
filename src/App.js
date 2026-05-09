@@ -606,54 +606,64 @@ const NavDropdownBar = ({mainView, switchView, trackEvent, uiLang, UI, T}) => {
       active: mainView==="home"
     },
     {
-      id:"mocktest",
-      label:isAr?"🎓 اختبار المحادثة":"🎓 IELTS Mock Test",
-      single:true,
-      view:"mocktest",
-      active: mainView==="mocktest"
-    },
-    {
-      id:"learn",
-      label:isAr?"📚 تعلّم ▾":"📚 Learn ▾",
-      active: ["teacher","speaking"].includes(mainView),
+      id:"exams",
+      label:isAr?"📋 الاختبارات ▾":"📋 Exams ▾",
+      active: ["placement","mocktest","reading","exercises"].includes(mainView),
       items:[
-        {label:isAr?"👩‍🏫 تعلّمي مع ليندا":"👩‍🏫 Learn with Linda", view:"teacher", icon:"👩‍🏫"},
-        {label:isAr?"🎤 تدريب المحادثة":"🎤 Speaking Practice", view:"speaking", icon:"🎤"},
         {label:isAr?"📋 اختبار تحديد المستوى":"📋 Placement Test", view:"placement", icon:"📋"},
+        {label:isAr?"🎓 اختبار المحادثة الوهمي":"🎓 IELTS Mock Exam", view:"mocktest", icon:"🎓"},
+        {label:isAr?"📖 اختبارات القراءة":"📖 Reading Tests", view:"reading", icon:"📖"},
+        {label:isAr?"💪 تمارين":"💪 Exercises", view:"exercises", icon:"💪"},
       ]
     },
     {
-      id:"practise",
-      label:isAr?"✏️ تمرّن ▾":"✏️ Practice ▾",
-      active: ["analyze","practice","grammar","reading","exercises","game"].includes(mainView),
+      id:"speaking",
+      label:isAr?"🎤 المحادثة ▾":"🎤 Speaking ▾",
+      active: ["teacher","speaking"].includes(mainView),
+      items:[
+        // "English Lessons" = Learn with Linda (A1→C2 structured course)
+        // "Speaking Coach"  = Speaking Practice with Sarah
+        // Rename either string here to rebrand
+        {label:isAr?"👩‍🏫 الدروس الإنجليزية":"👩‍🏫 English Lessons", view:"teacher", icon:"👩‍🏫"},
+        {label:isAr?"🎤 مدرّب المحادثة":"🎤 Speaking Coach", view:"speaking", icon:"🎤"},
+      ]
+    },
+    {
+      id:"writing",
+      label:isAr?"✍️ الكتابة ▾":"✍️ Writing ▾",
+      active: ["analyze","practice","grammar"].includes(mainView),
       items:[
         {label:isAr?"🎓 تحليل المقال":"🎓 Analyze Essay", view:"analyze", icon:"🎓"},
         {label:isAr?"✍️ تدريب الكتابة":"✍️ Writing Practice", view:"practice", icon:"✍️"},
         {label:isAr?"📐 قواعد اللغة":"📐 Grammar", view:"grammar", icon:"📐"},
-        {label:isAr?"📖 اختبارات القراءة":"📖 Reading Tests", view:"reading", icon:"📖"},
-        {label:isAr?"💪 تمارين":"💪 Exercises", view:"exercises", icon:"💪"},
-        {label:isAr?"🎮 ألعاب تعليمية":"🎮 Games", view:"game", icon:"🎮"},
       ]
     },
     {
-      id:"tools",
-      label:isAr?"🛠️ أدوات ▾":"🛠️ Tools ▾",
-      active: ["vocabulary","pronunciation","toolkit"].includes(mainView),
+      id:"words",
+      label:isAr?"📚 الكلمات ▾":"📚 Words ▾",
+      active: ["vocabulary","pronunciation","toolkit","game"].includes(mainView),
       items:[
         {label:isAr?"📚 المفردات":"📚 Vocabulary", view:"vocabulary", icon:"📚"},
         {label:isAr?"🔊 النطق":"🔊 Pronunciation", view:"pronunciation", icon:"🔊"},
         {label:isAr?"🧰 أدوات آيلتس":"🧰 IELTS Toolkit", view:"toolkit", icon:"🧰"},
+        {label:isAr?"🎮 ألعاب تعليمية":"🎮 Games", view:"game", icon:"🎮"},
       ]
     },
     {
       id:"track",
       label:isAr?"📈 تتبّع ▾":"📈 Track ▾",
-      active: ["progress","studyplan","contact"].includes(mainView),
+      active: ["progress","studyplan"].includes(mainView),
       items:[
         {label:isAr?"📈 تقدمي":"📈 My Progress", view:"progress", icon:"📈"},
         {label:isAr?"🗺️ الخطة الدراسية":"🗺️ Study Plan", view:"studyplan", icon:"🗺️"},
-        {label:isAr?"✉️ اتصل بنا":"✉️ Contact", view:"contact", icon:"✉️"},
       ]
+    },
+    {
+      id:"contact",
+      label:isAr?"✉️ اتصل بنا":"✉️ Contact",
+      single:true,
+      view:"contact",
+      active: mainView==="contact"
     },
   ];
 
@@ -5172,7 +5182,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
         if(m) clean = m[0];
       }
       const parsed = JSON.parse(clean);
-      if(mountedRef.current){setReport(parsed); setPhase("results"); setMockUsed();}
+      if(mountedRef.current){setReport(parsed); setPhase("results");}
     }catch(e){
       console.error("Mock Test scoring error:",e);
       if(mountedRef.current){setReport({error:true}); setPhase("results");}
@@ -5279,11 +5289,11 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   if(!testPair) return <div style={{textAlign:"center",padding:40,...sty,color:T2.textMuted}}>Preparing your test...</div>;
 
   // Fix 4: free users who've already used their one attempt see an upgrade prompt
-  if(!isPro && mockUsed && phase==="intro") return (
+  if(!isPro && phase==="intro") return (
     <div style={{maxWidth:520,margin:"0 auto",padding:"40px 24px",textAlign:"center"}}>
       <div style={{fontSize:48,marginBottom:16}}>🎓</div>
       <h2 style={{fontFamily:"Georgia,serif",fontSize:24,color:T2.text,margin:"0 0 10px"}}>IELTS Speaking Mock Test</h2>
-      <p style={{...sty,fontSize:14,color:T2.textMuted,lineHeight:1.7,margin:"0 0 24px"}}>You've used your one free mock test. Upgrade to Pro to take unlimited mock tests anytime.</p>
+      <p style={{...sty,fontSize:14,color:T2.textMuted,lineHeight:1.7,margin:"0 0 24px"}}>{isAr?"اختبار المحادثة الكامل متاح لأعضاء Pro فقط. سجّل الآن للحصول على اختبارات غير محدودة مع تقييم شامل على المعايير الأربعة.":"The full IELTS Speaking Mock Test is a Pro feature. Upgrade to access unlimited mock tests, scored on all four official IELTS criteria."}</p>
       <div style={{background:"#fef9c3",border:"1px solid #fcd34d",borderRadius:10,padding:"12px 16px",marginBottom:24,...sty,fontSize:13,color:"#92400e"}}>
         ✅ Your free test is complete — the results were saved above if you'd like to review them.
       </div>
@@ -5546,7 +5556,7 @@ const SpeakingPage = ({isPro, onUpgrade, session, onAuth}) => {
   const [showAnswer, setShowAnswer] = useState({});
 
   const tabs = [
-    {id:"mock",label:"🎓 Mock Test",free:true},
+    {id:"mock",label:"🎓 Mock Test",free:false},
     {id:"chat",label:"🎤 Speaking Practice",free:true},
     {id:"examples",label:"📝 Models & Tips",free:true},
     {id:"vocabulary",label:"📚 Vocabulary",free:false},
@@ -9906,6 +9916,14 @@ const LindaPage=({isPro,onUpgrade,uiLang="en",session,onAuth})=>{
   const currentLesson=lessons.find(l=>l.id===progress.currentLesson)||lessons[0];
   const completedSet=new Set(progress.completed||[]);
   const levelLocked=(lvl)=>!isPro&&!FREE_LINDA_LEVELS.includes(lvl);
+  // Free users get lesson 1 of A1 and B2 once each. After completing, Pro required.
+  const lessonLocked=(lesson)=>{
+    if(isPro) return false;
+    if(!FREE_LINDA_LEVELS.includes(progress.level)) return true;
+    const idx=(LINDA_CURRICULUM[progress.level]?.lessons||[]).findIndex(l=>l.id===lesson.id);
+    if(idx===0) return completedSet.has(lesson.id); // first lesson: locked after completing
+    return true; // all other lessons require Pro
+  };
 
   const saveProgress=(updates)=>{
     const next={...progress,...updates};
@@ -10180,6 +10198,7 @@ ALWAYS:
 
   const startLesson=async(lesson,resumeSession=false)=>{
     if(!lesson)return;
+    if(!resumeSession&&lessonLocked(lesson)){if(onUpgrade)onUpgrade();return;}
     cancelElevenLabs();
     if(!resumeSession){
       clearLindaSession();
@@ -10331,7 +10350,7 @@ ALWAYS:
           <strong>{isAr?"يتطلب Google Chrome":"Requires Google Chrome"}</strong> {isAr?"للصوت. غيره: كتابة فقط.":"for voice and Linda's voice."}
         </div>
         {!isPro&&<div style={{background:T.primaryLight,border:`1px solid ${T.primaryBorder}`,borderRadius:10,padding:"9px 13px",fontSize:12,color:T.primary,...sty}}>
-          {isAr?"المستوى A1 مجاني بالكامل. A2 إلى C2 يتطلب Pro.":"Level A1 is free. A2 through C2 require Pro."}
+          {isAr?"الدرس الأول من A1 وB2 مجاني مرة واحدة. باقي الدروس تتطلب Pro.":"First lesson of A1 and B2 is free — once. All other lessons require Pro."}
         </div>}
       </div>
 
@@ -10365,20 +10384,25 @@ ALWAYS:
           {lessons.map((lesson,idx)=>{
             const done=completedSet.has(lesson.id);
             const isCurrent=lesson.id===progress.currentLesson;
+            const locked=lessonLocked(lesson);
             return(
-              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer"}}
-                onClick={()=>startLesson(lesson)}>
-                <div style={{width:28,height:28,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,flexShrink:0}}>
-                  {done?"✓":idx+1}
+              <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 18px",borderBottom:idx<lessons.length-1?`1px solid ${T.border}`:"none",background:locked?T.bgMuted:isCurrent?"#faf5ff":"white",cursor:locked?"not-allowed":"pointer",opacity:locked?0.7:1}}
+                onClick={()=>locked?onUpgrade():startLesson(lesson)}>
+                <div style={{width:28,height:28,borderRadius:"50%",background:locked?"#f3f4f6":done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:locked?T.textLight:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,flexShrink:0}}>
+                  {locked?"🔒":done?"✓":idx+1}
                 </div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:13,fontWeight:isCurrent?700:500,color:done?T.textMuted:T.text,...sty}}>{isAr?lesson.titleAr:lesson.title}</div>
+                  <div style={{fontSize:13,fontWeight:isCurrent?700:500,color:locked?T.textLight:done?T.textMuted:T.text,...sty}}>{isAr?lesson.titleAr:lesson.title}</div>
                   <div style={{fontSize:11,color:T.textMuted,marginTop:1,...sty}}>
-                    {PHASE_LABELS.map((p,i)=><span key={i} style={{marginRight:8,color:done||completedSet.has(lesson.id)?T.green:"#a78bfa"}}>{p}</span>)}
+                    {locked
+                      ?<span style={{color:T.primary,fontWeight:600,...sty}}>🔓 {isAr?"يتطلب Pro":"Pro required"}</span>
+                      :PHASE_LABELS.map((p,i)=><span key={i} style={{marginRight:8,color:done?T.green:"#a78bfa"}}>{p}</span>)
+                    }
                   </div>
                 </div>
-                {isCurrent&&<div style={{fontSize:11,fontWeight:700,color:"#7c3aed",background:"#ede9fe",padding:"2px 8px",borderRadius:20,...sty}}>{isAr?"الدرس الحالي":"Current"}</div>}
-                {done&&<span style={{fontSize:16}}>✅</span>}
+                {!locked&&isCurrent&&<div style={{fontSize:11,fontWeight:700,color:"#7c3aed",background:"#ede9fe",padding:"2px 8px",borderRadius:20,...sty}}>{isAr?"الدرس الحالي":"Current"}</div>}
+                {!locked&&done&&<span style={{fontSize:16}}>✅</span>}
+                {locked&&<span style={{fontSize:16}}>🔓</span>}
               </div>
             );
           })}
@@ -10440,7 +10464,7 @@ ALWAYS:
               const isCurrent=lesson.id===currentLesson?.id;
               return(
                 <div key={lesson.id} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 12px",borderBottom:idx<lessons.length-1?"1px solid #f3e8ff":"none",background:isCurrent?"#faf5ff":"white",cursor:"pointer"}}
-                  onClick={()=>{startLesson(lesson);setMobileTab("chat");}}>
+                  onClick={()=>{if(lessonLocked(lesson)){onUpgrade();return;}startLesson(lesson);setMobileTab("chat");}}>
                   <div style={{width:20,height:20,borderRadius:"50%",background:done?"#d1fae5":isCurrent?"#7c3aed":"#e9d5ff",color:done?"#059669":isCurrent?"white":"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800,flexShrink:0}}>
                     {done?"✓":idx+1}
                   </div>
