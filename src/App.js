@@ -11736,14 +11736,13 @@ export default function IELTSBot(){
       const messageContent=taskType==="task1academic"&&image
         ?[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:image}},{type:"text",text:`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`}]
         :`IELTS ${TASK_TYPES[taskType].label}\nQuestion: "${topic}"\nEssay:\n${essay}\n\nEvaluate thoroughly. Count words by splitting on spaces. Respond as JSON only.`;
-      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:2000,system:getSystemPrompt(taskType,lang),messages:[{role:"user",content:messageContent}]})});
+      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:3000,system:getSystemPrompt(taskType,lang),messages:[{role:"user",content:messageContent}]})});
       // Fix 13: handle non-200 HTTP responses before attempting JSON parse
       if(!res.ok){ throw new Error(`API error ${res.status}`); }
       const data=await res.json();
       const text=data.content.map(b=>b.text||"").join("");
-      const cleanText=text.replace(/```json|```/g,"").trim();
-      // Fix 13: validate response looks like JSON before parsing to get a meaningful error
-      if(!cleanText.startsWith("{")&&!cleanText.startsWith("[")){ throw new Error("Unexpected response format"); }
+      let cleanText=text.replace(/```json|```/g,"").trim();
+      if(!cleanText.startsWith("{")&&!cleanText.startsWith("[")){const m=cleanText.match(/\{[\s\S]*\}/);if(m)cleanText=m[0];else throw new Error("Unexpected response format");}
       const parsed=JSON.parse(cleanText);
       if(parsed.error==="non_english"){
         setLoading(false);
@@ -11757,7 +11756,7 @@ export default function IELTSBot(){
       setLoading(false);
       setResult(parsed);
       setActiveTab("annotated");
-    }catch(e){ setLoading(false); setError("Something went wrong. Please try again."); }
+    }catch(e){ console.error("[analyze] parse error:",e); setLoading(false); setError("Something went wrong. Please try again."); }
   };
 
   return (
