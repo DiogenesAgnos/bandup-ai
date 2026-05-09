@@ -8,15 +8,15 @@
 //
 // This file is a thin proxy with safety guards:
 //   - Model whitelist (rejects anything else — protects cost)
-//   - max_tokens hard cap (4000 — covers writing analysis, blocks runaway)
+//   - max_tokens hard cap (2000 — full IELTS analysis in ~22s vs ~50s at 4000)
 //   - Message normalisation (merge consecutive same-role, drop leading non-user)
-//   - 45s timeout
+//   - 70s timeout (safely under 90s maxDuration)
 //   - Proper 429 (rate limit) and 529 (overloaded) signalling so the frontend's
 //     existing retry logic in Sarah/Linda/Mock kicks in correctly.
 
 // Vercel function config — Hobby plan default is 10s which kills writing analysis.
 // 60s is the Hobby max; covers Sonnet comfortably, tight but usable for Opus.
-export const config = { maxDuration: 60 };
+export const config = { maxDuration: 90 };
 
 // Models the frontend uses today + the latest Opus for future writing-analysis upgrade.
 const ALLOWED_MODELS = new Set([
@@ -26,8 +26,8 @@ const ALLOWED_MODELS = new Set([
   "claude-haiku-4-5-20251001",
 ]);
 const FALLBACK_MODEL = "claude-sonnet-4-6";
-const MAX_OUTPUT_TOKENS = 4000;
-const REQUEST_TIMEOUT_MS = 45000;
+const MAX_OUTPUT_TOKENS = 2000; // 2000 tokens keeps Sonnet response ~22s vs ~50s at 4000
+const REQUEST_TIMEOUT_MS = 70000; // 70s abort, safely under 90s maxDuration
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
