@@ -4139,7 +4139,9 @@ const speakElevenLabs=async(text,voiceId,onEnd)=>{
     _tryAudioContext(arrayBuffer,url,onEnd,snapshot);
 
   }catch(e){
-    if(onEnd)onEnd();
+    // Bug fix: don't fire onEnd here AND in fallback — caller would receive
+    // two completion signals, causing premature phase advance + audio overlap.
+    // The fallback owns onEnd if it runs.
     speakTextFallback(text,onEnd);
   }
 };
@@ -4167,7 +4169,10 @@ const _tryAudioContext=async(arrayBuffer,url,onEnd,snapshot)=>{
     }catch(e){}
   }
   if(url)try{URL.revokeObjectURL(url);}catch(e){}
-  speakTextFallback(text,onEnd);
+  // Bug fix: `text` is not in this function's scope — calling speakTextFallback(text, onEnd)
+  // here threw a silent ReferenceError. AudioContext path is already a fallback;
+  // if it fails too, we just signal completion.
+  if(onEnd)onEnd();
 };
 
 const cancelElevenLabs=()=>{
@@ -4367,7 +4372,7 @@ RESPONSE RULES:
   const callClaude=async(system,history,userMsg)=>{
     try{
       let msgs=history.slice(-14);
-      // Gemini requires first message to be "user" role
+      // Claude requires first message to be "user" role
       while(msgs.length>0&&msgs[0].role!=="user") msgs.shift();
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const controller=new AbortController();
@@ -4984,7 +4989,15 @@ const MockSpeakingTest = ({isPro, onUpgrade, session, onAuth}) => {
   const examinerSpeak = (text, onDone) => {
     cancelElevenLabs();          // always stop any previous speech before starting new one
     setIsSpeaking(true);
-    speakElevenLabs(stripForTTS(text), SARAH_VOICE_ID, ()=>{ if(mountedRef.current){setIsSpeaking(false); if(onDone)onDone();}});
+    // Capture cancel-id AFTER our own cancel — so if a NEW cancel happens
+    // (e.g. user taps mic mid-question), the cancel-onEnd path will NOT
+    // call onDone, preventing premature phase advancement.
+    const myCancelId = _elCancelId;
+    speakElevenLabs(stripForTTS(text), SARAH_VOICE_ID, ()=>{
+      if(!mountedRef.current) return;
+      setIsSpeaking(false);
+      if(onDone && _elCancelId === myCancelId) onDone();
+    });
   };
 
   // ── Part 1 helpers ──
@@ -5128,10 +5141,19 @@ Return ONLY valid JSON in this exact format:
 Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciation on spelling patterns, complexity of words attempted, and sentence rhythm visible in text.`;
 
     try{
-      const res = await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},
+      const controller = new AbortController();
+      const timeoutId = setTimeout(()=>controller.abort(), 45000);
+      const doFetch = () => fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},signal:controller.signal,
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:900,system:sys,
           messages:[{role:"user",content:`Score this IELTS Speaking test transcript:\n\n${fullTranscript}`}]})});
-      // Handle rate limit with one retry
+      let res = await doFetch();
+      // Rate-limit: wait 4s and retry once (matches Sarah/Linda behaviour)
+      if(res.status===429){
+        await new Promise(r=>setTimeout(r,4000));
+        if(!mountedRef.current){clearTimeout(timeoutId);return;}
+        res = await doFetch();
+      }
+      clearTimeout(timeoutId);
       if(res.status===429){
         if(mountedRef.current) setReport({error:true,rateLimited:true});
         setPhase("results");setScoring(false);return;
@@ -5142,10 +5164,17 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
       }
       const data = await res.json();
       const raw = data?.content?.[0]?.text||"";
-      const clean = raw.replace(/```json|```/g,"").trim();
+      // Hardened JSON extraction: strip code fences, then if Claude added preamble,
+      // extract the outer {...} block. Prevents JSON.parse crashes on flaky output.
+      let clean = raw.replace(/```json|```/g,"").trim();
+      if(!clean.startsWith("{")){
+        const m = clean.match(/\{[\s\S]*\}/);
+        if(m) clean = m[0];
+      }
       const parsed = JSON.parse(clean);
       if(mountedRef.current){setReport(parsed); setPhase("results"); setMockUsed();}
     }catch(e){
+      console.error("Mock Test scoring error:",e);
       if(mountedRef.current){setReport({error:true}); setPhase("results");}
     }
     setScoring(false);
@@ -5291,7 +5320,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
       <div style={{background:"#fffbeb",border:"1px solid #fcd34d",borderRadius:10,padding:"12px 16px",marginBottom:24,...sty,fontSize:13,color:"#92400e",lineHeight:1.6}}>
         ⚠️ <strong>Exam conditions apply.</strong> Find a quiet space. Speak clearly and in full sentences. The examiner will not correct you during the test — feedback comes at the end.
       </div>
-      <button onClick={()=>{setPhase("p1_brief"); setTimeout(()=>{ examinerSpeak("Good morning. My name is Sarah. Could you tell me your full name, please?", ()=>setPhase("p1_name")); },300);}}
+      <button onClick={()=>{ if(!session){if(onAuth)onAuth();return;} setPhase("p1_brief"); setTimeout(()=>{ examinerSpeak("Good morning. My name is Helen. Could you tell me your full name, please?", ()=>setPhase("p1_name")); },300);}}
         style={{width:"100%",background:"#dc2626",color:"white",border:"none",borderRadius:12,padding:"18px",fontSize:16,fontWeight:800,cursor:"pointer",...sty,boxShadow:"0 6px 20px rgba(220,38,38,0.3)"}}>
         Start Mock Test →
       </button>
@@ -5302,7 +5331,7 @@ Be strict and honest. Do not inflate scores. Use 0.5 increments. Base pronunciat
   if(phase==="p1_name") return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"32px 24px"}}>
       <PausedOverlay/><Progress/><PauseBar/>
-      <ExaminerBubble text="Good morning. My name is Sarah. Could you tell me your full name, please?" />
+      <ExaminerBubble text="Good morning. My name is Helen. Could you tell me your full name, please?" />
       <MicBtn onDone={(text)=>{ const ans=(text||transcript||"").trim(); answersRef.current.push({part:"Part 1 Intro",question:"Could you tell me your full name?",answer:ans||"[No response]"}); setTranscript(""); finalTranscriptRef.current=""; speakFiredRef.current=""; setP1TopicIdx(0); setP1QuestionIdx(0); setPhase("p1_asking"); }}/>
     </div>
   );
@@ -10026,7 +10055,7 @@ ALWAYS:
   const callClaude=async(system,history,userMsg)=>{
     try{
       let msgs=history.slice(-12);
-      // Gemini requires first message to be "user" role
+      // Claude requires first message to be "user" role
       while(msgs.length>0&&msgs[0].role!=="user") msgs.shift();
       if(userMsg)msgs.push({role:"user",content:userMsg});
       const controller=new AbortController();
