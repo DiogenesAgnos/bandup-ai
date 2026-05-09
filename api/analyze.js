@@ -14,6 +14,10 @@
 //   - Proper 429 (rate limit) and 529 (overloaded) signalling so the frontend's
 //     existing retry logic in Sarah/Linda/Mock kicks in correctly.
 
+// Vercel function config — Hobby plan default is 10s which kills writing analysis.
+// 60s is the Hobby max; covers Sonnet comfortably, tight but usable for Opus.
+export const config = { maxDuration: 60 };
+
 // Models the frontend uses today + the latest Opus for future writing-analysis upgrade.
 const ALLOWED_MODELS = new Set([
   "claude-sonnet-4-6",
