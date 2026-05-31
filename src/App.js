@@ -8389,10 +8389,6 @@ const PlacementTest = ({uiLang="ar", onNavigate, isPro=false, session=null}) => 
       });
     }
   },[session?.email]);
-  const [reviewSection, setReviewSection] = useState(null); // null | "reading" | "grammar"
-  const timerRef = useRef(null);
-  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
-
 
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
   const isAr = uiLang === "ar";
