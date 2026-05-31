@@ -8175,6 +8175,122 @@ const VocabularyPage = ({uiLang="ar", isPro=false, onUpgrade}) => {
 
 
 // ── PLACEMENT TEST ──────────────────────────────────────────────
+// Adaptive grammar & vocabulary question bank — A1 through C2
+const ADAPTIVE_PLACEMENT_QUESTIONS = {
+  a1:[
+    {q:"I ___ a student at this university.",opts:["am","is","are","be"],a:0},
+    {q:"She ___ from Egypt.",opts:["is","are","am","be"],a:0},
+    {q:"There is ___ apple on the table.",opts:["a","an","the","—"],a:1},
+    {q:"They ___ happy today.",opts:["are","is","am","be"],a:0},
+    {q:"I don't ___ coffee in the morning.",opts:["like","likes","liking","to like"],a:0},
+    {q:"The cat is ___ the table.",opts:["on","in","for","from"],a:0},
+    {q:"He ___ TV every night.",opts:["watches","watch","watching","watched"],a:0},
+    {q:"___ you a teacher?",opts:["Are","Is","Am","Do"],a:0},
+    {q:"I have ___ brothers and one sister.",opts:["two","second","twice","both"],a:0},
+    {q:"She ___ English very well.",opts:["speaks","speak","speaking","spoken"],a:0},
+    {q:"I go to school ___ bus.",opts:["by","on","in","with"],a:0},
+    {q:"This is ___ expensive bag.",opts:["a","an","the","—"],a:0},
+    {q:"The word 'happy' means:",opts:["sad","angry","glad","tired"],a:2},
+    {q:"We ___ hungry — let's eat!",opts:["are","is","am","were"],a:0},
+    {q:"What ___ your name?",opts:["is","are","am","be"],a:0},
+  ],
+  a2:[
+    {q:"I ___ to the gym yesterday.",opts:["went","go","goes","going"],a:0},
+    {q:"___ you like some tea?",opts:["Would","Will","Do","Can"],a:0},
+    {q:"She has been here ___ three hours.",opts:["since","for","during","from"],a:1},
+    {q:"He ___ play football — he injured his leg.",opts:["can't","doesn't","won't","isn't"],a:0},
+    {q:"I was ___ TV when you called.",opts:["watching","watched","watch","watches"],a:0},
+    {q:"They ___ arrived yet.",opts:["haven't","didn't","aren't","don't"],a:0},
+    {q:"She is taller ___ her brother.",opts:["than","then","that","as"],a:0},
+    {q:"It's the ___ film I've ever seen!",opts:["best","good","better","well"],a:0},
+    {q:"The word 'cheap' means:",opts:["expensive","fast","low in price","old"],a:2},
+    {q:"I usually ___ at 7 o'clock in the morning.",opts:["wake up","woke up","waking up","wakes up"],a:0},
+    {q:"___ he at home yesterday?",opts:["Was","Were","Is","Did"],a:0},
+    {q:"She doesn't like ___ to school by bus.",opts:["going","go","went","goes"],a:0},
+    {q:"I have ___ finished my homework.",opts:["just","yet","still","ever"],a:0},
+    {q:"There are ___ students in the classroom.",opts:["thirty","third","thirtieth","three ten"],a:0},
+    {q:"The word 'receive' means:",opts:["send","give","get","refuse"],a:2},
+  ],
+  b1:[
+    {q:"If I had more money, I ___ a new car.",opts:["would buy","will buy","bought","buy"],a:0},
+    {q:"The meeting ___ by the manager tomorrow.",opts:["will be chaired","will chair","is chaired","has chaired"],a:0},
+    {q:"Despite ___ hard, she failed the exam.",opts:["studying","studied","to study","study"],a:0},
+    {q:"He gave a ___ argument that convinced the committee.",opts:["persuasive","persuaded","persuading","persuasion"],a:0},
+    {q:"The report highlighted ___ need for further research.",opts:["the","a","an","—"],a:0},
+    {q:"Scientists found a strong ___ between diet and mental health.",opts:["link","linked","linking","linkage"],a:0},
+    {q:"By the time she arrived, the meeting ___ already started.",opts:["had","has","was","would"],a:0},
+    {q:"The new regulations are designed to ___ pollution levels.",opts:["reduce","reducing","reduced","reduction"],a:0},
+    {q:"She is known for her ___ attention to detail.",opts:["meticulous","mediocre","merciful","menacing"],a:0},
+    {q:"The word 'prevalent' most closely means:",opts:["rare","widely common","strictly controlled","recently discovered"],a:1},
+    {q:"Which sentence is correct?",opts:["The informations were useful.","The information was useful.","The informations was useful.","The information were useful."],a:1},
+    {q:"The results of the experiment ___ announced tomorrow.",opts:["will be","are being","have been","were"],a:0},
+    {q:"Not only ___ the project delayed, but it also exceeded its budget.",opts:["was","is","were","has"],a:0},
+    {q:"The word 'alleviate' most closely means:",opts:["worsen","make less severe","cause","ignore"],a:1},
+    {q:"Which uses 'however' correctly?",opts:["I like coffee, however tea.","I like coffee. However, I prefer tea.","However I like coffee and tea.","I like coffee however, I prefer tea."],a:1},
+  ],
+  b2:[
+    {q:"The findings were ___ with previous research in the field.",opts:["consistent","consisting","consisted","consistency"],a:0},
+    {q:"The study concluded that exercise has a ___ effect on cognitive function.",opts:["beneficial","benefited","benefiting","benefit"],a:0},
+    {q:"The number of people affected ___ risen sharply.",opts:["have","has","are","were"],a:1},
+    {q:"The word 'exacerbate' most closely means:",opts:["alleviate","mitigate","make worse","resolve"],a:2},
+    {q:"Which sentence is grammatically correct?",opts:["Neither the students nor the teacher were absent.","Neither the students nor the teacher was absent.","Neither the students nor the teacher are absent.","Neither the students nor the teacher have been absent."],a:1},
+    {q:"The word 'substantiate' most closely means:",opts:["disprove","confirm with evidence","criticise","ignore"],a:1},
+    {q:"___ she been given better advice, the outcome might have been different.",opts:["Had","Would","Should","If"],a:0},
+    {q:"The policy was introduced ___ resistance from several stakeholders.",opts:["despite","although","however","nevertheless"],a:0},
+    {q:"The word 'contentious' most closely means:",opts:["agreed upon","causing disagreement","irrelevant","straightforward"],a:1},
+    {q:"The researchers argued that their findings ___.",opts:["have broader implications","has broader implications","had broader implication","having broader implications"],a:0},
+    {q:"The phrase 'the lion's share' means:",opts:["a small part","an equal part","the largest part","the most difficult part"],a:2},
+    {q:"The word 'corroborate' most closely means:",opts:["contradict","confirm","criticise","ignore"],a:1},
+    {q:"Which is correct?",opts:["The data suggests a clear pattern.","The data suggest a clear pattern.","The data is suggesting a clear pattern.","The datas suggest a clear pattern."],a:0},
+    {q:"The word 'proliferation' most closely means:",opts:["reduction","rapid increase","distribution","regulation"],a:1},
+    {q:"The government has taken measures ___ homelessness.",opts:["to address","of addressing","for addressing","that address"],a:0},
+  ],
+  c1:[
+    {q:"Scarcely ___ the meeting when the fire alarm sounded.",opts:["they had begun","had they begun","did they begin","they began"],a:1},
+    {q:"The proposal was rejected on the grounds ___ it lacked sufficient evidence.",opts:["that","which","why","how"],a:0},
+    {q:"___ a more thorough investigation been conducted, the flaw might have been found earlier.",opts:["Had","If","Were","Should"],a:0},
+    {q:"The word 'equivocate' most closely means:",opts:["speak clearly","avoid commitment in speech","express strong views","summarise concisely"],a:1},
+    {q:"It is essential that the committee ___ the matter before the deadline.",opts:["addresses","address","will address","has addressed"],a:1},
+    {q:"The word 'circumvent' most closely means:",opts:["confront directly","find a way around","reinforce","eliminate"],a:1},
+    {q:"Not until the final report was published ___ the full extent of the damage.",opts:["was it known","did it know","it was known","was known"],a:0},
+    {q:"The word 'perfunctory' most closely means:",opts:["thorough and careful","carried out with minimal effort","highly skilled","excessively detailed"],a:1},
+    {q:"The study's findings, ___ they were preliminary, attracted considerable attention.",opts:["albeit","although","despite","even so"],a:0},
+    {q:"The word 'ramification' most closely means:",opts:["a minor detail","an unintended consequence or effect","a clear solution","an official decision"],a:1},
+    {q:"The evidence points ___ the conclusion that growth alone is insufficient.",opts:["towards","at","for","upon"],a:0},
+    {q:"The word 'ameliorate' most closely means:",opts:["worsen","ignore","improve","measure"],a:2},
+    {q:"Which sentence uses the subjunctive correctly?",opts:["I suggest that he goes home early.","I suggest that he go home early.","I suggest that he will go home early.","I suggest that he should goes home early."],a:1},
+    {q:"The word 'obfuscate' most closely means:",opts:["clarify","make unclear","emphasise","undermine"],a:1},
+    {q:"The government's decision was ___ of a broader shift in policy priorities.",opts:["indicative","indicated","indication","indicating"],a:0},
+  ],
+  c2:[
+    {q:"___ it not for the timely intervention of the central bank, the system might have collapsed.",opts:["Were","Had","Should","Would"],a:0},
+    {q:"The word 'loquacious' most closely means:",opts:["silent","talkative","argumentative","precise"],a:1},
+    {q:"The phenomenon ___ as 'groupthink' occurs when cohesion overrides critical evaluation.",opts:["referred to","referring to","which refers","that referring"],a:0},
+    {q:"The word 'sanguine' most closely means:",opts:["pessimistic","aggressive","optimistic","indifferent"],a:2},
+    {q:"The construction 'little did he know' involves:",opts:["a passive construction","fronted negation with inversion","a conditional clause","a relative clause"],a:1},
+    {q:"The word 'recondite' most closely means:",opts:["well-known","obscure and little-known","recently discovered","straightforward"],a:1},
+    {q:"To 'beg the question' formally means:",opts:["to raise an obvious question","to assume the conclusion in the premise","to avoid answering","to challenge a widely held view"],a:1},
+    {q:"The word 'tendentious' most closely means:",opts:["balanced and objective","promoting a particular cause","difficult to understand","lacking evidence"],a:1},
+    {q:"Which sentence is grammatically correct?",opts:["Whomever arrives first should sign in.","Whoever arrives first should sign in.","Who arrives first should sign in.","Whom arrives first should sign in."],a:1},
+    {q:"The word 'propitious' most closely means:",opts:["unfavourable","giving signs of success","requiring caution","relating to prophecy"],a:1},
+    {q:"'The exception proves the rule' formally means:",opts:["exceptions disprove the rule","the existence of an exception implies there is a general rule","unusual cases should be studied","rules should have no exceptions"],a:1},
+    {q:"The word 'laconic' most closely means:",opts:["using few words","using many words","unclear","elegant"],a:0},
+    {q:"In academic writing, 'hegemony' most closely refers to:",opts:["a type of government","a religious doctrine","dominant authority or influence","a cultural tradition"],a:2},
+    {q:"The word 'sophistry' most closely means:",opts:["wisdom","clever but misleading reasoning","honest argumentation","academic expertise"],a:1},
+    {q:"The word 'apposite' most closely means:",opts:["appropriate and fitting","irrelevant","opposing","ambiguous"],a:0},
+  ],
+};
+
+const PLACEMENT_LEVELS = ["a1","a2","b1","b2","c1","c2"];
+const PLACEMENT_CEFR_LABELS = {
+  a1:{label:"Beginner",cefr:"A1",ielts:"1.0 – 2.5",color:"#6b7280",bg:"#f3f4f6",advice:"Focus on building core vocabulary and basic grammar. Start with English Lessons with Linda on Englishfool."},
+  a2:{label:"Elementary",cefr:"A2",ielts:"2.5 – 3.5",color:"#2563eb",bg:"#dbeafe",advice:"Work on expanding vocabulary and basic sentence structures. Try the IELTS Games and Vocabulary page to build confidence."},
+  b1:{label:"Intermediate",cefr:"B1",ielts:"4.0 – 5.0",color:"#7c3aed",bg:"#ede9fe",advice:"You have a foundation. Focus on IELTS-specific writing structure, cohesive devices, and reading practice."},
+  b2:{label:"Upper Intermediate",cefr:"B2",ielts:"5.5 – 6.5",color:"#d97706",bg:"#fef3c7",advice:"You are in the IELTS scoring range. Focus on essay structure, vocabulary precision, and error reduction. The Essay Analyzer is your most valuable tool."},
+  c1:{label:"Advanced",cefr:"C1",ielts:"7.0 – 8.0",color:"#059669",bg:"#d1fae5",advice:"Strong English level. Work on sophisticated vocabulary, complex sentence variety, and exam technique to reach Band 7+."},
+  c2:{label:"Proficient",cefr:"C2",ielts:"8.5 – 9.0",color:"#dc2626",bg:"#fee2e2",advice:"Near-native level. Focus entirely on IELTS exam technique, timing, and Band 9 model answers."},
+};
+
 const PLACEMENT_READING_PASSAGE = {
   title: "The Rise of Urban Farming",
   text: `Urban farming — the practice of growing food within cities — has seen remarkable growth over the past two decades. Once dismissed as a niche hobby, it is now recognised as a serious response to food security concerns, environmental challenges, and the disconnect many city dwellers feel from natural food systems.
@@ -8225,14 +8341,8 @@ const PLACEMENT_GRAMMAR_VOCAB = [
   {q:"Despite budget cuts, the government allocated __ funds to healthcare than in the previous year.",options:["more","less","fewer","much"],a:0,exp:"'More' is correct here because 'budget cuts' followed by 'despite' signals healthcare spending increased. 'Fewer' is wrong — funds is uncountable. 'Much' cannot be used in comparatives."},
 ];
 
-const CEFR_LEVELS = [
-  {min:0,  max:25,  cefr:"A1", label:"Beginner",           ielts:"1.0 – 2.5", color:"#6b7280", bg:"#f3f4f6", advice:"Focus on building core vocabulary and basic grammar. The Vocabulary and Grammar sections of Englishfool are your starting point."},
-  {min:26, max:40,  cefr:"A2", label:"Elementary",         ielts:"2.5 – 3.5", color:"#2563eb", bg:"#dbeafe", advice:"Work on expanding vocabulary and basic sentence structures. Try the IELTS Games and Vocabulary page to build confidence."},
-  {min:41, max:56,  cefr:"B1", label:"Intermediate",       ielts:"4.0 – 5.0", color:"#7c3aed", bg:"#ede9fe", advice:"You have a foundation. Now focus on IELTS-specific writing structure, cohesive devices, and reading practice."},
-  {min:57, max:72,  cefr:"B2", label:"Upper Intermediate",  ielts:"5.5 – 6.5", color:"#d97706", bg:"#fef3c7", advice:"You are in IELTS range. Focus on essay structure, vocabulary precision, and error reduction. The Essay Analyzer is your most valuable tool."},
-  {min:73, max:87,  cefr:"C1", label:"Advanced",           ielts:"7.0 – 8.0", color:"#059669", bg:"#d1fae5", advice:"Strong English level. Work on sophisticated vocabulary, complex sentence variety, and exam technique to reach Band 7+."},
-  {min:88, max:100, cefr:"C2", label:"Proficient",         ielts:"8.5 – 9.0", color:"#dc2626", bg:"#fee2e2", advice:"Near-native level. Focus entirely on IELTS exam technique, timing, and Band 9 model answers."},
-];
+// CEFR_LEVELS kept as alias for legacy compatibility
+const CEFR_LEVELS = Object.values(PLACEMENT_CEFR_LABELS).map((v,i)=>({...v,min:i*17,max:i*17+16}));
 
 const PLACEMENT_STORAGE_KEY = "ef_placement_result";
 
@@ -8262,22 +8372,20 @@ const loadPlacementFromSupabase = async (email) => {
 
 const PlacementTest = ({uiLang="ar", onNavigate, isPro=false, session=null}) => {
   const saved = loadPlacementResult();
-  const hasTaken = !!saved;
   const [screen, setScreen] = useState(saved?"results":"intro");
-  const [readingAnswers, setReadingAnswers] = useState(saved?.readingAnswers||{});
-  const [grammarAnswers, setGrammarAnswers] = useState(saved?.grammarAnswers||{});
-  const [readingTime, setReadingTime] = useState(600);
-  const [grammarTime, setGrammarTime] = useState(600);
   const [results, setResults] = useState(saved||null);
-  // On mount: if logged in and no local result, check Supabase
+  const [currentLevelIdx, setCurrentLevelIdx] = useState(1); // start at A2
+  const [usedIdxs, setUsedIdxs] = useState({a1:[],a2:[],b1:[],b2:[],c1:[],c2:[]});
+  const [currentQ, setCurrentQ] = useState(null);
+  const [qNum, setQNum] = useState(0);
+  const [allAnswers, setAllAnswers] = useState([]);
+  const [chosen, setChosen] = useState(null);
+  const [consec, setConsec] = useState({correct:0,wrong:0});
+  const TOTAL_Q = 30;
   useEffect(()=>{
     if(session?.email && !saved){
       loadPlacementFromSupabase(session.email).then(remote=>{
-        if(remote){
-          savePlacementResult(remote); // cache locally
-          setResults(remote);
-          setScreen("results");
-        }
+        if(remote){ savePlacementResult(remote); setResults(remote); setScreen("results"); }
       });
     }
   },[session?.email]);
@@ -8285,347 +8393,227 @@ const PlacementTest = ({uiLang="ar", onNavigate, isPro=false, session=null}) => 
   const timerRef = useRef(null);
   const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
 
-  const startTimer = (setTime, onExpire) => {
-    if(timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(()=>{
-      setTime(prev=>{
-        if(prev<=1){ clearInterval(timerRef.current); onExpire(); return 0; }
-        return prev-1;
-      });
-    },1000);
+
+  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+  const isAr = uiLang === "ar";
+
+  const pickQ = (levelIdx, used) => {
+    const key = PLACEMENT_LEVELS[levelIdx];
+    const pool = ADAPTIVE_PLACEMENT_QUESTIONS[key];
+    const avail = pool.map((_,i)=>i).filter(i=>!used[key].includes(i));
+    const src = avail.length ? avail : pool.map((_,i)=>i);
+    const idx = src[Math.floor(Math.random()*src.length)];
+    return {q:{...pool[idx]}, idx, newUsed:{...used,[key]:[...used[key].filter(x=>avail.length>0),idx]}};
   };
 
-  useEffect(()=>{ return ()=>{ if(timerRef.current) clearInterval(timerRef.current); }; },[]);
+  const startTest = () => {
+    const initUsed={a1:[],a2:[],b1:[],b2:[],c1:[],c2:[]};
+    const {q,idx,newUsed}=pickQ(1,initUsed);
+    setCurrentLevelIdx(1); setUsedIdxs(newUsed); setCurrentQ({...q,levelIdx:1,bankIdx:idx});
+    setQNum(1); setAllAnswers([]); setChosen(null); setConsec({correct:0,wrong:0});
+    setScreen("test"); trackEvent('placement_test_start');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
 
-  const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+  const handleAnswer = (optIdx) => {
+    if(chosen!==null) return;
+    setChosen(optIdx);
+    const isCorrect = optIdx===currentQ.a;
+    const newAnswers=[...allAnswers,{level:PLACEMENT_LEVELS[currentLevelIdx],correct:isCorrect}];
+    setTimeout(()=>{
+      if(qNum>=TOTAL_Q){ finishTest(newAnswers); return; }
+      let lvl=currentLevelIdx, nc={...consec};
+      if(isCorrect){ nc.correct++; nc.wrong=0; if(nc.correct>=2&&lvl<5){lvl++;nc.correct=0;} }
+      else{ nc.wrong++; nc.correct=0; if(nc.wrong>=2&&lvl>0){lvl--;nc.wrong=0;} }
+      const {q:nq,idx:ni,newUsed}=pickQ(lvl,usedIdxs);
+      setCurrentLevelIdx(lvl); setUsedIdxs(newUsed); setCurrentQ({...nq,levelIdx:lvl,bankIdx:ni});
+      setAllAnswers(newAnswers); setQNum(qNum+1); setChosen(null); setConsec(nc);
+    },900);
+  };
 
-  const startReading = () => { trackEvent('placement_test_start'); setScreen("reading"); startTimer(setReadingTime, finishReading); };
-  const finishReading = () => { if(timerRef.current) clearInterval(timerRef.current); setScreen("grammar"); startTimer(setGrammarTime, finishGrammar); };
-  const finishGrammar = () => { if(timerRef.current) clearInterval(timerRef.current); calcResults(); };
-
-  const calcResults = (rAns=readingAnswers, gAns=grammarAnswers) => {
-    const rScore = PLACEMENT_READING_PASSAGE.questions.reduce((s,q,i)=> s+(rAns[i]===q.a?1:0),0);
-    const gScore = PLACEMENT_GRAMMAR_VOCAB.reduce((s,q,i)=> s+(gAns[i]===q.a?1:0),0);
-    const total = rScore+gScore;
-    const pct = Math.round((total/32)*100);
-    const level = CEFR_LEVELS.find(l=>pct>=l.min&&pct<=l.max)||CEFR_LEVELS[0];
-    const data = {rScore,gScore,total,pct,level,readingAnswers:rAns,grammarAnswers:gAns};
+  const finishTest = (final) => {
+    const lvlScores={};
+    PLACEMENT_LEVELS.forEach(l=>{lvlScores[l]={correct:0,total:0};});
+    final.forEach(({level,correct})=>{ lvlScores[level].total++; if(correct)lvlScores[level].correct++; });
+    let resultLevel="a1";
+    for(let i=5;i>=0;i--){
+      const l=PLACEMENT_LEVELS[i]; const s=lvlScores[l];
+      if(s.total>=2&&s.correct/s.total>=0.5){resultLevel=l;break;}
+      if(s.total>=1&&s.correct/s.total>=0.67){resultLevel=l;break;}
+    }
+    const info=PLACEMENT_CEFR_LABELS[resultLevel];
+    const totalCorrect=final.filter(a=>a.correct).length;
+    const pct=Math.round((totalCorrect/final.length)*100);
+    const data={resultLevel,levelInfo:info,levelScores:lvlScores,totalCorrect,totalQ:final.length,pct,answers:final};
     savePlacementResult(data);
-    if(session?.email) savePlacementToSupabase(session.email, data);
-    setResults(data);
-    setScreen("results");
-    setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),50);
+    if(session?.email) savePlacementToSupabase(session.email,data);
+    setResults(data); setScreen("results");
+    window.scrollTo({top:0,behavior:'smooth'});
   };
 
-  const retake = () => {
-    clearPlacementResult();
-    setScreen("intro"); setReadingAnswers({}); setGrammarAnswers({});
-    setReadingTime(600); setGrammarTime(600); setResults(null); setReviewSection(null);
-    window.scrollTo({top:0,behavior:"smooth"});
-  };
+  const retake=()=>{ clearPlacementResult(); setScreen("intro"); setResults(null); setAllAnswers([]); setChosen(null); setQNum(0); };
 
-  const TimerBar = ({time, total=600}) => {
-    const pct=(time/total)*100;
-    const color=time<120?T.red:time<240?T.amber:T.green;
+  // ── INTRO SCREEN ──
+  if(screen==="intro") return(
+    <div style={{...sty}}>
+      <Card style={{marginBottom:20,background:"#fff5f5",border:"1px solid #ffcccc"}}>
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <div style={{fontSize:44,marginBottom:10}}>📋</div>
+          <h2 style={{fontFamily:"Georgia,serif",fontSize:22,color:T.text,margin:"0 0 8px"}}>
+            {isAr?"اختبار تحديد المستوى":"Placement Test"}
+          </h2>
+          <p style={{color:T.textMuted,fontSize:14,...sty,margin:0,lineHeight:1.8,maxWidth:500,marginLeft:"auto",marginRight:"auto"}}>
+            {isAr
+              ?"٣٠ سؤالاً في القواعد والمفردات — يتكيّف الاختبار تلقائياً مع مستواك من A1 حتى C2. الوقت المتوقع: ١٠ دقائق."
+              :"30 multiple-choice grammar & vocabulary questions — the test adapts automatically to your level from A1 to C2. Expected time: 10 minutes."}
+          </p>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:12,marginBottom:20}}>
+          {[
+            {icon:"🎯",title:isAr?"تكيّفي":"Adaptive",sub:isAr?"الأسئلة تصعب أو تسهل حسب إجاباتك":"Questions adapt to your answers"},
+            {icon:"⚡",title:isAr?"سريع ودقيق":"Fast & Accurate",sub:isAr?"لا قراءة طويلة — إجابات سريعة":"No long passages — quick answers"},
+            {icon:"🏆",title:"A1 → C2",sub:isAr?"يقيس جميع المستويات":"Covers all levels"},
+          ].map((item,i)=>(
+            <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:10,padding:"14px 16px",textAlign:"center"}}>
+              <div style={{fontSize:26,marginBottom:6}}>{item.icon}</div>
+              <div style={{...sty,fontWeight:700,fontSize:13,color:T.text,marginBottom:4}}>{item.title}</div>
+              <div style={{...sty,fontSize:12,color:T.textMuted,lineHeight:1.5}}>{item.sub}</div>
+            </div>
+          ))}
+        </div>
+        {!isPro&&<div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"12px 16px",marginBottom:16,...sty,fontSize:13,color:T.amber,direction:isAr?"rtl":"ltr"}}>
+          {isAr?"📌 محاولة واحدة مجانية — إعادة الاختبار متاحة لمشتركي Pro":"📌 One free attempt — retaking the test requires Pro"}
+        </div>}
+        <div style={{textAlign:"center"}}>
+          <button onClick={startTest} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 44px",fontSize:16,fontWeight:700,cursor:"pointer",...sty,boxShadow:`0 4px 16px ${T.primary}44`}}>
+            {isAr?"ابدأ الاختبار ←":"Start Test →"}
+          </button>
+        </div>
+      </Card>
+    </div>
+  );
+
+  // ── TEST SCREEN ──
+  if(screen==="test"&&currentQ) {
+    const info=PLACEMENT_CEFR_LABELS[PLACEMENT_LEVELS[currentLevelIdx]];
+    const progress=(qNum/TOTAL_Q)*100;
     return(
-      <div style={{background:T.bgGray,borderRadius:4,height:6,overflow:"hidden",marginBottom:4}}>
-        <div style={{width:`${pct}%`,height:"100%",background:color,transition:"width 1s linear,background 0.5s"}}/>
+      <div style={{...sty}}>
+        <div style={{marginBottom:20}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <span style={{...sty,fontSize:13,color:T.textMuted,direction:isAr?"rtl":"ltr"}}>
+              {isAr?`سؤال ${qNum} من ${TOTAL_Q}`:`Question ${qNum} of ${TOTAL_Q}`}
+            </span>
+            <span style={{...sty,fontSize:12,fontWeight:700,color:info.color,background:info.bg,borderRadius:20,padding:"2px 12px",border:`1px solid ${info.color}30`}}>
+              {info.cefr}
+            </span>
+          </div>
+          <div style={{height:6,background:T.bgGray,borderRadius:10,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${progress}%`,background:T.primary,borderRadius:10,transition:"width 0.4s"}}/>
+          </div>
+        </div>
+        <Card style={{marginBottom:16}}>
+          <div style={{...sty,fontSize:16,fontWeight:600,color:T.text,marginBottom:22,lineHeight:1.7,direction:isAr?"rtl":"ltr"}}>
+            {currentQ.q}
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {currentQ.opts.map((opt,i)=>{
+              let bg="white",border=`1px solid ${T.border}`,col=T.text,fw=400;
+              if(chosen!==null){
+                if(i===currentQ.a){bg=T.greenBg;border=`1.5px solid ${T.green}`;col=T.green;fw=700;}
+                else if(i===chosen&&chosen!==currentQ.a){bg=T.redBg;border=`1.5px solid ${T.red}`;col=T.red;}
+              }
+              return(
+                <button key={i} onClick={()=>handleAnswer(i)} disabled={chosen!==null}
+                  style={{background:bg,border,borderRadius:10,padding:"12px 16px",cursor:chosen===null?"pointer":"default",textAlign:"left",display:"flex",alignItems:"center",gap:10,direction:isAr?"rtl":"ltr",...sty,fontSize:14,color:col,fontWeight:fw,transition:"all 0.18s"}}
+                  onMouseOver={e=>{if(chosen===null)e.currentTarget.style.background=T.primaryLight;}}
+                  onMouseOut={e=>{if(chosen===null)e.currentTarget.style.background="white";}}>
+                  <span style={{background:chosen===null?T.bgGray:i===currentQ.a?T.greenBg:i===chosen?T.redBg:T.bgGray,color:chosen===null?T.textMid:i===currentQ.a?T.green:i===chosen?T.red:T.textMid,borderRadius:"50%",width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,flexShrink:0}}>
+                    {isAr?["أ","ب","ج","د"][i]:["A","B","C","D"][i]}
+                  </span>
+                  {opt}
+                  {chosen!==null&&i===currentQ.a&&<span style={{marginLeft:"auto",fontSize:16,marginRight:isAr?"auto":0}}>✓</span>}
+                  {chosen!==null&&i===chosen&&chosen!==currentQ.a&&<span style={{marginLeft:"auto",fontSize:16,marginRight:isAr?"auto":0}}>✗</span>}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
       </div>
     );
-  };
+  }
 
-  // ── INTRO ──
-  if(screen==="intro") return(
-    <div style={{maxWidth:680,margin:"0 auto",padding:"32px 20px 80px"}}>
-      <div style={{textAlign:"center",marginBottom:32}}>
-        <div style={{fontSize:56,marginBottom:12}}>📋</div>
-        <h1 style={{fontFamily:"Georgia,serif",fontSize:28,color:T.text,margin:"0 0 8px"}}>{uiLang==="ar"?"اختبار تحديد المستوى":"Placement Test"}</h1>
-        <p style={{...sty,fontSize:15,color:T.textMid,lineHeight:1.7,marginBottom:0}}>{uiLang==="ar"?"اكتشف مستواك في الإنجليزية وتقديرك في الآيلتس — مجاني بالكامل":"Discover your English level and estimated IELTS band — completely free"}</p>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:28}}>
-        {[
-          {icon:"📖",label:uiLang==="ar"?"القراءة":"Reading",time:uiLang==="ar"?"١٠ دقائق":"10 minutes",count:uiLang==="ar"?"١٢ سؤالاً":"12 questions",desc:uiLang==="ar"?"فقرة أكاديمية + أسئلة فهم":"Academic passage + comprehension questions"},
-          {icon:"📐",label:uiLang==="ar"?"القواعد والمفردات":"Grammar & Vocabulary",time:uiLang==="ar"?"١٠ دقائق":"10 minutes",count:uiLang==="ar"?"٢٠ سؤالاً":"20 questions",desc:uiLang==="ar"?"زمن، مفردات، هيكل الجملة":"Tenses, vocabulary, sentence structure"},
-        ].map((s,i)=>(
-          <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"16px"}}>
-            <div style={{fontSize:28,marginBottom:6}}>{s.icon}</div>
-            <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:2}}>{s.label}</div>
-            <div style={{...sty,fontSize:12,color:T.primary,fontWeight:600,marginBottom:4}}>{s.time} · {s.count}</div>
-            <div style={{...sty,fontSize:12,color:T.textMuted,lineHeight:1.4}}>{s.desc}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{background:T.bgSurface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px 16px",marginBottom:24,direction:uiLang==="ar"?"rtl":"ltr"}}>
-        <div style={{...sty,fontSize:13,color:T.textMid,lineHeight:1.7}}>{uiLang==="ar"?"✅ ستحصل على: مستواك في الإطار الأوروبي (A1–C2) · تقدير درجة الآيلتس · مراجعة إجاباتك الخاطئة · خطة تعلم مخصصة":"✅ You'll get: CEFR level (A1–C2) · Estimated IELTS band · Full answer review with corrections · Personalised learning plan"}</div>
-      </div>
-      <div style={{textAlign:"center"}}>
-        <button onClick={startReading} style={{background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px 40px",fontSize:16,fontWeight:700,cursor:"pointer",...sty,boxShadow:`0 4px 16px ${T.primary}44`}}>
-          {uiLang==="ar"?"ابدأ الاختبار ←":"Start Test →"}
-        </button>
-        <div style={{...sty,fontSize:12,color:T.textMuted,marginTop:8}}>{uiLang==="ar"?"مجاني · لا يتطلب تسجيلاً · ٢٠ دقيقة فقط":"Free · No sign-up required · 20 minutes"}</div>
-      </div>
-    </div>
-  );
-
-  // ── READING ──
-  if(screen==="reading") return(
-    <div style={{maxWidth:900,margin:"0 auto",padding:"24px 20px 80px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:8}}>
-        <div style={{...sty,fontWeight:700,fontSize:15,color:T.text}}>📖 {uiLang==="ar"?"القسم الأول: القراءة":"Section 1: Reading"}</div>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <div style={{...sty,fontSize:13,color:T.textMuted}}>{Object.keys(readingAnswers).length}/12 {uiLang==="ar"?"مجاب":"answered"}</div>
-          <div style={{...sty,fontWeight:700,fontSize:15,color:readingTime<120?T.red:readingTime<240?T.amber:T.text,fontVariantNumeric:"tabular-nums",minWidth:40}}>⏱ {fmt(readingTime)}</div>
-        </div>
-      </div>
-      <TimerBar time={readingTime}/>
-
-      {/* Mobile notice */}
-      <div className="placement-mobile-notice" style={{display:"none",background:"#fef3c7",border:"1px solid #f59e0b",borderRadius:10,padding:"12px 16px",marginTop:12,marginBottom:4}}>
-        <div style={{...sty,fontSize:13,color:"#92400e",fontWeight:600,textAlign:"center"}}>
-          💻 {uiLang==="ar"?"يُفضَّل أداء قسم القراءة على الحاسوب — الشاشة الأكبر تتيح لك رؤية النص والأسئلة بوضوح":"This section is best taken on a computer — the larger screen lets you read and answer questions more comfortably"}
-        </div>
-      </div>
-
-      {/* Desktop: side by side | Mobile: stacked */}
-      <div className="placement-reading-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:12}}>
-        <div style={{background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"20px",height:"70vh",overflowY:"auto"}} className="placement-passage">
-          <div style={{...sty,fontWeight:700,fontSize:13,color:T.primary,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.05em"}}>{PLACEMENT_READING_PASSAGE.title}</div>
-          {PLACEMENT_READING_PASSAGE.text.split("\n\n").map((p,i)=>(
-            <p key={i} style={{fontFamily:"Georgia,serif",fontSize:14,lineHeight:1.8,color:T.text,marginBottom:12}}>{p}</p>
-          ))}
-        </div>
-        <div style={{height:"70vh",overflowY:"auto",display:"flex",flexDirection:"column",gap:12}} className="placement-questions">
-          {PLACEMENT_READING_PASSAGE.questions.map((q,qi)=>(
-            <div key={qi} style={{background:"white",border:`1.5px solid ${readingAnswers[qi]!==undefined?T.primaryBorder:T.border}`,borderRadius:10,padding:"14px"}}>
-              <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,marginBottom:8,lineHeight:1.5}}>{qi+1}. {q.q}</div>
-              {q.options.map((opt,oi)=>(
-                <button key={oi} onClick={()=>setReadingAnswers(p=>({...p,[qi]:oi}))}
-                  style={{display:"block",width:"100%",textAlign:"left",background:readingAnswers[qi]===oi?T.primaryLight:"transparent",border:`1px solid ${readingAnswers[qi]===oi?T.primaryBorder:T.border}`,borderRadius:7,padding:"7px 10px",marginBottom:4,cursor:"pointer",...sty,fontSize:12,color:readingAnswers[qi]===oi?T.primary:T.textMid,fontWeight:readingAnswers[qi]===oi?600:400,transition:"all 0.15s"}}>
-                  {String.fromCharCode(65+oi)}. {opt}
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div style={{textAlign:"center",marginTop:16}}>
-        <button onClick={finishReading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
-          {uiLang==="ar"?"إنهاء القراءة · الانتقال للقسم الثاني →":"Finish Reading · Next Section →"}
-        </button>
-      </div>
-    </div>
-  );
-
-  // ── GRAMMAR ──
-  if(screen==="grammar") return(
-    <div style={{maxWidth:680,margin:"0 auto",padding:"24px 20px 80px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:8}}>
-        <div style={{...sty,fontWeight:700,fontSize:15,color:T.text}}>📐 {uiLang==="ar"?"القسم الثاني: القواعد والمفردات":"Section 2: Grammar & Vocabulary"}</div>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <div style={{...sty,fontSize:13,color:T.textMuted}}>{Object.keys(grammarAnswers).length}/20 {uiLang==="ar"?"مجاب":"answered"}</div>
-          <div style={{...sty,fontWeight:700,fontSize:15,color:grammarTime<120?T.red:grammarTime<240?T.amber:T.text,fontVariantNumeric:"tabular-nums",minWidth:40}}>⏱ {fmt(grammarTime)}</div>
-        </div>
-      </div>
-      <TimerBar time={grammarTime}/>
-      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:16}}>
-        {PLACEMENT_GRAMMAR_VOCAB.map((q,qi)=>(
-          <div key={qi} style={{background:"white",border:`1.5px solid ${grammarAnswers[qi]!==undefined?T.primaryBorder:T.border}`,borderRadius:10,padding:"14px"}}>
-            <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,marginBottom:8,lineHeight:1.5}}>{qi+1}. {q.q}</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-              {q.options.map((opt,oi)=>(
-                <button key={oi} onClick={()=>setGrammarAnswers(p=>({...p,[qi]:oi}))}
-                  style={{textAlign:"left",background:grammarAnswers[qi]===oi?T.primaryLight:"transparent",border:`1px solid ${grammarAnswers[qi]===oi?T.primaryBorder:T.border}`,borderRadius:7,padding:"7px 10px",cursor:"pointer",...sty,fontSize:12,color:grammarAnswers[qi]===oi?T.primary:T.textMid,fontWeight:grammarAnswers[qi]===oi?600:400,transition:"all 0.15s"}}>
-                  {String.fromCharCode(65+oi)}. {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div style={{textAlign:"center",marginTop:20}}>
-        <button onClick={finishGrammar} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"12px 32px",fontSize:14,fontWeight:700,cursor:"pointer",...sty}}>
-          {uiLang==="ar"?"أنهِ الاختبار واعرض نتيجتك →":"Finish & See Results →"}
-        </button>
-      </div>
-    </div>
-  );
-
-  // ── RESULTS ──
-  if(screen==="results"&&results) {
-    const {rScore,gScore,total,pct,level,readingAnswers:rAns,grammarAnswers:gAns} = results;
-    const nextSteps = {
-      A1:[{icon:"📝",text:uiLang==="ar"?"ابدأ بمفردات الآيلتس الأساسية":"Start with IELTS core vocabulary",view:"vocabulary"},{icon:"🎮",text:uiLang==="ar"?"العب لعبة الإملاء والقواعد يومياً":"Play spelling & grammar games daily",view:"game"},{icon:"📐",text:uiLang==="ar"?"مارس تمارين القواعد":"Practice grammar exercises",view:"exercises"}],
-      A2:[{icon:"📝",text:uiLang==="ar"?"ادرس مفردات الآيلتس الأساسية":"Study IELTS vocabulary list",view:"vocabulary"},{icon:"🎮",text:uiLang==="ar"?"العب ألعاب المفردات والكتابة":"Play vocabulary & writing games",view:"game"},{icon:"✍️",text:uiLang==="ar"?"جرّب تحليل مقالة مجانية":"Try a free essay analysis",view:"analyze"}],
-      B1:[{icon:"📖",text:uiLang==="ar"?"ابدأ اختبارات القراءة":"Start reading tests",view:"reading"},{icon:"✍️",text:uiLang==="ar"?"حلّل مقالتك الأولى":"Analyse your first essay",view:"analyze"},{icon:"📚",text:uiLang==="ar"?"راجع أدوات الآيلتس":"Review IELTS toolkit",view:"toolkit"}],
-      B2:[{icon:"✍️",text:uiLang==="ar"?"ركّز على تحليل المقالات":"Focus on essay analysis",view:"analyze"},{icon:"📖",text:uiLang==="ar"?"أكمل جميع اختبارات القراءة":"Complete all reading tests",view:"reading"},{icon:"🏋️",text:uiLang==="ar"?"مارس تمارين الباراغراف":"Practice paraphrasing exercises",view:"exercises"}],
-      C1:[{icon:"✍️",text:uiLang==="ar"?"ارفع درجتك من ٦.٥ إلى ٧+":"Push from 6.5 to Band 7+",view:"analyze"},{icon:"🗣️",text:uiLang==="ar"?"درّب مهارة المحادثة":"Practise speaking skills",view:"speaking"},{icon:"🏋️",text:uiLang==="ar"?"تمارين متقدمة وتصحيح الأخطاء":"Advanced exercises & error correction",view:"exercises"}],
-      C2:[{icon:"✍️",text:uiLang==="ar"?"اتقن أسلوب Band 8-9":"Master Band 8-9 writing style",view:"analyze"},{icon:"🗣️",text:uiLang==="ar"?"راجع نماذج Band 8 للمحادثة":"Review Band 8 speaking models",view:"speaking"},{icon:"📖",text:uiLang==="ar"?"ابقَ حاداً مع اختبارات القراءة":"Stay sharp with reading tests",view:"reading"}],
-    };
-    const steps = nextSteps[level.cefr]||nextSteps.B1;
-    const dateStr = results.date ? new Date(results.date).toLocaleDateString(uiLang==="ar"?"ar-JO":"en-GB",{day:"numeric",month:"short",year:"numeric"}) : "";
-
+  // ── RESULTS SCREEN ──
+  if(screen==="results"&&results){
+    const info=results.levelInfo||PLACEMENT_CEFR_LABELS[results.resultLevel]||PLACEMENT_CEFR_LABELS["b1"];
+    const steps=[
+      {icon:"📖",text:isAr?"درس الإنجليزية مع ليندا":"English Lessons with Linda",view:"teacher"},
+      {icon:"🗺️",text:isAr?"خطة الدراسة المخصصة":"Your personalised study plan",view:"studyplan"},
+      {icon:"🎮",text:isAr?"ألعاب الآيلتس":"IELTS Games",view:"game"},
+      {icon:"✍️",text:isAr?"تحليل المقالة":"Essay Analysis",view:"analyze"},
+    ];
     return(
-      <div style={{maxWidth:720,margin:"0 auto",padding:"32px 20px 80px"}}>
-
-        {/* Saved badge */}
-        {results.date&&(
-          <div style={{...sty,fontSize:12,color:T.textMuted,textAlign:"center",marginBottom:12}}>
-            {uiLang==="ar"?`✅ نتيجة محفوظة · أجريت في ${dateStr}`:`✅ Saved result · Taken on ${dateStr}`}
+      <div style={{...sty}}>
+        <Card style={{marginBottom:20,textAlign:"center",background:info.bg,border:`1px solid ${info.color}30`}}>
+          <div style={{fontSize:40,marginBottom:8}}>🎓</div>
+          <div style={{...sty,fontSize:13,color:T.textMuted,marginBottom:4}}>{isAr?"مستواك الحالي:":"Your current level:"}</div>
+          <div style={{fontFamily:"Georgia,serif",fontSize:48,fontWeight:900,color:info.color,marginBottom:4,lineHeight:1}}>{info.cefr}</div>
+          <div style={{...sty,fontSize:18,fontWeight:700,color:T.text,marginBottom:12}}>{info.label}</div>
+          <div style={{background:"white",borderRadius:10,padding:"10px 20px",display:"inline-block",marginBottom:16,boxShadow:T.shadow}}>
+            <span style={{...sty,fontSize:13,color:T.textMuted}}>{isAr?"تقدير درجة الآيلتس:":"Estimated IELTS band:"}</span>
+            <span style={{...sty,fontSize:18,fontWeight:800,color:info.color,marginLeft:8}}>{info.ielts}</span>
           </div>
-        )}
-
-        {/* Level badge */}
-        <div style={{textAlign:"center",marginBottom:24}}>
-          <div style={{display:"inline-flex",flexDirection:"column",alignItems:"center",background:level.bg,border:`2px solid ${level.color}`,borderRadius:20,padding:"20px 40px",marginBottom:12}}>
-            <div style={{fontFamily:"Georgia,serif",fontSize:60,fontWeight:900,color:level.color,lineHeight:1}}>{level.cefr}</div>
-            <div style={{...sty,fontSize:16,fontWeight:700,color:level.color,marginTop:4}}>{level.label}</div>
-          </div>
-          <div style={{...sty,fontSize:15,color:T.text,fontWeight:600,marginBottom:4}}>
-            {uiLang==="ar"?"تقدير درجة الآيلتس:":"Estimated IELTS Band:"} <span style={{color:T.primary}}>{level.ielts}</span>
-          </div>
-          <div style={{...sty,fontSize:13,color:T.textMuted}}>{uiLang==="ar"?"نتيجتك:":"Your score:"} {total}/32 ({pct}%)</div>
-        </div>
-
-        {/* Score breakdown */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
-          {[
-            {icon:"📖",label:uiLang==="ar"?"القراءة":"Reading",score:rScore,max:12},
-            {icon:"📐",label:uiLang==="ar"?"القواعد والمفردات":"Grammar & Vocab",score:gScore,max:20},
-          ].map((s,i)=>(
-            <div key={i} style={{background:"white",border:`1px solid ${T.border}`,borderRadius:10,padding:"14px",textAlign:"center"}}>
-              <div style={{fontSize:24,marginBottom:4}}>{s.icon}</div>
-              <div style={{...sty,fontSize:12,color:T.textMuted,marginBottom:4}}>{s.label}</div>
-              <div style={{fontFamily:"Georgia,serif",fontSize:28,fontWeight:700,color:T.primary}}>{s.score}<span style={{fontSize:14,color:T.textMuted}}>/{s.max}</span></div>
-              <div style={{background:T.bgGray,borderRadius:4,height:6,marginTop:8,overflow:"hidden"}}>
-                <div style={{width:`${(s.score/s.max)*100}%`,height:"100%",background:T.primary,transition:"width 1s"}}/>
-              </div>
+          <p style={{...sty,fontSize:14,color:T.textMid,lineHeight:1.7,margin:0,direction:isAr?"rtl":"ltr"}}>{info.advice}</p>
+        </Card>
+        {results.levelScores&&(
+          <Card style={{marginBottom:20}}>
+            <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:14,direction:isAr?"rtl":"ltr"}}>{isAr?"أداؤك حسب المستوى:":"Performance by level:"}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {PLACEMENT_LEVELS.map(l=>{
+                const s=results.levelScores[l];
+                if(!s||s.total===0)return null;
+                const pct=Math.round((s.correct/s.total)*100);
+                const li=PLACEMENT_CEFR_LABELS[l];
+                return(
+                  <div key={l} style={{display:"flex",alignItems:"center",gap:10}}>
+                    <span style={{...sty,fontSize:11,fontWeight:700,color:li.color,background:li.bg,borderRadius:6,padding:"2px 8px",minWidth:36,textAlign:"center"}}>{li.cefr}</span>
+                    <div style={{flex:1,height:8,background:T.bgGray,borderRadius:10,overflow:"hidden"}}>
+                      <div style={{height:"100%",width:`${pct}%`,background:pct>=50?li.color:T.red,borderRadius:10,transition:"width 0.5s"}}/>
+                    </div>
+                    <span style={{...sty,fontSize:12,color:T.textMuted,minWidth:40,textAlign:"right"}}>{s.correct}/{s.total}</span>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-
-        {/* Advice */}
-        <div style={{background:level.bg,border:`1px solid ${level.color}40`,borderRadius:10,padding:"14px 16px",marginBottom:20,direction:uiLang==="ar"?"rtl":"ltr"}}>
-          <div style={{...sty,fontSize:13,color:T.text,lineHeight:1.7}}>💡 {level.advice}</div>
-        </div>
-
-        {/* Answer review toggle buttons */}
-        <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap"}}>
-          <button onClick={()=>setReviewSection(reviewSection==="reading"?null:"reading")}
-            style={{...sty,fontSize:13,fontWeight:600,padding:"9px 18px",borderRadius:8,cursor:"pointer",background:reviewSection==="reading"?T.primaryLight:"white",border:`1.5px solid ${reviewSection==="reading"?T.primary:T.border}`,color:reviewSection==="reading"?T.primary:T.textMid,transition:"all 0.2s"}}>
-            📖 {uiLang==="ar"?"مراجعة القراءة":"Review Reading"} ({rScore}/12)
-          </button>
-          <button onClick={()=>setReviewSection(reviewSection==="grammar"?null:"grammar")}
-            style={{...sty,fontSize:13,fontWeight:600,padding:"9px 18px",borderRadius:8,cursor:"pointer",background:reviewSection==="grammar"?T.primaryLight:"white",border:`1.5px solid ${reviewSection==="grammar"?T.primary:T.border}`,color:reviewSection==="grammar"?T.primary:T.textMid,transition:"all 0.2s"}}>
-            📐 {uiLang==="ar"?"مراجعة القواعد":"Review Grammar"} ({gScore}/20)
-          </button>
-        </div>
-
-        {/* Answer review: Reading */}
-        {reviewSection==="reading"&&(
-          <div style={{marginBottom:20,display:"flex",flexDirection:"column",gap:10}}>
-            {PLACEMENT_READING_PASSAGE.questions.map((q,qi)=>{
-              const userAns=rAns?.[qi];
-              const correct=userAns===q.a;
-              return(
-                <div key={qi} style={{background:"white",border:`1.5px solid ${correct?"#86efac":"#fca5a5"}`,borderRadius:10,padding:"14px",borderLeft:`4px solid ${correct?T.green:T.red}`}}>
-                  <div style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:8}}>
-                    <span style={{fontSize:16,flexShrink:0}}>{correct?"✅":"❌"}</span>
-                    <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,lineHeight:1.5}}>{qi+1}. {q.q}</div>
-                  </div>
-                  <div style={{display:"flex",flexDirection:"column",gap:4}}>
-                    {q.options.map((opt,oi)=>{
-                      const isCorrect=oi===q.a;
-                      const isUser=oi===userAns;
-                      let bg="transparent",border=T.border,color=T.textMid;
-                      if(isCorrect){bg="#d1fae5";border="#86efac";color="#065f46";}
-                      else if(isUser&&!isCorrect){bg="#fee2e2";border="#fca5a5";color="#991b1b";}
-                      return(
-                        <div key={oi} style={{...sty,fontSize:12,padding:"6px 10px",borderRadius:6,background:bg,border:`1px solid ${border}`,color,fontWeight:isCorrect||isUser?600:400}}>
-                          {String.fromCharCode(65+oi)}. {opt}
-                          {isCorrect&&<span style={{marginLeft:8,fontSize:11}}>✓ {uiLang==="ar"?"الإجابة الصحيحة":"Correct answer"}</span>}
-                          {isUser&&!isCorrect&&<span style={{marginLeft:8,fontSize:11}}>← {uiLang==="ar"?"إجابتك":"Your answer"}</span>}
-                        </div>
-                      );
-                    })}
-                    {userAns===undefined&&<div style={{...sty,fontSize:12,color:T.textMuted,fontStyle:"italic"}}>{uiLang==="ar"?"لم تجب على هذا السؤال":"Not answered"}</div>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          </Card>
         )}
-
-        {/* Answer review: Grammar */}
-        {reviewSection==="grammar"&&(
-          <div style={{marginBottom:20,display:"flex",flexDirection:"column",gap:10}}>
-            {PLACEMENT_GRAMMAR_VOCAB.map((q,qi)=>{
-              const userAns=gAns?.[qi];
-              const correct=userAns===q.a;
-              return(
-                <div key={qi} style={{background:"white",border:`1.5px solid ${correct?"#86efac":"#fca5a5"}`,borderRadius:10,padding:"14px",borderLeft:`4px solid ${correct?T.green:T.red}`}}>
-                  <div style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:8}}>
-                    <span style={{fontSize:16,flexShrink:0}}>{correct?"✅":"❌"}</span>
-                    <div style={{...sty,fontSize:13,fontWeight:600,color:T.text,lineHeight:1.5}}>{qi+1}. {q.q}</div>
-                  </div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-                    {q.options.map((opt,oi)=>{
-                      const isCorrect=oi===q.a;
-                      const isUser=oi===userAns;
-                      let bg="transparent",border=T.border,color=T.textMid;
-                      if(isCorrect){bg="#d1fae5";border="#86efac";color="#065f46";}
-                      else if(isUser&&!isCorrect){bg="#fee2e2";border="#fca5a5";color="#991b1b";}
-                      return(
-                        <div key={oi} style={{...sty,fontSize:12,padding:"6px 10px",borderRadius:6,background:bg,border:`1px solid ${border}`,color,fontWeight:isCorrect||isUser?600:400,lineHeight:1.4}}>
-                          {String.fromCharCode(65+oi)}. {opt}
-                          {isCorrect&&<div style={{fontSize:10,marginTop:2}}>✓ {uiLang==="ar"?"صحيح":"Correct"}</div>}
-                          {isUser&&!isCorrect&&<div style={{fontSize:10,marginTop:2,color:"#991b1b"}}>← {uiLang==="ar"?"إجابتك":"Yours"}</div>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {userAns===undefined&&<div style={{...sty,fontSize:12,color:T.textMuted,fontStyle:"italic",marginTop:4}}>{uiLang==="ar"?"لم تجب":"Not answered"}</div>}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Next steps */}
         <div style={{marginBottom:20}}>
-          <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:10,direction:uiLang==="ar"?"rtl":"ltr"}}>
-            {uiLang==="ar"?"🗺️ خطواتك القادمة في Englishfool:":"🗺️ Your next steps on Englishfool:"}
-          </div>
+          <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:10,direction:isAr?"rtl":"ltr"}}>{isAr?"🗺️ خطواتك القادمة على Englishfool:":"🗺️ Your next steps on Englishfool:"}</div>
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {steps.map((s,i)=>(
               <button key={i} onClick={()=>onNavigate&&onNavigate(s.view)}
-                style={{display:"flex",alignItems:"center",gap:12,background:"white",border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",textAlign:"left",transition:"all 0.2s",direction:uiLang==="ar"?"rtl":"ltr"}}
+                style={{display:"flex",alignItems:"center",gap:12,background:"white",border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 16px",cursor:"pointer",textAlign:"left",transition:"all 0.2s",direction:isAr?"rtl":"ltr",...sty}}
                 onMouseOver={e=>{e.currentTarget.style.borderColor=T.primary;e.currentTarget.style.background=T.primaryLight;}}
                 onMouseOut={e=>{e.currentTarget.style.borderColor=T.border;e.currentTarget.style.background="white";}}>
                 <span style={{fontSize:20}}>{s.icon}</span>
-                <span style={{...sty,fontSize:13,color:T.text,fontWeight:500,flex:1}}>{s.text}</span>
+                <span style={{fontSize:13,color:T.text,fontWeight:500,flex:1}}>{s.text}</span>
                 <span style={{color:T.primary,fontSize:14}}>→</span>
               </button>
             ))}
           </div>
-          <div style={{...sty,fontSize:12,color:T.textMuted,marginTop:8,direction:uiLang==="ar"?"rtl":"ltr"}}>
-            💾 {uiLang==="ar"?"نتيجتك محفوظة — ستجدها هنا في كل مرة تعود فيها":"Your result is saved — it will be here every time you return"}
+          <div style={{...sty,fontSize:12,color:T.textMuted,marginTop:8,direction:isAr?"rtl":"ltr"}}>
+            💾 {isAr?"نتيجتك محفوظة — ستجدها هنا في كل مرة تعود فيها":"Your result is saved — it will be here every time you return"}
           </div>
         </div>
-
-        {/* Retake */}
         <div style={{textAlign:"center"}}>
           {isPro?(
             <button onClick={retake} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 24px",fontSize:13,...sty,color:T.textMid,cursor:"pointer"}}>
-              {uiLang==="ar"?"🔄 أعد الاختبار (سيمسح نتيجتك الحالية)":"🔄 Retake Test (clears your saved result)"}
+              {isAr?"🔄 أعد الاختبار (سيمسح نتيجتك الحالية)":"🔄 Retake Test (clears your saved result)"}
             </button>
           ):(
             <div style={{background:T.amberBg,border:`1px solid ${T.amberBorder}`,borderRadius:10,padding:"14px 20px",display:"inline-block"}}>
-              <div style={{fontSize:13,color:T.amber,fontWeight:700,...sty,marginBottom:4}}>
-                {uiLang==="ar"?"🔒 إعادة الاختبار متاحة لمشتركي Pro":"🔒 Retaking the test is a Pro feature"}
-              </div>
-              <div style={{fontSize:12,color:T.textMuted,...sty}}>
-                {uiLang==="ar"?"اشترك في Pro لإعادة الاختبار وتتبع تحسّنك عبر الزمن":"Subscribe to Pro to retake and track your improvement over time"}
-              </div>
+              <div style={{fontSize:13,color:T.amber,fontWeight:700,...sty,marginBottom:4}}>{isAr?"🔒 إعادة الاختبار متاحة لمشتركي Pro":"🔒 Retaking the test is a Pro feature"}</div>
+              <div style={{fontSize:12,color:T.textMuted,...sty}}>{isAr?"اشترك في Pro لإعادة الاختبار وتتبع تحسّنك عبر الزمن":"Subscribe to Pro to retake and track your improvement over time"}</div>
             </div>
           )}
         </div>
@@ -8634,6 +8622,7 @@ const PlacementTest = ({uiLang="ar", onNavigate, isPro=false, session=null}) => 
   }
   return null;
 };
+
 // ── END PLACEMENT TEST ───────────────────────────────────────────
 // ── FREE CONSULTATION MODAL ──────────────────────
 const FB_PAGE_URL = "https://www.facebook.com/profile.php?id=61579432547860";
@@ -11370,6 +11359,250 @@ const HomeDemoSection=({uiLang="en",switchView})=>{
   );
 };
 
+
+// ── ONBOARDING FUNNEL ──────────────────────────────────────────────────────────
+// 3-step experience: who you are → quiz → personalised study plan nudge
+// Only shown to brand-new visitors (no ef_funnel_done in localStorage)
+const OnboardingFunnel = ({uiLang="en", onComplete, switchView}) => {
+  const [step, setStep] = useState(1); // 1 | 2 | 3
+  const [answers, setAnswers] = useState({goal:null,targetBand:null,currentLevel:null,deadline:null});
+  const [regMode, setRegMode] = useState("register"); // register | login
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regName, setRegName] = useState("");
+  const [regError, setRegError] = useState("");
+  const [regLoading, setRegLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const isAr = uiLang === "ar";
+  const dir = isAr ? "rtl" : "ltr";
+  const sty = {fontFamily:"'Cairo','Source Sans Pro',system-ui"};
+
+  const completeAndGoToPlan = () => {
+    try { localStorage.setItem("ef_funnel_done","1"); } catch {}
+    onComplete(answers);
+    switchView("studyplan");
+  };
+  const completeAndGoHome = () => {
+    try { localStorage.setItem("ef_funnel_done","1"); } catch {}
+    onComplete(answers);
+  };
+
+  const handleAuth = async () => {
+    setRegError(""); setRegLoading(true);
+    try {
+      if(regMode==="login") {
+        if(!regEmail.trim()||!regPassword.trim()){setRegError(isAr?"أدخل البريد وكلمة المرور":"Enter email and password");setRegLoading(false);return;}
+        const {error} = await supabase.auth.signInWithPassword({email:regEmail.trim(),password:regPassword});
+        if(error){setRegError(error.message);setRegLoading(false);return;}
+      } else {
+        if(!regName.trim()){setRegError(isAr?"أدخل اسمك":"Enter your name");setRegLoading(false);return;}
+        if(!regEmail.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regEmail.trim())){setRegError(isAr?"بريد إلكتروني غير صحيح":"Invalid email");setRegLoading(false);return;}
+        if(regPassword.length<6){setRegError(isAr?"كلمة المرور 6 أحرف على الأقل":"Password min 6 characters");setRegLoading(false);return;}
+        const {error} = await supabase.auth.signUp({email:regEmail.trim(),password:regPassword,options:{data:{name:regName.trim()}}});
+        if(error){setRegError(error.message);setRegLoading(false);return;}
+      }
+      setRegLoading(false);
+      setStep(2);
+    } catch(e) {setRegError(isAr?"حدث خطأ، حاول مجدداً":"Something went wrong");setRegLoading(false);}
+  };
+
+  const inp = {width:"100%",background:"#f9fafb",border:`1px solid ${T.border}`,borderRadius:8,color:T.text,fontSize:14,padding:"11px 14px",...sty,outline:"none",boxSizing:"border-box"};
+
+  // ── STEP 1 — Welcome + Sign up ──
+  if(step===1) return (
+    <div style={{minHeight:"100vh",background:"linear-gradient(160deg,#fff 0%,#fef2f2 100%)",display:"flex",flexDirection:"column"}}>
+      {/* Hero */}
+      <div style={{background:`linear-gradient(135deg,${T.primary} 0%,#7f1d1d 100%)`,padding:"48px 24px 40px",textAlign:"center",direction:dir}}>
+        <div style={{marginBottom:14}}>
+          <Logo size={34}/>
+        </div>
+        <h1 style={{fontFamily:"Georgia,serif",fontSize:"clamp(22px,4vw,34px)",color:"white",margin:"0 0 14px",lineHeight:1.3,fontWeight:700}}>
+          {isAr
+            ?"منصتك الكاملة للتحضير للآيلتس 🎓"
+            :"Your complete IELTS preparation platform 🎓"}
+        </h1>
+        <p style={{...sty,fontSize:"clamp(13px,2vw,16px)",color:"rgba(255,255,255,0.85)",margin:"0 auto 20px",maxWidth:560,lineHeight:1.8}}>
+          {isAr
+            ?"ذكاء اصطناعي يحلل مقالاتك · يصحح محادثتك · يضع لك خطة دراسية · كل هذا في مكان واحد"
+            :"AI essay scoring · live speaking corrections · personalised study plan · all in one place"}
+        </p>
+        <div style={{display:"flex",justifyContent:"center",gap:20,flexWrap:"wrap"}}>
+          {(isAr?[["📊","تحليل فوري للمقالة"],["🎤","محادثة مع سارة"],["📋","اختبار تحديد المستوى"],["🗺️","خطة دراسية مخصصة"]]:[["📊","Instant essay scoring"],["🎤","Speaking with Sarah"],["📋","Level placement test"],["🗺️","Personalised plan"]]).map(([ic,lb],i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.12)",borderRadius:20,padding:"6px 14px",border:"1px solid rgba(255,255,255,0.2)"}}>
+              <span style={{fontSize:16}}>{ic}</span>
+              <span style={{...sty,fontSize:12,color:"rgba(255,255,255,0.9)",fontWeight:600}}>{lb}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Sign-up card */}
+      <div style={{flex:1,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"32px 20px 60px"}}>
+        <div style={{background:"white",borderRadius:20,padding:"32px 28px",maxWidth:420,width:"100%",boxShadow:"0 8px 40px rgba(0,0,0,0.1)",border:`1px solid ${T.border}`}}>
+          <div style={{textAlign:"center",marginBottom:20}}>
+            <div style={{fontSize:30,marginBottom:8}}>{regMode==="register"?"🚀":"👋"}</div>
+            <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 4px"}}>
+              {regMode==="register"
+                ?(isAr?"أنشئ حسابك المجاني":"Create your free account")
+                :(isAr?"أهلاً بعودتك":"Welcome back")}
+            </h2>
+            <p style={{...sty,fontSize:13,color:T.textMuted,margin:0}}>
+              {isAr?"خطوتان فقط قبل خطتك الدراسية":"Just 2 steps before your study plan"}
+            </p>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {regMode==="register"&&<input value={regName} onChange={e=>setRegName(e.target.value)} placeholder={isAr?"اسمك الكامل":"Full name"} style={inp} autoComplete="name"/>}
+            <input value={regEmail} onChange={e=>setRegEmail(e.target.value)} placeholder={isAr?"بريدك الإلكتروني":"Email address"} type="email" style={inp} autoComplete="email"/>
+            <div style={{position:"relative"}}>
+              <input value={regPassword} onChange={e=>setRegPassword(e.target.value)} placeholder={isAr?"كلمة المرور (6 أحرف+)":"Password (6+ characters)"} type={showPass?"text":"password"} style={{...inp,paddingRight:44}} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/>
+              <button type="button" onClick={()=>setShowPass(!showPass)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:15,color:T.textMuted,padding:4}}>{showPass?"🙈":"👁️"}</button>
+            </div>
+            {regError&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"9px 12px",fontSize:12,color:T.red,...sty}}>{regError}</div>}
+            <button onClick={handleAuth} disabled={regLoading} style={{background:T.primary,color:"white",border:"none",borderRadius:8,padding:"13px",fontSize:15,fontWeight:700,cursor:regLoading?"not-allowed":"pointer",...sty,opacity:regLoading?0.7:1}}>
+              {regLoading?"⏳...":(regMode==="register"?(isAr?"أنشئ حسابي وتابع ←":"Create Account & Continue →"):(isAr?"دخول وتابع ←":"Sign In & Continue →"))}
+            </button>
+            <button onClick={()=>{setRegError(""); setStep(2);}} style={{background:"transparent",border:`1px solid ${T.border}`,borderRadius:8,padding:"11px",fontSize:13,color:T.textMuted,cursor:"pointer",...sty}}>
+              {isAr?"تخطّ — جرّب بدون حساب":"Skip — explore without account"}
+            </button>
+          </div>
+          <div style={{textAlign:"center",marginTop:12,...sty,fontSize:12,color:T.textMuted}}>
+            {regMode==="register"
+              ?<span>{isAr?"لديك حساب؟ ":"Already have an account? "}<button onClick={()=>{setRegMode("login");setRegError("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:12,...sty}}>{isAr?"سجّل دخولك":"Sign in"}</button></span>
+              :<span>{isAr?"حساب جديد؟ ":"New here? "}<button onClick={()=>{setRegMode("register");setRegError("");}} style={{background:"none",border:"none",color:T.primary,cursor:"pointer",fontWeight:700,fontSize:12,...sty}}>{isAr?"أنشئ حساباً":"Sign up free"}</button></span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── STEP 2 — Quiz: goal, level, target band, deadline ──
+  if(step===2) {
+    const QUESTIONS_AR = [
+      {key:"goal",label:"ما هدفك الرئيسي؟",opts:["أريد تحسين إنجليزيتي العامة","أريد الحصول على درجة الآيلتس","أريد الهجرة أو الدراسة في الخارج","أريد العمل في بيئة إنجليزية"]},
+      {key:"currentLevel",label:"كيف تصف مستواك الحالي في الإنجليزية؟",opts:["مبتدئ — لا أتكلم إنجليزي تقريباً","أساسي — أفهم الجمل البسيطة","متوسط — أتواصل لكن بصعوبة","جيد — لكن أحتاج تحسين"]},
+      {key:"targetBand",label:"ما هي درجة الآيلتس التي تستهدفها؟",opts:["لا أحتاج آيلتس — أريد الإنجليزية فقط","5.0 – 5.5","6.0 – 6.5","7.0 فأكثر"]},
+      {key:"deadline",label:"متى يجب أن تجتاز الاختبار؟",opts:["لدي شهر أو أقل","لدي 3 أشهر","لدي 6 أشهر فأكثر","لم أحدد موعداً بعد"]},
+    ];
+    const QUESTIONS_EN = [
+      {key:"goal",label:"What is your main goal?",opts:["Improve my general English","Get an IELTS score","Immigrate or study abroad","Work in an English-speaking environment"]},
+      {key:"currentLevel",label:"How would you describe your current English level?",opts:["Beginner — I barely speak English","Basic — I understand simple sentences","Intermediate — I communicate but struggle","Good — but I need to improve"]},
+      {key:"targetBand",label:"What IELTS band score are you targeting?",opts:["I don't need IELTS — just English","5.0 – 5.5","6.0 – 6.5","7.0 or above"]},
+      {key:"deadline",label:"When do you need to sit the exam?",opts:["I have a month or less","I have 3 months","I have 6 months or more","I haven't set a date yet"]},
+    ];
+    const qs = isAr ? QUESTIONS_AR : QUESTIONS_EN;
+    const answered = qs.filter(q=>answers[q.key]!==null).length;
+    const allAnswered = answered===qs.length;
+    return(
+      <div style={{minHeight:"100vh",background:"#f8fafc",direction:dir}}>
+        <div style={{background:T.primary,padding:"18px 24px",textAlign:"center"}}>
+          <Logo size={24} style={{marginBottom:4}}/>
+          <div style={{...sty,fontSize:13,color:"rgba(255,255,255,0.8)",marginTop:4}}>
+            {isAr?"خطوة ٢ من ٣ — أخبرنا عن نفسك":"Step 2 of 3 — Tell us about yourself"}
+          </div>
+          <div style={{display:"flex",justifyContent:"center",gap:6,marginTop:10}}>
+            {[1,2,3].map(n=><div key={n} style={{width:32,height:4,borderRadius:10,background:n<=2?"white":"rgba(255,255,255,0.3)"}}/>)}
+          </div>
+        </div>
+        <div style={{maxWidth:560,margin:"0 auto",padding:"28px 20px 60px"}}>
+          {qs.map((q,qi)=>(
+            <div key={q.key} style={{background:"white",borderRadius:14,padding:"20px",marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.06)",border:`1px solid ${T.border}`}}>
+              <div style={{...sty,fontWeight:700,fontSize:14,color:T.text,marginBottom:14,lineHeight:1.5}}>{qi+1}. {q.label}</div>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {q.opts.map((opt,oi)=>{
+                  const sel=answers[q.key]===oi;
+                  return(
+                    <button key={oi} onClick={()=>setAnswers(prev=>({...prev,[q.key]:oi}))}
+                      style={{background:sel?T.primaryLight:"#f8fafc",border:sel?`1.5px solid ${T.primary}`:`1px solid ${T.border}`,borderRadius:10,padding:"11px 16px",textAlign:"left",cursor:"pointer",...sty,fontSize:13,color:sel?T.primary:T.text,fontWeight:sel?700:400,display:"flex",alignItems:"center",gap:10,transition:"all 0.15s",direction:dir}}>
+                      <span style={{width:20,height:20,borderRadius:"50%",border:sel?`2px solid ${T.primary}`:`2px solid ${T.border}`,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:sel?T.primary:"white"}}>
+                        {sel&&<span style={{width:8,height:8,borderRadius:"50%",background:"white",display:"block"}}/>}
+                      </span>
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          <button onClick={()=>allAnswered&&setStep(3)} disabled={!allAnswered}
+            style={{width:"100%",background:allAnswered?T.primary:"#e5e7eb",color:allAnswered?"white":T.textLight,border:"none",borderRadius:10,padding:"14px",fontSize:15,fontWeight:700,cursor:allAnswered?"pointer":"not-allowed",...sty,transition:"all 0.2s"}}>
+            {isAr?"رؤية خطتي الدراسية ←":"See my study plan →"}
+          </button>
+          {!allAnswered&&<div style={{...sty,fontSize:12,color:T.textMuted,textAlign:"center",marginTop:8}}>{isAr?"أجب على جميع الأسئلة للمتابعة":"Answer all questions to continue"}</div>}
+        </div>
+      </div>
+    );
+  }
+
+  // ── STEP 3 — Personalised plan summary ──
+  if(step===3) {
+    const needsIELTS = answers.goal===1||answers.goal===2;
+    const isUrgent = answers.deadline===0;
+    const isHighBand = answers.targetBand===3;
+    const isLow = answers.currentLevel<=1;
+
+    const prioritySteps = [];
+    if(isLow){ prioritySteps.push({icon:"👩‍🏫",title:isAr?"ابدأ مع ليندا — دروس A1":"Start with Linda — A1 lessons",view:"teacher",urgency:"high"}); }
+    prioritySteps.push({icon:"📋",title:isAr?"اختبار تحديد المستوى":"Placement Test",view:"placement",urgency:"high"});
+    if(needsIELTS){ prioritySteps.push({icon:"✍️",title:isAr?"محلل المقالة — تحليلان مجانيان":"Essay Analyzer — 2 free analyses",view:"analyze",urgency:isHighBand?"high":"medium"}); }
+    prioritySteps.push({icon:"🎤",title:isAr?"تدرّب على المحادثة مع سارة":"Speaking practice with Sarah",view:"speaking",urgency:"medium"});
+    prioritySteps.push({icon:"🎮",title:isAr?"ألعاب المفردات — مجانية":"Vocabulary Games — free",view:"game",urgency:"low"});
+
+    const urgencyColor = u=>u==="high"?T.red:u==="medium"?T.amber:T.green;
+    const urgencyLabel = u=>isAr?(u==="high"?"أولوية قصوى":u==="medium"?"مهم":"تدريب يومي"):(u==="high"?"Top priority":u==="medium"?"Important":"Daily practice");
+
+    return(
+      <div style={{minHeight:"100vh",background:"#f8fafc",direction:dir}}>
+        <div style={{background:T.primary,padding:"18px 24px",textAlign:"center"}}>
+          <Logo size={24} style={{marginBottom:4}}/>
+          <div style={{...sty,fontSize:13,color:"rgba(255,255,255,0.8)",marginTop:4}}>
+            {isAr?"خطوة ٣ من ٣ — خطتك الدراسية":"Step 3 of 3 — Your study plan"}
+          </div>
+          <div style={{display:"flex",justifyContent:"center",gap:6,marginTop:10}}>
+            {[1,2,3].map(n=><div key={n} style={{width:32,height:4,borderRadius:10,background:"white"}}/>)}
+          </div>
+        </div>
+        <div style={{maxWidth:560,margin:"0 auto",padding:"28px 20px 60px"}}>
+          {/* Personalised headline */}
+          <div style={{background:"white",borderRadius:14,padding:"20px",marginBottom:20,boxShadow:"0 2px 12px rgba(0,0,0,0.06)",border:`1px solid ${T.border}`,textAlign:"center"}}>
+            <div style={{fontSize:36,marginBottom:8}}>🎯</div>
+            <h2 style={{fontFamily:"Georgia,serif",fontSize:20,color:T.text,margin:"0 0 8px"}}>
+              {isAr?"خطتك مجهّزة":"Your plan is ready"}
+            </h2>
+            <p style={{...sty,fontSize:13,color:T.textMid,lineHeight:1.7,margin:0}}>
+              {isAr
+                ?`بناءً على إجاباتك — هذه أهم الخطوات${needsIELTS?" للوصول إلى درجتك في الآيلتس":" لتحسين مستواك"}`
+                :`Based on your answers — here are your most important steps${needsIELTS?" to reach your IELTS target":""}`}
+            </p>
+            {isUrgent&&<div style={{background:T.redBg,border:`1px solid ${T.redBorder}`,borderRadius:8,padding:"8px 12px",marginTop:12,...sty,fontSize:12,color:T.red,fontWeight:700}}>
+              ⚡ {isAr?"وقتك ضيق — ابدأ بالأولويات القصوى فقط":"Your time is tight — focus only on top priority steps"}
+            </div>}
+          </div>
+          {/* Priority steps */}
+          <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+            {prioritySteps.map((s,i)=>(
+              <button key={i} onClick={()=>{completeAndGoHome();}} style={{display:"flex",alignItems:"center",gap:12,background:"white",border:`1px solid ${T.border}`,borderRadius:12,padding:"14px 16px",cursor:"pointer",transition:"all 0.2s",direction:dir,...sty}}
+                onMouseOver={e=>{e.currentTarget.style.borderColor=T.primary;e.currentTarget.style.background=T.primaryLight;}}
+                onMouseOut={e=>{e.currentTarget.style.borderColor=T.border;e.currentTarget.style.background="white";}}>
+                <span style={{fontSize:22,flexShrink:0}}>{s.icon}</span>
+                <span style={{flex:1,fontSize:13,color:T.text,fontWeight:500,textAlign:isAr?"right":"left"}}>{s.title}</span>
+                <span style={{...sty,fontSize:10,fontWeight:700,color:urgencyColor(s.urgency),background:`${urgencyColor(s.urgency)}18`,borderRadius:20,padding:"2px 8px",whiteSpace:"nowrap",flexShrink:0}}>{urgencyLabel(s.urgency)}</span>
+              </button>
+            ))}
+          </div>
+          <button onClick={completeAndGoToPlan} style={{width:"100%",background:T.primary,color:"white",border:"none",borderRadius:10,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",...sty,boxShadow:`0 4px 16px ${T.primary}44`,marginBottom:10}}>
+            {isAr?"افتح الخطة الكاملة ←":"Open full study plan →"}
+          </button>
+          <button onClick={completeAndGoHome} style={{width:"100%",background:"transparent",border:`1px solid ${T.border}`,borderRadius:10,padding:"12px",fontSize:13,color:T.textMid,cursor:"pointer",...sty}}>
+            {isAr?"استكشف المنصة بنفسي":"Explore the platform on my own"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+// ── END ONBOARDING FUNNEL ──────────────────────────────────────────────────────
+
 export default function IELTSBot(){
   const [mainView,setMainView]=useState(()=>getViewFromPath());
   const [taskType,setTaskType]=useState(()=>getLastResult()?.taskType||"task2");
@@ -11392,7 +11625,9 @@ export default function IELTSBot(){
   const [paywallTab,setPaywallTab]=useState("cliq");
   const [showManageSub,setShowManageSub]=useState(false);
   const [showConsultation,setShowConsultation]=useState(false);
-  const [showOnboarding,setShowOnboarding]=useState(()=>{try{return!localStorage.getItem("ef_onboarded");}catch{return true;}});
+  const [showOnboarding,setShowOnboarding]=useState(false); // legacy — kept to avoid reference errors
+  const [funnelStep,setFunnelStep]=useState(()=>{try{return localStorage.getItem("ef_funnel_done")?"done":"step1";}catch{return "step1";}}); // step1|step2|step3|done
+  const [funnelAnswers,setFunnelAnswers]=useState({goal:null,targetBand:null,currentLevel:null,deadline:null});
   const [showAuth,setShowAuth]=useState(false);
   const [showChangePassword,setShowChangePassword]=useState(false);
   const [session,setSession]=useState(null);
@@ -11782,6 +12017,22 @@ export default function IELTSBot(){
       setActiveTab("annotated");
     }catch(e){ console.error("[analyze] parse error:",e); setLoading(false); setError("Something went wrong. Please try again."); }
   };
+
+  // ── ONBOARDING FUNNEL GATE ─────────────────────────────────────
+  if(funnelStep!=="done") {
+    return (
+      <ErrorBoundary>
+        <OnboardingFunnel
+          uiLang={uiLang}
+          switchView={switchView}
+          onComplete={(ans)=>{
+            setFunnelAnswers(ans);
+            setFunnelStep("done");
+          }}
+        />
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <div style={{minHeight:"100vh",background:"#f9f9f9",fontFamily:"'Cairo','Source Sans Pro',system-ui,sans-serif",color:T.text}}>
